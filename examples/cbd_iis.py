@@ -1,0 +1,108 @@
+# coding:utf-8
+
+"""
+Combinatorial Benders Decomposition (||)
+=========================================
+
+This example demonstrates how to use the Combinatorial Benders decomposition method
+with customized Benders cuts.
+"""
+
+# %%
+# Define the original problem:
+from benderslib import Gurobi, AnnotationBenders, CombinatorialBenders, NoGoodCut, MasterProblem, SubProblem
+from gurobipy import Model, GRB
+
+
+def make_original_problem():
+    # The problem is constructed such that the IIS involves only a few complicating variables.
+    model = Model()
+
+    n_vars = 9
+    x = model.addVars(n_vars, name="x", vtype=GRB.BINARY)
+    y = model.addVars(n_vars, name="y", vtype=GRB.BINARY)
+
+    # Constraint 1: All subproblem variables must be one
+    model.addConstrs((y[i] == 1 for i in range(n_vars)), name="sub")
+    # Constraint 2: But, part of the subproblem variables must be smaller than its first-stage counterpart
+    model.addConstrs((y[i] <= x[i] for i in range(int(n_vars))), name="link")
+
+    # Objective: minimize the number of non-zero first-stage variables, second-stage has no objective
+    model.setObjective(x.sum(), sense=GRB.MINIMIZE)
+
+    model.Params.OutputFlag = 0
+    model.Params.LogToConsole = 0
+    model.update()
+    complicating_vars = [v.VarName for v in x.values()]
+    return model, complicating_vars
+
+
+# %%
+# Define stronger customized Benders feasibility cut using IIS:
+
+def cut_generator(complicating_var_values: dict, master_problem: MasterProblem, sub_problem: SubProblem):
+    """
+    Generate a stronger feasibility cut using the Irreducible Infeasible Subsystem (IIS) of the subproblem.
+    Though `master_problem` is not used, it is required as a placeholder for the callback function.
+    """
+
+    # Compute the IIS of the subproblem
+    sp = sub_problem.model._solver_model
+    sp.computeIIS()
+    # Save IIS to file
+    # sp.write("subproblem.ilp")
+
+    # Get the names of the variables in the IIS
+    # v.IISLB and v.IISUB can be either 0 (False) or 1 (True), indicating whether the LB or UB is part of the IIS.
+    iis_vars = [v.VarName for v in sp.getVars() if v.IISLB or v.IISUB]
+    iis_var_values = {var: val for var, val in complicating_var_values.items() if var in iis_vars}
+
+    return NoGoodCut(iis_var_values)
+
+
+# %%
+# Solve the problem using Gurobi and Combinatorial Benders Decomposition:
+if __name__ == '__main__':
+    # With subproblem objective
+    model, complicating_vars = make_original_problem()
+
+    # Solve with Gurobi
+    model.optimize()
+    if model.Status == GRB.OPTIMAL:
+        print("Original Problem Solution:")
+        var_values = {v.VarName: v.X for v in model.getVars()}
+        print(var_values)
+        print(f"Obj: {model.ObjVal}\n")
+    else:
+        print("Original Problem Solution: Infeasible or Unbounded\n")
+
+    # Solve with Benders Decomposition + IIS-based cuts
+    AB = AnnotationBenders(
+        model,
+        solver=Gurobi,
+        complicating_vars=complicating_vars,
+        benders=CombinatorialBenders,
+    )
+    # Modify the cut generator to use IIS-based feasibility cuts
+    AB.benders_instance.feas_cut_generator = cut_generator
+    AB.solve()
+
+    # Solve with Benders Decomposition + Naive cuts
+    AB_copy = AnnotationBenders(
+        model,
+        solver=Gurobi,
+        complicating_vars=complicating_vars,
+        benders=CombinatorialBenders,
+    )
+    AB_copy.solve()
+
+    print()
+    print(f"Sol. Time (IIS vs Naive): {AB.result.time:.4f}, {AB_copy.result.time:.4f}")
+    print(f"Num. Cuts (IIS vs Naive): {AB.result.n_cuts}, {AB_copy.result.n_cuts}")
+
+# %%
+#
+# .. admonition:: References
+#
+#     * Tutorial of Combinatorial Benders Decomposition: :doc:`../tutorials/cbd`
+#     * This example uses the following classes: :ref:`api-annotation`, :ref:`api-cbd`

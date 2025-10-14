@@ -4,17 +4,18 @@ with open("README.md", 'r') as readme:
     long_description = readme.read()
 
 setup(
-    name="BendersLib",
+    name="benderslib",
     version="0.0.1",
-    description="A Bender\'s decomposition library.",
+    description="An Extensible Benders Decomposition Library in Python",
     long_description=long_description,
     long_description_content_type="text/markdown",
+    # TODO: change License to MIT (?)
     license="GPL-3.0",
-    url="https://guo.ph/benderslib",
-    
-    author="Penghui Guo",
+    url="https://benders.dev",
+
+    author="Peng-Hui Guo",
     author_email="m@guo.ph",
-    
-    packages=["benders"],
+
+    packages=["benderslib"],
     install_requires=[]
 )

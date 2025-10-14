@@ -1,3 +1,0 @@
-Logic-based Benders Decomposition
-=================================
-   

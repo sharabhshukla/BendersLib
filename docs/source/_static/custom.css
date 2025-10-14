@@ -1,0 +1,36 @@
+.sphx-glr-download-link-note /* Download link note in header */
+/*.binder-badge,                !* Binder launch badge in footer *!*/
+/*.lite-badge,                  !* Lite launch badge in footer *!*/
+/*.sphx-glr-download-jupyter,   !* Download Jupyter notebook link in footer *!*/
+/*.sphx-glr-download-python,    !* Download Python script link in footer *!*/
+/*.sphx-glr-download-zip        !* Download zipped link in footer *!*/
+{
+  display: none;
+}
+
+/*Sphinx-Gallery Download Button Customization*/
+div.sphx-glr-download a {
+    background-color: #E3F0F6;
+    background-image: none;
+    color: #11557c;
+    border: 0;
+    /*Uniformed Box Size*/
+    display: inline-block;
+    min-width: 500px;
+    text-align: center;
+    box-sizing: border-box;
+}
+div.sphx-glr-download a:hover {
+    background-color: #BCD4DF;
+}
+
+/*Hide thumbnails under examples*/
+/*.sphx-glr-thumbnails*/
+/*{*/
+/*    display: none;*/
+/*}*/
+
+/*Link color customization*/
+a:visited:hover {
+    color: var(--color-link) !important;
+}

@@ -1,3 +1,0 @@
-Two-stage Stochastic Programming
-================================
-   

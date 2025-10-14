@@ -1,3 +1,0 @@
-Bilevel Programming
-===================
-   
