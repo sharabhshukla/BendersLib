@@ -29,7 +29,7 @@ If we fix the :math:`x` variables to a specific value :math:`\bar{x}`, the remai
 or feasibility problem (when :math:`q=0` ).
 The main challenge is that MILPs do not have a strong, readily-available dual like LPs do.
 Therefore, the classical method of generating cuts from dual solutions is not applicable.
-CBD overcomes this by deriving "combinatorial" cuts based on infeasibility analysis.
+The Combinatorial Benders Decomposition overcomes this by deriving "combinatorial" cuts.
 
 
 Reformulation
@@ -62,7 +62,7 @@ This can be a LP, MILP, pure integer LP, or feasibility problem (when :math:`q=0
 However, the complicating variables :math:`x` are required to be binary.
 The outcome of solving this subproblem informs the generation of a new cut for the master problem.
 
-1.  **Infeasible:** No `y` satisfies the constraints. This leads to a **no-good cut** (feasibility cut).
+1.  **Infeasible:** No :math:`y` satisfies the constraints. This leads to a **no-good cut** (feasibility cut).
 2.  **Feasible:** An optimal :math:`\bar{y}` is found. This leads to a **combinatorial optimality cut**.
 
 .. note::
@@ -71,13 +71,16 @@ The outcome of solving this subproblem informs the generation of a new cut for t
 
     *   **MILP**: In this case both no-good cuts and combinatorial optimality cuts are generated, unless the MILP is ensured
         to be always feasible. The subproblem is solved using a MILP solver, or specialized combinatorial algorithms.
+    *   **Feasibility problem** (when :math:`q=0`): In this case only no-good cuts are generated, and the subproblem
+        is not necessarily be solved by a mathematical programming solver. Instead, constraint programming or specialized
+        feasibility algorithms can be used.
     *   **LP**: In this case, classical Benders Decomposition can be preferred due to its stronger cuts from duality,
         but Combinatorial Benders Decomposition can still be applied. Both no-good cuts and combinatorial optimality
         cuts are generated. The subproblem is solved using a LP solver.
-    *   **Feasibility problem** (when :math:`q=0`): In this case only no-good cuts are generated, and the subproblem
-        is not necessarily be solved by a mathematical programming solver. Instead, constraint programming or specialized
-        feasibility algorithms can be used. In this case, the term :doc:`lbbd` may be used interchangeably with
-        Combinatorial Benders Decomposition in the literature.
+
+    In the cases that subproblems are not solved by mathematical programming solvers, the
+    term :doc:`lbbd` may be used interchangeably with Combinatorial Benders Decomposition in the literature,
+    as the former emphasizes the subproblem can be any types of optimization problems.
 
 
 Benders Cuts
@@ -111,10 +114,10 @@ No-good Cut (Feasibility Cut)
 
 .. note::
 
-    *   For the cut to be strong, the set :math:`|I_1 \cup I_0|` should be as small as possible,
+    *   For the cut to be strong, the set :math:`I_1 \cup I_0` should be as small as possible,
         ideally containing only the variables relevant to the subproblem's infeasibility. This can be found by identifying an
         :abbr:`Irreducible Inconsistent Subsystem (a minimal subset of constraints and/or variable bounds that cause the infeasibility)` (IIS).
-    *   In contrast to IIS, the set :math:`|I_1 \cup I_0|`  can also be determined heuristically based on problem-specific insights.
+    *   In contrast to IIS, the set :math:`I_1 \cup I_0`  can also be determined heuristically based on problem-specific insights.
         It is not necessarily minimal, but it should still be as small as possible to enhance the cut's effectiveness.
 
 Combinatorial Optimality Cut
@@ -126,7 +129,7 @@ Combinatorial Optimality Cut
     the subproblem cost will be at least :math:`z^*`. This is done using a "big-M" formulation.
     If the :math:`x` solution remains unchanged, the cut :math:`\theta \geq z^*` is active. Otherwise, it is relaxed.
 
-*   **The Cut:** We add the following constraint to the master problem.
+*   **The Cut:** We add the following linear constraint to the master problem.
 
     .. math::
        \theta \geq z^* - M \left( \sum_{i \in I_1} (1 - x_i) + \sum_{i \in I_0} x_i \right)
@@ -140,7 +143,7 @@ Combinatorial Optimality Cut
 
 Algorithm
 --------------------------------------------
-The iterative procedure for Combinatorial Benders Decomposition is as follows:
+The iterative procedure for Combinatorial Benders Decomposition is as follows.
 
 #. **Initialization**
 
@@ -160,7 +163,7 @@ The iterative procedure for Combinatorial Benders Decomposition is as follows:
 
 #. **Step 3: Solve the subproblem**
 
-   *   Solve the subproblem with `x` fixed to :math:`\bar{x}_k`.
+   *   Solve the subproblem with :math:`x` fixed to :math:`\bar{x}_k`.
 
 #. **Step 4: Generate and add a cut**
 
@@ -181,7 +184,7 @@ The iterative procedure for Combinatorial Benders Decomposition is as follows:
    *   Increment :math:`k = k + 1` and go back to **Step 1**.
 
 The main customization required for implementing Combinatorial Benders Decomposition lies in the logic for
-generating the support sets (:math:`I_1`, :math:`I_0`) for both the feasibility and optimality cuts,
+generating (:math:`I_1`, :math:`I_0`) for both the feasibility and optimality cuts,
 as this is problem-dependent and crucial for the algorithm's efficiency.
 
 
