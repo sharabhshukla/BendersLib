@@ -61,6 +61,8 @@ explicit_order = [
 
     'cbd.py',
     'cbd_iis.py',
+
+    'lshape.py',
 ]
 
 sphinx_gallery_conf = {

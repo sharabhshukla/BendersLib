@@ -14,6 +14,8 @@ Deterministic
 Stochastic
 ----------------------
 
+- :doc:`lshape`: A simple two-stage stochastic programming example.
+
 
 Gallery
 ----------------------

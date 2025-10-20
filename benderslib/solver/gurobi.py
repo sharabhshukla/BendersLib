@@ -17,7 +17,7 @@ class Gurobi(SolverBase):
     Parameters
     ---------------
     model: gurobipy.Model
-        An instance of Gurobi's ``gurobipy.Model``.
+        An instance of Gurobi's ```gurobipy.Model```.
     """
 
     def __init__(self, model: Model) -> None:
@@ -167,7 +167,7 @@ class Gurobi(SolverBase):
 
         Returns
         ---------------
-        `gurobipy.Model`
+        ``gurobipy.Model``
             A Gurobi Model object representing the master problem.
 
         Example
@@ -234,7 +234,7 @@ class Gurobi(SolverBase):
 
         Returns
         ---------------
-        `gurobipy.Model`
+        ``gurobipy.Model``
             A Gurobi Model object representing the sub problem.
 
         Example

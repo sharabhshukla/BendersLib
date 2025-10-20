@@ -70,3 +70,17 @@ the definition of no-good (feasibility) cut (:class:`NoGoodCut`) and combinatori
     :inherited-members:
     :show-inheritance:
 
+L-shaped Method
+--------------------------------------
+
+Please refer to :doc:`../tutorials/lshape` for its theory and
+the definition of optimality cut (:class:`ClassicalOC`)
+and feasibility cut (:class:`ClassicalFC`).
+Note that L-shaped method is a special case of classical Benders
+decomposition applied to two-stage stochastic programming problems.
+Therefore, the Benders cuts used in L-shaped method are the same as those
+in classical Benders decomposition.
+
+.. autoclass:: LShaped
+   :inherited-members:
+   :show-inheritance:

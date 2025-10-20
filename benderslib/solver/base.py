@@ -14,7 +14,7 @@ class SolverBase(ABC):
     Parameters
     ---------------
     model :
-        An instance of the solver's model class (e.g., Gurobi's ``gurobipy.Model``).
+        An instance of the solver's model class (e.g., Gurobi's ```gurobipy.Model```).
     """
 
     def __init__(self, model) -> None:

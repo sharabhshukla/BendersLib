@@ -6,7 +6,7 @@ import logging
 import time
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import Union, Type
+from typing import Union, Type, Iterable
 
 from .consts import BendersConsts as CST
 from .params import BendersParams
@@ -100,11 +100,12 @@ class ProblemBase:
     """
 
     def __init__(self, solver_backend: SolverBase):
-        # TODO: IDE will only show methods of SolverBase, but not solver.Gurobi
         self.model: SolverBase = solver_backend
         """The solver backend instance (e.g., :class:`Gurobi`) that implements the :class:`SolverBase`"""
         self._solver_model = self.model._solver_model
-        """The underlying solver model instance (e.g., `gurobipy.Model`)."""
+        """The underlying solver model instance (e.g., ``gurobipy.Model``)."""
+        self.status = CST.UNSOLVED
+        """The status of the problem, see :class:`BendersConsts` for possible values."""
 
     def __repr__(self):
         n_vars = len(self.model._all_vars)
@@ -122,8 +123,172 @@ class ProblemBase:
         )
 
     def __getattr__(self, name):
-        # TODO: how to use self.func instead of self.model.func()?
         return getattr(self.model, name)
+
+    def fix_vars(self, var_values: dict):
+        """
+        Fix the values of specified variables in the model.
+
+        Parameters
+        ---------------
+        var_values : dict
+            A dictionary mapping variable names to their fixed values.
+
+        Example
+        ---------------
+
+        .. code-block:: python
+
+                problem.fix_vars({'x1': 10, 'x2': 5.5})
+        """
+        self.model.fix_vars(var_values)
+
+    def unfix_vars(self, vars: list[str]):
+        """
+        Unfix the specified variables in the model, restoring their original bounds.
+
+        Parameters
+        ---------------
+        vars : list
+            A list of variable names to be unfixed.
+
+        Example
+        ---------------
+
+        .. code-block:: python
+
+                problem.unfix_vars(['x1', 'x2'])
+        """
+        self.model.unfix_vars(vars)
+
+    def get_var_values(self, vars: list[str] = None) -> dict[str, float | int]:
+        """
+        Get the current values of specified variables in the model.
+
+        Parameters
+        ---------------
+        vars : list or None
+            A list of variable names to retrieve values for. If None, retrieves values for all variables
+
+        Returns
+        ---------------
+        dict[str, float]
+            A dictionary mapping variable names to their current values.
+
+        Example
+        ---------------
+
+        .. code-block:: python
+
+                values = problem.get_var_values(['x1', 'x2'])
+                # or get all variable values
+                all_values = problem.get_var_values()
+
+        """
+        return self.model.get_var_values(vars)
+
+    def get_var_coefs(self, vars: list[str] = None) -> dict[str, list]:
+        """
+        Get the coefficients of specified variables in all the constraints of the model.
+
+        Parameters
+        ---------------
+        vars : list or None
+            A list of variable names to retrieve coefficients for. If None, retrieves coefficients for all variables.
+
+        Returns
+        ---------------
+        dict[str, list]
+            A dictionary mapping variable names to a list of their coefficients in each constraint.
+
+        Example
+        ---------------
+        .. code-block:: python
+
+                coefs = problem.get_var_coefs(['x1', 'x2'])
+                # or get coefficients for all variables
+                all_coefs = problem.get_var_coefs()
+        """
+        return self.model.get_var_coefs(vars)
+
+    def get_rhs(self) -> list[float | int]:
+        """
+        Get the right-hand side values of all constraints in the model.
+
+        Returns
+        ---------------
+        list[float]
+            A list of right-hand side values for each constraint.
+
+        Example
+        ---------------
+        .. code-block:: python
+
+                rhs = problem.get_rhs()
+        """
+        return self.model.get_rhs()
+
+    def get_dual_values(self) -> list[float | int]:
+        """
+        Get the dual values (shadow prices) of all constraints in the model.
+        This is essential for generating Classical Benders optimality cuts,
+        which are used by :class:`ClassicalBenders`.
+
+        Returns
+        ---------------
+        list[float]
+            A list of dual values for each constraint.
+
+        Example
+        ---------------
+        .. code-block:: python
+
+                pi = problem.get_dual_values()
+        """
+        return self.model.get_dual_values()
+
+    def get_extreme_ray(self) -> list[float | int]:
+        """
+        Get the extreme ray of the model.
+        This is essential for generating Classical Benders feasibility cuts,
+        which are used by :class:`ClassicalBenders`.
+
+        Returns
+        ---------------
+        lst[float]
+            A list representing the extreme ray.
+
+        Example
+        ---------------
+        .. code-block:: python
+
+                ray = problem.get_extreme_ray()
+        """
+        return self.model.get_extreme_ray()
+
+    def get_obj(self) -> float:
+        """
+        Get the objective value of the model after solving.
+
+        Returns
+        ---------------
+        float
+            The objective value.
+
+        Example
+        ---------------
+        .. code-block:: python
+
+                obj_val = problem.get_obj()
+        """
+        return self.model.get_obj()
+
+    def solve(self):
+        """
+        Solve :attr:`model` by calling :func:`SolverBase.solve()` and update the :attr:`status` attribute.
+        """
+        self.model.solve()
+        self.status = self.model.status
 
 
 class MasterProblem(ProblemBase):
@@ -147,8 +312,8 @@ class MasterProblem(ProblemBase):
         self.feasibility_cuts: list[Cut] = []
         """List of feasibility cuts (:class:`FeasibilityCut`) added to the master problem."""
 
-        self.oc_id = itertools.count(1)
-        self.fc_id = itertools.count(1)
+        self.__oc_id = itertools.count(1)
+        self.__fc_id = itertools.count(1)
 
     def add_cut(self, cut):
         """
@@ -166,17 +331,34 @@ class MasterProblem(ProblemBase):
             The name of the added cut in the master problem.
         """
         if cut.ctype == CST.OPTIMALITY:
-            cut_id = f"OC{next(self.oc_id)}"
+            cut_id = f"OC{next(self.__oc_id)}"
             cut.cut_id = cut_id
             self.optimality_cuts.append(cut)
         else:
-            cut_id = f"FC{next(self.fc_id)}"
+            cut_id = f"FC{next(self.__fc_id)}"
             cut.cut_id = cut_id
             self.feasibility_cuts.append(cut)
 
         cut_name = f"{cut.name}_{cut.cut_id}"
         self.model.add_cut(cut, name=cut_name)
         return cut_name
+
+    def remove_cut(self, cut_name):
+        """
+        Remove a constraint from the solver's model by its name.
+
+        Parameters
+        ---------------
+        cut_name : str
+            The name of the constraint to be removed.
+
+        Example
+        ---------------
+        .. code-block:: python
+
+                problem.remove_cut('BendersOC_1')
+        """
+        self.model.remove_cut(cut_name)
 
 
 class SubProblem(ProblemBase):
@@ -194,6 +376,18 @@ class SubProblem(ProblemBase):
     def __init__(self, solver_backend: SolverBase, complicating_vars: list = None):
         self.complicating_vars = complicating_vars
         super().__init__(solver_backend)
+
+
+class SubProblems:
+    def __init__(self, sub_problems: Iterable['SubProblem'], prob: list[float] = None):
+        self.sub_problems = sub_problems
+        self.prob = prob
+
+        self.status = CST.UNSOLVED
+
+    def solve(self, batch_size: int = None):
+        for s in self.sub_problems:
+            pass
 
 
 class Cut:
@@ -462,13 +656,13 @@ class BendersBase(ABC):
         self.result.n_sol += 1
         self.result.status = CST.FEASIBLE
 
-        self.result.lb = self.master_problem.model.get_obj()
-        theta = self.master_problem.model.get_var_values(['theta'])['theta']
-        self.result.ub = self.result.lb - theta + self.sub_problem.model.get_obj()
+        self.result.lb = self.master_problem.get_obj()
+        theta = self.master_problem.get_var_values(['theta'])['theta']
+        self.result.ub = self.result.lb - theta + self.sub_problem.get_obj()
 
         if self.result.ub < self.result.obj:
             self.result.obj = self.result.ub
-            self.result.solution = self.sub_problem.model.get_var_values()
+            self.result.solution = self.sub_problem.get_var_values()
 
         self.result.gap_abs = abs(self.result.ub - self.result.lb)
         if abs(self.result.ub) > self.params.tol_abs:
@@ -543,19 +737,19 @@ class BendersBase(ABC):
         while self.result.n_iter <= self.params.iter_limit:
             self.result.n_iter += 1
             tm = time.perf_counter()
-            self.master_problem.model.solve()
+            self.master_problem.solve()
             self.result.runtime_master += time.perf_counter() - tm
 
-            if self.master_problem.model.status == CST.OPTIMAL:
+            if self.master_problem.status == CST.OPTIMAL:
                 # Master problem is optimal -> solve subproblem
-                var_values = self.master_problem.model.get_var_values(self.complicating_vars)
-                self.sub_problem.model.fix_vars(var_values)
+                var_values = self.master_problem.get_var_values(self.complicating_vars)
+                self.sub_problem.fix_vars(var_values)
                 ts = time.perf_counter()
-                self.sub_problem.model.solve()
+                self.sub_problem.solve()
                 self.result.runtime_sub += time.perf_counter() - ts
 
                 # Sub problem is infeasible -> add feasibility cut
-                if self.sub_problem.model.status == CST.INFEASIBLE:
+                if self.sub_problem.status == CST.INFEASIBLE:
                     self.result.lb_list.append(self.result.lb)
                     self.result.ub_list.append(self.result.ub)
                     if self.__timeout(time_start):
@@ -563,7 +757,7 @@ class BendersBase(ABC):
                     self.add_feasibility_cut(var_values)
 
                 # Sub problem is optimal -> add optimality cut
-                elif self.sub_problem.model.status == CST.OPTIMAL:
+                elif self.sub_problem.status == CST.OPTIMAL:
                     self.__update_result(time_start)
                     _time_pre_log = self.__log_line(time_start, _time_pre_log, self.params.log_to_console)
                     # REACH OPTIMALITY
@@ -574,17 +768,17 @@ class BendersBase(ABC):
                 # Sub problem is neither infeasible nor optimal -> error
                 else:
                     self.result.status = CST.ERROR
-                    raise ValueError(f"Subproblem returned an unexpected status: {self.sub_problem.model.status}.")
+                    raise ValueError(f"Subproblem returned an unexpected status: {self.sub_problem.status}.")
 
             # Master problem is infeasible -> original problem is infeasible
-            elif self.master_problem.model.status == CST.INFEASIBLE:
+            elif self.master_problem.status == CST.INFEASIBLE:
                 self.result.status = CST.INFEASIBLE
                 break
 
             # Master problem is neither infeasible nor optimal -> error
             else:
                 self.result.status = CST.ERROR
-                raise ValueError(f"Master problem returned an unexpected status: {self.master_problem.model.status}.")
+                raise ValueError(f"Master problem returned an unexpected status: {self.master_problem.status}.")
 
         # Finalize
         self.result.time = time.perf_counter() - time_start

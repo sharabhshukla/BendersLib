@@ -1,8 +1,7 @@
 # coding:utf-8
 
 from .core import BendersParams, MasterProblem, SubProblem, BendersBase
-from .cut import ClassicalOC, ClassicalFC
-from .cut import NoGoodCut, CombinatorialCut
+from .cut import ClassicalOC, ClassicalFC, NoGoodCut, CombinatorialCut, LShapedCut
 
 
 class ClassicalBenders(BendersBase):
@@ -44,16 +43,16 @@ class ClassicalBenders(BendersBase):
         self.sub_problem.complicating_vars = complicating_vars
 
         # Attributes
-        self._var_coefs = self.sub_problem.model.get_var_coefs(complicating_vars)
-        self._rhs = self.sub_problem.model.get_rhs()
+        self._var_coefs = self.sub_problem.get_var_coefs(complicating_vars)
+        self._rhs = self.sub_problem.get_rhs()
 
     def add_optimality_cut(self, complicating_var_values: dict):
-        dual_values = self.sub_problem.model.get_dual_values()
+        dual_values = self.sub_problem.get_dual_values()
         cut = self.optimality_cut(complicating_var_values, self._var_coefs, dual_values, self._rhs)
         self.master_problem.add_cut(cut)
 
     def add_feasibility_cut(self, complicating_var_values: dict):
-        extreme_ray = self.sub_problem.model.get_extreme_ray()
+        extreme_ray = self.sub_problem.get_extreme_ray()
         cut = self.feasibility_cut(complicating_var_values, self._var_coefs, extreme_ray, self._rhs)
         self.master_problem.add_cut(cut)
 
@@ -118,20 +117,50 @@ class CombinatorialBenders(BendersBase):
         if self.opt_cut_generator is not None:
             cut = self.opt_cut_generator(complicating_var_values, self.master_problem, self.sub_problem)
         else:
-            sub_obj = self.sub_problem.model.get_obj()
+            sub_obj = self.sub_problem.get_obj()
             cut = self.optimality_cut(complicating_var_values, sub_obj)
         self.master_problem.add_cut(cut)
 
 
 class LShaped(BendersBase):
+
+    def __init__(
+            self,
+            master_problem: MasterProblem,
+            sub_problems: SubProblem,
+            complicating_vars: list,
+            multi_cut: bool = False,
+            params: BendersParams = BendersParams()
+    ):
+        self.optimality_cut = ClassicalOC if not multi_cut else LShapedCut
+        self.feasibility_cut = ClassicalFC
+
+        super().__init__(
+            master_problem, sub_problems, complicating_vars, None, None, params)
+
+        self.master_problem.complicating_vars = complicating_vars
+        self.sub_problem.complicating_vars = complicating_vars
+
+    #     # Attributes
+    #     self._var_coefs = self.sub_problem.get_var_coefs(complicating_vars)
+    #     self._rhs = self.sub_problem.get_rhs()
+    #
+    # def add_optimality_cut(self, complicating_var_values: dict):
+    #     dual_values = self.sub_problem.get_dual_values()
+    #     cut = self.optimality_cut(complicating_var_values, self._var_coefs, dual_values, self._rhs)
+    #     self.master_problem.add_cut(cut)
+    #
+    # def add_feasibility_cut(self, complicating_var_values: dict):
+    #     extreme_ray = self.sub_problem.get_extreme_ray()
+    #     cut = self.feasibility_cut(complicating_var_values, self._var_coefs, extreme_ray, self._rhs)
+    #     self.master_problem.add_cut(cut)
+
+
+class IntegerLShaped(BendersBase):
     pass
 
 
 class AnnotatedLShaped(BendersBase):
-    pass
-
-
-class IntegerLShaped(BendersBase):
     pass
 
 

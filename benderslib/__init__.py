@@ -39,7 +39,8 @@ from .cut import (
 
 from .benders import (
     ClassicalBenders,
-    CombinatorialBenders
+    CombinatorialBenders,
+    LShaped
 )
 
 from .annotation import (
@@ -71,6 +72,7 @@ __all__ = [
 
     "ClassicalBenders",
     "CombinatorialBenders",
+    "LShaped",
 
     "AnnotationBenders",
 ]
