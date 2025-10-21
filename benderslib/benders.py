@@ -136,13 +136,15 @@ class LShaped(BendersBase):
     ):
         self.optimality_cut = LShapedMOC if multi_cut else ClassicalOC
         self.feasibility_cut = ClassicalFC
+
+        master_problem.complicating_vars = complicating_vars
+        for sub in sub_problems:
+            sub.complicating_vars = complicating_vars
         sub_problems.parallel_sub = parallel_sub
         sub_problems.batch_size = batch_size
+
         super().__init__(
             master_problem, sub_problems, complicating_vars, self.optimality_cut, self.feasibility_cut, params)
-
-        self.master_problem.complicating_vars = complicating_vars
-        self.sub_problem.complicating_vars = complicating_vars
 
         # Attributes
         self._var_coefs = self.sub_problem.get_var_coefs(self.master_problem.complicating_vars)

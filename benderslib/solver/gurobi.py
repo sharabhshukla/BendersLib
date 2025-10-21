@@ -21,6 +21,7 @@ class Gurobi(SolverBase):
     """
 
     def __init__(self, model: Model) -> None:
+        model.update()
         super().__init__(model)
 
         # Attributes in Gurobi Model

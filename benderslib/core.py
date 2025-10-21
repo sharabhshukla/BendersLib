@@ -395,9 +395,13 @@ class SubProblems:
 
     def __repr__(self):
         return (
-            f"Sub Problems \n"
-            f" - {'Scenario No.:'.ljust(CST.LOG_NAME_WIDTH)}{len(self.prob)}"
+                f"Sub Problems \n"
+                f" - {'Scenario No.:'.ljust(CST.LOG_NAME_WIDTH)}{len(self.prob)}" +
+                self.sub_problems[0].__repr__().replace("Sub Problem", "")
         )
+
+    def __iter__(self):
+        return iter(self.sub_problems)
 
     def get_obj(self) -> float:
         # Get the expected objective value across all subproblems
