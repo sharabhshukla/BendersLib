@@ -205,5 +205,4 @@ class LogicBasedCut(FeasibilityCut):
 
 
 if __name__ == '__main__':
-    # TODO: LogicBasedCut cut is "if ... then ..." constraint
     pass

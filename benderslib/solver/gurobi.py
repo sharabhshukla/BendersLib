@@ -138,7 +138,6 @@ class Gurobi(SolverBase):
         self.model.Params.LogToConsole = 0
 
         # Get Model.FarkasDual requires InfUnbdInfo = 1
-        # TODO: is not necessary for master problem
         self.model.Params.InfUnbdInfo = 1
 
         self.model.optimize()
@@ -283,6 +282,4 @@ class Gurobi(SolverBase):
 
 
 if __name__ == '__main__':
-    # TODO: use model.getAttr to obtain attributes by batch (e.g., get_var_values)
-    # TODO: more efficient make_master_problem and make_sub_problem
     pass

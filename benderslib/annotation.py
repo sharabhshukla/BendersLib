@@ -113,5 +113,4 @@ class AnnotationBenders:
 
 
 if __name__ == '__main__':
-    # TODO: support methods other than ClassicalBenders
     pass

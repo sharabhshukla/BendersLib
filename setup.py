@@ -9,7 +9,6 @@ setup(
     description="An Extensible Benders Decomposition Library in Python",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    # TODO: change License to MIT (?)
     license="GPL-3.0",
     url="https://benders.dev",
 

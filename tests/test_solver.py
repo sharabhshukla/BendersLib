@@ -167,7 +167,4 @@ class TestGurobiSolver(SolverTestBase):
 
 
 if __name__ == "__main__":
-    # TODO: see https://github.com/ERGO-Code/HiGHS/blob/master/tests/test_highspy.py
-    # FIXME: implementation should be independent of the solver
-
     pytest.main([__file__])

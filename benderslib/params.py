@@ -31,7 +31,6 @@ class BendersParams:
         BD = ClassicalBenders(mp, sp, complicating_vars, params=params)
     """
 
-    # TODO: theta lower bound should be -inf theoretically
     # Theta (estimator in master problem for subproblem's objective)
     theta_lb: float = 0
     """Lower bound for the theta variable in the master problem."""

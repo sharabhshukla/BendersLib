@@ -489,7 +489,6 @@ class MultiCut:
     def __init__(self, cuts: list[Cut], name):
         self.cuts = cuts
         self.name = name
-        # TODO: multi-cut & single-cut strategies
 
         # Attributes
         self.multi_cut_id = None
@@ -562,7 +561,6 @@ class BendersBase(ABC):
         """An instance of :class:`BendersResult` that stores the results and statistics."""
 
     def __str__(self):
-        # TODO: should be solver independent
         all_model_com_vars = {self.master_problem._solver_model.getVarByName(v) for v in self.complicating_vars}
         integer_num = len([v for v in all_model_com_vars if v.VType == 'I'])
         binary_num = len([v for v in all_model_com_vars if v.VType == 'B'])
@@ -795,19 +793,4 @@ class BendersBase(ABC):
 
 
 if __name__ == '__main__':
-    # TODO: save Cut and BendersResult to file
-    # TODO: number compareing (0 vs 1e-10) in computing gap
-    # TODO: width (multiple subproblems); depth (multi-stage)
-    # TODO: function callback for accelerating (trust region, lifting)
-    # TODO: class callback, https://docs.gurobi.com/projects/optimizer/en/current/reference/python/callback.html
-
-    # FIXME: for Maximization problems -> modify objective output
-    # FIXME: assert manul master and sub problem should have the same objective SENSE
-
-    # FIXME: wrong objective value when sub objective is (- 2 * y) and theta_lb = 0
-    # TODO: simple example showing Benders decomposition theory
-    # TODO: documentation (classical Benders)
-    # TODO: how to define a cut, to make it extensible?
-    # TODO: overload __add__ for intuitive cut creation
-    # TODO: templates for customization
     pass

@@ -172,7 +172,9 @@ class LogicBasedBenders(BendersBase):
     pass
 
 
+class BendersDual(BendersBase):
+    pass
+
+
 if __name__ == '__main__':
-    # TODO: Benders Dual Decomposition
-    # TODO: Benchmarking, BD is faster on what kind of problems?
     pass
