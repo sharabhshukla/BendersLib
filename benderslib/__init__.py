@@ -23,6 +23,7 @@ from .core import (
     ProblemBase,
     MasterProblem,
     SubProblem,
+    SubProblems,
     Cut,
     OptimalityCut,
     FeasibilityCut,
@@ -34,7 +35,10 @@ from .cut import (
     ClassicalFC,
     ClassicalOC,
     NoGoodCut,
-    CombinatorialCut
+    CombinatorialCut,
+    LShapedOC,
+    LShapedMOC,
+    LShapedFC
 )
 
 from .benders import (
@@ -59,6 +63,7 @@ __all__ = [
     "ProblemBase",
     "MasterProblem",
     "SubProblem",
+    "SubProblems",
     "Cut",
     "OptimalityCut",
     "FeasibilityCut",
@@ -69,6 +74,9 @@ __all__ = [
     "ClassicalOC",
     "NoGoodCut",
     "CombinatorialCut",
+    "LShapedOC",
+    "LShapedMOC",
+    "LShapedFC",
 
     "ClassicalBenders",
     "CombinatorialBenders",

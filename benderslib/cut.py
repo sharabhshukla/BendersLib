@@ -189,9 +189,19 @@ class CombinatorialCut(OptimalityCut):
         super().__init__(vars=vars, coefs=coefs, rhs=rhs, sense='>=', name="CombinatorialCut")
 
 
-class LShapedCut(OptimalityCut):
+class LShapedOC(OptimalityCut):
     def __init__(self):
-        super().__init__(vars=[], coefs=[], rhs=0, sense='>=', name="LShapedCut")
+        super().__init__(vars=[], coefs=[], rhs=0, sense='>=', name="LShapedOC")
+
+
+class LShapedMOC(OptimalityCut):
+    def __init__(self):
+        super().__init__(vars=[], coefs=[], rhs=0, sense='>=', name="LShapedMOC")
+
+
+class LShapedFC(FeasibilityCut):
+    def __init__(self):
+        super().__init__(vars=[], coefs=[], rhs=0, sense='>=', name="LShapedFC")
 
 
 class IntegerLShapedCut(OptimalityCut):

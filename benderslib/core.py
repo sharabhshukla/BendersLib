@@ -379,15 +379,94 @@ class SubProblem(ProblemBase):
 
 
 class SubProblems:
-    def __init__(self, sub_problems: Iterable['SubProblem'], prob: list[float] = None):
-        self.sub_problems = sub_problems
-        self.prob = prob
+    def __init__(
+            self,
+            sub_problems: Iterable['SubProblem'],
+            prob: list[float] = None,
+            parallel_sub: bool = False,
+            batch_size: int = 1,
+    ):
+        self.sub_problems = list(sub_problems)
+        self.prob = prob if prob is not None else [1.0 / len(self.sub_problems)] * len(self.sub_problems)
+        self.parallel_sub = parallel_sub
+        self.batch_size = batch_size
 
         self.status = CST.UNSOLVED
 
-    def solve(self, batch_size: int = None):
-        for s in self.sub_problems:
-            pass
+    def __repr__(self):
+        return (
+            f"Sub Problems \n"
+            f" - {'Scenario No.:'.ljust(CST.LOG_NAME_WIDTH)}{len(self.prob)}"
+        )
+
+    def get_obj(self) -> float:
+        # Get the expected objective value across all subproblems
+        objs = [sub.get_obj() for sub in self.sub_problems]
+        return sum(ob * p for ob, p in zip(objs, self.prob))
+
+    def get_var_values(self, vars: list[str] = None) -> dict[str, float | int]:
+        s_var_values = {}
+        for s, sub in enumerate(self.sub_problems):
+            var_values = sub.get_var_values(vars)
+            for var_name, value in var_values.items():
+                s_var_values[f"{var_name}_{s}"] = value
+        return s_var_values
+
+    def get_var_coefs(self, vars: list[str] = None) -> dict[str, list]:
+        # Get averaged coefficients across all subproblems
+        avg_var_coefs = {}
+        for s, sub in enumerate(self.sub_problems):
+            var_coefs = sub.get_var_coefs(vars)
+            for var_name, coefs in var_coefs.items():
+                if var_name not in avg_var_coefs:
+                    avg_var_coefs[var_name] = [0.0] * len(coefs)
+                for i in range(len(coefs)):
+                    avg_var_coefs[var_name][i] += coefs[i] * self.prob[s]
+        return avg_var_coefs
+
+    def get_rhs(self):
+        # Get averaged RHS across all subproblems
+        avg_rhs = None
+        for s, sub in enumerate(self.sub_problems):
+            rhs = sub.get_rhs()
+            if avg_rhs is None:
+                avg_rhs = [0.0] * len(rhs)
+            for i in range(len(rhs)):
+                avg_rhs[i] += rhs[i] * self.prob[s]
+        return avg_rhs
+
+    def get_dual_values(self) -> list[float | int]:
+        # Get averaged dual values across all subproblems
+        avg_dual_values = None
+        for s, sub in enumerate(self.sub_problems):
+            dual_values = sub.get_dual_values()
+            if avg_dual_values is None:
+                avg_dual_values = [0.0] * len(dual_values)
+            for i in range(len(dual_values)):
+                avg_dual_values[i] += dual_values[i] * self.prob[s]
+        return avg_dual_values
+
+    def get_extreme_ray(self):
+        for sub in self.sub_problems:
+            if sub.status == CST.INFEASIBLE:
+                ray = sub.get_extreme_ray()
+                return ray
+
+    def fix_vars(self, var_values: dict):
+        for sub in self.sub_problems:
+            sub.fix_vars(var_values)
+
+    def solve(self):
+        if self.parallel_sub:
+            raise NotImplementedError("Parallel subproblem solving is not implemented yet.")
+        else:
+            status = CST.OPTIMAL
+            for sub in self.sub_problems:
+                sub.solve()
+                if sub.status == CST.INFEASIBLE:
+                    status = CST.INFEASIBLE
+                    break
+            self.status = status
 
 
 class Cut:
@@ -507,8 +586,9 @@ class BendersBase(ABC):
     ----------
     master_problem : MasterProblem
         An instance of :class:`MasterProblem` representing the master problem.
-    sub_problem : SubProblem
-        An instance of :class:`SubProblem` representing the subproblem.
+    sub_problem : SubProblem | SubProblems
+        An instance of :class:`SubProblem` representing the subproblem,
+        or :class:`SubProblems` for multiple subproblems.
     complicating_vars : list[str]
         A list of names of the complicating variables in the master problem.
     optimality_cut : Type[OptimalityCut], optional
@@ -541,7 +621,7 @@ class BendersBase(ABC):
     def __init__(
             self,
             master_problem: MasterProblem,
-            sub_problem: SubProblem,
+            sub_problem: SubProblem | SubProblems,
             complicating_vars: list[str],
             optimality_cut: Type[OptimalityCut] = None,
             feasibility_cut: Type[FeasibilityCut] = None,
@@ -662,7 +742,7 @@ class BendersBase(ABC):
             self.result.obj = self.result.ub
             self.result.solution = self.sub_problem.get_var_values()
 
-        self.result.gap_abs = abs(self.result.ub - self.result.lb)
+        self.result.gap_abs = abs(self.result.obj - self.result.lb)
         if abs(self.result.ub) > self.params.tol_abs:
             # Non-zero ub
             self.result.gap = self.result.gap_abs / abs(self.result.ub)
