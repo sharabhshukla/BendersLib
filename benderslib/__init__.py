@@ -36,9 +36,7 @@ from .cut import (
     ClassicalOC,
     NoGoodCut,
     CombinatorialCut,
-    LShapedOC,
     LShapedMOC,
-    LShapedFC
 )
 
 from .benders import (
@@ -74,9 +72,7 @@ __all__ = [
     "ClassicalOC",
     "NoGoodCut",
     "CombinatorialCut",
-    "LShapedOC",
     "LShapedMOC",
-    "LShapedFC",
 
     "ClassicalBenders",
     "CombinatorialBenders",

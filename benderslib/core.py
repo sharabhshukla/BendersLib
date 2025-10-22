@@ -1,8 +1,6 @@
 # coding:utf-8
 
 import itertools
-import sys
-import logging
 import time
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
@@ -11,19 +9,7 @@ from typing import Union, Type, Iterable
 from .consts import BendersConsts as CST
 from .params import BendersParams
 from .solver import SolverBase
-from . import __version__, __author__, __url__, __copyright__, __license__
-
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
-
-console_handler = logging.StreamHandler(sys.stdout)
-console_handler.setFormatter(logging.Formatter('%(message)s'))
-logger.addHandler(console_handler)
-
-
-# file_handler = logging.FileHandler('log.txt', encoding='utf-8')
-# file_handler.setFormatter(logging.Formatter('%(message)s'))
-# logger.addHandler(file_handler)
+from .logger import BendersLogger
 
 
 @dataclass
@@ -395,9 +381,9 @@ class SubProblems:
 
     def __repr__(self):
         return (
-                f"Sub Problems \n"
+                f"Sub Problems: \n"
                 f" - {'Scenario No.:'.ljust(CST.LOG_NAME_WIDTH)}{len(self.prob)}" +
-                self.sub_problems[0].__repr__().replace("Sub Problem", "")
+                self.sub_problems[0].__repr__().replace("Sub Problem: ", "")
         )
 
     def __iter__(self):
@@ -643,6 +629,8 @@ class BendersBase(ABC):
         # Attributes
         self.result = BendersResult()
         """An instance of :class:`BendersResult` that stores the results and statistics."""
+        self.__logger = BendersLogger(self)
+        """An instance of :class:`BendersLogger` for handling logging."""
 
     def __str__(self):
         all_model_com_vars = {self.master_problem._solver_model.getVarByName(v) for v in self.complicating_vars}
@@ -685,54 +673,6 @@ class BendersBase(ABC):
             A dictionary mapping the names of complicating variables to their current values.
         """
         ...
-
-    def __log_title(self, log_to_console=True):
-        if log_to_console:
-            l = CST.LOG_ITER_WIDTH * 7
-            logging.info("=" * l)
-            logging.info(f"BendersLib (v{__version__}, {__license__}, {__url__}) by {__author__} ({__copyright__})")
-            logging.info("-" * l)
-
-            logging.info(self)
-            logging.info(self.master_problem)
-            logging.info(self.sub_problem)
-            logging.info(self.params)
-
-            logging.info("-" * l)
-            logging.info(
-                f"{'Iter.':>{CST.LOG_ITER_WIDTH}}, "
-                f"{'LB':>{CST.LOG_ITER_WIDTH}}, "
-                f"{'UB':>{CST.LOG_ITER_WIDTH}}, "
-                f"{'Obj.':>{CST.LOG_ITER_WIDTH}}, "
-                f"{'Gap(%)':>{CST.LOG_ITER_WIDTH}}, "
-                f"{'Runtime(s)':>{CST.LOG_ITER_WIDTH}}")
-            logging.info("-" * l)
-
-    def __log_line(self, time_start, time_pre_log, log_to_console=True):
-        current_time = time.perf_counter()
-        if current_time - time_pre_log >= self.params.log_freq_sec or time_pre_log == time_start:
-            _time_pre_log = current_time
-            if log_to_console:
-                logging.info(
-                    f"{self.result.n_iter:{CST.LOG_ITER_WIDTH}}, "
-                    f"{self.result.lb:>{CST.LOG_ITER_WIDTH}.2f}, "
-                    f"{self.result.ub:>{CST.LOG_ITER_WIDTH}.2f}, "
-                    f"{self.result.obj:>{CST.LOG_ITER_WIDTH}.2f}, "
-                    f"{self.result.gap * 100:>{CST.LOG_ITER_WIDTH}.2f}, "
-                    f"{self.result.runtime:>{CST.LOG_ITER_WIDTH}.2f}"
-                )
-            return _time_pre_log
-        return time_pre_log
-
-    def __log_end(self, log_to_console=True):
-        l = CST.LOG_ITER_WIDTH * 7
-        if log_to_console:
-            logging.info("-" * l)
-            logging.info(self.result)
-            logging.info("=" * l)
-
-            if self.params.log_file:
-                logging.info(f"Log file (level: {self.params.log_level}) saved to: '{self.params.log_file}'")
 
     def __update_result(self, time_start):
         self.result.n_sol += 1
@@ -814,7 +754,7 @@ class BendersBase(ABC):
         self.result.n_iter = 0
         time_start = time.perf_counter()
         _time_pre_log = time_start
-        self.__log_title(self.params.log_to_console)
+        self.__logger.log_title()
 
         while self.result.n_iter <= self.params.iter_limit:
             self.result.n_iter += 1
@@ -841,7 +781,7 @@ class BendersBase(ABC):
                 # Sub problem is optimal -> add optimality cut
                 elif self.sub_problem.status == CST.OPTIMAL:
                     self.__update_result(time_start)
-                    _time_pre_log = self.__log_line(time_start, _time_pre_log, self.params.log_to_console)
+                    _time_pre_log = self.__logger.log_line(time_start, _time_pre_log)
                     # REACH OPTIMALITY
                     if self.__optimized() or self.__timeout(time_start):
                         break
@@ -867,7 +807,7 @@ class BendersBase(ABC):
         self.result.n_opt_cuts = len(self.master_problem.optimality_cuts)
         self.result.n_feas_cuts = len(self.master_problem.feasibility_cuts)
         self.result.n_cuts = self.result.n_opt_cuts + self.result.n_feas_cuts
-        self.__log_end(self.params.log_to_console)
+        self.__logger.log_end()
 
     # def save_result(self):
     #     pass
