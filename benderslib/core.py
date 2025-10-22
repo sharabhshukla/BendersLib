@@ -697,19 +697,25 @@ class BendersBase(ABC):
         self.result.ub_list.append(self.result.ub)
         self.result.runtime = time.perf_counter() - time_start
 
-    def __timeout(self, time_start):
+    def __terminate(self, time_start):
+        # Iteration limit
+        if self.result.n_iter >= self.params.iter_limit:
+            self.result.status = CST.TIMEOUT
+            return True
+
+        # Time limit
         if time.perf_counter() - time_start >= self.params.time_limit:
             self.result.status = CST.TIMEOUT
             return True
-        return False
 
-    def __optimized(self):
+        # Optimality
         if any([
             self.result.gap <= self.params.tol_rel,
             self.result.gap_abs <= self.params.tol_abs,
         ]):
             self.result.status = CST.OPTIMAL
             return True
+
         return False
 
     def solve(self, callback=None) -> None:
@@ -774,7 +780,7 @@ class BendersBase(ABC):
                 if self.sub_problem.status == CST.INFEASIBLE:
                     self.result.lb_list.append(self.result.lb)
                     self.result.ub_list.append(self.result.ub)
-                    if self.__timeout(time_start):
+                    if self.__terminate(time_start):
                         break
                     self.add_feasibility_cut(var_values)
 
@@ -783,7 +789,7 @@ class BendersBase(ABC):
                     self.__update_result(time_start)
                     _time_pre_log = self.__logger.log_line(time_start, _time_pre_log)
                     # REACH OPTIMALITY
-                    if self.__optimized() or self.__timeout(time_start):
+                    if self.__terminate(time_start):
                         break
                     self.add_optimality_cut(var_values)
 
