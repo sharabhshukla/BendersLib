@@ -369,94 +369,75 @@ class SubProblems:
             self,
             sub_problems: Iterable['SubProblem'],
             prob: list[float] = None,
+            multi_opti_cut: bool = False,
+            multi_feas_cut: bool = False,
             parallel_sub: bool = False,
             batch_size: int = 1,
     ):
         self.sub_problems = list(sub_problems)
-        self.prob = prob if prob is not None else [1.0 / len(self.sub_problems)] * len(self.sub_problems)
+        self.prob = prob
+        self.multi_opti_cut = multi_opti_cut
+        self.multi_feas_cut = multi_feas_cut
         self.parallel_sub = parallel_sub
         self.batch_size = batch_size
 
         self.status = CST.UNSOLVED
+        """The status of the problem, see :class:`BendersConsts` for possible values."""
 
     def __repr__(self):
         return (
                 f"Sub Problems: \n"
-                f" - {'Scenario No.:'.ljust(CST.LOG_NAME_WIDTH)}{len(self.prob)}" +
-                self.sub_problems[0].__repr__().replace("Sub Problem: ", "")
+                f" - {'Scenario No.:'.ljust(CST.LOG_NAME_WIDTH)}{len(self.prob)}"
+                + self.sub_problems[0].__repr__().replace("Sub Problem: ", "")
         )
 
     def __iter__(self):
         return iter(self.sub_problems)
 
     def get_obj(self) -> float:
-        # Get the expected objective value across all subproblems
         objs = [sub.get_obj() for sub in self.sub_problems]
         return sum(ob * p for ob, p in zip(objs, self.prob))
-
-    def get_var_values(self, vars: list[str] = None) -> dict[str, float | int]:
-        s_var_values = {}
-        for s, sub in enumerate(self.sub_problems):
-            var_values = sub.get_var_values(vars)
-            for var_name, value in var_values.items():
-                s_var_values[f"{var_name}_{s}"] = value
-        return s_var_values
-
-    def get_var_coefs(self, vars: list[str] = None) -> dict[str, list]:
-        # Get averaged coefficients across all subproblems
-        avg_var_coefs = {}
-        for s, sub in enumerate(self.sub_problems):
-            var_coefs = sub.get_var_coefs(vars)
-            for var_name, coefs in var_coefs.items():
-                if var_name not in avg_var_coefs:
-                    avg_var_coefs[var_name] = [0.0] * len(coefs)
-                for i in range(len(coefs)):
-                    avg_var_coefs[var_name][i] += coefs[i] * self.prob[s]
-        return avg_var_coefs
-
-    def get_rhs(self):
-        # Get averaged RHS across all subproblems
-        avg_rhs = None
-        for s, sub in enumerate(self.sub_problems):
-            rhs = sub.get_rhs()
-            if avg_rhs is None:
-                avg_rhs = [0.0] * len(rhs)
-            for i in range(len(rhs)):
-                avg_rhs[i] += rhs[i] * self.prob[s]
-        return avg_rhs
-
-    def get_dual_values(self) -> list[float | int]:
-        # Get averaged dual values across all subproblems
-        avg_dual_values = None
-        for s, sub in enumerate(self.sub_problems):
-            dual_values = sub.get_dual_values()
-            if avg_dual_values is None:
-                avg_dual_values = [0.0] * len(dual_values)
-            for i in range(len(dual_values)):
-                avg_dual_values[i] += dual_values[i] * self.prob[s]
-        return avg_dual_values
-
-    def get_extreme_ray(self):
-        for sub in self.sub_problems:
-            if sub.status == CST.INFEASIBLE:
-                ray = sub.get_extreme_ray()
-                return ray
 
     def fix_vars(self, var_values: dict):
         for sub in self.sub_problems:
             sub.fix_vars(var_values)
 
+    def get_var_values(self, vars: list[str] = None):
+        var_values = {}
+        for i, sub in enumerate(self.sub_problems):
+            var_values[i] = sub.get_var_values(vars)
+        return var_values
+
+    # def get_var_coefs(self, vars: list[str] = None):
+    #     for sub in self.sub_problems:
+    #         yield sub.get_var_coefs(vars)
+    #
+    # def get_rhs(self):
+    #     for sub in self.sub_problems:
+    #         yield sub.get_rhs()
+    #
+    # def get_dual_values(self):
+    #     for sub in self.sub_problems:
+    #         assert sub.status == CST.OPTIMAL, "Subproblem must be optimal to get dual values."
+    #         yield sub.get_dual_values()
+    #
+    # def get_extreme_ray(self):
+    #     for sub in self.sub_problems:
+    #         assert sub.status == CST.INFEASIBLE, "Subproblem must be infeasible to get extreme ray."
+    #         yield sub.get_extreme_ray()
+
     def solve(self):
         if self.parallel_sub:
             raise NotImplementedError("Parallel subproblem solving is not implemented yet.")
         else:
-            status = CST.OPTIMAL
             for sub in self.sub_problems:
                 sub.solve()
                 if sub.status == CST.INFEASIBLE:
-                    status = CST.INFEASIBLE
-                    break
-            self.status = status
+                    self.status = CST.INFEASIBLE
+                    if not self.multi_feas_cut:
+                        break
+            if all(sub.status == CST.OPTIMAL for sub in self.sub_problems):
+                self.status = CST.OPTIMAL
 
 
 class Cut:
@@ -555,15 +536,12 @@ class FeasibilityCut(Cut):
 
 
 class MultiCut:
-    def __init__(self, cuts: list[Cut], name):
+
+    def __init__(self, cuts: Iterable['Cut']):
         self.cuts = cuts
-        self.name = name
 
-        # Attributes
-        self.multi_cut_id = None
-
-    def __repr__(self):
-        return f"{self.name}: " + "\n".join([str(cut) for cut in self.cuts])
+    def __iter__(self):
+        return iter(self.cuts)
 
 
 class BendersBase(ABC):
@@ -613,8 +591,8 @@ class BendersBase(ABC):
             master_problem: MasterProblem,
             sub_problem: SubProblem | SubProblems,
             complicating_vars: list[str],
-            optimality_cut: Type[OptimalityCut] = None,
-            feasibility_cut: Type[FeasibilityCut] = None,
+            optimality_cut: Type[OptimalityCut] | Type[MultiCut] = None,
+            feasibility_cut: Type[FeasibilityCut] | Type[MultiCut] = None,
             params: BendersParams = BendersParams()
     ):
         self.master_problem = master_problem
@@ -662,7 +640,7 @@ class BendersBase(ABC):
         ...
 
     @abstractmethod
-    def add_feasibility_cut(self, complicating_var_values: dict):
+    def add_feasibility_cut(self, complicating_var_values: dict[str, float | int]):
         """
         The method to add :class:`FeasibilityCut` to :class:`MasterProblem` based on the current values of
         the complicating variables.

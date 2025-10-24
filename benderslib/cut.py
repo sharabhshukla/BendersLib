@@ -1,6 +1,6 @@
 # coding:utf-8
 
-from .core import OptimalityCut, FeasibilityCut
+from .core import OptimalityCut, FeasibilityCut, MultiCut, CST
 
 
 class ClassicalOC(OptimalityCut):
@@ -189,14 +189,64 @@ class CombinatorialCut(OptimalityCut):
         super().__init__(vars=vars, coefs=coefs, rhs=rhs, sense='>=', name="CombinatorialCut")
 
 
-class LShapedMOC(OptimalityCut):
-    def __init__(self):
-        super().__init__(vars=[], coefs=[], rhs=0, sense='>=', name="LShapedMOC")
+class LShapedOC(MultiCut):
+
+    def __init__(self, master_problem, sub_problems):
+        avg_var_coefs = {}
+        avg_rhs = []
+        avg_dual_values = []
+
+        for i, sub in enumerate(sub_problems):
+            _var_coefs = sub.get_var_coefs(master_problem.complicating_vars)
+            _rhs = sub.get_rhs()
+            _dual = sub.get_dual_values()
+
+            if not avg_var_coefs:
+                avg_var_coefs = {var: [0.0] * len(coef_list) for var, coef_list in _var_coefs.items()}
+            if not avg_rhs:
+                avg_rhs = [0.0] * len(_rhs)
+            if not avg_dual_values:
+                avg_dual_values = [0.0] * len(_dual)
+
+            prob = sub_problems.prob[i]
+            for var, coefs in _var_coefs.items():
+                for j, coef in enumerate(coefs):
+                    avg_var_coefs[var][j] += prob * coef
+            for j, rhs_val in enumerate(_rhs):
+                avg_rhs[j] += prob * rhs_val
+            for j, dual_val in enumerate(_dual):
+                avg_dual_values[j] += prob * dual_val
+
+        complicating_var_values = master_problem.get_var_values(master_problem.complicating_vars)
+        cut = ClassicalOC(complicating_var_values, avg_var_coefs, avg_dual_values, avg_rhs)
+
+        super().__init__(cuts=[cut])
 
 
-class IntegerLShapedCut(OptimalityCut):
-    def __init__(self):
-        super().__init__(vars=[], coefs=[], rhs=0, sense='>=', name="IntegerLShapedCut")
+class LShapedFC(MultiCut):
+
+    def __init__(self, master_problem, sub_problems):
+        complicating_var_values = master_problem.get_var_values(master_problem.complicating_vars)
+        cuts = []
+        for sub in sub_problems:
+            if sub.status == CST.INFEASIBLE:
+                _var_coefs = sub.get_var_coefs(master_problem.complicating_vars)
+                _rhs = sub.get_rhs()
+                extreme_ray = sub.get_extreme_ray()
+                cut = ClassicalFC(complicating_var_values, _var_coefs, extreme_ray, _rhs)
+                cuts.append(cut)
+                if not sub_problems.multi_feas_cut:
+                    break
+
+        super().__init__(cuts=cuts)
+
+
+class IntLShapedOC(MultiCut):
+    pass
+
+
+class IntLShapedFC(MultiCut):
+    pass
 
 
 class LogicBasedCut(FeasibilityCut):

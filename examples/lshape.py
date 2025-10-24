@@ -16,9 +16,7 @@ import random
 from benderslib import MasterProblem, SubProblem, SubProblems, Gurobi, LShaped
 from gurobipy import Model, GRB
 
-
 # random.seed(1)
-
 
 def first_stage_model(n_plants, n_scenarios, multi_cut=False):
     model = Model("FirstStage")
@@ -37,7 +35,8 @@ def first_stage_model(n_plants, n_scenarios, multi_cut=False):
 
     model.update()
     complicating_vars = [capacity[i].VarName for i in range(n_plants)]
-    return model, complicating_vars
+    estimators = [theta[i].VarName for i in range(n_scenarios)] if multi_cut else [theta.VarName]
+    return model, complicating_vars, estimators
 
 
 # %%
@@ -98,7 +97,7 @@ def deterministic_equivalent_model(n_plants, scenarios):
 if __name__ == '__main__':
     # Data
     n_plants = 5
-    n_scenarios = 10
+    n_scenarios = 7
     scenarios = [
         {"demand": [random.randint(10, 20) for _ in range(n_plants)],
          "prob": 1.0 / n_scenarios}
@@ -113,8 +112,8 @@ if __name__ == '__main__':
         print("Deterministic Equivalent Problem is infeasible or unbounded.\n")
 
     # Master problem
-    multi_cut = False
-    master_model, complicating_vars = first_stage_model(n_plants, n_scenarios, multi_cut=multi_cut)
+    multi_opti_cut = False
+    master_model, complicating_vars, estimators = first_stage_model(n_plants, n_scenarios, multi_cut=multi_opti_cut)
     MasterProblem = MasterProblem(solver_backend=Gurobi(master_model))
 
     # Subproblems
@@ -127,7 +126,9 @@ if __name__ == '__main__':
         master_problem=MasterProblem,
         sub_problems=SubProblems,
         complicating_vars=complicating_vars,
-        multi_cut=multi_cut,
+        estimators=estimators,
+        multi_opti_cut=multi_opti_cut,
+        multi_feas_cut=True,
         parallel_sub=False,
         batch_size=n_scenarios
     )

@@ -1,7 +1,7 @@
 # coding:utf-8
 
 from .core import BendersParams, MasterProblem, SubProblem, SubProblems, BendersBase
-from .cut import ClassicalOC, ClassicalFC, NoGoodCut, CombinatorialCut, LShapedMOC
+from .cut import ClassicalOC, ClassicalFC, NoGoodCut, CombinatorialCut, LShapedOC, LShapedFC
 
 
 class ClassicalBenders(BendersBase):
@@ -129,36 +129,40 @@ class LShaped(BendersBase):
             master_problem: MasterProblem,
             sub_problems: SubProblems,
             complicating_vars: list,
-            multi_cut: bool = False,
+            estimators: list = None,
+            multi_opti_cut: bool = False,
+            multi_feas_cut: bool = False,
             parallel_sub: bool = False,
             batch_size: int = 1,
             params: BendersParams = BendersParams()
     ):
-        self.optimality_cut = LShapedMOC if multi_cut else ClassicalOC
+        self.optimality_cut = LShapedOC
         self.feasibility_cut = ClassicalFC
 
+        self.multi_opti_cut = multi_opti_cut
+        self.multi_feas_cut = multi_feas_cut
+
+        # Setup master and subproblems
         master_problem.complicating_vars = complicating_vars
         for sub in sub_problems:
             sub.complicating_vars = complicating_vars
+        sub_problems.multi_opti_cut = multi_opti_cut
+        sub_problems.multi_feas_cut = multi_feas_cut
         sub_problems.parallel_sub = parallel_sub
         sub_problems.batch_size = batch_size
 
         super().__init__(
             master_problem, sub_problems, complicating_vars, self.optimality_cut, self.feasibility_cut, params)
 
-        # Attributes
-        self._var_coefs = self.sub_problem.get_var_coefs(self.master_problem.complicating_vars)
-        self._rhs = self.sub_problem.get_rhs()
-
     def add_optimality_cut(self, complicating_var_values: dict):
-        dual_values = self.sub_problem.get_dual_values()
-        cut = self.optimality_cut(complicating_var_values, self._var_coefs, dual_values, self._rhs)
-        self.master_problem.add_cut(cut)
+        cuts = LShapedOC(self.master_problem, self.sub_problem)
+        for cut in cuts:
+            self.master_problem.add_cut(cut)
 
     def add_feasibility_cut(self, complicating_var_values: dict):
-        extreme_ray = self.sub_problem.get_extreme_ray()
-        cut = self.feasibility_cut(complicating_var_values, self._var_coefs, extreme_ray, self._rhs)
-        self.master_problem.add_cut(cut)
+        cuts = LShapedFC(self.master_problem, self.sub_problem)
+        for cut in cuts:
+            self.master_problem.add_cut(cut)
 
 
 class IntegerLShaped(BendersBase):
