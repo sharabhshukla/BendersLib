@@ -1,6 +1,6 @@
 # coding:utf-8
 
-from .core import OptimalityCut, FeasibilityCut, MultiCut, CST
+from .core import OptimalityCut, FeasibilityCut, MultiCut, CST, Cut
 
 
 class ClassicalOC(OptimalityCut):
@@ -8,13 +8,13 @@ class ClassicalOC(OptimalityCut):
     The classical optimality cut for Benders decomposition.
 
     The cut uses the optimal dual solution to form a valid lower bound on the subproblem's cost,
-    represented by the variable :math:`\eta` in the master problem.
+    represented by the variable :math:`\\eta` in the master problem.
 
     .. math::
 
         \\eta \\geq \\bar{\\pi}^T (b - A x)
 
-    where :math:`\eta` is the variable representing the subproblem's cost, :math:`\\bar{\\pi}` is the optimal solution
+    where :math:`\\eta` is the variable representing the subproblem's cost, :math:`\\bar{\\pi}` is the optimal solution
     to the dual subproblem (dual values of primal constraints), :math:`A` and :math:`b` are the matrices that define
     the subproblem constraints, and :math:`x` are the master problem variables.
     This cut can be interpreted as a first-order Taylor approximation or a supporting hyperplane for the value function of the subproblem.
@@ -113,7 +113,7 @@ class NoGoodCut(FeasibilityCut):
         \\sum_{i \\in I_1} x_i - \\sum_{i \\in I_0} x_i \\leq |I_1| - 1
 
     These two forms can both be found in the literature.
-    To make sure the cut is strong, :math:`|I_1 \cup I_0|` should be **as small as possible**,
+    To make sure the cut is strong, :math:`|I_1 \\cup I_0|` should be **as small as possible**,
     i.e., only including the binary variables that are relevant to the infeasibility of the subproblem,
     which is usually a small subset of all binary variables in the master problem.
 
@@ -192,35 +192,39 @@ class CombinatorialCut(OptimalityCut):
 class LShapedOC(MultiCut):
 
     def __init__(self, master_problem, sub_problems):
-        avg_var_coefs = {}
-        avg_rhs = []
-        avg_dual_values = []
+        cuts = []
+        # Averaged cut attributes
+        avg_coefs = [0 for _ in range(len(master_problem.complicating_vars) + 1)]
+        avg_rhs = 0
 
         for i, sub in enumerate(sub_problems):
+            # Model attributes
             _var_coefs = sub.get_var_coefs(master_problem.complicating_vars)
             _rhs = sub.get_rhs()
             _dual = sub.get_dual_values()
 
-            if not avg_var_coefs:
-                avg_var_coefs = {var: [0.0] * len(coef_list) for var, coef_list in _var_coefs.items()}
-            if not avg_rhs:
-                avg_rhs = [0.0] * len(_rhs)
-            if not avg_dual_values:
-                avg_dual_values = [0.0] * len(_dual)
+            # Cut attributes
+            coefs = [sum(a * b for a, b in zip(_dual, var_coefs)) for var, var_coefs in _var_coefs.items()] + [1.0]
+            cut_rhs = sum(a * b for a, b in zip(_dual, _rhs))
 
-            prob = sub_problems.prob[i]
-            for var, coefs in _var_coefs.items():
-                for j, coef in enumerate(coefs):
-                    avg_var_coefs[var][j] += prob * coef
-            for j, rhs_val in enumerate(_rhs):
-                avg_rhs[j] += prob * rhs_val
-            for j, dual_val in enumerate(_dual):
-                avg_dual_values[j] += prob * dual_val
+            if sub_problems.multi_opti_cut:
+                # Multiple optimality cuts, one per subproblem
+                vars = sub.complicating_vars + [sub_problems.estimators[i]]
+                cut = OptimalityCut(vars=vars, coefs=coefs, rhs=cut_rhs, sense='>=', name=f"LShaped_s{i}")
+                cuts.append(cut)
+            else:
+                # Single averaged optimality cut
+                prob = sub_problems.prob[i]
+                avg_coefs = [ac + c * prob for ac, c in zip(avg_coefs, coefs)]
+                avg_rhs += cut_rhs * prob
 
-        complicating_var_values = master_problem.get_var_values(master_problem.complicating_vars)
-        cut = ClassicalOC(complicating_var_values, avg_var_coefs, avg_dual_values, avg_rhs)
+        if not sub_problems.multi_opti_cut:
+            # Single averaged optimality cut
+            vars = master_problem.complicating_vars + ['theta']
+            cut = OptimalityCut(vars=vars, coefs=avg_coefs, rhs=avg_rhs, sense='>=', name="LShaped")
+            cuts.append(cut)
 
-        super().__init__(cuts=[cut])
+        super().__init__(cuts=cuts)
 
 
 class LShapedFC(MultiCut):

@@ -146,6 +146,7 @@ class LShaped(BendersBase):
         master_problem.complicating_vars = complicating_vars
         for sub in sub_problems:
             sub.complicating_vars = complicating_vars
+        sub_problems.estimators = estimators
         sub_problems.multi_opti_cut = multi_opti_cut
         sub_problems.multi_feas_cut = multi_feas_cut
         sub_problems.parallel_sub = parallel_sub

@@ -369,6 +369,7 @@ class SubProblems:
             self,
             sub_problems: Iterable['SubProblem'],
             prob: list[float] = None,
+            estimators: list = None,
             multi_opti_cut: bool = False,
             multi_feas_cut: bool = False,
             parallel_sub: bool = False,
@@ -376,6 +377,7 @@ class SubProblems:
     ):
         self.sub_problems = list(sub_problems)
         self.prob = prob
+        self.estimators = estimators
         self.multi_opti_cut = multi_opti_cut
         self.multi_feas_cut = multi_feas_cut
         self.parallel_sub = parallel_sub

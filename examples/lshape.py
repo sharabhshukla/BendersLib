@@ -26,7 +26,10 @@ def first_stage_model(n_plants, n_scenarios, multi_cut=False):
     # Estimator for the second-stage cost
     if multi_cut:
         theta = model.addVars(n_scenarios, name="theta")
-        model.setObjective(capacity.sum() + theta.sum(), GRB.MINIMIZE)
+        model.setObjective(capacity.sum() + theta.sum() / n_scenarios, GRB.MINIMIZE)
+
+        t = model.addVar(name='theta')
+        model.addConstr(theta.sum() / n_scenarios == t)
     else:
         theta = model.addVar(name='theta')
         model.setObjective(capacity.sum() + theta, GRB.MINIMIZE)
@@ -97,9 +100,9 @@ def deterministic_equivalent_model(n_plants, scenarios):
 if __name__ == '__main__':
     # Data
     n_plants = 5
-    n_scenarios = 7
+    n_scenarios = 12
     scenarios = [
-        {"demand": [random.randint(10, 20) for _ in range(n_plants)],
+        {"demand": [random.randint(10, 15) for _ in range(n_plants)],
          "prob": 1.0 / n_scenarios}
         for _ in range(n_scenarios)]
 
@@ -112,7 +115,7 @@ if __name__ == '__main__':
         print("Deterministic Equivalent Problem is infeasible or unbounded.\n")
 
     # Master problem
-    multi_opti_cut = False
+    multi_opti_cut = True
     master_model, complicating_vars, estimators = first_stage_model(n_plants, n_scenarios, multi_cut=multi_opti_cut)
     MasterProblem = MasterProblem(solver_backend=Gurobi(master_model))
 
@@ -128,7 +131,7 @@ if __name__ == '__main__':
         complicating_vars=complicating_vars,
         estimators=estimators,
         multi_opti_cut=multi_opti_cut,
-        multi_feas_cut=True,
+        multi_feas_cut=False,
         parallel_sub=False,
         batch_size=n_scenarios
     )
