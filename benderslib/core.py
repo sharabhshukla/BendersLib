@@ -372,16 +372,12 @@ class SubProblems:
             estimators: list = None,
             multi_opti_cut: bool = False,
             multi_feas_cut: bool = False,
-            parallel_sub: bool = False,
-            batch_size: int = 1,
     ):
         self.sub_problems = list(sub_problems)
         self.prob = prob
         self.estimators = estimators
         self.multi_opti_cut = multi_opti_cut
         self.multi_feas_cut = multi_feas_cut
-        self.parallel_sub = parallel_sub
-        self.batch_size = batch_size
 
         self.status = CST.UNSOLVED
         """The status of the problem, see :class:`BendersConsts` for possible values."""
@@ -429,17 +425,19 @@ class SubProblems:
     #         yield sub.get_extreme_ray()
 
     def solve(self):
-        if self.parallel_sub:
-            raise NotImplementedError("Parallel subproblem solving is not implemented yet.")
+        for sub in self.sub_problems:
+            sub.solve()
+            if sub.status == CST.INFEASIBLE and not self.multi_feas_cut:
+                break
+
+        if all(sub.status == CST.OPTIMAL for sub in self.sub_problems):
+            self.status = CST.OPTIMAL
+        elif any(sub.status == CST.INFEASIBLE for sub in self.sub_problems):
+            self.status = CST.INFEASIBLE
         else:
-            for sub in self.sub_problems:
-                sub.solve()
-                if sub.status == CST.INFEASIBLE:
-                    self.status = CST.INFEASIBLE
-                    if not self.multi_feas_cut:
-                        break
-            if all(sub.status == CST.OPTIMAL for sub in self.sub_problems):
-                self.status = CST.OPTIMAL
+            self.status = CST.ERROR
+            raise RuntimeError("SubProblems status could not be determined.")
+
 
 
 class Cut:

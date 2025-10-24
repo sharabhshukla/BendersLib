@@ -75,7 +75,7 @@ class CombinatorialBenders(BendersBase):
         An instance of :class:`SubProblem` representing the subproblem.
     complicating_vars : list[str]
         A list of names of the complicating variables in the master problem.
-    opt_cut_generator : callable, optional
+    opti_cut_generator : callable, optional
         A callable function to generate optimality cuts.
         If not provided, the default :class:`CombinatorialCut` will be used.
     feas_cut_generator : callable, optional
@@ -91,7 +91,7 @@ class CombinatorialBenders(BendersBase):
             master_problem: MasterProblem,
             sub_problem: SubProblem,
             complicating_vars: list,
-            opt_cut_generator=None,
+            opti_cut_generator=None,
             feas_cut_generator=None,
             params: BendersParams = BendersParams()
     ):
@@ -103,7 +103,7 @@ class CombinatorialBenders(BendersBase):
         self.master_problem.complicating_vars = complicating_vars
         self.sub_problem.complicating_vars = complicating_vars
 
-        self.opt_cut_generator = opt_cut_generator
+        self.opti_cut_generator = opti_cut_generator
         self.feas_cut_generator = feas_cut_generator
 
     def add_feasibility_cut(self, complicating_var_values: dict[str, float | int]):
@@ -114,8 +114,8 @@ class CombinatorialBenders(BendersBase):
         self.master_problem.add_cut(cut)
 
     def add_optimality_cut(self, complicating_var_values: dict[str, float | int]):
-        if self.opt_cut_generator is not None:
-            cut = self.opt_cut_generator(complicating_var_values, self.master_problem, self.sub_problem)
+        if self.opti_cut_generator is not None:
+            cut = self.opti_cut_generator(complicating_var_values, self.master_problem, self.sub_problem)
         else:
             sub_obj = self.sub_problem.get_obj()
             cut = self.optimality_cut(complicating_var_values, sub_obj)
@@ -132,8 +132,6 @@ class LShaped(BendersBase):
             estimators: list = None,
             multi_opti_cut: bool = False,
             multi_feas_cut: bool = False,
-            parallel_sub: bool = False,
-            batch_size: int = 1,
             params: BendersParams = BendersParams()
     ):
         self.optimality_cut = LShapedOC
@@ -149,8 +147,6 @@ class LShaped(BendersBase):
         sub_problems.estimators = estimators
         sub_problems.multi_opti_cut = multi_opti_cut
         sub_problems.multi_feas_cut = multi_feas_cut
-        sub_problems.parallel_sub = parallel_sub
-        sub_problems.batch_size = batch_size
 
         super().__init__(
             master_problem, sub_problems, complicating_vars, self.optimality_cut, self.feasibility_cut, params)
