@@ -14,6 +14,7 @@ class BendersLogger:
         self.benders = benders
         self.result = benders.result
         self._is_setup = False
+        self._last_log_iter = -1
 
     def setup(self):
         if self._is_setup:
@@ -80,21 +81,25 @@ class BendersLogger:
                 f"{self.result.gap * 100:>{CST.LOG_ITER_WIDTH}.2f}, "
                 f"{self.result.runtime:>{CST.LOG_ITER_WIDTH}.2f}"
             )
+            if self.result.n_iter > self._last_log_iter:
+                self._last_log_iter = self.result.n_iter
             return _time_pre_log
         return time_pre_log
 
     def log_end(self):
         self.setup()
 
+        if self._last_log_iter != self.result.n_iter:
+            logging.info(
+                f"{self.result.n_iter:{CST.LOG_ITER_WIDTH}}, "
+                f"{self.result.lb:>{CST.LOG_ITER_WIDTH}.2f}, "
+                f"{self.result.ub:>{CST.LOG_ITER_WIDTH}.2f}, "
+                f"{self.result.obj:>{CST.LOG_ITER_WIDTH}.2f}, "
+                f"{self.result.gap * 100:>{CST.LOG_ITER_WIDTH}.2f}, "
+                f"{self.result.runtime:>{CST.LOG_ITER_WIDTH}.2f}"
+            )
+
         l = CST.LOG_ITER_WIDTH * 7
-        logging.info(
-            f"{self.result.n_iter:{CST.LOG_ITER_WIDTH}}, "
-            f"{self.result.lb:>{CST.LOG_ITER_WIDTH}.2f}, "
-            f"{self.result.ub:>{CST.LOG_ITER_WIDTH}.2f}, "
-            f"{self.result.obj:>{CST.LOG_ITER_WIDTH}.2f}, "
-            f"{self.result.gap * 100:>{CST.LOG_ITER_WIDTH}.2f}, "
-            f"{self.result.runtime:>{CST.LOG_ITER_WIDTH}.2f}"
-        )
         logging.info("-" * l)
         logging.info(self.result)
         logging.info("=" * l)
