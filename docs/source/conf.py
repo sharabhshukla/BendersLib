@@ -153,12 +153,20 @@ sphinx_gallery_conf = {
 html_theme = "furo"
 html_title = "BendersLib"
 html_favicon = '_static/icon.png'
+blue = "#0066CC"
+# blue = "#0064a2"
 html_theme_options = {
     "light_css_variables": {
+        "color-sidebar-link-text--top-level": blue,
+        "color-toc-item-text--active": blue,
+        "color-link": blue,
         "color-link--visited": "var(--color-link)",
         "color-link--hover": "var(--color-link)",
     },
     "dark_css_variables": {
+        "color-sidebar-link-text--top-level": blue,
+        "color-toc-item-text--active": blue,
+        "color-link": blue,
         "color-link--visited": "var(--color-link)",
         "color-link--hover": "var(--color-link)",
     },
