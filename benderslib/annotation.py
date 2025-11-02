@@ -54,7 +54,7 @@ class AnnotationBenders:
             params: BendersParams = BendersParams(),
     ):
         self.complicating_vars = complicating_vars
-        self.master_problem, self.sub_problem = self._decompose(original_problem, solver)
+        self.master_problem, self.sub_problem = self._decompose(original_problem, solver, complicating_vars)
         self.params = params
 
         benders_kwargs = {
@@ -75,7 +75,13 @@ class AnnotationBenders:
         self.result = self.benders_instance.result
         """An instance of :class:`BendersResult` that stores the results and statistics."""
 
-    def _decompose(self, original_problem, solver: Type[SolverBase]) -> tuple[MasterProblem, SubProblem]:
+    @staticmethod
+    def _decompose(
+            original_problem,
+            solver: Type[SolverBase],
+            complicating_vars: list[str],
+            solver_model=False
+    ) -> tuple:
         """
         Decomposes the original problem into a master problem and a subproblem
         based on the specified complicating variables.
@@ -86,16 +92,24 @@ class AnnotationBenders:
             The original optimization problem in a solver-specific format.
         solver: Type[SolverBase]
             The solver class to be used for solving the master and subproblems.
+        complicating_vars: list[str]
+            A list of variable names that are considered complicating variables for the decomposition.
+        solver_model: bool, optional
+            If True, return the master and subproblem in the solver-specific format;
+            If False, return instances of :class:`MasterProblem` and :class:`SubProblem`.
 
         Returns
         -------
-        tuple[MasterProblem, SubProblem]
+        tuple[MasterProblem, SubProblem] | tuple[object, object]
             A tuple containing the master problem and subproblem instances.
         """
         solver_backend = solver(original_problem)
-        master = solver_backend.make_master_problem(self.complicating_vars)
-        sub = solver_backend.make_sub_problem(self.complicating_vars)
-        return MasterProblem(solver(master)), SubProblem(solver(sub))
+        master = solver_backend.make_master_problem(complicating_vars)
+        sub = solver_backend.make_sub_problem(complicating_vars)
+        if solver_model:
+            return master, sub
+        else:
+            return MasterProblem(solver(master)), SubProblem(solver(sub))
 
     def solve(self, callback=None):
         """

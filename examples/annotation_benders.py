@@ -59,6 +59,12 @@ if __name__ == '__main__':
     # Solve with Benders Decomposition
     AB = AnnotationBenders(model, solver=Gurobi, complicating_vars=complicating_vars, benders=ClassicalBenders)
     AB.solve()
+
+    # # Another way: Manually decompose the model and create ClassicalBenders instance
+    # master_model, sub_model = AnnotationBenders._decompose(model, Gurobi, complicating_vars, solver_model=True)
+    # AB = ClassicalBenders.from_models(master_model, Gurobi, sub_model, Gurobi, complicating_vars=complicating_vars)
+    # AB.solve()
+
     print("\nBenders Decomposition Solution:")
     print(AB.result.solution)
     print(f"Obj: {AB.result.obj}")
