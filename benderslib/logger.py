@@ -108,6 +108,11 @@ class BendersLogger:
         if params.log_file:
             logging.info(f"Log file (level: {params.log_level}) saved to: '{params.log_file}'")
 
+    @staticmethod
+    def warning(msg: str):
+        logger = logging.getLogger()
+        logger.warning(msg)
+
 
 if __name__ == "__main__":
     pass

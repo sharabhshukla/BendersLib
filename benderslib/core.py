@@ -302,6 +302,8 @@ class MasterProblem(ProblemBase):
         self.__oc_id = itertools.count(1)
         self.__fc_id = itertools.count(1)
 
+        self.__added_cut = set()
+
     def add_cut(self, cut):
         """
         Add a cut (optimality or feasibility) to the master problem, and update the corresponding cut lists
@@ -317,6 +319,12 @@ class MasterProblem(ProblemBase):
         str
             The name of the added cut in the master problem.
         """
+        if cut in self._added_cut:
+            # BendersLogger.warning(f"Warning: Duplicate cut detected: {cut}. This cut will not be added again.")
+            return None
+        else:
+            self.__added_cut.add(cut)
+
         if cut.ctype == CST.OPTIMALITY:
             cut_id = f"OC{next(self.__oc_id)}"
             cut.cut_id = cut_id
@@ -489,6 +497,26 @@ class Cut:
         return (f"{self.name} ({self.ctype}): "
                 f"{' + '.join(f'{a} * {b}' for a, b in zip(self.coefs, self.vars))} "
                 f"{self.sense} {self.rhs}")
+
+    def __eq__(self, other):
+        if not isinstance(other, Cut):
+            raise TypeError(f"Can only compare <Cut> with another <Cut>, <{type(other)}> is given.")
+
+        # Sort by variable name to ensure order doesn't matter
+        self_sorted_pairs = tuple(sorted(zip(self.vars, self.coefs)))
+        other_sorted_pairs = tuple(sorted(zip(other.vars, other.coefs)))
+
+        return (
+                self.ctype == other.ctype and
+                self.sense == other.sense and
+                self.rhs == other.rhs and
+                self_sorted_pairs == other_sorted_pairs
+        )
+
+    def __hash__(self):
+        # Sort by variable name to ensure hash is consistent
+        sorted_pairs = tuple(sorted(zip(self.vars, self.coefs)))
+        return hash((sorted_pairs, self.rhs, self.sense, self.ctype))
 
 
 class OptimalityCut(Cut):
