@@ -13,8 +13,9 @@ The L-shaped method requires the second-stage problem to be a Linear Program.
 
 import random
 
-from benderslib import MasterProblem, SubProblem, SubProblems, Gurobi, LShaped
+from benderslib import MasterProblem, SubProblem, SubProblems, Gurobi, LShaped, BendersParams
 from gurobipy import Model, GRB
+
 
 # random.seed(1)
 
@@ -125,12 +126,15 @@ if __name__ == '__main__':
     sub_problems = SubProblems(sub_problems, prob=[data["prob"] for data in scenarios])
 
     # L-shaped method
+    params = BendersParams(
+        multi_opti_cut=multi_opti_cut,
+        multi_feas_cut=True
+    )
     L = LShaped(
         master_problem=master_problem,
         sub_problem=sub_problems,
         complicating_vars=complicating_vars,
         estimators=estimators,
-        multi_opti_cut=multi_opti_cut,
-        multi_feas_cut=True,
+        params=params
     )
     L.solve()

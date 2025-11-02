@@ -93,6 +93,8 @@ class ProblemBase:
         """The underlying solver model instance (e.g., ``gurobipy.Model``)."""
         self.status = CST.UNSOLVED
         """The status of the problem, see :class:`BendersConsts` for possible values."""
+        self.params = None
+        """An instance of :class:`BendersParams` containing parameters for the Benders decomposition process."""
 
     def __repr__(self):
         n_vars = len(self.model._all_vars)
@@ -319,7 +321,7 @@ class MasterProblem(ProblemBase):
         str
             The name of the added cut in the master problem.
         """
-        if cut in self._added_cut:
+        if cut in self.__added_cut:
             # BendersLogger.warning(f"Warning: Duplicate cut detected: {cut}. This cut will not be added again.")
             return None
         else:
@@ -379,14 +381,12 @@ class SubProblems:
             sub_problems: Iterable['SubProblem'],
             prob: list[float] = None,
             estimators: list = None,
-            multi_opti_cut: bool = False,
-            multi_feas_cut: bool = False,
     ):
         self.sub_problems = list(sub_problems)
         self.prob = prob
         self.estimators = estimators
-        self.multi_opti_cut = multi_opti_cut
-        self.multi_feas_cut = multi_feas_cut
+        self.params = None
+        """An instance of :class:`BendersParams` containing parameters for the Benders decomposition process."""
 
         self.status = CST.UNSOLVED
         """The status of the problem, see :class:`BendersConsts` for possible values."""
@@ -436,7 +436,7 @@ class SubProblems:
     def solve(self):
         for sub in self.sub_problems:
             sub.solve()
-            if sub.status == CST.INFEASIBLE and not self.multi_feas_cut:
+            if sub.status == CST.INFEASIBLE and not self.params.multi_feas_cut:
                 break
 
         if all(sub.status == CST.OPTIMAL for sub in self.sub_problems):
@@ -578,15 +578,24 @@ class CutGenerator(ABC):
     sub_problem : SubProblem | SubProblems
         An instance of :class:`SubProblem` representing the subproblem,
         or :class:`SubProblems` for multiple subproblems.
+    params : BendersParams, optional
+        An instance of :class:`BendersParams` containing parameters for the Benders decomposition process.
     """
 
-    def __init__(self, master_problem: MasterProblem, sub_problem: SubProblem | SubProblems):
+    def __init__(
+            self,
+            master_problem: MasterProblem,
+            sub_problem: SubProblem | SubProblems,
+            params: BendersParams = BendersParams()
+    ):
         self._master_problem = master_problem
         """The master problem instance."""
         self._sub_problem = sub_problem
         """The subproblem instance."""
         self._complicating_vars = master_problem.complicating_vars
         """List of names of the complicating variables."""
+        self.params = params
+        """An instance of :class:`BendersParams` containing parameters for the Benders decomposition process."""
 
         assert set(self._complicating_vars) == set(sub_problem.complicating_vars), \
             "Complicating variables in master and subproblem must match."
@@ -604,9 +613,9 @@ class _FuncWrapperCut(CutGenerator):
     A wrapper class to allow using a function as a cut generator.
     """
 
-    def __init__(self, master_problem, sub_problem, func: Callable):
+    def __init__(self, master_problem, sub_problem, func: Callable, params: BendersParams = BendersParams()):
         self._func = func
-        super().__init__(master_problem, sub_problem)
+        super().__init__(master_problem, sub_problem, params)
 
     def generate(self):
         return self._func(self._master_problem, self._sub_problem)
@@ -668,22 +677,24 @@ class BendersSolver:
     ):
         master_problem.complicating_vars = complicating_vars
         sub_problem.complicating_vars = complicating_vars
+        master_problem.params = params
+        sub_problem.params = params
 
         self.master_problem = master_problem
         self.sub_problem = sub_problem
         self.complicating_vars = complicating_vars
 
         if inspect.isfunction(optimality_cut):
-            self.optimality_cut = _FuncWrapperCut(master_problem, sub_problem, optimality_cut)
+            self.optimality_cut = _FuncWrapperCut(master_problem, sub_problem, optimality_cut, params)
         elif inspect.isclass(optimality_cut):
-            self.optimality_cut = optimality_cut(master_problem, sub_problem)
+            self.optimality_cut = optimality_cut(master_problem, sub_problem, params)
         elif optimality_cut is not None:
             raise ValueError("<optimality_cut> must be a <function> or a <class>.")
 
         if inspect.isfunction(feasibility_cut):
-            self.feasibility_cut = _FuncWrapperCut(master_problem, sub_problem, feasibility_cut)
+            self.feasibility_cut = _FuncWrapperCut(master_problem, sub_problem, feasibility_cut, params)
         elif inspect.isclass(feasibility_cut):
-            self.feasibility_cut = feasibility_cut(master_problem, sub_problem)
+            self.feasibility_cut = feasibility_cut(master_problem, sub_problem, params)
         elif feasibility_cut is not None:
             raise ValueError("<feasibility_cut> must be a <function> or a <class>.")
 

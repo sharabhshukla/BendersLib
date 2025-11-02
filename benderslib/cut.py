@@ -48,8 +48,8 @@ class ClassicalOC(OptimalityCut):
 
 class ClassicalOCGen(CutGenerator):
 
-    def __init__(self, master_problem, sub_problem):
-        super().__init__(master_problem, sub_problem)
+    def __init__(self, master_problem, sub_problem, params):
+        super().__init__(master_problem, sub_problem, params)
 
         self.var_coefs = sub_problem.get_var_coefs(self._complicating_vars)
         self.rhs = sub_problem.get_rhs()
@@ -111,8 +111,8 @@ class ClassicalFC(FeasibilityCut):
 
 class ClassicalFCGen(CutGenerator):
 
-    def __init__(self, master_problem, sub_problem):
-        super().__init__(master_problem, sub_problem)
+    def __init__(self, master_problem, sub_problem, params):
+        super().__init__(master_problem, sub_problem, params)
 
         self.var_coefs = sub_problem.get_var_coefs(self._complicating_vars)
         self.rhs = sub_problem.get_rhs()
@@ -169,8 +169,8 @@ class NoGoodCut(FeasibilityCut):
 
 class CombinatorialFCGen(CutGenerator):
 
-    def __init__(self, master_problem, sub_problem):
-        super().__init__(master_problem, sub_problem)
+    def __init__(self, master_problem, sub_problem, params):
+        super().__init__(master_problem, sub_problem, params)
 
     def generate(self) -> list[NoGoodCut]:
         """
@@ -239,8 +239,8 @@ class CombinatorialOC(OptimalityCut):
 
 class CombinatorialOCGen(CutGenerator):
 
-    def __init__(self, master_problem, sub_problem, big_m: float = None):
-        super().__init__(master_problem, sub_problem)
+    def __init__(self, master_problem, sub_problem, params, big_m: float = None):
+        super().__init__(master_problem, sub_problem, params)
         self.big_m = big_m
 
     def generate(self) -> list[CombinatorialOC]:
@@ -258,8 +258,8 @@ class CombinatorialOCGen(CutGenerator):
 
 class LShapedOCGen(CutGenerator):
 
-    def __init__(self, master_problem, sub_problem):
-        super().__init__(master_problem, sub_problem)
+    def __init__(self, master_problem, sub_problem, params):
+        super().__init__(master_problem, sub_problem, params)
 
         self.var_coefs = dict()
         self.rhs = dict()
@@ -318,13 +318,13 @@ class LShapedOCGen(CutGenerator):
         This method generates :class:`ClassicalOC` optimality cuts based on the current solution
         of the master problem and the dual values obtained from the subproblems.
         """
-        return self._multi_cuts() if self._sub_problem.multi_opti_cut else self._single_cut()
+        return self._multi_cuts() if self.params.multi_opti_cut else self._single_cut()
 
 
 class LShapedFCGen(CutGenerator):
 
-    def __init__(self, master_problem, sub_problem):
-        super().__init__(master_problem, sub_problem)
+    def __init__(self, master_problem, sub_problem, params):
+        super().__init__(master_problem, sub_problem, params)
 
         self.var_coefs = dict()
         self.rhs = dict()
@@ -347,7 +347,7 @@ class LShapedFCGen(CutGenerator):
 
                 cut = ClassicalFC(self._complicating_vars, _var_coefs, _extreme_ray, _rhs)
                 cuts.append(cut)
-                if not self._sub_problem.multi_feas_cut:
+                if not self.params.multi_feas_cut:
                     break
 
         return cuts

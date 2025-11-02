@@ -45,6 +45,14 @@ class BendersParams:
     iter_limit: int = float('Inf')
     """Iteration limit for the Benders algorithm."""
 
+    # L-shaped method
+    multi_opti_cut: bool = False
+    """**[L-shaped method]** Whether to add multiple optimality cuts per scenario in each iteration of the L-shaped method."""
+    multi_feas_cut: bool = False
+    """**[L-shaped method]** Whether to add multiple feasibility cuts per scenario in each iteration of the L-shaped method.
+    If ``False``, one feasibility cut is added when a infeasible subproblem is found;
+    If ``True``, all extreme rays are used to generate multiple feasibility cuts."""
+
     # Logging
     log_freq_sec: float = 0.5
     """Frequency (in seconds) to log messages to the console/file."""

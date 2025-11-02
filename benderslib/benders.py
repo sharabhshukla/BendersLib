@@ -100,18 +100,9 @@ class LShaped(BendersSolver):
             estimators: list = None,
             optimality_cut=LShapedOCGen,
             feasibility_cut=LShapedFCGen,
-            # Parameters
-            multi_opti_cut: bool = False,
-            multi_feas_cut: bool = False,
             params: BendersParams = BendersParams()
     ):
-        # Setup master and subproblems
-        master_problem.complicating_vars = complicating_vars
-        for sub in sub_problem:
-            sub.complicating_vars = complicating_vars
         sub_problem.estimators = estimators
-        sub_problem.multi_opti_cut = multi_opti_cut
-        sub_problem.multi_feas_cut = multi_feas_cut
 
         super().__init__(
             master_problem,

@@ -7,7 +7,7 @@ Template for Customizing Benders Decomposition
 """
 
 from gurobipy import Model
-from benderslib import BendersSolver, Cut, CutGenerator, Gurobi, MasterProblem, SubProblem
+from benderslib import BendersSolver, Cut, CutGenerator, Gurobi, MasterProblem, SubProblem, BendersParams
 
 
 # %%
@@ -25,8 +25,8 @@ def sub_problems():
 # or the cut generation process is complex.
 class OptiCut(CutGenerator):
 
-    def __init__(self, master_problem: MasterProblem, sub_problem: SubProblem):
-        super().__init__(master_problem, sub_problem)
+    def __init__(self, master_problem: MasterProblem, sub_problem: SubProblem, params: BendersParams):
+        super().__init__(master_problem, sub_problem, params)
 
     def generate(self) -> list[Cut]:
         # Implement the logic to generate feasibility cut
@@ -35,8 +35,8 @@ class OptiCut(CutGenerator):
 
 class FeasCut(CutGenerator):
 
-    def __init__(self, master_problem: MasterProblem, sub_problem: SubProblem):
-        super().__init__(master_problem, sub_problem)
+    def __init__(self, master_problem: MasterProblem, sub_problem: SubProblem, params: BendersParams):
+        super().__init__(master_problem, sub_problem, params)
 
     def generate(self) -> list[Cut]:
         # Implement the logic to generate feasibility cut
