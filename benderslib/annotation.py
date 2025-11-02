@@ -3,7 +3,7 @@
 from typing import Type
 
 from .solver import SolverBase
-from .core import BendersParams, MasterProblem, SubProblem, BendersBase
+from .core import BendersParams, MasterProblem, SubProblem, BendersSolver
 
 
 class AnnotationBenders:
@@ -22,13 +22,13 @@ class AnnotationBenders:
         It should be compatible with the :attr:`original_problem`.
     complicating_vars: list[str]
         A list of variable names that are considered complicating variables for the decomposition.
-    benders: Type[BendersBase]
+    benders: Type[BendersSolver]
         The Benders decomposition method to be applied, e.g., :class:`ClassicalBenders`.
 
     Caution
     -------
     - The parameter ``solver`` should be a **class** (not an instance) that inherits from :class:`SolverBase`.
-    - The parameter ``benders`` should be a **class** (not an instance) that inherits from :class:`BendersBase`.
+    - The parameter ``benders`` should be a **class** (not an instance) that inherits from :class:`BendersSolver`.
 
     .. code-block:: python
         :emphasize-lines: 5, 7
@@ -48,19 +48,27 @@ class AnnotationBenders:
             original_problem,
             solver: Type[SolverBase],
             complicating_vars: list[str],
-            benders: Type[BendersBase],
+            benders: Type[BendersSolver],
+            optimality_cut=None,
+            feasibility_cut=None,
             params: BendersParams = BendersParams(),
     ):
         self.complicating_vars = complicating_vars
         self.master_problem, self.sub_problem = self._decompose(original_problem, solver)
         self.params = params
 
-        self.benders_instance = benders(
-            master_problem=self.master_problem,
-            sub_problem=self.sub_problem,
-            complicating_vars=self.complicating_vars,
-            params=self.params
-        )
+        benders_kwargs = {
+            "master_problem": self.master_problem,
+            "sub_problem": self.sub_problem,
+            "complicating_vars": self.complicating_vars,
+            "params": self.params
+        }
+        if optimality_cut is not None:
+            benders_kwargs["optimality_cut"] = optimality_cut
+        if feasibility_cut is not None:
+            benders_kwargs["feasibility_cut"] = feasibility_cut
+
+        self.benders_instance = benders(**benders_kwargs)
         """The Benders decomposition instance initialized from the ``benders`` parameter."""
 
         # Attributes
@@ -96,20 +104,6 @@ class AnnotationBenders:
         """
         self.benders_instance.solve(callback)
         self.result = self.benders_instance.result
-
-    def add_optimality_cut(self, var_values: dict):
-        """
-        Call the ``add_optimality_cut`` method of the underlying Benders decomposition
-        instance initialized from the ``benders`` parameter.
-        """
-        return self.benders_instance.add_optimality_cut(var_values)
-
-    def add_feasibility_cut(self, var_values: dict):
-        """
-        Call the ``add_feasibility_cut`` method of the underlying Benders decomposition
-        instance initialized from the ``benders`` parameter.
-        """
-        return self.benders_instance.add_feasibility_cut(var_values)
 
 
 if __name__ == '__main__':

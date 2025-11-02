@@ -4,7 +4,8 @@ import itertools
 import time
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import Union, Type, Iterable
+from typing import Union, Iterable, Callable, Iterator
+import inspect
 
 from .consts import BendersConsts as CST
 from .params import BendersParams
@@ -384,12 +385,12 @@ class SubProblems:
 
     def __repr__(self):
         return (
-                f"Sub Problems: \n"
-                f" - {'Scenario No.:'.ljust(CST.LOG_NAME_WIDTH)}{len(self.prob)}"
-                + self.sub_problems[0].__repr__().replace("Sub Problem: ", "")
+            f"Sub Problems: \n"
+            f" - {'Scenario No.:'.ljust(CST.LOG_NAME_WIDTH)}{len(self.prob)}"
+            # + self.sub_problems[0].__repr__().replace("Sub Problem: ", "")
         )
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator['SubProblem']:
         return iter(self.sub_problems)
 
     def get_obj(self) -> float:
@@ -437,7 +438,6 @@ class SubProblems:
         else:
             self.status = CST.ERROR
             raise RuntimeError("SubProblems status could not be determined.")
-
 
 
 class Cut:
@@ -535,20 +535,59 @@ class FeasibilityCut(Cut):
         super().__init__(vars, coefs, rhs, sense, CST.FEASIBILITY, name)
 
 
-class MultiCut:
-
-    def __init__(self, cuts: Iterable['Cut']):
-        self.cuts = cuts
-
-    def __iter__(self):
-        return iter(self.cuts)
-
-
-class BendersBase(ABC):
+class CutGenerator(ABC):
     """
-    A base class for Benders decomposition methods.
-    Any specific Benders decomposition method (e.g., :class:`ClassicalBenders`) should inherit from this class
-    and implement the abstract methods :meth:`add_optimality_cut` and :meth:`add_feasibility_cut`.
+    A base class for cut generators in Benders decomposition.
+    Any specific cut generation method (e.g., :class:`ClassicalOC`) should inherit from this class
+    and implement the abstract method :meth:`generate`.
+    Attributes that will not change during the Benders process should be ideally initialized in `__init__`
+    for efficiency.
+
+    Parameters
+    ----------
+    master_problem : MasterProblem
+        An instance of :class:`MasterProblem` representing the master problem.
+    sub_problem : SubProblem | SubProblems
+        An instance of :class:`SubProblem` representing the subproblem,
+        or :class:`SubProblems` for multiple subproblems.
+    """
+
+    def __init__(self, master_problem: MasterProblem, sub_problem: SubProblem | SubProblems):
+        self._master_problem = master_problem
+        """The master problem instance."""
+        self._sub_problem = sub_problem
+        """The subproblem instance."""
+        self._complicating_vars = master_problem.complicating_vars
+        """List of names of the complicating variables."""
+
+        assert set(self._complicating_vars) == set(sub_problem.complicating_vars), \
+            "Complicating variables in master and subproblem must match."
+
+    @abstractmethod
+    def generate(self) -> list['OptimalityCut'] | list['FeasibilityCut']:
+        """
+        This method should be implemented to generate cuts based on the current state of the master and subproblem(s).
+        """
+        ...
+
+
+class _FuncWrapperCut(CutGenerator):
+    """
+    A wrapper class to allow using a function as a cut generator.
+    """
+
+    def __init__(self, master_problem, sub_problem, func: Callable):
+        self._func = func
+        super().__init__(master_problem, sub_problem)
+
+    def generate(self):
+        return self._func(self._master_problem, self._sub_problem)
+
+
+class BendersSolver:
+    """
+    The core class for Benders decomposition methods.
+    Any specific Benders decomposition method (e.g., :class:`ClassicalBenders`) is inherited from this class.
 
     Parameters
     ----------
@@ -559,26 +598,30 @@ class BendersBase(ABC):
         or :class:`SubProblems` for multiple subproblems.
     complicating_vars : list[str]
         A list of names of the complicating variables in the master problem.
-    optimality_cut : Type[OptimalityCut], optional
-        An abstract class that inherits from :class:`OptimalityCut` to be used for generating optimality
-        cuts. If `None`, no optimality cuts will be added.
-    feasibility_cut : Type[FeasibilityCut], optional
-        An abstract class that inherits from :class:`FeasibilityCut` to be used for generating feasibility
-        cuts. If `None`, no feasibility cuts will be added.
+    optimality_cut : Type[CutGenerator], optional
+        An abstract class that inherits from :class:`CutGenerator` to be used for generating optimality
+        cuts.
+        It also accepts a function with signature ``func(master_problem, sub_problem) -> list[OptimalityCut]``.
+        If `None`, no optimality cuts will be added.
+    feasibility_cut : Type[CutGenerator], optional
+        An abstract class that inherits from :class:`CutGenerator` to be used for generating feasibility
+        cuts.
+        It also accepts a function with signature ``func(master_problem, sub_problem) -> list[FeasibilityCut]``.
+        If `None`, no feasibility cuts will be added.
     params : BendersParams, optional
         An instance of :class:`BendersParams` containing parameters for the Benders decomposition process.
         If not provided, default parameters will be used.
 
     Caution
     -------
-    The ``optimality_cut`` parameter requires the ``OptimalityCut``'s subclass itself, not an instance.
+    The ``optimality_cut`` parameter requires the ``CutGenerator``'s subclass itself, not an instance.
     For example, use ``ClassicalOC``, not ``ClassicalOC()``.
     This also applies to the ``feasibility_cut`` parameter.
 
     .. code-block:: python
         :emphasize-lines: 3
 
-        from benderslib import ClassicalBenders, ClassicalOC, ClassicalFC
+        from benderslib import ClassicalBenders, ClassicalOCGen, ClassicalFCGen
 
         BD = ClassicalBenders(mp, sp, com_vars, optimality_cut=ClassicalOC, feasibility_cut=ClassicalFC)
 
@@ -591,18 +634,34 @@ class BendersBase(ABC):
             master_problem: MasterProblem,
             sub_problem: SubProblem | SubProblems,
             complicating_vars: list[str],
-            optimality_cut: Type[OptimalityCut] | Type[MultiCut] = None,
-            feasibility_cut: Type[FeasibilityCut] | Type[MultiCut] = None,
+            optimality_cut=None,
+            feasibility_cut=None,
             params: BendersParams = BendersParams()
     ):
+        master_problem.complicating_vars = complicating_vars
+        sub_problem.complicating_vars = complicating_vars
+
         self.master_problem = master_problem
         self.sub_problem = sub_problem
         self.complicating_vars = complicating_vars
-        self.optimality_cut = optimality_cut
-        self.feasibility_cut = feasibility_cut
-        self.params = params
+
+        if inspect.isfunction(optimality_cut):
+            self.optimality_cut = _FuncWrapperCut(master_problem, sub_problem, optimality_cut)
+        elif inspect.isclass(optimality_cut):
+            self.optimality_cut = optimality_cut(master_problem, sub_problem)
+        elif optimality_cut is not None:
+            raise ValueError("<optimality_cut> must be a <function> or a <class>.")
+
+        if inspect.isfunction(feasibility_cut):
+            self.feasibility_cut = _FuncWrapperCut(master_problem, sub_problem, feasibility_cut)
+        elif inspect.isclass(feasibility_cut):
+            self.feasibility_cut = feasibility_cut(master_problem, sub_problem)
+        elif feasibility_cut is not None:
+            raise ValueError("<feasibility_cut> must be a <function> or a <class>.")
 
         assert self.optimality_cut or self.feasibility_cut, "Provide at least <optimality_cut> or <feasibility_cut>."
+
+        self.params = params
 
         # Attributes
         self.result = BendersResult()
@@ -621,36 +680,26 @@ class BendersBase(ABC):
             f" - {'Method:'.ljust(CST.LOG_NAME_WIDTH)}{self.__class__.__name__}\n"
             f" - {'Complicating Var. No.:'.ljust(CST.LOG_NAME_WIDTH)}{len(self.complicating_vars)}"
             f" [Integer: {integer_num}, Binary: {binary_num}, Continuous: {continuous_num}]\n"
-            f" - {'Optimality Cut:'.ljust(CST.LOG_NAME_WIDTH)}{self.optimality_cut.__name__ or None}\n"
-            f" - {'Feasibility Cut:'.ljust(CST.LOG_NAME_WIDTH)}{self.feasibility_cut.__name__ or None}"
+            f" - {'Optimality Cut:'.ljust(CST.LOG_NAME_WIDTH)}{self.optimality_cut.__class__.__name__ or None}\n"
+            f" - {'Feasibility Cut:'.ljust(CST.LOG_NAME_WIDTH)}{self.feasibility_cut.__class__.__name__ or None}"
 
         )
 
-    @abstractmethod
-    def add_optimality_cut(self, complicating_var_values: dict[str, float | int]):
+    def _add_optimality_cut(self):
         """
-        The method to add :class:`OptimalityCut` to :class:`MasterProblem` based on the current values of
-        the complicating variables.
+        The method to add one or multiple :class:`OptimalityCut` to :class:`MasterProblem`.
+        """
+        cuts = self.optimality_cut.generate()
+        for cut in cuts:
+            self.master_problem.add_cut(cut)
 
-        Parameters
-        ----------
-        complicating_var_values : dict[str, float | int]
-            A dictionary mapping the names of complicating variables to their current values.
+    def _add_feasibility_cut(self):
         """
-        ...
-
-    @abstractmethod
-    def add_feasibility_cut(self, complicating_var_values: dict[str, float | int]):
+        The method to add one or multiple :class:`FeasibilityCut` to :class:`MasterProblem`.
         """
-        The method to add :class:`FeasibilityCut` to :class:`MasterProblem` based on the current values of
-        the complicating variables.
-
-        Parameters
-        ----------
-        complicating_var_values : dict[str, float | int]
-            A dictionary mapping the names of complicating variables to their current values.
-        """
-        ...
+        cuts = self.feasibility_cut.generate()
+        for cut in cuts:
+            self.master_problem.add_cut(cut)
 
     def __update_result(self, time_start):
         self.result.n_sol += 1
@@ -705,7 +754,7 @@ class BendersBase(ABC):
         .. Note::
 
             After calling this method, the results and statistics of the Benders decomposition process can be accessed
-            through the :attr:`BendersBase.result` attribute, which is an instance of :class:`BendersResult`.
+            through the :attr:`BendersSolver.result` attribute, which is an instance of :class:`BendersResult`.
 
             .. code-block:: python
                 :emphasize-lines: 4
@@ -760,7 +809,7 @@ class BendersBase(ABC):
                     self.result.ub_list.append(self.result.ub)
                     if self.__terminate(time_start):
                         break
-                    self.add_feasibility_cut(var_values)
+                    self._add_feasibility_cut()
 
                 # Sub problem is optimal -> add optimality cut
                 elif self.sub_problem.status == CST.OPTIMAL:
@@ -769,7 +818,7 @@ class BendersBase(ABC):
                     # REACH OPTIMALITY
                     if self.__terminate(time_start):
                         break
-                    self.add_optimality_cut(var_values)
+                    self._add_optimality_cut()
 
                 # Sub problem is neither infeasible nor optimal -> error
                 else:
@@ -797,6 +846,9 @@ class BendersBase(ABC):
     #     pass
     #
     # def save_checkpoint(self):
+    #     pass
+    #
+    # def load_checkpoint(self):
     #     pass
 
 

@@ -18,6 +18,10 @@ Benders Cut
    :inherited-members:
    :show-inheritance:
 
+.. autoclass:: CutGenerator
+   :inherited-members:
+   :show-inheritance:
+
 Master and Sub Problem
 -----------------------------------------
 
@@ -36,6 +40,14 @@ Master and Sub Problem
 Benders Algorithm
 -----------------------------------------
 
-.. autoclass:: BendersBase
+.. autoclass:: BendersSolver
    :inherited-members:
    :show-inheritance:
+
+.. _api-annotation:
+
+Annotation Benders Decomposition
+--------------------------------------
+
+.. autoclass:: AnnotationBenders
+    :inherited-members:

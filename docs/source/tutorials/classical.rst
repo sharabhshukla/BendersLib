@@ -227,7 +227,7 @@ We implemented the manual method in :ref:`api-classical`, and automated it in
 
     * Rahmaniani et al. [#]_ and Aardal et al. [#]_ also provide the method's mathematical formulation.
     * BendersLib's implementation of optimality and feasibility cuts: :class:`ClassicalOC` and :class:`ClassicalFC`.
-    * BendersLib's implementation of the Benders algorithm: :func:`BendersBase.solve`.
+    * BendersLib's implementation of the Benders algorithm: :func:`BendersSolver.solve`.
     * **Examples**: :doc:`../examples/classical_benders` and :doc:`../examples/annotation_benders`.
 
 References

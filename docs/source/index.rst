@@ -79,8 +79,8 @@ The output will be:
     Benders Decomposition:
      - Method:                  ClassicalBenders
      - Complicating Var. No.:   1 [Integer: 1, Binary: 0, Continuous: 0]
-     - Optimality Cut:          ClassicalOC
-     - Feasibility Cut:         ClassicalFC
+     - Optimality Cut:          ClassicalOCGen
+     - Feasibility Cut:         ClassicalFCGen
     Master Problem:
      - Variable No.:            2 [Integer: 1, Binary: 0]
      - Constraint No.:          0

@@ -100,9 +100,9 @@ def deterministic_equivalent_model(n_plants, scenarios):
 if __name__ == '__main__':
     # Data
     n_plants = 5
-    n_scenarios = 12
+    n_scenarios = 99
     scenarios = [
-        {"demand": [random.randint(10, 15) for _ in range(n_plants)],
+        {"demand": [random.randint(10, 20) for _ in range(n_plants)],
          "prob": 1.0 / n_scenarios}
         for _ in range(n_scenarios)]
 
@@ -115,24 +115,22 @@ if __name__ == '__main__':
         print("Deterministic Equivalent Problem is infeasible or unbounded.\n")
 
     # Master problem
-    multi_opti_cut = True
+    multi_opti_cut = False
     master_model, complicating_vars, estimators = first_stage_model(n_plants, n_scenarios, multi_cut=multi_opti_cut)
-    MasterProblem = MasterProblem(solver_backend=Gurobi(master_model))
+    master_problem = MasterProblem(solver_backend=Gurobi(master_model))
 
     # Subproblems
     sub_models = second_stage_model(n_plants, scenarios)
     sub_problems = (SubProblem(solver_backend=Gurobi(sub_model)) for sub_model in sub_models)
-    SubProblems = SubProblems(sub_problems, prob=[data["prob"] for data in scenarios])
+    sub_problems = SubProblems(sub_problems, prob=[data["prob"] for data in scenarios])
 
     # L-shaped method
     L = LShaped(
-        master_problem=MasterProblem,
-        sub_problems=SubProblems,
+        master_problem=master_problem,
+        sub_problem=sub_problems,
         complicating_vars=complicating_vars,
         estimators=estimators,
         multi_opti_cut=multi_opti_cut,
-        multi_feas_cut=False,
-        parallel_sub=False,
-        batch_size=n_scenarios
+        multi_feas_cut=True,
     )
     L.solve()

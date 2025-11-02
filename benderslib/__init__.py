@@ -27,16 +27,23 @@ from .core import (
     Cut,
     OptimalityCut,
     FeasibilityCut,
+    CutGenerator,
     BendersResult,
-    BendersBase
+    BendersSolver
 )
 
 from .cut import (
-    ClassicalFC,
     ClassicalOC,
+    ClassicalFC,
     NoGoodCut,
-    CombinatorialCut,
-    LShapedOC,
+    CombinatorialOC,
+
+    ClassicalFCGen,
+    ClassicalOCGen,
+    CombinatorialFCGen,
+    CombinatorialOCGen,
+    LShapedOCGen,
+    LShapedFCGen
 )
 
 from .benders import (
@@ -65,14 +72,20 @@ __all__ = [
     "Cut",
     "OptimalityCut",
     "FeasibilityCut",
+    "CutGenerator",
     "BendersResult",
-    "BendersBase",
+    "BendersSolver",
 
-    "ClassicalFC",
     "ClassicalOC",
+    "ClassicalFC",
     "NoGoodCut",
-    "CombinatorialCut",
-    "LShapedOC",
+    "CombinatorialOC",
+    "ClassicalFCGen",
+    "ClassicalOCGen",
+    "CombinatorialFCGen",
+    "CombinatorialOCGen",
+    "LShapedOCGen",
+    "LShapedFCGen",
 
     "ClassicalBenders",
     "CombinatorialBenders",

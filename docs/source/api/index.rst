@@ -4,15 +4,15 @@ API Reference
 .. mermaid::
 
     classDiagram
-        BendersBase <|-- ClassicalBenders
+        BendersSolver <|-- ClassicalBenders
 
         ProblemBase <|-- MasterProblem
         ProblemBase <|-- SubProblem
 
-        BendersBase o-- MasterProblem
-        BendersBase o-- SubProblem
-        BendersBase o-- BendersParams
-        BendersBase o-- BendersResult
+        BendersSolver o-- MasterProblem
+        BendersSolver o-- SubProblem
+        BendersSolver o-- BendersParams
+        BendersSolver o-- BendersResult
 
         ProblemBase o-- SolverBase
         SolverBase <|-- Gurobi
@@ -22,13 +22,13 @@ API Reference
 
         MasterProblem o-- Cut
 
-        class BendersBase{
+        class BendersSolver{
             +MasterProblem master_problem
             +SubProblem sub_problem
             +BendersParams params
             +solve()
         }
-        <<Abstract>> BendersBase
+        <<Abstract>> BendersSolver
 
         class ClassicalBenders
 

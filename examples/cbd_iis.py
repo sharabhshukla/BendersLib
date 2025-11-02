@@ -40,7 +40,7 @@ def make_original_problem():
 # %%
 # Define stronger customized Benders feasibility cut using IIS:
 
-def cut_generator(complicating_var_values: dict, master_problem: MasterProblem, sub_problem: SubProblem):
+def cut_generator(master_problem: MasterProblem, sub_problem: SubProblem):
     """
     Generate a stronger feasibility cut using the Irreducible Infeasible Subsystem (IIS) of the subproblem.
     Though `master_problem` is not used, it is required as a placeholder for the callback function.
@@ -55,9 +55,10 @@ def cut_generator(complicating_var_values: dict, master_problem: MasterProblem, 
     # Get the names of the variables in the IIS
     # v.IISLB and v.IISUB can be either 0 (False) or 1 (True), indicating whether the LB or UB is part of the IIS.
     iis_vars = [v.VarName for v in sp.getVars() if v.IISLB or v.IISUB]
-    iis_var_values = {var: val for var, val in complicating_var_values.items() if var in iis_vars}
+    iis_var_values = master_problem.get_var_values(iis_vars)
 
-    return NoGoodCut(iis_var_values)
+    cut = NoGoodCut(iis_var_values)
+    return [cut]
 
 
 # %%
@@ -81,10 +82,11 @@ if __name__ == '__main__':
         model,
         solver=Gurobi,
         complicating_vars=complicating_vars,
+        # Customized feasibility cut generator
+        feasibility_cut=cut_generator,
         benders=CombinatorialBenders,
     )
     # Modify the cut generator to use IIS-based feasibility cuts
-    AB.benders_instance.feas_cut_generator = cut_generator
     AB.solve()
 
     # Solve with Benders Decomposition + Naive cuts
