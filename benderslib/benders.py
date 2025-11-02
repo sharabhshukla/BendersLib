@@ -46,6 +46,29 @@ class ClassicalBenders(BendersSolver):
             params
         )
 
+    @classmethod
+    def from_models(
+            cls,
+            master_model,
+            master_solver,
+            sub_model,
+            sub_solver,
+            complicating_vars,
+            optimality_cut=ClassicalOCGen,
+            feasibility_cut=ClassicalFCGen,
+            params: BendersParams = BendersParams()
+    ):
+        return super().from_models(
+            master_model,
+            master_solver,
+            sub_model,
+            sub_solver,
+            complicating_vars,
+            optimality_cut,
+            feasibility_cut,
+            params
+        )
+
 
 class CombinatorialBenders(BendersSolver):
     """
@@ -75,7 +98,7 @@ class CombinatorialBenders(BendersSolver):
             self,
             master_problem: MasterProblem,
             sub_problem: SubProblem,
-            complicating_vars: list,
+            complicating_vars: list[str],
             optimality_cut=CombinatorialOCGen,
             feasibility_cut=CombinatorialFCGen,
             params: BendersParams = BendersParams()
@@ -89,14 +112,37 @@ class CombinatorialBenders(BendersSolver):
             params
         )
 
+    @classmethod
+    def from_models(
+            cls,
+            master_model,
+            master_solver,
+            sub_model,
+            sub_solver,
+            complicating_vars,
+            optimality_cut=CombinatorialOCGen,
+            feasibility_cut=CombinatorialFCGen,
+            params: BendersParams = BendersParams()
+    ):
+        return super().from_models(
+            master_model,
+            master_solver,
+            sub_model,
+            sub_solver,
+            complicating_vars,
+            optimality_cut,
+            feasibility_cut,
+            params
+        )
+
 
 class LShaped(BendersSolver):
 
     def __init__(
             self,
             master_problem: MasterProblem,
-            sub_problem: SubProblems | SubProblem,
-            complicating_vars: list,
+            sub_problem: SubProblems,
+            complicating_vars: list[str],
             estimators: list = None,
             optimality_cut=LShapedOCGen,
             feasibility_cut=LShapedFCGen,
@@ -107,6 +153,29 @@ class LShaped(BendersSolver):
         super().__init__(
             master_problem,
             sub_problem,
+            complicating_vars,
+            optimality_cut,
+            feasibility_cut,
+            params
+        )
+
+    @classmethod
+    def from_models(
+            cls,
+            master_model,
+            master_solver,
+            sub_model,
+            sub_solver,
+            complicating_vars,
+            optimality_cut=LShapedOCGen,
+            feasibility_cut=LShapedFCGen,
+            params: BendersParams = BendersParams()
+    ):
+        return super().from_models(
+            master_model,
+            master_solver,
+            sub_model,
+            sub_solver,
             complicating_vars,
             optimality_cut,
             feasibility_cut,

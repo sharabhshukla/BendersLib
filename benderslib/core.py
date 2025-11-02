@@ -708,6 +708,59 @@ class BendersSolver:
         self.__logger = BendersLogger(self)
         """An instance of :class:`BendersLogger` for handling logging."""
 
+    @classmethod
+    def from_models(
+            cls,
+            master_model,
+            master_solver,
+            sub_model,
+            sub_solver,
+            complicating_vars,
+            optimality_cut,
+            feasibility_cut,
+            params: BendersParams = BendersParams()
+    ):
+        """
+        Class method to create a :class:`BendersSolver` instance directly from solver models.
+
+        Parameters
+        ----------
+        master_model :
+            Solver model instance for the master problem (e.g., ``gurobipy.Model``).
+        master_solver : Type[SolverBase]
+            An abstract class that inherits from :class:`SolverBase` to be used as the solver backend for the master problem.
+        sub_model :
+            Solver model instance for the subproblem (e.g., ``gurobipy.Model``).
+        sub_solver : Type[SolverBase]
+            An abstract class that inherits from :class:`SolverBase` to be used as the solver backend for the subproblem.
+        complicating_vars : list[str]
+            A list of names of the complicating variables in the master problem.
+        optimality_cut : Type[CutGenerator], optional
+            An abstract class that inherits from :class:`CutGenerator` to be used for generating optimality
+            cuts.
+            It also accepts a function with signature ``func(master_problem, sub_problem) -> list[OptimalityCut]``.
+            If `None`, no optimality cuts will be added.
+        feasibility_cut : Type[CutGenerator], optional
+            An abstract class that inherits from :class:`CutGenerator` to be used for generating feasibility
+            cuts.
+            It also accepts a function with signature ``func(master_problem, sub_problem) -> list[FeasibilityCut]``.
+            If `None`, no feasibility cuts will be added.
+        params : BendersParams, optional
+            An instance of :class:`BendersParams` containing parameters for the Benders decomposition process.
+            If not provided, default parameters will be used.
+        """
+        master_problem = MasterProblem(master_solver(master_model))
+        sub_problem = SubProblem(sub_solver(sub_model))
+
+        return cls(
+            master_problem,
+            sub_problem,
+            complicating_vars,
+            optimality_cut,
+            feasibility_cut,
+            params
+        )
+
     def __str__(self):
         all_model_com_vars = {self.master_problem._solver_model.getVarByName(v) for v in self.complicating_vars}
         integer_num = len([v for v in all_model_com_vars if v.VType == 'I'])

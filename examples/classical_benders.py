@@ -75,14 +75,19 @@ if __name__ == '__main__':
         print("Original Problem Solution: Infeasible or Unbounded\n")
 
     # Solving using Benders Decomposition:
+
     # Define master problem
-    model, complicating_vars = make_master_problem()
-    master_problem = MasterProblem(solver_backend=Gurobi(model))
+    master_model, complicating_vars = make_master_problem()
+    # master_problem = MasterProblem(solver_backend=Gurobi(master_model))
+
     # Define subproblem
-    model = make_sub_problem()
-    sub_problem = SubProblem(solver_backend=Gurobi(model))
+    sub_model = make_sub_problem()
+    # sub_problem = SubProblem(solver_backend=Gurobi(sub_model))
+
     # Create and solve Benders Decomposition instance
-    BD = ClassicalBenders(master_problem, sub_problem, complicating_vars=complicating_vars)
+    BD = ClassicalBenders.from_models(master_model, Gurobi, sub_model, Gurobi, complicating_vars=complicating_vars)
+    # BD = ClassicalBenders(master_problem, sub_problem, complicating_vars=complicating_vars)
+
     BD.solve()
     print("\nBenders Decomposition Solution:")
     print(BD.result.solution)
