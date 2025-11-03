@@ -27,9 +27,8 @@ class TestClassicalBenders:
 
         x = model.addVar(name="x", vtype=GRB.INTEGER)
         z = model.addVar(name="z")
-        theta = model.addVar(name="theta", lb=BendersParams.theta_lb)
 
-        model.setObjective(x + theta)
+        model.setObjective(x)
 
         model.update()
         return model, [x.VarName, z.VarName]

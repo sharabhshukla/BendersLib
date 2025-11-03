@@ -112,7 +112,79 @@ class ProblemBase:
         )
 
     def __getattr__(self, name):
+        # Make attributes of the solver backend accessible directly
         return getattr(self.model, name)
+
+    def add_vars(self, var_names: list[str], var_types: list[str], lb: list[float], ub: list[float]) -> list[str]:
+        """
+        Add variables to the model.
+
+        Parameters
+        ---------------
+        var_names : list
+            A list of variable names to be added.
+        var_types : list
+            A list of variable types corresponding to `var_names`. Each type should be one of:
+            :attr:`BendersConsts.CONTINUOUS`, :attr:`BendersConsts.INTEGER`, or :attr:`BendersConsts.BINARY`.
+        lb : list
+            A list of lower bounds for the variables.
+        ub : list
+            A list of upper bounds for the variables.
+
+        Returns
+        ---------------
+        list[str]
+            A list of names of the added variables.
+
+        Example
+        ---------------
+
+        .. code-block:: python
+
+                added_vars = problem.add_vars(
+                    var_names=['x1', 'x2'],
+                    var_types=[CST.CONTINUOUS, CST.INTEGER],
+                    lb=[0, 0],
+                    ub=[10, 5]
+                )
+        """
+        return self.model.add_vars(var_names, var_types, lb, ub)
+
+    def get_obj_expr(self) -> dict[str, float]:
+        """
+        Get the objective function expression of the model.
+
+        Returns
+        ---------------
+        dict[str, float]
+            A dictionary mapping variable names to their coefficients in the objective function.
+
+        Example
+        ---------------
+
+        .. code-block:: python
+
+                obj_expr = problem.get_obj_expr()
+        """
+        return self.model.get_obj_expr()
+
+    def set_obj(self, var_coefs: dict[str, float]) -> None:
+        """
+        Set the objective function of the model.
+
+        Parameters
+        ---------------
+        var_coefs : dict
+            A dictionary mapping variable names to their coefficients in the objective function.
+
+        Example
+        ---------------
+
+        .. code-block:: python
+
+                problem.set_obj({'x1': 1.0, 'x2': 2.0})
+        """
+        self.model.set_obj(var_coefs)
 
     def fix_vars(self, var_values: dict):
         """
@@ -294,17 +366,59 @@ class MasterProblem(ProblemBase):
 
     def __init__(self, solver_backend: SolverBase, complicating_vars: list = None):
         self.complicating_vars = complicating_vars
+        """A list of names of the complicating variables in the master problem."""
         super().__init__(solver_backend)
 
         self.optimality_cuts: list[Cut] = []
         """List of optimality cuts (:class:`OptimalityCut`) added to the master problem."""
         self.feasibility_cuts: list[Cut] = []
         """List of feasibility cuts (:class:`FeasibilityCut`) added to the master problem."""
+        self.estimators: list[str] = []
+        """List of estimator variable names added to the master problem."""
 
         self.__oc_id = itertools.count(1)
         self.__fc_id = itertools.count(1)
 
         self.__added_cut = set()
+
+    def _add_estimators(self, multiple: bool = False, num: int = 1, lb: float = 0.0) -> None:
+        """
+        Add estimator variable(s) to the master problem.
+
+        Parameters
+        ----------
+        multiple : bool, optional
+            If True, add multiple estimator variables (only for stochastic Benders);
+            if False, add a single estimator variable. Default is False.
+        num : int, optional
+            The number of estimator variables to add if `multiple` is True (equals to the number of subproblems).
+            Default is 1.
+        lb : float, optional
+            The lower bound for the estimator variable(s). Default is 0.0.
+        """
+        estimators = [CST.ESTIMATOR_FORMAT.format(i + 1) for i in range(num)] if multiple else [CST.ESTIMATOR_NAME]
+        var_types = [CST.CONTINUOUS] * len(estimators)
+        lb = [lb] * len(estimators)
+        ub = [float('Inf')] * len(estimators)
+
+        self.add_vars(estimators, var_types, lb, ub)
+
+        obj_expr = self.get_obj_expr()
+        obj_expr.update({est: 1.0 / num if multiple else 1.0 for est in estimators})
+        self.set_obj(obj_expr)
+
+        self.estimators = estimators
+
+    def get_estimator_values(self) -> dict[str, float]:
+        """
+        Get the current values of the estimator variables in the master problem.
+
+        Returns
+        ---------------
+        dict[str, float]
+            A dictionary mapping estimator variable names to their current values.
+        """
+        return self.get_var_values(self.estimators)
 
     def add_cut(self, cut):
         """
@@ -372,6 +486,7 @@ class SubProblem(ProblemBase):
 
     def __init__(self, solver_backend: SolverBase, complicating_vars: list = None):
         self.complicating_vars = complicating_vars
+        """A list of names of the complicating variables in the master problem."""
         super().__init__(solver_backend)
 
 
@@ -380,11 +495,11 @@ class SubProblems:
             self,
             sub_problems: Iterable['SubProblem'],
             prob: list[float] = None,
-            estimators: list = None,
     ):
         self.sub_problems = list(sub_problems)
+        """A list of :class:`SubProblem` instances representing the subproblems."""
         self.prob = prob
-        self.estimators = estimators
+        """A list of probabilities or weights associated with each subproblem. If None, equal weights are assumed."""
         self.params = None
         """An instance of :class:`BendersParams` containing parameters for the Benders decomposition process."""
 
@@ -401,6 +516,9 @@ class SubProblems:
     def __iter__(self) -> Iterator['SubProblem']:
         return iter(self.sub_problems)
 
+    def __len__(self) -> int:
+        return len(self.sub_problems)
+
     def get_obj(self) -> float:
         objs = [sub.get_obj() for sub in self.sub_problems]
         return sum(ob * p for ob, p in zip(objs, self.prob))
@@ -414,24 +532,6 @@ class SubProblems:
         for i, sub in enumerate(self.sub_problems):
             var_values[i] = sub.get_var_values(vars)
         return var_values
-
-    # def get_var_coefs(self, vars: list[str] = None):
-    #     for sub in self.sub_problems:
-    #         yield sub.get_var_coefs(vars)
-    #
-    # def get_rhs(self):
-    #     for sub in self.sub_problems:
-    #         yield sub.get_rhs()
-    #
-    # def get_dual_values(self):
-    #     for sub in self.sub_problems:
-    #         assert sub.status == CST.OPTIMAL, "Subproblem must be optimal to get dual values."
-    #         yield sub.get_dual_values()
-    #
-    # def get_extreme_ray(self):
-    #     for sub in self.sub_problems:
-    #         assert sub.status == CST.INFEASIBLE, "Subproblem must be infeasible to get extreme ray."
-    #         yield sub.get_extreme_ray()
 
     def solve(self):
         for sub in self.sub_problems:
@@ -798,7 +898,9 @@ class BendersSolver:
         self.result.status = CST.FEASIBLE
 
         self.result.lb = self.master_problem.get_obj()
-        theta = self.master_problem.get_var_values(['theta'])['theta']
+        estimator_values = self.master_problem.get_estimator_values()
+        theta = sum(estimator_values.values()) / len(estimator_values)
+
         self.result.ub = self.result.lb - theta + self.sub_problem.get_obj()
 
         if self.result.ub < self.result.obj:
@@ -836,6 +938,19 @@ class BendersSolver:
             return True
 
         return False
+
+    def __pre_process(self):
+        # Add estimator variable(s) to the master problem
+        if isinstance(self.sub_problem, SubProblem):
+            # Deterministic problem with SubProblem
+            self.master_problem._add_estimators(multiple=False, num=1, lb=self.params.theta_lb)
+        else:
+            # Stochastic problem with SubProblems
+            self.master_problem._add_estimators(
+                multiple=self.params.multi_opti_cut,
+                num=len(self.sub_problem),
+                lb=self.params.theta_lb
+            )
 
     def solve(self, callback=None) -> None:
         """
@@ -875,6 +990,8 @@ class BendersSolver:
         """
 
         # Initialize
+        self.__pre_process()
+
         self.result.status = CST.UNSOLVED
         self.result.n_iter = 0
         time_start = time.perf_counter()

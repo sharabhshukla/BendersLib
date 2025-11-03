@@ -19,28 +19,15 @@ from gurobipy import Model, GRB
 
 # random.seed(1)
 
-def first_stage_model(n_plants, n_scenarios, multi_cut=False):
+def first_stage_model(n_plants):
     model = Model("FirstStage")
 
     capacity = model.addVars(n_plants, name="capacity")
-
-    # Estimator for the second-stage cost
-    if multi_cut:
-        theta = model.addVars(n_scenarios, name="theta")
-        model.setObjective(capacity.sum() + theta.sum() / n_scenarios, GRB.MINIMIZE)
-
-        t = model.addVar(name='theta')
-        model.addConstr(theta.sum() / n_scenarios == t)
-    else:
-        theta = model.addVar(name='theta')
-        model.setObjective(capacity.sum() + theta, GRB.MINIMIZE)
-
-    # model.addConstr(capacity.sum() <= 10, name="total_capacity_constr")
+    model.setObjective(capacity.sum(), GRB.MINIMIZE)
 
     model.update()
     complicating_vars = [capacity[i].VarName for i in range(n_plants)]
-    estimators = [theta[i].VarName for i in range(n_scenarios)] if multi_cut else [theta.VarName]
-    return model, complicating_vars, estimators
+    return model, complicating_vars
 
 
 # %%
@@ -103,7 +90,7 @@ if __name__ == '__main__':
     n_plants = 5
     n_scenarios = 99
     scenarios = [
-        {"demand": [random.randint(10, 20) for _ in range(n_plants)],
+        {"demand": [random.randint(10, 22) for _ in range(n_plants)],
          "prob": 1.0 / n_scenarios}
         for _ in range(n_scenarios)]
 
@@ -116,8 +103,7 @@ if __name__ == '__main__':
         print("Deterministic Equivalent Problem is infeasible or unbounded.\n")
 
     # Master problem
-    multi_opti_cut = False
-    master_model, complicating_vars, estimators = first_stage_model(n_plants, n_scenarios, multi_cut=multi_opti_cut)
+    master_model, complicating_vars = first_stage_model(n_plants)
     master_problem = MasterProblem(solver_backend=Gurobi(master_model))
 
     # Subproblems
@@ -127,14 +113,13 @@ if __name__ == '__main__':
 
     # L-shaped method
     params = BendersParams(
-        multi_opti_cut=multi_opti_cut,
+        multi_opti_cut=True,
         multi_feas_cut=True
     )
     L = LShaped(
         master_problem=master_problem,
         sub_problem=sub_problems,
         complicating_vars=complicating_vars,
-        estimators=estimators,
         params=params
     )
     L.solve()

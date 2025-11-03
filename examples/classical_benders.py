@@ -38,9 +38,8 @@ def make_master_problem():
 
     x = model.addVar(name="x", vtype=GRB.INTEGER)
     z = model.addVar(name="z")
-    theta = model.addVar(name="theta", lb=BendersParams.theta_lb)
 
-    model.setObjective(x + theta)
+    model.setObjective(x)
 
     model.update()
     return model, [x.VarName, z.VarName]
@@ -69,7 +68,7 @@ if __name__ == '__main__':
     model.optimize()
     if model.Status == GRB.OPTIMAL:
         print("Original Problem Solution:")
-        print({v.VarName: v.X for v in model.getVars()})
+        # print({v.VarName: v.X for v in model.getVars()})
         print(f"Obj: {model.ObjVal}\n")
     else:
         print("Original Problem Solution: Infeasible or Unbounded\n")
@@ -90,7 +89,7 @@ if __name__ == '__main__':
 
     BD.solve()
     print("\nBenders Decomposition Solution:")
-    print(BD.result.solution)
+    # print(BD.result.solution)
     print(f"Obj: {BD.result.obj}\n")
 
 # %%

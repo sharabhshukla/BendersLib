@@ -66,6 +66,39 @@ class Gurobi(SolverBase):
                 self.model.addConstr(var <= ub)
                 var.ub = GRB.INFINITY
 
+    def add_vars(self, var_names: list[str], var_types: list[str], lb: list[float], ub: list[float]) -> list[str]:
+        _var_type_map = {
+            CST.BINARY: GRB.BINARY,
+            CST.INTEGER: GRB.INTEGER,
+            CST.CONTINUOUS: GRB.CONTINUOUS
+        }
+
+        for var_name, var_type, lower, upper in zip(var_names, var_types, lb, ub):
+            grb_var_type = _var_type_map.get(var_type, GRB.CONTINUOUS)
+            self.model.addVar(lb=lower, ub=upper, vtype=grb_var_type, name=var_name)
+
+            if var_type == CST.BINARY:
+                self._bin_vars.append(var_name)
+            elif var_type == CST.INTEGER:
+                self._int_vars.append(var_name)
+            self._all_vars.append(var_name)
+            self._var_bounds[var_name] = (lower, upper)
+
+        self.model.update()
+        return var_names
+
+    def get_obj_expr(self) -> dict[str, float]:
+        expr = self.model.getObjective()
+        res = {expr.getVar(i).VarName: expr.getCoeff(i) for i in range(expr.size())}
+        return res
+
+    def set_obj(self, var_coefs: dict) -> None:
+        coefs = list(var_coefs.values())
+        vars = [self.model.getVarByName(var) for var in var_coefs.keys()]
+        obj_expr = LinExpr(coefs, vars)
+        self.model.setObjective(obj_expr, sense=GRB.MINIMIZE if self._sense == CST.MIN else GRB.MAXIMIZE)
+        self.model.update()
+
     def fix_vars(self, var_values: dict):
         for var_name, var_value in var_values.items():
             var = self.model.getVarByName(var_name)
@@ -149,11 +182,10 @@ class Gurobi(SolverBase):
         }
         self.status = _grb_status_map.get(self.model.Status, CST.ERROR)
 
-    def make_master_problem(self, master_vars:list[str]) -> Model:
+    def make_master_problem(self, master_vars: list[str]) -> Model:
         """
         Generating the master problem from the original problem by extracting the specified master problem variables,
-        constraints that only involve these variables, objective terms associated with these variables, and adding
-        a new variable ``theta`` in the objective to represent the sub problem's objective value.
+        constraints that only involve these variables, objective terms associated with these variables.
 
         .. Note::
            This method is required for :class:`AnnotationBenders`, which automatically decomposes the original problem
@@ -209,8 +241,7 @@ class Gurobi(SolverBase):
             [v.Obj for v in master_vars_dict.values()],
             [v for v in master_vars_dict.values()]
         )
-        theta = master.addVar(name='theta', lb=BendersParams.theta_lb)
-        master.setObjective(obj_expr + theta)
+        master.setObjective(obj_expr)
 
         master.update()
         return master

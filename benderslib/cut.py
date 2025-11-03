@@ -16,7 +16,8 @@ class ClassicalOC(OptimalityCut):
     where :math:`\\eta` is the variable representing the subproblem's cost, :math:`\\bar{\\pi}` is the optimal solution
     to the dual subproblem (dual values of primal constraints), :math:`A` and :math:`b` are the matrices that define
     the subproblem constraints, and :math:`x` are the master problem variables.
-    This cut can be interpreted as a first-order Taylor approximation or a supporting hyperplane for the value function of the subproblem.
+    This cut can be interpreted as a first-order Taylor approximation or a supporting hyperplane for the value
+    function of the subproblem.
 
     Parameters
     ----------
@@ -30,20 +31,11 @@ class ClassicalOC(OptimalityCut):
         A list of right-hand side values of the subproblem constraints.
     """
 
-    def __init__(self, vars: list[str], var_coefs: dict, dual_values: list, rhs: list):
-        vars = vars + ['theta']
-
-        coefs = [sum(a * b for a, b in zip(dual_values, var_coefs)) for var, var_coefs in var_coefs.items()] + [1.0]
+    def __init__(self, vars: list[str], var_coefs: dict, dual_values: list, rhs: list, estimator=CST.ESTIMATOR_NAME):
+        coefs = [sum(a * b for a, b in zip(dual_values, var_coefs)) for var, var_coefs in var_coefs.items()]
         cut_rhs = sum(a * b for a, b in zip(dual_values, rhs))
 
-        # # Even slower when data is small
-        # dual_v = np.array(dual_values)
-        # rhs_v = np.array(rhs)
-        # coefs_m = np.array(list(var_coefs.values()))
-        # coefs = list(coefs_m @ dual_v) + [1.0]
-        # cut_rhs = float(dual_v @ rhs_v)
-
-        super().__init__(vars=vars, coefs=coefs, rhs=cut_rhs, sense='>=', name="ClassicalOC")
+        super().__init__(vars=vars + [estimator], coefs=coefs + [1.0], rhs=cut_rhs, sense='>=', name="ClassicalOC")
 
 
 class ClassicalOCGen(CutGenerator):
@@ -225,12 +217,12 @@ class CombinatorialOC(OptimalityCut):
         big_m = sub_obj if big_m is None else big_m
 
         # Form 1
-        # vars = ['theta'] + var_ones + var_zeros
+        # vars = [CST.ESTIMATOR_NAME] + var_ones + var_zeros
         # coefs = [1.0] + [-big_m] * len(var_ones) + [big_m] * len(var_zeros)
         # rhs = sub_obj - big_m * len(var_ones)
 
         # Form 2: same number of cuts, but faster to solve the master problem
-        vars = ['theta'] + var_ones + var_zeros
+        vars = [CST.ESTIMATOR_NAME] + var_ones + var_zeros
         coefs = [1.0 / big_m] + [-1.0] * len(var_ones) + [1.0] * len(var_zeros)
         rhs = 1 - len(var_ones)
 
@@ -292,14 +284,13 @@ class LShapedOCGen(CutGenerator):
                 avg_rhs = [a + r * prob for a, r in zip(avg_rhs, _rhs)]
                 avg_dual = [a + d * prob for a, d in zip(avg_dual, _dual)]
 
-        vars = self._complicating_vars + ['theta']
+        vars = self._complicating_vars
         cut = ClassicalOC(vars, avg_var_coefs, avg_dual, avg_rhs)
         return [cut]
 
     def _multi_cuts(self) -> list[ClassicalOC]:
         """
         This method generates multiple :class:`ClassicalOC` optimality cuts, one for each subproblem (scenario).
-        :return:
         """
         cuts = []
         for i, sub in enumerate(self._sub_problem):
@@ -307,10 +298,9 @@ class LShapedOCGen(CutGenerator):
             _rhs = self.rhs[i]
             _dual = sub.get_dual_values()
 
-            vars = self._complicating_vars + [self._sub_problem.estimators[i]]
-            cut = ClassicalOC(vars, _var_coefs, _dual, _rhs)
+            vars = self._complicating_vars
+            cut = ClassicalOC(vars, _var_coefs, _dual, _rhs, estimator=CST.ESTIMATOR_FORMAT.format(i + 1))
             cuts.append(cut)
-
         return cuts
 
     def generate(self) -> list[ClassicalOC]:

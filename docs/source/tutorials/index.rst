@@ -107,9 +107,9 @@ Contents
 
    classical.rst
    cbd.rst
-   gbd.rst
    lshape.rst
    ilshape.rst
+   gbd.rst
    lbbd.rst
    enhance.rst
 

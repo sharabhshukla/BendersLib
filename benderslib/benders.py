@@ -143,13 +143,10 @@ class LShaped(BendersSolver):
             master_problem: MasterProblem,
             sub_problem: SubProblems,
             complicating_vars: list[str],
-            estimators: list = None,
             optimality_cut=LShapedOCGen,
             feasibility_cut=LShapedFCGen,
             params: BendersParams = BendersParams()
     ):
-        sub_problem.estimators = estimators
-
         super().__init__(
             master_problem,
             sub_problem,

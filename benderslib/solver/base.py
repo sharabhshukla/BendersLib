@@ -17,7 +17,7 @@ class SolverBase(ABC):
         An instance of the solver's model class (e.g., Gurobi's ```gurobipy.Model```).
     """
 
-    def __init__(self, model) -> None:
+    def __init__(self, model):
         self.model = model
         self.status = CST.UNSOLVED
         """
@@ -49,6 +49,74 @@ class SolverBase(ABC):
         """A dictionary mapping variable names to their (lower_bound, upper_bound) tuples."""
         self._rhs: list[float] = []
         """A list of right-hand side values for all constraints in the model."""
+
+    @abstractmethod
+    def add_vars(self, var_names: list[str], var_types: list[str], lb: list[float], ub: list[float]) -> list[str]:
+        """
+        Add new variables to the model.
+
+        Parameters
+        ---------------
+        var_names : list[str]
+            A list of names for the new variables.
+        var_types : list[str]
+            A list of variable types (e.g., 'C' for continuous, 'I' for integer, 'B' for binary).
+        lb : list[float]
+            A list of lower bounds for the new variables.
+        ub : list[float]
+            A list of upper bounds for the new variables.
+
+        Example
+        ---------------
+
+        .. code-block:: python
+
+                solver.add_vars(
+                    var_names=['x3', 'x4'],
+                    var_types=['C', 'I'],
+                    lb=[0.0, 1.0],
+                    ub=[10.0, 5.0]
+                )
+        """
+        ...
+
+    @abstractmethod
+    def get_obj_expr(self) -> dict[str, float]:
+        """
+        Get the objective function expression of the model.
+
+        Returns
+        ---------------
+        dict[str, float]
+            A dictionary mapping variable names to their coefficients in the objective function.
+
+        Example
+        ---------------
+
+        .. code-block:: python
+
+                obj_expr = solver.get_obj_expr()
+        """
+        ...
+
+    @abstractmethod
+    def set_obj(self, var_coefs: dict[str, float]) -> None:
+        """
+        Set the objective function of the model.
+
+        Parameters
+        ---------------
+        var_coefs : dict[str, float]
+            A dictionary mapping variable names to their coefficients in the objective function.
+
+        Example
+        ---------------
+
+        .. code-block:: python
+
+                solver.set_obj({'x1': 1.0, 'x2': 2.0})
+        """
+        ...
 
     @abstractmethod
     def fix_vars(self, var_values: dict) -> None:

@@ -66,8 +66,8 @@ if __name__ == '__main__':
     model.optimize()
     if model.Status == GRB.OPTIMAL:
         print("Original Problem Solution:")
-        var_values = {v.VarName: v.X for v in model.getVars()}
-        print(var_values)
+        # var_values = {v.VarName: v.X for v in model.getVars()}
+        # print(var_values)
         print(f"Obj: {model.ObjVal}\n")
     else:
         print("Original Problem Solution: Infeasible or Unbounded\n")
@@ -76,7 +76,7 @@ if __name__ == '__main__':
     AB = AnnotationBenders(model, solver=Gurobi, complicating_vars=complicating_vars, benders=CombinatorialBenders)
     AB.solve()
     print("\nBenders Decomposition Solution:")
-    print(AB.result.solution)
+    # print(AB.result.solution)
     print(f"Obj: {AB.result.obj}")
 
 # %%

@@ -32,6 +32,20 @@ class BendersConsts:
     ERROR = 'ERROR'
     """Status indicating an unknown error occurred during solving."""
 
+    # Estimator
+    ESTIMATOR_NAME = 'theta'
+    """Name of the estimator variable in the master problem."""
+    ESTIMATOR_FORMAT = 'theta_{}'
+    """Format string for naming estimator variables with indices."""
+
+    # Variable types
+    BINARY = 'B'
+    """Identifier for binary variable type."""
+    INTEGER = 'I'
+    """Identifier for integer variable type."""
+    CONTINUOUS = 'C'
+    """Identifier for continuous variable type."""
+
     # Cut types
     OPTIMALITY = 'OPTIMALITY'
     """Type identifier for optimality cuts."""
