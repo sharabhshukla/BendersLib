@@ -110,8 +110,7 @@ class BendersLogger:
 
     @staticmethod
     def warning(msg: str):
-        logger = logging.getLogger()
-        logger.warning(msg)
+        logging.warning(msg)
 
 
 if __name__ == "__main__":

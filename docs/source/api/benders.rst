@@ -37,6 +37,10 @@ Built-in Benders Cuts
    :inherited-members:
    :show-inheritance:
 
+.. autoclass:: LShapedOC
+   :inherited-members:
+   :show-inheritance:
+
 .. _api-classical:
 
 Classical Benders Decomposition
@@ -78,9 +82,10 @@ L-shaped Method
 --------------------------------------
 
 Please refer to :doc:`../tutorials/lshape` for its theory and
-the definition of optimality cut (:class:`ClassicalOC`)
+the definition of optimality cut (:class:`ClassicalOC` for single-cut
+version, :class:`LShapedOC` for multi-cut version))
 and feasibility cut (:class:`ClassicalFC`).
-Note that L-shaped method is a special case of classical Benders
+Note that L-shaped method is a generalization of classical Benders
 decomposition applied to two-stage stochastic programming problems.
 Therefore, the Benders cuts used in L-shaped method are the same as those
 in classical Benders decomposition.

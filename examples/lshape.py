@@ -32,7 +32,7 @@ def first_stage_model(n_plants):
 
 # %%
 # Define the second-stage problem:
-def second_stage_model(n_plants, scenarios):
+def second_stage_model(n_plants, scenarios, total_capacity):
     for s, data in enumerate(scenarios):
         demand = data["demand"]
 
@@ -44,17 +44,16 @@ def second_stage_model(n_plants, scenarios):
 
         # Minimize shortage
         model.addConstrs((shortage[i] >= demand[i] - capacity[i] for i in range(n_plants)), name="shortage_constr")
-        ROI = 1  # return on investment
-        model.setObjective(ROI * shortage.sum(), GRB.MINIMIZE)
+        model.setObjective(shortage.sum())
 
-        model.addConstr(capacity.sum() >= 40, name="min_total_capacity_constr")
+        model.addConstr(capacity.sum() >= total_capacity, name="min_total_capacity_constr")
 
         yield model
 
 
 # %%
 # Define the deterministic equivalent problem for verification:
-def deterministic_equivalent_model(n_plants, scenarios):
+def deterministic_equivalent_model(n_plants, scenarios, total_capacity):
     model = Model('DE')
 
     capacity = model.addVars(n_plants, name="capacity")
@@ -63,8 +62,7 @@ def deterministic_equivalent_model(n_plants, scenarios):
     # Objective
     model.setObjective(
         capacity.sum() +
-        sum(data["prob"] * sum(shortage[s, i] for i in range(n_plants)) for s, data in enumerate(scenarios)),
-        GRB.MINIMIZE)
+        sum(data["prob"] * sum(shortage[s, i] for i in range(n_plants)) for s, data in enumerate(scenarios)))
 
     # Constraints
     for s, data in enumerate(scenarios):
@@ -74,11 +72,10 @@ def deterministic_equivalent_model(n_plants, scenarios):
             name=f"shortage_constr_s{s}"
         )
 
-    model.addConstr(capacity.sum() >= 40, name="min_total_capacity_constr")
+    model.addConstr(capacity.sum() >= total_capacity, name="min_total_capacity_constr")
 
     model.Params.OutputFlag = 0
     model.Params.LogToConsole = 0
-
     model.update()
     return model
 
@@ -88,14 +85,15 @@ def deterministic_equivalent_model(n_plants, scenarios):
 if __name__ == '__main__':
     # Data
     n_plants = 5
-    n_scenarios = 99
+    n_scenarios = 40
+    total_capacity = 10
     scenarios = [
-        {"demand": [random.randint(10, 22) for _ in range(n_plants)],
-         "prob": 1.0 / n_scenarios}
+        {"demand": [random.randint(10, 220) for _ in range(n_plants)],
+         "prob": 1.3}
         for _ in range(n_scenarios)]
 
     # Deterministic equivalent solution
-    de_model = deterministic_equivalent_model(n_plants, scenarios)
+    de_model = deterministic_equivalent_model(n_plants, scenarios, total_capacity)
     de_model.optimize()
     if de_model.Status == GRB.OPTIMAL:
         print(f"Deterministic Equivalent Obj: {de_model.ObjVal:.4f}\n")
@@ -107,14 +105,15 @@ if __name__ == '__main__':
     master_problem = MasterProblem(solver_backend=Gurobi(master_model))
 
     # Subproblems
-    sub_models = second_stage_model(n_plants, scenarios)
+    sub_models = second_stage_model(n_plants, scenarios, total_capacity)
     sub_problems = (SubProblem(solver_backend=Gurobi(sub_model)) for sub_model in sub_models)
-    sub_problems = SubProblems(sub_problems, prob=[data["prob"] for data in scenarios])
+    prob = [data["prob"] for data in scenarios]
+    sub_problems = SubProblems(sub_problems, prob=prob)
 
     # L-shaped method
     params = BendersParams(
         multi_opti_cut=True,
-        multi_feas_cut=True
+        # multi_feas_cut=True
     )
     L = LShaped(
         master_problem=master_problem,

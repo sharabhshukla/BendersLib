@@ -10,7 +10,6 @@ class ClassicalOC(OptimalityCut):
     represented by the variable :math:`\\eta` in the master problem.
 
     .. math::
-
         \\eta \\geq \\bar{\\pi}^T (b - A x)
 
     where :math:`\\eta` is the variable representing the subproblem's cost, :math:`\\bar{\\pi}` is the optimal solution
@@ -64,7 +63,6 @@ class ClassicalFC(FeasibilityCut):
     It is defined as follows to cut off the region of master solutions that leads to this infeasibility.
 
     .. math::
-
         0 \\geq \\bar{r}^T (b - A x)
 
     where :math:`\\bar{r}` is an extreme ray of the dual subproblem, :math:`A` and :math:`b` are the matrices
@@ -126,7 +124,6 @@ class NoGoodCut(FeasibilityCut):
     It is defined as follows to ensure at least one binary variable changes its value in the next iteration,
 
     .. math::
-
         \\sum_{i \\in I_1} (1 - x_i) + \\sum_{i \\in I_0} x_i \\geq 1
 
     where :math:`I_1` is the set of indices of binary variables that are 1 in the current solution,
@@ -134,7 +131,6 @@ class NoGoodCut(FeasibilityCut):
     It can be rewritten as follows.
 
     .. math::
-
         \\sum_{i \\in I_1} x_i - \\sum_{i \\in I_0} x_i \\leq |I_1| - 1
 
     These two forms can both be found in the literature.
@@ -198,7 +194,6 @@ class CombinatorialOC(OptimalityCut):
     The cut is rewritten as follows.
 
     .. math::
-
         \\frac{\\theta}{z*} - \\sum_{i \\in I_1} x_i + \\sum_{i \\in I_0} x_i \\geq 1 - |I_1|
 
     Parameters
@@ -248,6 +243,72 @@ class CombinatorialOCGen(CutGenerator):
         return [cut]
 
 
+class LShapedOC(OptimalityCut):
+    """
+    An aggregated optimality cut for the L-shaped method (single-cut version).
+    This class encapsulates the aggregation logic. It takes raw data from all
+    scenarios (probabilities, duals, matrices) and computes the final cut.
+    The cut represents the following inequality.
+
+    .. math::
+        \\theta \\geq \\sum_{\\omega} p_\\omega [\\pi_\\omega^T (h_\\omega - T_\\omega x)]
+
+    It is rearranged to the standard linear constraint form below.
+
+    .. math::
+        (\\sum_{\\omega} p_\\omega \\pi_\\omega^T T_\\omega) x + \\theta \\geq \\sum_{\\omega} p_\\omega \\pi_\\omega^T h_\\omega
+
+    Parameters
+    ----------
+    vars : list[str]
+        A list of variable names for the complicating variables :math:`x`.
+    probs : list[float]
+        A list of probabilities for each scenario :math:`p_\\omega`.
+    duals : list[list[float]]
+        A list of lists, where each inner list contains the dual variable values :math:`\\pi_\\omega^T` for a scenario.
+    rhss : list[list[float]]
+        A list of lists, where each inner list is the right-hand side :math:`h_ω` for a scenario.
+    var_coefs_list : list[dict]
+        A list of dictionaries. Each dictionary maps variable names to their
+        coefficient lists :math:`T_ω` for a scenario.
+    estimator : str
+        The name of the master problem variable representing the future cost.
+    """
+
+    def __init__(
+            self,
+            vars: list[str],
+            probs: list[float],
+            duals: list[list[float]],
+            rhss: list[list[float]],
+            var_coefs_list: list[dict],
+            estimator=CST.ESTIMATOR_NAME
+    ):
+
+        aggregated_rhs = 0.0
+        aggregated_x_coefs_dict = {var: 0.0 for var in vars}
+
+        for i in range(len(probs)):
+            prob = probs[i]
+            dual_values = duals[i]
+            rhs_values = rhss[i]
+            scenario_var_coefs = var_coefs_list[i]
+
+            # Right-hand side
+            scenario_rhs = sum(d * r for d, r in zip(dual_values, rhs_values))
+            aggregated_rhs += prob * scenario_rhs
+
+            # Complicating variable coefficients
+            for var_name in vars:
+                coef_sum = sum(d * c for d, c in zip(dual_values, scenario_var_coefs[var_name]))
+                aggregated_x_coefs_dict[var_name] += prob * coef_sum
+
+        final_aggregated_x_coefs = [aggregated_x_coefs_dict[var] for var in vars]
+        final_vars = vars + [estimator]
+        final_coefs = final_aggregated_x_coefs + [1.0]
+        super().__init__(vars=final_vars, coefs=final_coefs, rhs=aggregated_rhs, sense='>=', name="LShapedOC")
+
+
 class LShapedOCGen(CutGenerator):
 
     def __init__(self, master_problem, sub_problem, params):
@@ -260,37 +321,32 @@ class LShapedOCGen(CutGenerator):
             self.var_coefs[i] = sub.get_var_coefs(self._complicating_vars)
             self.rhs[i] = sub.get_rhs()
 
-    def _single_cut(self) -> list[ClassicalOC]:
+    def _single_cut(self) -> list[LShapedOC]:
         """
-        This method generates a single :class:`ClassicalOC` optimality cut aggregating all subproblems (scenarios).
+        This method generates a single :class:`LShapedOC` optimality cut aggregating all subproblems (scenarios).
         """
-        avg_var_coefs = None
-        avg_rhs = None
-        avg_dual = None
+        complicating_vars = self._complicating_vars
 
+        all_probs = []
+        all_duals = []
+        all_rhss = []
+        all_var_coefs = []
         for i, sub in enumerate(self._sub_problem):
-            _var_coefs = self.var_coefs[i]
-            _rhs = self.rhs[i]
-            _dual = sub.get_dual_values()
+            all_probs.append(self._sub_problem.prob[i])
+            all_duals.append(sub.get_dual_values())
+            all_rhss.append(self.rhs[i])
+            all_var_coefs.append(self.var_coefs[i])
 
-            prob = self._sub_problem.prob[i]
-            if avg_var_coefs is None:
-                avg_var_coefs = {var: [coef * prob for coef in coefs] for var, coefs in _var_coefs.items()}
-                avg_rhs = [r * prob for r in _rhs]
-                avg_dual = [d * prob for d in _dual]
-            else:
-                for var, coefs in _var_coefs.items():
-                    avg_var_coefs[var] = [a + c * prob for a, c in zip(avg_var_coefs[var], coefs)]
-                avg_rhs = [a + r * prob for a, r in zip(avg_rhs, _rhs)]
-                avg_dual = [a + d * prob for a, d in zip(avg_dual, _dual)]
-
-        vars = self._complicating_vars
-        cut = ClassicalOC(vars, avg_var_coefs, avg_dual, avg_rhs)
+        cut = LShapedOC(complicating_vars, all_probs, all_duals, all_rhss, all_var_coefs)
         return [cut]
 
     def _multi_cuts(self) -> list[ClassicalOC]:
         """
         This method generates multiple :class:`ClassicalOC` optimality cuts, one for each subproblem (scenario).
+
+        .. note::
+            The cut is only generated if the subproblem's objective value exceeds the current estimator value
+            in the master problem for that scenario.
         """
         cuts = []
         for i, sub in enumerate(self._sub_problem):
@@ -300,7 +356,11 @@ class LShapedOCGen(CutGenerator):
 
             vars = self._complicating_vars
             cut = ClassicalOC(vars, _var_coefs, _dual, _rhs, estimator=CST.ESTIMATOR_FORMAT.format(i + 1))
-            cuts.append(cut)
+
+            # Add the cut only if it is violated
+            if sub.get_obj() > self._master_problem.get_estimator_values()[CST.ESTIMATOR_FORMAT.format(i + 1)]:
+                cuts.append(cut)
+
         return cuts
 
     def generate(self) -> list[ClassicalOC]:

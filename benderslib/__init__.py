@@ -37,6 +37,7 @@ from .cut import (
     ClassicalFC,
     NoGoodCut,
     CombinatorialOC,
+    LShapedOC,
 
     ClassicalFCGen,
     ClassicalOCGen,
@@ -80,6 +81,8 @@ __all__ = [
     "ClassicalFC",
     "NoGoodCut",
     "CombinatorialOC",
+    "LShapedOC",
+
     "ClassicalFCGen",
     "ClassicalOCGen",
     "CombinatorialFCGen",

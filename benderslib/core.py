@@ -381,7 +381,7 @@ class MasterProblem(ProblemBase):
 
         self.__added_cut = set()
 
-    def _add_estimators(self, multiple: bool = False, num: int = 1, lb: float = 0.0) -> None:
+    def _add_estimators(self, multiple: bool = False, prob: list[float] = None, lb: float = 0.0) -> None:
         """
         Add estimator variable(s) to the master problem.
 
@@ -390,21 +390,26 @@ class MasterProblem(ProblemBase):
         multiple : bool, optional
             If True, add multiple estimator variables (only for stochastic Benders);
             if False, add a single estimator variable. Default is False.
-        num : int, optional
-            The number of estimator variables to add if `multiple` is True (equals to the number of subproblems).
-            Default is 1.
+        prob : list[float], optional
+            A list of probabilities (or weights) for each estimator variable when `multiple` is True.
+            Default is None.
         lb : float, optional
             The lower bound for the estimator variable(s). Default is 0.0.
         """
-        estimators = [CST.ESTIMATOR_FORMAT.format(i + 1) for i in range(num)] if multiple else [CST.ESTIMATOR_NAME]
+        # Number of estimator variables
+        _num = len(prob) if multiple else 1
+
+        # Add estimator variable(s)
+        estimators = [CST.ESTIMATOR_FORMAT.format(i + 1) for i in range(_num)] if multiple else [CST.ESTIMATOR_NAME]
         var_types = [CST.CONTINUOUS] * len(estimators)
         lb = [lb] * len(estimators)
         ub = [float('Inf')] * len(estimators)
-
         self.add_vars(estimators, var_types, lb, ub)
 
+        # Update objective function
+        _update = {est: p for est, p in zip(estimators, prob)} if multiple else {estimators[0]: 1.0}
         obj_expr = self.get_obj_expr()
-        obj_expr.update({est: 1.0 / num if multiple else 1.0 for est in estimators})
+        obj_expr.update(_update)
         self.set_obj(obj_expr)
 
         self.estimators = estimators
@@ -436,7 +441,7 @@ class MasterProblem(ProblemBase):
             The name of the added cut in the master problem.
         """
         if cut in self.__added_cut:
-            # BendersLogger.warning(f"Warning: Duplicate cut detected: {cut}. This cut will not be added again.")
+            BendersLogger.warning(f"Warning: Duplicate cut detected: {cut}. This cut will not be added again.")
             return None
         else:
             self.__added_cut.add(cut)
@@ -494,11 +499,11 @@ class SubProblems:
     def __init__(
             self,
             sub_problems: Iterable['SubProblem'],
-            prob: list[float] = None,
+            prob: list[float] | None = None,
     ):
         self.sub_problems = list(sub_problems)
         """A list of :class:`SubProblem` instances representing the subproblems."""
-        self.prob = prob
+        self.prob = prob or [1.0 / len(self.sub_problems)] * len(self.sub_problems)
         """A list of probabilities or weights associated with each subproblem. If None, equal weights are assumed."""
         self.params = None
         """An instance of :class:`BendersParams` containing parameters for the Benders decomposition process."""
@@ -521,7 +526,7 @@ class SubProblems:
 
     def get_obj(self) -> float:
         objs = [sub.get_obj() for sub in self.sub_problems]
-        return sum(ob * p for ob, p in zip(objs, self.prob))
+        return sum(obj * p for obj, p in zip(objs, self.prob))
 
     def fix_vars(self, var_values: dict):
         for sub in self.sub_problems:
@@ -807,6 +812,7 @@ class BendersSolver:
         """An instance of :class:`BendersResult` that stores the results and statistics."""
         self.__logger = BendersLogger(self)
         """An instance of :class:`BendersLogger` for handling logging."""
+        self.__prob = self.sub_problem.prob if isinstance(self.sub_problem, SubProblems) else None
 
     @classmethod
     def from_models(
@@ -898,8 +904,17 @@ class BendersSolver:
         self.result.status = CST.FEASIBLE
 
         self.result.lb = self.master_problem.get_obj()
-        estimator_values = self.master_problem.get_estimator_values()
-        theta = sum(estimator_values.values()) / len(estimator_values)
+        estimator_vals = self.master_problem.get_estimator_values()
+
+        if isinstance(self.sub_problem, SubProblem) or not self.params.multi_opti_cut:
+            # Deterministic problem, or stochastic problem with a single estimator
+            theta = estimator_vals[CST.ESTIMATOR_NAME]
+        else:
+            # Stochastic problem with multiple estimators
+            theta = sum(
+                estimator_vals[f"{CST.ESTIMATOR_FORMAT.format(i + 1)}"] * p
+                for i, p in enumerate(self.__prob)
+            )
 
         self.result.ub = self.result.lb - theta + self.sub_problem.get_obj()
 
@@ -939,18 +954,17 @@ class BendersSolver:
 
         return False
 
-    def __pre_process(self):
-        # Add estimator variable(s) to the master problem
-        if isinstance(self.sub_problem, SubProblem):
-            # Deterministic problem with SubProblem
-            self.master_problem._add_estimators(multiple=False, num=1, lb=self.params.theta_lb)
+    def __preprocess(self):
+        # Add estimators to the master problem
+        if isinstance(self.sub_problem, SubProblem) or not self.params.multi_opti_cut:
+            # Deterministic problem, or stochastic problem with a single estimator
+            self.master_problem._add_estimators(lb=self.params.theta_lb)
         else:
-            # Stochastic problem with SubProblems
-            self.master_problem._add_estimators(
-                multiple=self.params.multi_opti_cut,
-                num=len(self.sub_problem),
-                lb=self.params.theta_lb
-            )
+            # Stochastic problem with multiple estimators
+            self.master_problem._add_estimators(multiple=True, prob=self.__prob, lb=self.params.theta_lb)
+
+        # Other preprocessing steps can be added here
+        ...
 
     def solve(self, callback=None) -> None:
         """
@@ -990,7 +1004,7 @@ class BendersSolver:
         """
 
         # Initialize
-        self.__pre_process()
+        self.__preprocess()
 
         self.result.status = CST.UNSOLVED
         self.result.n_iter = 0
