@@ -883,7 +883,7 @@ class BendersSolver:
 
         )
 
-    def _add_optimality_cut(self):
+    def __add_optimality_cut(self):
         """
         The method to add one or multiple :class:`OptimalityCut` to :class:`MasterProblem`.
         """
@@ -891,7 +891,7 @@ class BendersSolver:
         for cut in cuts:
             self.master_problem.add_cut(cut)
 
-    def _add_feasibility_cut(self):
+    def __add_feasibility_cut(self):
         """
         The method to add one or multiple :class:`FeasibilityCut` to :class:`MasterProblem`.
         """
@@ -1032,7 +1032,7 @@ class BendersSolver:
                     self.result.ub_list.append(self.result.ub)
                     if self.__terminate(time_start):
                         break
-                    self._add_feasibility_cut()
+                    self.__add_feasibility_cut()
 
                 # Sub problem is optimal -> add optimality cut
                 elif self.sub_problem.status == CST.OPTIMAL:
@@ -1041,7 +1041,7 @@ class BendersSolver:
                     # REACH OPTIMALITY
                     if self.__terminate(time_start):
                         break
-                    self._add_optimality_cut()
+                    self.__add_optimality_cut()
 
                 # Sub problem is neither infeasible nor optimal -> error
                 else:
