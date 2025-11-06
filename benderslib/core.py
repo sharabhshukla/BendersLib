@@ -425,7 +425,7 @@ class MasterProblem(ProblemBase):
         """
         return self.get_var_values(self.estimators)
 
-    def add_cut(self, cut) -> str:
+    def add_cut(self, cut) -> str | None:
         """
         Add a cut (optimality or feasibility) to the master problem, and update the corresponding cut lists
         :attr:`optimality_cuts` or :attr:`feasibility_cuts`.

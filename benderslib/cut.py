@@ -118,7 +118,7 @@ class ClassicalFCGen(CutGenerator):
         return [cut]
 
 
-class NoGoodCut(FeasibilityCut):
+class NoGoodFC(FeasibilityCut):
     """
     The no-good cut (feasibility cut) for Combinatorial Benders Decomposition. Please refer to :doc:`../tutorials/cbd`.
     It is defined as follows to ensure at least one binary variable changes its value in the next iteration,
@@ -152,7 +152,7 @@ class NoGoodCut(FeasibilityCut):
         coefs = [1.0] * len(var_ones) + [-1.0] * len(var_zeros)
         rhs = len(var_ones) - 1
 
-        super().__init__(vars=vars, coefs=coefs, rhs=rhs, sense='<=', name="NoGoodCut")
+        super().__init__(vars=vars, coefs=coefs, rhs=rhs, sense='<=', name="NoGoodFC")
 
 
 class CombinatorialFCGen(CutGenerator):
@@ -160,14 +160,14 @@ class CombinatorialFCGen(CutGenerator):
     def __init__(self, master_problem, sub_problem, params):
         super().__init__(master_problem, sub_problem, params)
 
-    def generate(self) -> list[NoGoodCut]:
+    def generate(self) -> list[NoGoodFC]:
         """
-        This method generates :class:`NoGoodCut` feasibility cuts based on the current solution
+        This method generates :class:`NoGoodFC` feasibility cuts based on the current solution
         of the master problem.
         """
         var_values = self._master_problem.get_var_values(self._complicating_vars)
 
-        cut = NoGoodCut(var_values)
+        cut = NoGoodFC(var_values)
         return [cut]
 
 

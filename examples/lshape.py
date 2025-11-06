@@ -87,7 +87,7 @@ if __name__ == '__main__':
     n_scenarios = 99
     total_capacity = 10
     scenarios = [[random.randint(10, 220) for _ in range(n_plants)] for _ in range(n_scenarios)]
-    probs = [1.1 for _ in range(n_scenarios)]
+    probs = [11 for _ in range(n_scenarios)]
 
     # Deterministic equivalent solution
     de_model = deterministic_equivalent_model(n_plants, scenarios, probs, total_capacity)
@@ -104,7 +104,7 @@ if __name__ == '__main__':
     # Subproblems
     sub_models = second_stage_model(n_plants, scenarios, total_capacity)
     sub_problems = (SubProblem(solver_backend=Gurobi(sub_model)) for sub_model in sub_models)
-    prob = None
+    # prob = None
     sub_problems = SubProblems(sub_problems, prob=probs)
 
     # L-shaped method

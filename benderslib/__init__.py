@@ -35,7 +35,7 @@ from .core import (
 from .cut import (
     ClassicalOC,
     ClassicalFC,
-    NoGoodCut,
+    NoGoodFC,
     CombinatorialOC,
     LShapedOC,
 
@@ -79,7 +79,7 @@ __all__ = [
 
     "ClassicalOC",
     "ClassicalFC",
-    "NoGoodCut",
+    "NoGoodFC",
     "CombinatorialOC",
     "LShapedOC",
 

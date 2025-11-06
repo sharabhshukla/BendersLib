@@ -10,7 +10,7 @@ with customized Benders cuts.
 
 # %%
 # Define the original problem:
-from benderslib import Gurobi, AnnotationBenders, CombinatorialBenders, NoGoodCut, MasterProblem, SubProblem
+from benderslib import Gurobi, AnnotationBenders, CombinatorialBenders, NoGoodFC, MasterProblem, SubProblem
 from gurobipy import Model, GRB
 
 
@@ -57,7 +57,7 @@ def cut_generator(master_problem: MasterProblem, sub_problem: SubProblem):
     iis_vars = [v.VarName for v in sp.getVars() if v.IISLB or v.IISUB]
     iis_var_values = master_problem.get_var_values(iis_vars)
 
-    cut = NoGoodCut(iis_var_values)
+    cut = NoGoodFC(iis_var_values)
     return [cut]
 
 

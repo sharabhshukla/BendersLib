@@ -29,7 +29,7 @@ Built-in Benders Cuts
    :inherited-members:
    :show-inheritance:
 
-.. autoclass:: NoGoodCut
+.. autoclass:: NoGoodFC
    :inherited-members:
    :show-inheritance:
 
@@ -66,7 +66,7 @@ Combinatorial Benders Decomposition
 --------------------------------------
 
 Please refer to :doc:`../tutorials/cbd` for its theory and
-the definition of no-good (feasibility) cut (:class:`NoGoodCut`) and combinatorial optimality cut (:class:`CombinatorialCut`).
+the definition of no-good (feasibility) cut (:class:`NoGoodFC`) and combinatorial optimality cut (:class:`CombinatorialCut`).
 
 .. autoclass:: CombinatorialOCGen
     :show-inheritance:
