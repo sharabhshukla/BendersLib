@@ -92,29 +92,29 @@ class Gurobi(SolverBase):
         res = {expr.getVar(i).VarName: expr.getCoeff(i) for i in range(expr.size())}
         return res
 
-    def set_obj(self, var_coefs: dict) -> None:
+    def set_obj(self, var_coefs: dict[str, float]) -> None:
         coefs = list(var_coefs.values())
         vars = [self.model.getVarByName(var) for var in var_coefs.keys()]
         obj_expr = LinExpr(coefs, vars)
         self.model.setObjective(obj_expr, sense=GRB.MINIMIZE if self._sense == CST.MIN else GRB.MAXIMIZE)
         self.model.update()
 
-    def fix_vars(self, var_values: dict):
+    def fix_vars(self, var_values: dict[str, float]) -> None:
         for var_name, var_value in var_values.items():
             var = self.model.getVarByName(var_name)
             var.lb = var_value
             var.ub = var_value
 
-    def unfix_vars(self, vars: list):
+    def unfix_vars(self, vars: list[str]) -> None:
         for var_name in vars:
             var = self.model.getVarByName(var_name)
             var.lb, var.ub = self._var_bounds.get(var_name, (0, GRB.INFINITY))
 
-    def get_var_values(self, vars=None) -> dict:
+    def get_var_values(self, vars: list[str] | None = None) -> dict[str, float]:
         vars = vars or self._all_vars
         return {var_name: self.model.getVarByName(var_name).X for var_name in vars}
 
-    def get_var_coefs(self, vars=None) -> dict:
+    def get_var_coefs(self, vars: list[str] | None = None) -> dict[str, list]:
         # vars = vars or self._all_vars
         # _all_cons = self.model.getConstrs()
         # res = {v: [0.0] * len(_all_cons) for v in vars}
@@ -140,19 +140,19 @@ class Gurobi(SolverBase):
 
         return res
 
-    def get_rhs(self) -> list:
+    def get_rhs(self) -> list[float]:
         return self.model.getAttr('RHS', self.model.getConstrs())
 
-    def get_dual_values(self) -> list:
+    def get_dual_values(self) -> list[float]:
         return self.model.getAttr('Pi', self.model.getConstrs())
 
-    def get_extreme_ray(self) -> list:
+    def get_extreme_ray(self) -> list[float]:
         return self.model.FarkasDual
 
     def get_obj(self) -> float:
         return self.model.ObjVal
 
-    def add_cut(self, cut, name=None):
+    def add_cut(self, cut, name=None) -> None:
         lhs = sum(coef * self.model.getVarByName(var) for var, coef in zip(cut.vars, cut.coefs))
         if cut.sense == CST.EQ:
             self.model.addConstr(lhs == cut.rhs, name=name)
@@ -160,13 +160,12 @@ class Gurobi(SolverBase):
             self.model.addConstr(lhs <= cut.rhs, name=name)
         elif cut.sense == CST.GE:
             self.model.addConstr(lhs >= cut.rhs, name=name)
-        # self.model.addConstr(lhs >= cut.rhs, name=name)
 
-    def remove_cut(self, cut_name):
+    def remove_cut(self, cut_name: str) -> None:
         con = self.model.getConstrByName(cut_name)
         self.model.remove(con)
 
-    def solve(self):
+    def solve(self) -> None:
         # Hide solver output
         self.model.Params.OutputFlag = 0
         self.model.Params.LogToConsole = 0

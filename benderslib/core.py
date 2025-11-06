@@ -186,13 +186,13 @@ class ProblemBase:
         """
         self.model.set_obj(var_coefs)
 
-    def fix_vars(self, var_values: dict):
+    def fix_vars(self, var_values: dict[str, float]) -> None:
         """
         Fix the values of specified variables in the model.
 
         Parameters
         ---------------
-        var_values : dict
+        var_values : dict[str, float]
             A dictionary mapping variable names to their fixed values.
 
         Example
@@ -204,7 +204,7 @@ class ProblemBase:
         """
         self.model.fix_vars(var_values)
 
-    def unfix_vars(self, vars: list[str]):
+    def unfix_vars(self, vars: list[str]) -> None:
         """
         Unfix the specified variables in the model, restoring their original bounds.
 
@@ -222,13 +222,13 @@ class ProblemBase:
         """
         self.model.unfix_vars(vars)
 
-    def get_var_values(self, vars: list[str] = None) -> dict[str, float | int]:
+    def get_var_values(self, vars: list[str] | None = None) -> dict[str, float]:
         """
         Get the current values of specified variables in the model.
 
         Parameters
         ---------------
-        vars : list or None
+        vars : list[str] or None
             A list of variable names to retrieve values for. If None, retrieves values for all variables
 
         Returns
@@ -248,13 +248,13 @@ class ProblemBase:
         """
         return self.model.get_var_values(vars)
 
-    def get_var_coefs(self, vars: list[str] = None) -> dict[str, list]:
+    def get_var_coefs(self, vars: list[str] | None = None) -> dict[str, list]:
         """
         Get the coefficients of specified variables in all the constraints of the model.
 
         Parameters
         ---------------
-        vars : list or None
+        vars : list[str] or None
             A list of variable names to retrieve coefficients for. If None, retrieves coefficients for all variables.
 
         Returns
@@ -272,7 +272,7 @@ class ProblemBase:
         """
         return self.model.get_var_coefs(vars)
 
-    def get_rhs(self) -> list[float | int]:
+    def get_rhs(self) -> list[float]:
         """
         Get the right-hand side values of all constraints in the model.
 
@@ -289,7 +289,7 @@ class ProblemBase:
         """
         return self.model.get_rhs()
 
-    def get_dual_values(self) -> list[float | int]:
+    def get_dual_values(self) -> list[float]:
         """
         Get the dual values (shadow prices) of all constraints in the model.
         This is essential for generating Classical Benders optimality cuts,
@@ -308,7 +308,7 @@ class ProblemBase:
         """
         return self.model.get_dual_values()
 
-    def get_extreme_ray(self) -> list[float | int]:
+    def get_extreme_ray(self) -> list[float]:
         """
         Get the extreme ray of the model.
         This is essential for generating Classical Benders feasibility cuts,
@@ -344,7 +344,7 @@ class ProblemBase:
         """
         return self.model.get_obj()
 
-    def solve(self):
+    def solve(self) -> None:
         """
         Solve :attr:`model` by calling :func:`SolverBase.solve()` and update the :attr:`status` attribute.
         """
@@ -425,7 +425,7 @@ class MasterProblem(ProblemBase):
         """
         return self.get_var_values(self.estimators)
 
-    def add_cut(self, cut):
+    def add_cut(self, cut) -> str:
         """
         Add a cut (optimality or feasibility) to the master problem, and update the corresponding cut lists
         :attr:`optimality_cuts` or :attr:`feasibility_cuts`.
@@ -459,7 +459,7 @@ class MasterProblem(ProblemBase):
         self.model.add_cut(cut, name=cut_name)
         return cut_name
 
-    def remove_cut(self, cut_name):
+    def remove_cut(self, cut_name: str) -> None:
         """
         Remove a constraint from the solver's model by its name.
 
@@ -528,17 +528,17 @@ class SubProblems:
         objs = [sub.get_obj() for sub in self.sub_problems]
         return sum(obj * p for obj, p in zip(objs, self.prob))
 
-    def fix_vars(self, var_values: dict):
+    def fix_vars(self, var_values: dict[str, float]) -> None:
         for sub in self.sub_problems:
             sub.fix_vars(var_values)
 
-    def get_var_values(self, vars: list[str] = None):
+    def get_var_values(self, vars: list[str] = None) -> dict[int, dict[str, float]]:
         var_values = {}
         for i, sub in enumerate(self.sub_problems):
             var_values[i] = sub.get_var_values(vars)
         return var_values
 
-    def solve(self):
+    def solve(self) -> None:
         for sub in self.sub_problems:
             sub.solve()
             if sub.status == CST.INFEASIBLE and not self.params.multi_feas_cut:

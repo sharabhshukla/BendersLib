@@ -119,13 +119,13 @@ class SolverBase(ABC):
         ...
 
     @abstractmethod
-    def fix_vars(self, var_values: dict) -> None:
+    def fix_vars(self, var_values: dict[str, float]) -> None:
         """
         Fix the values of specified variables in the model.
 
         Parameters
         ---------------
-        var_values : dict
+        var_values : dict[str, float]
             A dictionary mapping variable names to their fixed values.
 
         Example
@@ -138,13 +138,13 @@ class SolverBase(ABC):
         ...
 
     @abstractmethod
-    def unfix_vars(self, vars: list) -> None:
+    def unfix_vars(self, vars: list[str]) -> None:
         """
         Unfix the specified variables in the model, restoring their original bounds.
 
         Parameters
         ---------------
-        vars : list
+        vars : list[str]
             A list of variable names to be unfixed.
 
         Example
@@ -157,13 +157,13 @@ class SolverBase(ABC):
         ...
 
     @abstractmethod
-    def get_var_values(self, vars=None) -> dict:
+    def get_var_values(self, vars: list[str] | None = None) -> dict[str, float]:
         """
         Get the current values of specified variables in the model.
 
         Parameters
         ---------------
-        vars : list or None
+        vars : list[str] or None
             A list of variable names to retrieve values for. If None, retrieves values for all variables
 
         Returns
@@ -184,13 +184,13 @@ class SolverBase(ABC):
         ...
 
     @abstractmethod
-    def get_var_coefs(self, vars=None) -> dict[str, list]:
+    def get_var_coefs(self, vars: list[str] | None = None) -> dict[str, list]:
         """
         Get the coefficients of specified variables in all the constraints of the model.
 
         Parameters
         ---------------
-        vars : list or None
+        vars : list[str] or None
             A list of variable names to retrieve coefficients for. If None, retrieves coefficients for all variables.
 
         Returns
@@ -209,7 +209,7 @@ class SolverBase(ABC):
         ...
 
     @abstractmethod
-    def get_rhs(self) -> list:
+    def get_rhs(self) -> list[float]:
         """
         Get the right-hand side values of all constraints in the model.
 
@@ -227,7 +227,7 @@ class SolverBase(ABC):
         ...
 
     @abstractmethod
-    def get_dual_values(self) -> list:
+    def get_dual_values(self) -> list[float]:
         """
         Get the dual values (shadow prices) of all constraints in the model.
         This is essential for generating Classical Benders optimality cuts,
@@ -247,7 +247,7 @@ class SolverBase(ABC):
         ...
 
     @abstractmethod
-    def get_extreme_ray(self) -> list:
+    def get_extreme_ray(self) -> list[float]:
         """
         Get the extreme ray of the model.
         This is essential for generating Classical Benders feasibility cuts,
@@ -308,7 +308,7 @@ class SolverBase(ABC):
         ...
 
     @abstractmethod
-    def remove_cut(self, cut_name) -> None:
+    def remove_cut(self, cut_name: str) -> None:
         """
         Remove a constraint from the solver's model by its name.
 
