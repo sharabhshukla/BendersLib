@@ -1,7 +1,6 @@
 # coding:utf-8
 
 from ..consts import BendersConsts as CST
-from ..params import BendersParams
 from .base import SolverBase
 
 from gurobipy import Model, GRB, LinExpr
