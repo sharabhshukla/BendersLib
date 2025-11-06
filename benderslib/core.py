@@ -566,15 +566,12 @@ class Cut:
     rhs : float | int
         The right-hand side value of the cut.
     sense : str
-        The sense of the cut, must be in :attr:`senses`.
+        The sense of the cut, must be :attr:`BendersConsts.LE`, :attr:`BendersConsts.GE`, or :attr:`BendersConsts.EQ`.
     ctype : str
         :attr:`BendersConsts.OPTIMALITY` or :attr:`BendersConsts.FEASIBILITY`.
     name : str
         A name for the cut.
     """
-
-    senses = {CST.LE, CST.GE, CST.EQ}
-    """Allowed senses for the cut, :attr:`BendersConsts.LE`, :attr:`BendersConsts.GE`, and :attr:`BendersConsts.EQ`."""
 
     def __init__(
             self,
@@ -585,7 +582,7 @@ class Cut:
             ctype: Union[CST.OPTIMAL, CST.FEASIBILITY],
             name: str,
     ):
-        assert sense in self.senses, f"sense {sense} must be one of: {self.senses}"
+        assert sense in {CST.LE, CST.GE, CST.EQ}, f"sense {sense} must be one of: {{CST.LE, CST.GE, CST.EQ}}"
 
         self.vars = vars
         self.coefs = coefs
