@@ -523,20 +523,75 @@ class SubProblems:
         return len(self.sub_problems)
 
     def get_obj(self) -> float:
+        """
+        Get the :attr:`prob` weighted objective value of all subproblems.
+
+        Returns
+        ---------------
+        float
+            The weighted objective value.
+
+        Example
+        ---------------
+        .. code-block:: python
+
+                obj_val = sub_problems.get_obj()
+        """
         objs = [sub.get_obj() for sub in self.sub_problems]
         return sum(obj * p for obj, p in zip(objs, self.prob))
 
     def fix_vars(self, var_values: dict[str, float]) -> None:
+        """
+        Fix the values of specified variables in all subproblems.
+
+        Parameters
+        ---------------
+        var_values : dict[str, float]
+            A dictionary mapping variable names to their fixed values.
+
+        Example
+        ---------------
+
+        .. code-block:: python
+
+                sub_problems.fix_vars({'x1': 10, 'x2': 5.5})
+        """
         for sub in self.sub_problems:
             sub.fix_vars(var_values)
 
     def get_var_values(self, vars: list[str] = None) -> dict[int, dict[str, float]]:
+        """
+        Get the current values of specified variables in all subproblems.
+
+        Parameters
+        ---------------
+        vars : list[str], optional
+            A list of variable names to retrieve values for. If None, retrieves values for all variables.
+
+        Returns
+        ---------------
+        dict[int, dict[str, float]]
+            A dictionary mapping subproblem indices to dictionaries of variable names and their current values.
+
+        Example
+        ---------------
+        .. code-block:: python
+
+                values = sub_problems.get_var_values(['x1', 'x2'])
+                # or get all variable values
+                all_values = sub_problems.get_var_values()
+        """
         var_values = {}
         for i, sub in enumerate(self.sub_problems):
             var_values[i] = sub.get_var_values(vars)
         return var_values
 
     def solve(self) -> None:
+        """
+        Solve all subproblems and update the :attr:`status` attribute.
+        If any subproblem is infeasible and :attr:`BendersParams.multi_feas_cut` is `False`,
+        the solving process will stop early.
+        """
         for sub in self.sub_problems:
             sub.solve()
             if sub.status == CST.INFEASIBLE and not self.params.multi_feas_cut:
