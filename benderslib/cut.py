@@ -253,11 +253,6 @@ class LShapedOC(OptimalityCut):
     .. math::
         \\theta \\geq \\sum_{\\omega} p_\\omega [\\pi_\\omega^T (h_\\omega - T_\\omega x)]
 
-    It is rearranged to the standard linear constraint form below.
-
-    .. math::
-        (\\sum_{\\omega} p_\\omega \\pi_\\omega^T T_\\omega) x + \\theta \\geq \\sum_{\\omega} p_\\omega \\pi_\\omega^T h_\\omega
-
     Parameters
     ----------
     vars : list[str]
@@ -343,10 +338,6 @@ class LShapedOCGen(CutGenerator):
     def _multi_cuts(self) -> list[ClassicalOC]:
         """
         This method generates multiple :class:`ClassicalOC` optimality cuts, one for each subproblem (scenario).
-
-        .. note::
-            The cut is only generated if the subproblem's objective value exceeds the current estimator value
-            in the master problem for that scenario.
         """
         cuts = []
         for i, sub in enumerate(self._sub_problem):
@@ -363,10 +354,12 @@ class LShapedOCGen(CutGenerator):
 
         return cuts
 
-    def generate(self) -> list[ClassicalOC]:
+    def generate(self) -> list[ClassicalOC] | list[LShapedOC]:
         """
-        This method generates :class:`ClassicalOC` optimality cuts based on the current solution
+        This method generates optimality cuts based on the current solution
         of the master problem and the dual values obtained from the subproblems.
+        If :attr:`BendersParams.multi_opti_cut` is ``True``, :func:`_multi_cuts` is called to generate multiple cuts;
+        otherwise, :func:`_single_cut` is called to generate a single aggregated cut.
         """
         return self._multi_cuts() if self.params.multi_opti_cut else self._single_cut()
 
@@ -383,7 +376,7 @@ class LShapedFCGen(CutGenerator):
             self.var_coefs[i] = sub.get_var_coefs(self._complicating_vars)
             self.rhs[i] = sub.get_rhs()
 
-    def generate(self):
+    def generate(self) -> list[ClassicalFC]:
         """
         This method generates :class:`ClassicalFC` feasibility cuts based on the current solution
         of the master problem and the extreme rays obtained from the subproblems.

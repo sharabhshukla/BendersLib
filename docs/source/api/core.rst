@@ -37,6 +37,10 @@ Master and Sub Problem
    :inherited-members:
    :show-inheritance:
 
+.. autoclass:: SubProblems
+   :inherited-members:
+   :show-inheritance:
+
 Benders Algorithm
 -----------------------------------------
 

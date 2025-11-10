@@ -11,7 +11,7 @@ Classical Benders Decomposition
 Original Problem
 ---------------------------------
 
-Benders decomposition [#]_ is applied to MILPs or other problems that have a mix of "difficult" and "easy" variables.
+The Benders decomposition [#]_ is applied to MILPs or other problems that have a mix of "difficult" and "easy" variables.
 The difficult variable, namely "**complicating variables**", are variables that, if their values were fixed,
 would make the rest of the problem much easier to solve.
 The canonical example is a problem with both integer variables and continuous variables.

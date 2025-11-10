@@ -11,7 +11,7 @@ Combinatorial Benders Decomposition
 Original Problem
 --------------------------------------------
 
-Combinatorial Benders Decomposition (CBD) [1]_ extends the classical Benders framework to problems where fixing the
+The Combinatorial Benders Decomposition (CBD) [1]_ extends the classical Benders framework to problems where fixing the
 complicating variables results in a subproblem that is itself can be a combinatorial optimization problem.
 This is in contrast to classical Benders, where the subproblem is a LP.
 Consider a MILP of the form:
