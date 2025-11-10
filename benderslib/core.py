@@ -447,15 +447,13 @@ class MasterProblem(ProblemBase):
             self.__added_cut.add(cut)
 
         if cut.ctype == CST.OPTIMALITY:
-            cut_id = f"OC{next(self.__oc_id)}"
-            cut.cut_id = cut_id
+            cut_id = f"O_{next(self.__oc_id)}"
             self.optimality_cuts.append(cut)
         else:
-            cut_id = f"FC{next(self.__fc_id)}"
-            cut.cut_id = cut_id
+            cut_id = f"F_{next(self.__fc_id)}"
             self.feasibility_cuts.append(cut)
 
-        cut_name = f"{cut.name}_{cut.cut_id}"
+        cut_name = f"{cut.name}_{cut_id}"
         self.model.add_cut(cut, name=cut_name)
         return cut_name
 
@@ -590,10 +588,6 @@ class Cut:
         self.sense = sense
         self.ctype = ctype
         self.name = name
-
-        # Attributes
-        self.cut_id = None
-        """Unique identifier for the cut, assigned when the cut is added to the master problem."""
 
     def __repr__(self):
         return (f"{self.name} ({self.ctype}): "
