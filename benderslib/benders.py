@@ -56,6 +56,7 @@ class ClassicalBenders(BendersSolver):
             complicating_vars,
             optimality_cut=ClassicalOCGen,
             feasibility_cut=ClassicalFCGen,
+            prob=None,
             params: BendersParams = BendersParams()
     ):
         return super().from_models(
@@ -66,6 +67,7 @@ class ClassicalBenders(BendersSolver):
             complicating_vars,
             optimality_cut,
             feasibility_cut,
+            prob,
             params
         )
 
@@ -122,6 +124,7 @@ class CombinatorialBenders(BendersSolver):
             complicating_vars,
             optimality_cut=CombinatorialOCGen,
             feasibility_cut=CombinatorialFCGen,
+            prob=None,
             params: BendersParams = BendersParams()
     ):
         return super().from_models(
@@ -132,6 +135,7 @@ class CombinatorialBenders(BendersSolver):
             complicating_vars,
             optimality_cut,
             feasibility_cut,
+            prob,
             params
         )
 
@@ -189,6 +193,7 @@ class LShaped(BendersSolver):
             complicating_vars,
             optimality_cut=LShapedOCGen,
             feasibility_cut=LShapedFCGen,
+            prob=None,
             params: BendersParams = BendersParams()
     ):
         return super().from_models(
@@ -199,6 +204,7 @@ class LShaped(BendersSolver):
             complicating_vars,
             optimality_cut,
             feasibility_cut,
+            prob,
             params
         )
 

@@ -245,7 +245,7 @@ class CombinatorialOCGen(CutGenerator):
 
 class LShapedOC(OptimalityCut):
     """
-    An aggregated optimality cut for the L-shaped method (single-cut version).
+    An aggregated optimality cut for the :doc:`../tutorials/lshape` (single-cut version).
     This class encapsulates the aggregation logic. It takes raw data from all
     scenarios (probabilities, duals, matrices) and computes the final cut.
     The cut represents the following inequality.

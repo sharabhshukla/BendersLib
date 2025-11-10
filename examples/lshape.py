@@ -84,10 +84,10 @@ def deterministic_equivalent_model(n_plants, scenarios, probs, total_capacity):
 if __name__ == '__main__':
     # Data
     n_plants = 5
-    n_scenarios = 99
+    n_scenarios = 2
     total_capacity = 10
     scenarios = [[random.randint(10, 220) for _ in range(n_plants)] for _ in range(n_scenarios)]
-    probs = [11 for _ in range(n_scenarios)]
+    probs = [1.3 for _ in range(n_scenarios)]
 
     # Deterministic equivalent solution
     de_model = deterministic_equivalent_model(n_plants, scenarios, probs, total_capacity)
@@ -97,25 +97,32 @@ if __name__ == '__main__':
     else:
         print("Deterministic Equivalent Problem is infeasible or unbounded.\n")
 
-    # Master problem
+    # Solver models
     master_model, complicating_vars = first_stage_model(n_plants)
-    master_problem = MasterProblem(solver_backend=Gurobi(master_model))
-
-    # Subproblems
     sub_models = second_stage_model(n_plants, scenarios, total_capacity)
-    sub_problems = (SubProblem(solver_backend=Gurobi(sub_model)) for sub_model in sub_models)
-    # prob = None
-    sub_problems = SubProblems(sub_problems, prob=probs)
 
-    # L-shaped method
-    params = BendersParams(
-        multi_opti_cut=True,
-        # multi_feas_cut=True
-    )
-    L = LShaped(
-        master_problem=master_problem,
-        sub_problem=sub_problems,
+    # # Create L-shaped solver
+    # master_problem = MasterProblem(solver_backend=Gurobi(master_model))
+    # sub_problems = (SubProblem(solver_backend=Gurobi(sub_model)) for sub_model in sub_models)
+    # sub_problems = SubProblems(sub_problems, prob=probs)
+    # L = LShaped(
+    #     master_problem=master_problem,
+    #     sub_problem=sub_problems,
+    #     complicating_vars=complicating_vars,
+    # )
+
+    # Another way to create L-shaped solver
+    L = LShaped.from_models(
+        master_model=master_model,
+        master_solver=Gurobi,
+        sub_model=sub_models,
+        sub_solver=Gurobi,
         complicating_vars=complicating_vars,
-        params=params
+        prob=probs,
     )
+
+    # L.params.multi_opti_cut = True
+    # L.params.multi_feas_cut = True
+    L.params.log_freq_sec = 0.0
+
     L.solve()

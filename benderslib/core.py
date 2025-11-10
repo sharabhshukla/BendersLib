@@ -4,7 +4,7 @@ import itertools
 import time
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import Union, Iterable, Callable, Iterator
+from typing import Union, Iterable, Callable, Iterator, Type
 import inspect
 
 from .consts import BendersConsts as CST
@@ -864,12 +864,13 @@ class BendersSolver:
     def from_models(
             cls,
             master_model,
-            master_solver,
+            master_solver: Type[SolverBase],
             sub_model,
-            sub_solver,
-            complicating_vars,
-            optimality_cut,
-            feasibility_cut,
+            sub_solver: Type[SolverBase],
+            complicating_vars: list[str],
+            optimality_cut: Type[CutGenerator],
+            feasibility_cut: Type[CutGenerator],
+            prob: list[float] | None = None,
             params: BendersParams = BendersParams()
     ):
         """
@@ -897,12 +898,19 @@ class BendersSolver:
             cuts.
             It also accepts a function with signature ``func(master_problem, sub_problem) -> list[FeasibilityCut]``.
             If `None`, no feasibility cuts will be added.
+        prob : list[float], optional
+            A list of probabilities (or weights) for each subproblem when using multiple subproblems (L-shaped method).
         params : BendersParams, optional
             An instance of :class:`BendersParams` containing parameters for the Benders decomposition process.
             If not provided, default parameters will be used.
         """
         master_problem = MasterProblem(master_solver(master_model))
-        sub_problem = SubProblem(sub_solver(sub_model))
+
+        if isinstance(sub_model, Iterable):
+            sub_problem = (SubProblem(sub_solver(sub)) for sub in sub_model)
+            sub_problem = SubProblems(sub_problem, prob=prob)
+        else:
+            sub_problem = SubProblem(sub_solver(sub_model))
 
         return cls(
             master_problem,
