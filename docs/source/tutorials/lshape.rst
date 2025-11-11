@@ -86,8 +86,7 @@ that represents the expected future cost of the second-stage decisions.
    \text{s.t.} \quad & Ax \geq b \\
                      & x \in X \\
                      & \theta \geq \dots (\text{optimality cuts}) \\
-                     & 0 \geq \dots (\text{feasibility cuts}) \\
-                     & 0 \leq \theta < +\infty
+                     & 0 \geq \dots (\text{feasibility cuts})
    \end{aligned}
 
 For a given first-stage decision :math:`\bar{x}`, the second-stage problem decomposes into :math:`|\Omega|` independent

@@ -109,8 +109,8 @@ Contents
    cbd.rst
    lshape.rst
    ilshape.rst
-   gbd.rst
    lbbd.rst
+   gbd.rst
    enhance.rst
 
 References

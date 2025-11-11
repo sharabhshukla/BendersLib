@@ -198,13 +198,13 @@ and adding Benders cuts to the master problem based on the subproblem's results.
           *   Update the upper bound by :math:`UB = \min(UB, c^T \bar{x}_k + f^T \bar{y}_k)`.
           *   Add a **Benders optimality cut** to the master problem for lower bounding :math:`\eta`.
 
-          .. caution::
+   .. caution::
 
-                *   For :math:`-\infty < \eta < +\infty` introduced in the master problem for optimality cuts,
-                    :math:`\infty` should be replaced with a sufficiently large number,
-                    that remains as small as possible to ensure validity, to avoid numerical issues in practice.
-                *   In BendersLib, :math:`-\infty` is provided as a customizable parameter :attr:`BendersParams.theta_lb`;
-                    :math:`+\infty` is set to solvers' default upper bound for unbounded variables.
+        *   For :math:`-\infty < \eta < +\infty` introduced in the master problem for optimality cuts,
+            :math:`\infty` should be replaced with a sufficiently large number,
+            that remains as small as possible to ensure validity, to avoid numerical issues in practice.
+        *   In BendersLib, :math:`-\infty` is provided as a customizable parameter :attr:`BendersParams.theta_lb`;
+            :math:`+\infty` is set to solvers' default upper bound for unbounded variables.
 
    *   **Case B: subproblem is infeasible (dual is unbounded).**
 
