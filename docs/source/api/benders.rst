@@ -99,3 +99,26 @@ Therefore, :class:`ClassicalOC` and :class:`ClassicalFC` are also used in the L-
 .. autoclass:: LShaped
    :inherited-members:
    :show-inheritance:
+
+.. _api-ilshape:
+
+Integer L-shaped Method
+--------------------------------------
+
+Please refer to :doc:`../tutorials/ilshape` for its theory,
+the definition of integer L-shaped optimality cut (:class:`CombinatorialOC`),
+and no-good feasibility cut (:class:`NoGoodFC`).
+The integer L-shaped method is an extension of the L-shaped method and the Combinatorial Benders decomposition
+to solve two-stage stochastic integer programming problems.
+The cut used in this method are the same as those in Combinatorial Benders decomposition,
+and the algorithmic framework is similar to that of the L-shaped method.
+
+.. autoclass:: IntegerLShapedOCGen
+   :show-inheritance:
+
+.. autoclass:: IntegerLShapedFCGen
+   :show-inheritance:
+
+.. autoclass:: IntegerLShaped
+   :inherited-members:
+   :show-inheritance:

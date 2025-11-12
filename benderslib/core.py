@@ -1026,30 +1026,8 @@ class BendersSolver:
         This method implements the main Benders decomposition algorithm, iteratively solving the master and
         subproblems, adding cuts, and updating the results until convergence or stopping criteria are met.
 
-        .. Note::
-
-            After calling this method, the results and statistics of the Benders decomposition process can be accessed
-            through the :attr:`BendersSolver.result` attribute, which is an instance of :class:`BendersResult`.
-
-            .. code-block:: python
-                :emphasize-lines: 4
-
-                # Example usage:
-                BD = ClassicalBenders(master_problem, sub_problem, complicating_vars)
-                BD.solve()
-                print(BD.result)
-
-                # Output:
-                Benders Result:
-                  - Status:                  OPTIMAL
-                  - Incumbent:               2.0000
-                  - Bound:                   2.0000
-                  - Gap (abs.):              0.0000
-                  - Gap (rel.):              0.00%
-                  - Solutions No.:           1
-                  - Iteration No.:           3
-                  - Cuts No.:                2 [Optimality: 0, Feasibility: 2]
-                  - Solve Time (sec.):       0.00 [Master: 0.00, Sub: 0.00]
+        After calling this method, the results and statistics of the Benders decomposition process can be accessed
+        through the :attr:`BendersSolver.result` attribute, which is an instance of :class:`BendersResult`.
 
         Parameters
         ----------

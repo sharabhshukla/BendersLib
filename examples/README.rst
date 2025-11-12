@@ -14,7 +14,8 @@ Deterministic
 Stochastic
 ----------------------
 
-- :doc:`lshape`: A simple two-stage stochastic programming example.
+- :doc:`lshape`: A simple two-stage stochastic programming example with LP recourse using the L-shaped method.
+- :doc:`ilshape`: Integer L-shaped method for two-stage stochastic programming with binary complicating variables and integer recourse.
 
 
 Gallery

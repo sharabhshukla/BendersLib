@@ -44,13 +44,16 @@ from .cut import (
     CombinatorialFCGen,
     CombinatorialOCGen,
     LShapedOCGen,
-    LShapedFCGen
+    LShapedFCGen,
+    IntegerLShapedOCGen,
+    IntegerLShapedFCGen,
 )
 
 from .benders import (
     ClassicalBenders,
     CombinatorialBenders,
-    LShaped
+    LShaped,
+    IntegerLShaped
 )
 
 from .annotation import (
@@ -89,10 +92,13 @@ __all__ = [
     "CombinatorialOCGen",
     "LShapedOCGen",
     "LShapedFCGen",
+    "IntegerLShapedOCGen",
+    "IntegerLShapedFCGen",
 
     "ClassicalBenders",
     "CombinatorialBenders",
     "LShaped",
+    "IntegerLShaped",
 
     "AnnotationBenders",
 ]

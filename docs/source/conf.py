@@ -63,6 +63,7 @@ explicit_order = [
     'cbd_iis.py',
 
     'lshape.py',
+    'ilshape.py',
 
     'custom_template.py'
 ]

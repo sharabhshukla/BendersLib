@@ -227,6 +227,8 @@ The iterative procedure combines the loops of the :doc:`lshape` method with the 
     *   Rahmaniani et al. [#]_ discussed Benders decomposition with discrete subproblems.
     *   See :doc:`lshape` for the basis for the two-stage stochastic programming structure.
     *   See :doc:`cbd` for the basis for the no-good cut and combinatorial optimality cut.
+    * **Example**: :doc:`../examples/ilshape`.
+
 
 References
 ------------------------------

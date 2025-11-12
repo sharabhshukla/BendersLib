@@ -123,6 +123,9 @@ with interfaces to popular solvers.
 *   Annotation Benders Decomposition: :ref:`Implementation <api-annotation>`, :doc:`Example <examples/annotation_benders>`
 *   Classical Benders Decomposition: :doc:`Tutorial <tutorials/classical>`, :ref:`Implementation <api-classical>`, :doc:`Example <examples/classical_benders>`
 *   Combinatorial Benders Decomposition: :doc:`Tutorial <tutorials/cbd>`, :ref:`Implementation <api-cbd>`, :doc:`Example <examples/cbd>`
+*   L-shaped Method: :doc:`Tutorial <tutorials/lshape>`, :ref:`Implementation <api-lshape>`, :doc:`Example <examples/lshape>`
+*   Integer L-shaped Method: :doc:`Tutorial <tutorials/ilshape>`, :ref:`Implementation <api-ilshape>`, :doc:`Example <examples/ilshape>`
+*   **Customizing your own Benders Decomposition**: :doc:`Example <examples/custom_template>`
 
 The variants supported are not limited to the above.
 Since BendersLib is designed to be extensible, allowing users to implement their own Benders cuts.

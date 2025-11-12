@@ -394,6 +394,7 @@ class LShapedFCGen(CutGenerator):
         of the master problem and the extreme rays obtained from the subproblems.
         """
         cuts = []
+
         for i, sub in enumerate(self._sub_problem):
             if sub.status == CST.INFEASIBLE:
                 _var_coefs = self.var_coefs[i]
@@ -406,6 +407,66 @@ class LShapedFCGen(CutGenerator):
                     break
 
         return cuts
+
+
+class IntegerLShapedOCGen(CutGenerator):
+
+    def __init__(self, master_problem, sub_problem, params):
+        super().__init__(master_problem, sub_problem, params)
+
+    def _single_cut(self) -> list[CombinatorialOC]:
+        """
+        This method generates a single :class:`CombinatorialOC` optimality cut aggregating all subproblems (scenarios).
+        """
+        bin_var_values = self._master_problem.get_var_values(self._complicating_vars)
+        sub_obj = self._sub_problem.get_obj()
+        estimator = self._master_problem.estimators[0]
+        theta_lb = self._master_problem.get_estimator_values()[estimator]
+
+        cut = CombinatorialOC(bin_var_values, sub_obj, big_m=sub_obj - theta_lb, estimator=estimator)
+        return [cut]
+
+    def _multi_cuts(self) -> list[CombinatorialOC]:
+        """
+        This method generates multiple :class:`CombinatorialOC` optimality cuts, one for each subproblem (scenario).
+        """
+        cuts = []
+
+        for i, sub in enumerate(self._sub_problem):
+            bin_var_values = self._master_problem.get_var_values(self._complicating_vars)
+            sub_obj = sub.get_obj()
+            estimator = self._master_problem.estimators[i]
+            theta_lb = self._master_problem.get_estimator_values()[estimator]
+
+            cut = CombinatorialOC(bin_var_values, sub_obj, big_m=sub_obj - theta_lb, estimator=estimator)
+            cuts.append(cut)
+
+        return cuts
+
+    def generate(self):
+        """
+        This method generates optimality cuts based on the current values of binary complicating variables
+        in the master problem and the objective values obtained from the subproblems.
+        If :attr:`BendersParams.multi_opti_cut` is ``True``, :func:`_multi_cuts` is called to generate multiple cuts;
+        otherwise, :func:`_single_cut` is called to generate a single aggregated cut.
+        """
+        return self._multi_cuts() if self.params.multi_opti_cut else self._single_cut()
+
+
+class IntegerLShapedFCGen(CutGenerator):
+
+    def __init__(self, master_problem, sub_problem, params):
+        super().__init__(master_problem, sub_problem, params)
+
+    def generate(self) -> list[NoGoodFC]:
+        """
+        This method generates :class:`NoGoodFC` feasibility cuts based on the current values of binary
+        complicating variables in the master problem.
+        """
+        bin_var_values = self._master_problem.get_var_values(self._complicating_vars)
+        cut = NoGoodFC(bin_var_values)
+
+        return [cut]
 
 
 if __name__ == '__main__':
