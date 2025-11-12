@@ -441,7 +441,10 @@ class IntegerLShapedOCGen(CutGenerator):
             theta_lb = self._master_problem.get_estimator_values()[estimator]
 
             cut = CombinatorialOC(bin_var_values, sub_obj, big_m=sub_obj - theta_lb, estimator=estimator)
-            cuts.append(cut)
+
+            # Add the cut only if it is violated
+            if sub.get_obj() > self._master_problem.get_estimator_values()[estimator]:
+                cuts.append(cut)
 
         return cuts
 
