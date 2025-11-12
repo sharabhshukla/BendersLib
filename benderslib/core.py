@@ -868,8 +868,8 @@ class BendersSolver:
             sub_model,
             sub_solver: Type[SolverBase],
             complicating_vars: list[str],
-            optimality_cut: Type[CutGenerator],
-            feasibility_cut: Type[CutGenerator],
+            optimality_cut: Type[CutGenerator] | Callable,
+            feasibility_cut: Type[CutGenerator] | Callable,
             prob: list[float] | None = None,
             params: BendersParams = BendersParams()
     ):

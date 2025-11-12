@@ -64,6 +64,7 @@ explicit_order = [
 
     'lshape.py',
     'ilshape.py',
+    'ilshape_iis.py',
 
     'custom_template.py'
 ]

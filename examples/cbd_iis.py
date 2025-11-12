@@ -1,7 +1,7 @@
 # coding:utf-8
 
 """
-Combinatorial Benders Decomposition (||)
+Combinatorial Benders Decomposition (IIS)
 =========================================
 
 This example demonstrates how to use the Combinatorial Benders decomposition method
@@ -39,7 +39,6 @@ def make_original_problem():
 
 # %%
 # Define stronger customized Benders feasibility cut using IIS:
-
 def cut_generator(master_problem: MasterProblem, sub_problem: SubProblem):
     """
     Generate a stronger feasibility cut using the Irreducible Infeasible Subsystem (IIS) of the subproblem.
