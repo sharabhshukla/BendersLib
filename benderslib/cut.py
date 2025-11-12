@@ -190,11 +190,15 @@ class CombinatorialOC(OptimalityCut):
         \\theta - M \\sum_{i \\in I_1} x_i + M \\sum_{i \\in I_0} x_i \\geq z^* - M |I_1|
 
     To ensure validity, :math:`M` should be larger than the maximum possible objective value of the subproblem.
-    If it is not specified, BendersLib set :math:`M = z^*` in each iteration.
+    If it is not specified, BendersLib set :math:`M = z^* - L` in each iteration,
+    where :math:`L = \\bar{\\theta}` is a known lower bound on :math:`\\theta`,
+    retrieved from the master problem in the current iteration.
     The cut is rewritten as follows.
 
     .. math::
-        \\frac{\\theta}{z*} - \\sum_{i \\in I_1} x_i + \\sum_{i \\in I_0} x_i \\geq 1 - |I_1|
+        \\frac{\\theta}{z^* - L} - \\sum_{i \\in I_1} x_i + \\sum_{i \\in I_0} x_i \\geq \\frac{z^*}{z^* - L} - |I_1|
+
+    This form is used when :math:`z^* - L \\neq 0` to improve the numerical stability.
 
     Parameters
     ----------
@@ -202,33 +206,41 @@ class CombinatorialOC(OptimalityCut):
         A dictionary mapping binary variable names to their values in the current master problem solution.
     sub_obj : float
         The objective value of the subproblem given the current master problem solution.
-    big_m : float
+    big_m : float, optional, default=sub_obj
         A large constant used in the cut formulation.
+    estimator : str, optional
+        The name of the master problem variable representing the future cost.
     """
 
-    def __init__(self, bin_var_values: dict, sub_obj: float, big_m: float = None):
+    def __init__(
+            self,
+            bin_var_values: dict,
+            sub_obj: float,
+            big_m: float = None,
+            estimator: str = CST.ESTIMATOR_NAME
+    ):
         var_zeros = [var for var, val in bin_var_values.items() if val <= 0.5]
         var_ones = [var for var, val in bin_var_values.items() if val > 0.5]
         big_m = sub_obj if big_m is None else big_m
 
-        # Form 1
-        # vars = [CST.ESTIMATOR_NAME] + var_ones + var_zeros
-        # coefs = [1.0] + [-big_m] * len(var_ones) + [big_m] * len(var_zeros)
-        # rhs = sub_obj - big_m * len(var_ones)
-
-        # Form 2: same number of cuts, but faster to solve the master problem
-        vars = [CST.ESTIMATOR_NAME] + var_ones + var_zeros
-        coefs = [1.0 / big_m] + [-1.0] * len(var_ones) + [1.0] * len(var_zeros)
-        rhs = 1 - len(var_ones)
+        if big_m == 0:
+            # Form 1
+            vars = [estimator] + var_ones + var_zeros
+            coefs = [1.0] + [-big_m] * len(var_ones) + [big_m] * len(var_zeros)
+            rhs = sub_obj - big_m * len(var_ones)
+        else:
+            # Form 2: same number of cuts, but faster to solve the master problem
+            vars = [estimator] + var_ones + var_zeros
+            coefs = [1.0 / big_m] + [-1.0] * len(var_ones) + [1.0] * len(var_zeros)
+            rhs = sub_obj / big_m - len(var_ones)
 
         super().__init__(vars=vars, coefs=coefs, rhs=rhs, sense='>=', name="CombinatorialCut")
 
 
 class CombinatorialOCGen(CutGenerator):
 
-    def __init__(self, master_problem, sub_problem, params, big_m: float = None):
+    def __init__(self, master_problem, sub_problem, params):
         super().__init__(master_problem, sub_problem, params)
-        self.big_m = big_m
 
     def generate(self) -> list[CombinatorialOC]:
         """
@@ -237,9 +249,9 @@ class CombinatorialOCGen(CutGenerator):
         """
         var_values = self._master_problem.get_var_values(self._complicating_vars)
         sub_obj = self._sub_problem.get_obj()
-        big_m = sub_obj if self.big_m is None else self.big_m
+        theta_lb = self._master_problem.get_estimator_values()[CST.ESTIMATOR_NAME]
 
-        cut = CombinatorialOC(var_values, sub_obj, big_m)
+        cut = CombinatorialOC(var_values, sub_obj, big_m=sub_obj - theta_lb)
         return [cut]
 
 
