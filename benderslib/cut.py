@@ -249,7 +249,8 @@ class CombinatorialOCGen(CutGenerator):
         """
         var_values = self._master_problem.get_var_values(self._complicating_vars)
         sub_obj = self._sub_problem.get_obj()
-        theta_lb = self._master_problem.get_estimator_values()[CST.ESTIMATOR_NAME]
+        estimator = self._master_problem.estimators[0]
+        theta_lb = self._master_problem.get_estimator_values()[estimator]
 
         cut = CombinatorialOC(var_values, sub_obj, big_m=sub_obj - theta_lb)
         return [cut]
@@ -358,10 +359,11 @@ class LShapedOCGen(CutGenerator):
             _dual = sub.get_dual_values()
 
             vars = self._complicating_vars
-            cut = ClassicalOC(vars, _var_coefs, _dual, _rhs, estimator=CST.ESTIMATOR_FORMAT.format(i + 1))
+            estimator = self._master_problem.estimators[i]
+            cut = ClassicalOC(vars, _var_coefs, _dual, _rhs, estimator=estimator)
 
             # Add the cut only if it is violated
-            if sub.get_obj() > self._master_problem.get_estimator_values()[CST.ESTIMATOR_FORMAT.format(i + 1)]:
+            if sub.get_obj() > self._master_problem.get_estimator_values()[estimator]:
                 cuts.append(cut)
 
         return cuts

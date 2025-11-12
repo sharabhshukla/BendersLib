@@ -962,11 +962,12 @@ class BendersSolver:
 
         if isinstance(self.sub_problem, SubProblem) or not self.params.multi_opti_cut:
             # Deterministic problem, or stochastic problem with a single estimator
-            theta = estimator_vals[CST.ESTIMATOR_NAME]
+            estimator = self.master_problem.estimators[0]
+            theta = estimator_vals[estimator]
         else:
             # Stochastic problem with multiple estimators
             theta = sum(
-                estimator_vals[f"{CST.ESTIMATOR_FORMAT.format(i + 1)}"] * p
+                estimator_vals[self.master_problem.estimators[i]] * p
                 for i, p in enumerate(self.__prob)
             )
 
