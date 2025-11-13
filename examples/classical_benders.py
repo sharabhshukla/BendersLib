@@ -11,7 +11,6 @@ Classical Benders Decomposition
 #
 # Define a simple MILP problem:
 from benderslib import BendersParams, MasterProblem, SubProblem, Gurobi, ClassicalBenders
-
 from gurobipy import Model, GRB
 
 

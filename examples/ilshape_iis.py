@@ -17,6 +17,7 @@ import random
 
 from benderslib import Gurobi, IntegerLShaped, NoGoodFC, CST, SubProblems, MasterProblem
 from gurobipy import Model, GRB
+import matplotlib.pyplot as plt
 
 
 # random.seed(1)
@@ -149,4 +150,8 @@ if __name__ == '__main__':
     print(f"Sol. Time (IIS vs Naive): {L_IIS.result.time:.4f}, {L.result.time:.4f}")
     print(f"Num. Cuts (IIS vs Naive): {L_IIS.result.n_cuts}, {L.result.n_cuts}")
 
-
+    # Plot cut added
+    plt.bar(['IIS-based Cuts', 'Naive Cuts'], [L_IIS.result.n_cuts, L.result.n_cuts], color=['blue', 'orange'])
+    plt.ylabel('Number of Feasibility Cuts Added')
+    plt.title('Comparison of Feasibility Cuts Added')
+    plt.show()

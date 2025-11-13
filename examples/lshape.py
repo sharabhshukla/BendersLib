@@ -15,6 +15,7 @@ import random
 
 from benderslib import MasterProblem, SubProblem, SubProblems, Gurobi, LShaped, BendersParams
 from gurobipy import Model, GRB
+from matplotlib import pyplot as plt
 
 
 # random.seed(1)
@@ -126,3 +127,13 @@ if __name__ == '__main__':
     L.params.log_freq_sec = 0.0
 
     L.solve()
+
+    # Draw convergence curve
+    plt.plot(L.result.lb_list, label='Lower Bound')
+    plt.plot(L.result.ub_list, label='Upper Bound')
+    plt.xlabel('Iteration')
+    plt.ylabel('Objective Value')
+    plt.title('Benders Decomposition')
+    plt.legend()
+    plt.grid(True)
+    plt.show()

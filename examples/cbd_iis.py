@@ -12,6 +12,7 @@ with customized Benders cuts.
 # Define the original problem:
 from benderslib import Gurobi, AnnotationBenders, CombinatorialBenders, NoGoodFC, MasterProblem, SubProblem
 from gurobipy import Model, GRB
+import matplotlib.pyplot as plt
 
 
 def make_original_problem():
@@ -100,6 +101,16 @@ if __name__ == '__main__':
     print()
     print(f"Sol. Time (IIS vs Naive): {AB.result.time:.4f}, {AB_copy.result.time:.4f}")
     print(f"Num. Cuts (IIS vs Naive): {AB.result.n_cuts}, {AB_copy.result.n_cuts}")
+
+    # Plot cut added
+    plt.bar(
+        ['IIS-based Cuts', 'Naive Cuts'],
+        [AB.result.n_cuts, AB_copy.result.n_cuts],
+        color=['blue', 'orange']
+    )
+    plt.ylabel('Number of Benders Cuts Added')
+    plt.title('Comparison of Benders Cuts Added')
+    plt.show()
 
 # %%
 #

@@ -19,5 +19,8 @@ Stochastic
 - :doc:`ilshape`: Integer L-shaped method for two-stage stochastic programming with binary complicating variables and integer recourse.
 - :doc:`ilshape_iis`: Integer L-shaped method with IIS for stronger, customized no-good cuts.
 
+Applications
+----------------------
+
 Gallery
 ----------------------
