@@ -10,6 +10,7 @@ Deterministic
 - :doc:`annotation_benders`: Automatic problem decomposition.
 - :doc:`cbd`: Combinatorial Benders decomposition with binary complicated variables.
 - :doc:`cbd_iis`: Combinatorial Benders decomposition with IIS for stronger, customized no-good cuts.
+- :doc:`lbbd`: Logic-based Benders decomposition with custom subproblem solver.
 
 Stochastic
 ----------------------

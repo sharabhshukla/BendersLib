@@ -23,6 +23,7 @@ from .core import (
     ProblemBase,
     MasterProblem,
     SubProblem,
+    LogicBasedSubProblem,
     SubProblems,
     Cut,
     OptimalityCut,
@@ -53,7 +54,8 @@ from .benders import (
     ClassicalBenders,
     CombinatorialBenders,
     LShaped,
-    IntegerLShaped
+    IntegerLShaped,
+    LogicBasedBenders
 )
 
 from .annotation import (
@@ -72,6 +74,7 @@ __all__ = [
     "ProblemBase",
     "MasterProblem",
     "SubProblem",
+    "LogicBasedSubProblem",
     "SubProblems",
     "Cut",
     "OptimalityCut",
@@ -99,6 +102,7 @@ __all__ = [
     "CombinatorialBenders",
     "LShaped",
     "IntegerLShaped",
+    "LogicBasedBenders",
 
     "AnnotationBenders",
 ]

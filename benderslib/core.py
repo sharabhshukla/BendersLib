@@ -493,6 +493,112 @@ class SubProblem(ProblemBase):
         super().__init__(solver_backend)
 
 
+class LogicBasedSubProblem(ABC):
+    """
+    The abstract base class for the subproblem in the Logic-based Benders Decomposition.
+    To implement a customized subproblem, at least :meth:`solve` required to be overridden,
+    as it will be called during the Benders solving process after :meth:`BendersSolver.solve` is invoked.
+    Other methods and attributes can be added as needed, based on the specific implementation of :class:`CutGenerator`.
+
+    Parameters
+    ----------
+    complicating_vars : list[str]
+        A list of names of the complicating variables in the master problem.
+    params : BendersParams, optional
+        An instance of :class:`BendersParams` containing parameters for the Benders decomposition process.
+    """
+
+    def __init__(self, complicating_vars: list[str], params: BendersParams = BendersParams()):
+        self.complicating_vars = complicating_vars
+        """A list of names of the complicating variables in the master problem."""
+        self.complicating_var_values = {}
+        """A dictionary to store the values of complicating variables fixed from the master problem."""
+        self.obj = None
+        """The objective value of the subproblem after solving."""
+        self.var_values = {}
+        """A dictionary to store the current values of variables in the subproblem."""
+        self.status = CST.UNSOLVED
+        """The status of the problem, see :class:`BendersConsts` for possible values."""
+        self.params = params
+        """An instance of :class:`BendersParams` containing parameters for the Benders decomposition process."""
+
+    @abstractmethod
+    def solve(self) -> None:
+        """
+        This method is **required** to be implemented.
+        It solves the subproblem and update the :attr:`status`, :attr:`obj`, and :attr:`var_values` attributes.
+
+        *   :attr:`status` is used in :meth:`SubProblems.solve` to indicate if the subproblem is
+            optimal (:attr:`BendersConsts.OPTIMAL`) or infeasible (:attr:`BendersConsts.INFEASIBLE`),
+            guiding whether to add optimality or feasibility cuts.
+        *   :attr:`obj` is used in :meth:`BendersSolver.solve` to compute the upper bound,
+            determining convergence.
+        *   :attr:`var_values` is used in :meth:`BendersSolver.solve` when saving the final solution.
+
+        .. caution::
+            Always update :attr:`status`, :attr:`obj`, and :attr:`var_values` after solving the subproblem.
+            Returning values from this method will be ignored.
+        """
+        ...
+
+    def fix_vars(self, var_values: dict[str, float]) -> None:
+        """
+        Pass the values of complicating variables from the master problem to the subproblem.
+        It is used when calling :meth:`BendersSolver.solve`.
+        This method simply update :attr:`complicating_var_values`,
+        users do not need to override it.
+        """
+        self.complicating_var_values = var_values
+
+    def get_var_values(self, vars: list[str] = None) -> dict[str, float]:
+        """
+        Get the current values of specified variables in the subproblem.
+        It is used for saving the final solution.
+        This method simply return :attr:`var_values`, which should be updated in :meth:`solve`,
+        users do not need to override it.
+        """
+        if vars is None:
+            return self.var_values
+        else:
+            return {var: self.var_values[var] for var in vars}
+
+    def get_obj(self) -> float:
+        """
+        Get the objective value of the subproblem after solving.
+        This method simply return :attr:`obj`, which should be updated in :meth:`solve`,
+        users do not need to override it.
+        """
+        return self.obj
+
+    def __repr__(self):
+        return (
+            f"Logic-Based Sub Problem: \n"
+            f" - `{self.__class__.__name__}`"
+        )
+
+
+class _FuncWrapperSub(LogicBasedSubProblem):
+    """
+    A wrapper class to allow using a function as a logic-based subproblem.
+    """
+
+    def __init__(self, complicating_vars, func: Callable, params: BendersParams = BendersParams()):
+        self._func = func
+        super().__init__(complicating_vars, params)
+
+    def solve(self):
+        status, obj, var_values = self._func(self.complicating_var_values)
+        self.status = status
+        self.obj = obj
+        self.var_values = var_values
+
+    def __repr__(self):
+        return (
+            f"Logic-Based Sub Problem: \n"
+            f" - `{self._func.__name__}`"
+        )
+
+
 class SubProblems:
     def __init__(
             self,
@@ -841,6 +947,8 @@ class BendersSolver:
             self.optimality_cut = optimality_cut(master_problem, sub_problem, params)
         elif optimality_cut is not None:
             raise ValueError("<optimality_cut> must be a <function> or a <class>.")
+        elif optimality_cut is None:
+            self.optimality_cut = None
 
         if inspect.isfunction(feasibility_cut):
             self.feasibility_cut = _FuncWrapperCut(master_problem, sub_problem, feasibility_cut, params)
@@ -848,6 +956,8 @@ class BendersSolver:
             self.feasibility_cut = feasibility_cut(master_problem, sub_problem, params)
         elif feasibility_cut is not None:
             raise ValueError("<feasibility_cut> must be a <function> or a <class>.")
+        elif feasibility_cut is None:
+            self.feasibility_cut = None
 
         assert self.optimality_cut or self.feasibility_cut, "Provide at least <optimality_cut> or <feasibility_cut>."
 

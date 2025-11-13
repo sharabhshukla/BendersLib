@@ -1,6 +1,9 @@
 # coding:utf-8
+import inspect
+from typing import Callable, Type
 
-from .core import BendersParams, MasterProblem, SubProblem, SubProblems, BendersSolver
+from .core import BendersParams, MasterProblem, SubProblem, SubProblems, BendersSolver, LogicBasedSubProblem, \
+    CutGenerator, _FuncWrapperSub
 from .cut import ClassicalOCGen, ClassicalFCGen, CombinatorialFCGen, CombinatorialOCGen, LShapedOCGen, LShapedFCGen, \
     IntegerLShapedOCGen, IntegerLShapedFCGen
 
@@ -281,7 +284,30 @@ class IntegerLShaped(BendersSolver):
 
 
 class LogicBasedBenders(BendersSolver):
-    pass
+
+    def __init__(
+            self,
+            master_problem: MasterProblem,
+            sub_problem: LogicBasedSubProblem | SubProblem | Callable,
+            complicating_vars: list[str],
+            optimality_cut: Type[CutGenerator] | Callable | None = None,
+            feasibility_cut: Type[CutGenerator] | Callable | None = None,
+            params: BendersParams = BendersParams()
+    ):
+        if inspect.isfunction(sub_problem):
+            sub_problem = _FuncWrapperSub(complicating_vars, sub_problem)
+
+        super().__init__(
+            master_problem,
+            sub_problem,
+            complicating_vars,
+            optimality_cut,
+            feasibility_cut,
+            params
+        )
+
+    def solve(self, callback=None) -> None:
+        return super().solve(callback)
 
 
 class GeneralizedBenders(BendersSolver):
