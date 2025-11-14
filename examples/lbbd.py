@@ -16,7 +16,7 @@ For custom cut generators, please refer to :doc:`../examples/cbd_iis` and :doc:`
 
 # %%
 # Define the master problem:
-from benderslib import CST, MasterProblem, Gurobi, LogicBasedBenders, CombinatorialFCGen, LogicBasedSubProblem
+from benderslib import CST, MasterProblem, Gurobi, LogicBasedBenders, CombinatorialFCGen, LogicBasedSubProblem, NoGoodFC
 from gurobipy import Model, GRB
 
 
@@ -37,8 +37,8 @@ def master_model(n_plants):
 # The output is a tuple:
 # (:attr:`LogicBasedSubProblem.status`, :attr:`LogicBasedSubProblem.obj`, :attr:`LogicBasedSubProblem.var_values`).
 def sub_solver(complicating_var_values):
-    # Sub problem is feasible if certain number of plants are opened
-    if sum(complicating_var_values.values()) >= len(complicating_var_values) / 2:
+    # Sub problem is feasible if all plants are opened.
+    if sum(complicating_var_values.values()) == len(complicating_var_values):
         return CST.OPTIMAL, 0, {}
     return CST.INFEASIBLE, None, {}
 
@@ -52,7 +52,7 @@ class SubProblem(LogicBasedSubProblem):
         super().__init__(complicating_vars)
 
     def solve(self):
-        if sum(self.complicating_var_values.values()) >= len(self.complicating_var_values) / 2:
+        if sum(self.complicating_var_values.values()) == len(self.complicating_var_values):
             self.status = CST.OPTIMAL
             self.obj = 0
             self.var_values = {}
@@ -63,8 +63,25 @@ class SubProblem(LogicBasedSubProblem):
 
 
 # %%
+# Custom feasibility cut generator:
+def feasibility_cut_generator(master_problem, sub_problem):
+    open_vars = sub_problem.complicating_var_values
+    zeros = [i for i, val in open_vars.items() if val <= 0.01]
+
+    cuts = []
+    for z in zeros:
+        # We know that all the plants that are closed (zero) must be opened (one).
+        # Therefore, force zero variable to be one in the next iteration,
+        # significantly reducing the number of Benders iterations.
+        cut = NoGoodFC({z: 0})
+        cuts.append(cut)
+
+    return cuts
+
+
+# %%
 # Function as subproblem solver:
-n_plants = 7
+n_plants = 8
 master_model, complicating_vars = master_model(n_plants)
 master_model_copy = master_model.copy()
 
@@ -84,6 +101,6 @@ LBBD = LogicBasedBenders(
     master_problem=master_problem,
     sub_problem=SubProblem(complicating_vars),
     complicating_vars=complicating_vars,
-    feasibility_cut=CombinatorialFCGen,
+    feasibility_cut=feasibility_cut_generator
 )
 LBBD.solve()
