@@ -512,7 +512,10 @@ class LogicBasedSubProblem(ABC):
         self.complicating_vars = complicating_vars
         """A list of names of the complicating variables in the master problem."""
         self.complicating_var_values = {}
-        """A dictionary to store the values of complicating variables fixed from the master problem."""
+        """A dictionary to store the values of complicating variables fixed from the master problem.
+           After calling :meth:`BendersSolver.solve`, this attribute will be updated via :meth:`fix_vars`
+           after the master problem is solved. Therefore, users do not need to set it manually, 
+           and can directly use it when implementing :meth:`solve`."""
         self.obj = None
         """The objective value of the subproblem after solving."""
         self.var_values = {}
@@ -536,8 +539,25 @@ class LogicBasedSubProblem(ABC):
         *   :attr:`var_values` is used in :meth:`BendersSolver.solve` when saving the final solution.
 
         .. caution::
-            Always update :attr:`status`, :attr:`obj`, and :attr:`var_values` after solving the subproblem.
-            Returning values from this method will be ignored.
+            * It is safe to assume that :attr:`complicating_var_values` has been set.
+            * Always update :attr:`status`, :attr:`obj`, and :attr:`var_values` after solving the subproblem.
+              Returning values from this method will be ignored.
+
+        .. note::
+           Alternatively, BendersLib allows using a lightweight function
+           (instead of the class :class:`LogicBasedSubProblem`) as the subproblem solver.
+           The signature of the function should be as follows.
+
+           .. code-block:: python
+
+                def sub_solver(complicating_var_values: dict[str, float]) -> tuple[str, float, dict[str, float]]:
+                    ... # implement the subproblem solving logic here
+                    status = CST.OPTIMAL  # or CST.INFEASIBLE
+                    obj = 100.0  # objective value if optimal, None if infeasible
+                    var_values = {'y1': 10.0, 'y2': 5.0}  # variable values if optimal, {} if infeasible
+                    return status, obj, var_values
+
+           To maintain state, implement a class inherited from :class:`LogicBasedSubProblem` instead.
         """
         ...
 
@@ -825,7 +845,7 @@ class CutGenerator(ABC):
     A base class for cut generators in Benders decomposition.
     Any specific cut generation method (e.g., :class:`ClassicalOC`) should inherit from this class
     and implement the abstract method :meth:`generate`.
-    Attributes that will not change during the Benders process should be ideally initialized in `__init__`
+    Attributes that will not change during the Benders process should be ideally initialized in ``__init__``
     for efficiency.
 
     Parameters
@@ -861,6 +881,25 @@ class CutGenerator(ABC):
     def generate(self) -> list['OptimalityCut'] | list['FeasibilityCut']:
         """
         This method should be implemented to generate cuts based on the current state of the master and subproblem(s).
+        This method generates and returns a list of cuts (either :class:`OptimalityCut` or :class:`FeasibilityCut`)
+        with the information from :attr:`_master_problem` and :attr:`_sub_problem`, which are updated during
+        the Benders solving process.
+        Example implementations can be found in the source code of :class:`ClassicalOCGen` and :class:`ClassicalFCGen`.
+
+        .. note::
+           Alternatively, BendersLib allows using a lightweight function
+           (instead of the class :class:`CutGenerator`) as the cut generator.
+           The signature of the function should be as follows.
+
+           .. code-block:: python
+
+                def cut_generator(master_problem: MasterProblem, sub_problem: SubProblem) -> list[Cut]:
+                    cuts = []
+                    cut = ... # implement the cut generation logic here
+                    cuts.append(cut)
+                    return cuts  # a list of OptimalityCut or FeasibilityCut
+
+           To maintain state, implement a class inherited from :class:`CutGenerator` instead.
         """
         ...
 
