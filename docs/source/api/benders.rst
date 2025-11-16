@@ -135,4 +135,5 @@ Users also need to implement their own optimality/feasibility cut generator, inh
    :show-inheritance:
 
 .. autoclass:: LogicBasedBenders
+   :inherited-members:
    :show-inheritance:

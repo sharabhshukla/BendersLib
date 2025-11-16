@@ -288,7 +288,7 @@ class LogicBasedBenders(BendersSolver):
     def __init__(
             self,
             master_problem: MasterProblem,
-            sub_problem: LogicBasedSubProblem | SubProblem | Callable,
+            sub_problem: LogicBasedSubProblem | SubProblem | Callable | SubProblems,
             complicating_vars: list[str],
             optimality_cut: Type[CutGenerator] | Callable | None = None,
             feasibility_cut: Type[CutGenerator] | Callable | None = None,
@@ -305,9 +305,6 @@ class LogicBasedBenders(BendersSolver):
             feasibility_cut,
             params
         )
-
-    def solve(self, callback=None) -> None:
-        return super().solve(callback)
 
 
 class GeneralizedBenders(BendersSolver):

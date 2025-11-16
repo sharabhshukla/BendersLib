@@ -622,7 +622,7 @@ class _FuncWrapperSub(LogicBasedSubProblem):
 class SubProblems:
     def __init__(
             self,
-            sub_problems: Iterable['SubProblem'],
+            sub_problems: Iterable,
             prob: list[float] | None = None,
     ):
         self.sub_problems = list(sub_problems)
@@ -1017,8 +1017,8 @@ class BendersSolver:
             sub_model,
             sub_solver: Type[SolverBase],
             complicating_vars: list[str],
-            optimality_cut: Type[CutGenerator] | Callable,
-            feasibility_cut: Type[CutGenerator] | Callable,
+            optimality_cut: Type[CutGenerator] | Callable = None,
+            feasibility_cut: Type[CutGenerator] | Callable = None,
             prob: list[float] | None = None,
             params: BendersParams = BendersParams()
     ):

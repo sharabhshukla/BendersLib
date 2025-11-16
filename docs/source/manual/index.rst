@@ -12,6 +12,7 @@ Contents
    sub.rst
    cut.rst
    enhance.rst
+   custom.rst
    callback.rst
    numerical.rst
    contribution.rst
