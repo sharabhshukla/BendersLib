@@ -474,5 +474,13 @@ class IntegerLShapedFCGen(CutGenerator):
         return [cut]
 
 
+# class LogicBasedOC(OptimalityCut):
+#     ...
+#
+#
+# class SolverCut:
+#     ...
+
+
 if __name__ == '__main__':
     pass

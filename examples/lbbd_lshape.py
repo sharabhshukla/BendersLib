@@ -87,7 +87,7 @@ if __name__ == '__main__':
     # Data
     n_plants = 7
     n_scenarios = 3
-    penalty = 10
+    penalty = 2
     scenarios = [[random.choice([0, 1]) for _ in range(n_plants)] for _ in range(n_scenarios)]
     probs = [1 / len(scenarios) for _ in range(n_scenarios)]
 
@@ -102,27 +102,26 @@ if __name__ == '__main__':
     master_problem = MasterProblem(Gurobi(first_stage))
 
     # SubProblems instance
-    sub_problem = SubProblems([SubProblem(Gurobi(m)) for m in sub_models], prob=probs)
-
+    # sub_problem = SubProblems([SubProblem(Gurobi(m)) for m in sub_models], prob=probs)
     # Alternative way using LogicBasedSubProblem
     # sub_problem = SubProblems([Sub(complicating_vars, m) for m in sub_models], prob=probs)
 
-    LBBD = LogicBasedBenders(
-        master_problem=master_problem,
-        sub_problem=sub_problem,
-        complicating_vars=complicating_vars,
-        optimality_cut=IntegerLShapedOCGen,
-    )
-
-    # LBBD = LogicBasedBenders.from_models(
-    #     master_model=first_stage_copy,
-    #     master_solver=Gurobi,
-    #     sub_model=sub_models,
-    #     sub_solver=Gurobi,
+    # LBBD = LogicBasedBenders(
+    #     master_problem=master_problem,
+    #     sub_problem=sub_problem,
     #     complicating_vars=complicating_vars,
     #     optimality_cut=IntegerLShapedOCGen,
-    #     prob=probs,
     # )
 
-    LBBD.params.multi_opti_cut = True
+    LBBD = LogicBasedBenders.from_models(
+        master_model=first_stage_copy,
+        master_solver=Gurobi,
+        sub_model=sub_models,
+        sub_solver=Gurobi,
+        complicating_vars=complicating_vars,
+        optimality_cut=IntegerLShapedOCGen,
+        prob=probs,
+    )
+
+    # LBBD.params.multi_opti_cut = True
     LBBD.solve()

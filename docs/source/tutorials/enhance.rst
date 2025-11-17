@@ -1,6 +1,8 @@
 Enhancements
 ====================================
 
+[#]_
+
 Pareto-optimal Cut
 ------------------------------
 
@@ -14,6 +16,7 @@ Local Branching
 References
 ------------------------------
 
+.. [#] Hooker, J. (2024). Logic-Based Benders Decomposition: Theory and Applications. Springer International Publishing. https://doi.org/10.1007/978-3-031-45039-6
 .. [#] Magnanti, T. L., & Wong, R. T. (1981). Accelerating Benders Decomposition: Algorithmic Enhancement and Model Selection Criteria. Operations Research, 29(3), 464–484. https://doi.org/10.1287/opre.29.3.464
 .. [#] Kaltis, T., & Saharidis, G. K. D. (2025). Literature review on Benders cut selection and a multiple cut generation scheme. INFOR: Information Systems and Operational Research. https://www.tandfonline.com/doi/abs/10.1080/03155986.2025.2540205
 .. [#] Fischetti, M., & Lodi, A. (2003). Local branching. Mathematical Programming, 98(1), 23–47. https://doi.org/10.1007/s10107-003-0395-5
