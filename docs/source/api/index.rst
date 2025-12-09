@@ -78,4 +78,5 @@ Contents
    data.rst
    solver.rst
    core.rst
+   cut.rst
    benders.rst

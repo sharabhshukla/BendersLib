@@ -18,29 +18,6 @@ Benders cuts used.
 In this section, we present several Benders methods implemented in
 BendersLib, each with its own unique Benders cuts.
 
-Built-in Benders Cuts
---------------------------------------
-
-.. autoclass:: ClassicalOC
-   :inherited-members:
-   :show-inheritance:
-
-.. autoclass:: ClassicalFC
-   :inherited-members:
-   :show-inheritance:
-
-.. autoclass:: NoGoodFC
-   :inherited-members:
-   :show-inheritance:
-
-.. autoclass:: CombinatorialOC
-   :inherited-members:
-   :show-inheritance:
-
-.. autoclass:: LShapedOC
-   :inherited-members:
-   :show-inheritance:
-
 .. _api-classical:
 
 Classical Benders Decomposition
