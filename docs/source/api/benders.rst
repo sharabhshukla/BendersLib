@@ -123,6 +123,8 @@ and the algorithmic framework is similar to that of the L-shaped method.
    :inherited-members:
    :show-inheritance:
 
+.. _api-lbbd:
+
 Logic-based Benders Decomposition
 --------------------------------------
 

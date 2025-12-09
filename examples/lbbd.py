@@ -104,3 +104,10 @@ LBBD = LogicBasedBenders(
     feasibility_cut=feasibility_cut_generator
 )
 LBBD.solve()
+
+# %%
+#
+# .. admonition:: References
+#
+#     * Tutorial of the Logic-based Benders Decomposition: :doc:`../tutorials/lbbd`
+#     * This example uses the following class: :ref:`api-lbbd`

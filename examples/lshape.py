@@ -137,3 +137,14 @@ if __name__ == '__main__':
     plt.legend()
     plt.grid(True)
     plt.show()
+
+# %%
+#
+# .. admonition:: References
+#
+#     * Tutorial of the L-shaped method: :doc:`../tutorials/lshape`
+#     * This example uses the following class: :ref:`api-lshape`
+#
+# .. seealso::
+#
+#     * Example of integer L-shaped method: :doc:`ilshape`

@@ -391,3 +391,10 @@ LBBD_no_relax = LogicBasedBenders(
     feasibility_cut=feasibility_cut_generator
 )
 LBBD_no_relax.solve()
+
+# %%
+#
+# .. admonition:: References
+#
+#     * Tutorial of the Logic-based Benders Decomposition: :doc:`../tutorials/lbbd`
+#     * This example uses the following class: :ref:`api-lbbd`

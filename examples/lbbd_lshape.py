@@ -125,3 +125,15 @@ if __name__ == '__main__':
 
     # LBBD.params.multi_opti_cut = True
     LBBD.solve()
+
+# %%
+#
+# .. admonition:: References
+#
+#     * Tutorial of the Logic-based Benders Decomposition: :doc:`../tutorials/lbbd`
+#     * Tutorial of the L-shaped method: :doc:`../tutorials/lshape`
+#     * This example uses the following class: :ref:`api-lbbd`
+#
+# .. seealso::
+#
+#     * Example of the L-shaped method: :doc:`lshape`

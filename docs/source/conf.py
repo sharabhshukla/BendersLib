@@ -76,7 +76,7 @@ explicit_order = [
 sphinx_gallery_conf = {
     'examples_dirs': '../../examples',  # path to your example scripts
     'gallery_dirs': 'examples',  # path to where to save gallery generated output
-    'download_all_examples': False,
+    # 'download_all_examples': False,
     'capture_repr': ('__repr__', '__str__', '_repr_html_'),
     'filename_pattern': r'\.py',
     'within_subsection_order': ExplicitOrder(explicit_order),
