@@ -70,7 +70,8 @@ explicit_order = [
     'lbbd_lshape.py',
     'lbbd_location.py',
 
-    'custom_template.py'
+    'custom_template.py',
+    'decompose.py'
 ]
 
 sphinx_gallery_conf = {

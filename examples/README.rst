@@ -29,10 +29,11 @@ Applications
 Benchmarking
 ----------------------
 
-Templates
+Others
 ----------------------
 
 - :doc:`custom_template`: A template for creating custom Benders decomposition implementations.
+- :doc:`decompose`: Retrieving master and sub problems from a complete model.
 
 Gallery
 ----------------------

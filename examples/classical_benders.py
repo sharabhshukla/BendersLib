@@ -100,4 +100,4 @@ if __name__ == '__main__':
 #
 # .. seealso::
 #
-#     * Automated decomposition based complicating variables: :doc:`annotation_benders`
+#     * Automated decomposition based on complicating variables: :doc:`annotation_benders`

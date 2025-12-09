@@ -34,7 +34,7 @@ Generalized Benders decomposition (GBD) solves nonlinear programming for which t
 
 ## 4. Logic-based Benders decomposition
 
-Logic-based Benders decomposition (LBBD) can be used for problems which can be decomposed into any type of master and sub problem.
+Logic-based Benders decomposition (LBBD) can be used for problems which can be decomposed into any type of master and sub problems.
 
 ---
 
