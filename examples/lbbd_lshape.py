@@ -1,7 +1,7 @@
 # coding:utf-8
 
 """
-L-shaped Method by logic-based Benders Decomposition
+L-shaped Method by Logic-based Benders Decomposition
 =====================================================
 
 .. currentmodule:: benderslib

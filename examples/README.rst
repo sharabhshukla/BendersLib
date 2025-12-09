@@ -24,6 +24,11 @@ Stochastic
 Applications
 ----------------------
 
+- :doc:`lbbd_location`: Facility location problem solved using Logic-based Benders Decomposition.
+
+Benchmarking
+----------------------
+
 Templates
 ----------------------
 

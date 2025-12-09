@@ -126,7 +126,7 @@ and the algorithmic framework is similar to that of the L-shaped method.
 Logic-based Benders Decomposition
 --------------------------------------
 
-The logic-based Benders Decomposition is highly customizable.
+The Logic-based Benders Decomposition is highly customizable.
 When using non-standard solvers that are not natively supported by BendersLib (typically heuristics or exact algorithms),
 users need to define their own subproblem, inheriting from :class:`LogicBasedSubProblem`.
 Users also need to implement their own optimality/feasibility cut generator, inheriting from :class:`CutGenerator`.

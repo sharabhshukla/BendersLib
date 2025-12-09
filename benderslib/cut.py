@@ -37,25 +37,6 @@ class ClassicalOC(OptimalityCut):
         super().__init__(vars=vars + [estimator], coefs=coefs + [1.0], rhs=cut_rhs, sense='>=', name="ClassicalOC")
 
 
-class ClassicalOCGen(CutGenerator):
-
-    def __init__(self, master_problem, sub_problem, params):
-        super().__init__(master_problem, sub_problem, params)
-
-        self.var_coefs = sub_problem.get_var_coefs(self._complicating_vars)
-        self.rhs = sub_problem.get_rhs()
-
-    def generate(self) -> list[ClassicalOC]:
-        """
-        This method generates :class:`ClassicalOC` optimality cuts based on the current solution
-        of the master problem and the dual values obtained from the subproblem.
-        """
-        dual_values = self._sub_problem.get_dual_values()
-
-        cut = ClassicalOC(self._complicating_vars, self.var_coefs, dual_values, self.rhs)
-        return [cut]
-
-
 class ClassicalFC(FeasibilityCut):
     """
     The classical feasibility cut for Benders decomposition. Please refer to :doc:`../tutorials/classical`.
@@ -99,25 +80,6 @@ class ClassicalFC(FeasibilityCut):
         super().__init__(vars=vars, coefs=coefs, rhs=cut_rhs, sense='>=', name="ClassicalFC")
 
 
-class ClassicalFCGen(CutGenerator):
-
-    def __init__(self, master_problem, sub_problem, params):
-        super().__init__(master_problem, sub_problem, params)
-
-        self.var_coefs = sub_problem.get_var_coefs(self._complicating_vars)
-        self.rhs = sub_problem.get_rhs()
-
-    def generate(self) -> list[ClassicalFC]:
-        """
-        This method generates :class:`ClassicalFC` feasibility cuts based on the current solution
-        of the master problem and the extreme ray obtained from the subproblem.
-        """
-        extreme_ray = self._sub_problem.get_extreme_ray()
-
-        cut = ClassicalFC(self._complicating_vars, self.var_coefs, extreme_ray, self.rhs)
-        return [cut]
-
-
 class NoGoodFC(FeasibilityCut):
     """
     The no-good cut (feasibility cut) for Combinatorial Benders Decomposition. Please refer to :doc:`../tutorials/cbd`.
@@ -153,22 +115,6 @@ class NoGoodFC(FeasibilityCut):
         rhs = len(var_ones) - 1
 
         super().__init__(vars=vars, coefs=coefs, rhs=rhs, sense='<=', name="NoGoodFC")
-
-
-class CombinatorialFCGen(CutGenerator):
-
-    def __init__(self, master_problem, sub_problem, params):
-        super().__init__(master_problem, sub_problem, params)
-
-    def generate(self) -> list[NoGoodFC]:
-        """
-        This method generates :class:`NoGoodFC` feasibility cuts based on the current solution
-        of the master problem.
-        """
-        var_values = self._master_problem.get_var_values(self._complicating_vars)
-
-        cut = NoGoodFC(var_values)
-        return [cut]
 
 
 class CombinatorialOC(OptimalityCut):
@@ -237,25 +183,6 @@ class CombinatorialOC(OptimalityCut):
         super().__init__(vars=vars, coefs=coefs, rhs=rhs, sense='>=', name="CombinatorialCut")
 
 
-class CombinatorialOCGen(CutGenerator):
-
-    def __init__(self, master_problem, sub_problem, params):
-        super().__init__(master_problem, sub_problem, params)
-
-    def generate(self) -> list[CombinatorialOC]:
-        """
-        This method generates :class:`CombinatorialOC` optimality cuts based on the current solution
-        of the master problem and the objective value obtained from the subproblem.
-        """
-        var_values = self._master_problem.get_var_values(self._complicating_vars)
-        sub_obj = self._sub_problem.get_obj()
-        estimator = self._master_problem.estimators[0]
-        theta_lb = self._master_problem.get_estimator_values()[estimator]
-
-        cut = CombinatorialOC(var_values, sub_obj, big_m=sub_obj - theta_lb)
-        return [cut]
-
-
 class LShapedOC(OptimalityCut):
     """
     An aggregated optimality cut for the :doc:`../tutorials/lshape` (single-cut version).
@@ -315,6 +242,87 @@ class LShapedOC(OptimalityCut):
         final_vars = vars + [estimator]
         final_coefs = final_aggregated_x_coefs + [1.0]
         super().__init__(vars=final_vars, coefs=final_coefs, rhs=aggregated_rhs, sense='>=', name="LShapedOC")
+
+
+# class LogicBasedOC(OptimalityCut):
+#     ...
+#
+#
+# class SolverCut:
+#     ...
+
+
+class ClassicalOCGen(CutGenerator):
+
+    def __init__(self, master_problem, sub_problem, params):
+        super().__init__(master_problem, sub_problem, params)
+
+        self.var_coefs = sub_problem.get_var_coefs(self._complicating_vars)
+        self.rhs = sub_problem.get_rhs()
+
+    def generate(self) -> list[ClassicalOC]:
+        """
+        This method generates :class:`ClassicalOC` optimality cuts based on the current solution
+        of the master problem and the dual values obtained from the subproblem.
+        """
+        dual_values = self._sub_problem.get_dual_values()
+
+        cut = ClassicalOC(self._complicating_vars, self.var_coefs, dual_values, self.rhs)
+        return [cut]
+
+
+class ClassicalFCGen(CutGenerator):
+
+    def __init__(self, master_problem, sub_problem, params):
+        super().__init__(master_problem, sub_problem, params)
+
+        self.var_coefs = sub_problem.get_var_coefs(self._complicating_vars)
+        self.rhs = sub_problem.get_rhs()
+
+    def generate(self) -> list[ClassicalFC]:
+        """
+        This method generates :class:`ClassicalFC` feasibility cuts based on the current solution
+        of the master problem and the extreme ray obtained from the subproblem.
+        """
+        extreme_ray = self._sub_problem.get_extreme_ray()
+
+        cut = ClassicalFC(self._complicating_vars, self.var_coefs, extreme_ray, self.rhs)
+        return [cut]
+
+
+class CombinatorialFCGen(CutGenerator):
+
+    def __init__(self, master_problem, sub_problem, params):
+        super().__init__(master_problem, sub_problem, params)
+
+    def generate(self) -> list[NoGoodFC]:
+        """
+        This method generates :class:`NoGoodFC` feasibility cuts based on the current solution
+        of the master problem.
+        """
+        var_values = self._master_problem.get_var_values(self._complicating_vars)
+
+        cut = NoGoodFC(var_values)
+        return [cut]
+
+
+class CombinatorialOCGen(CutGenerator):
+
+    def __init__(self, master_problem, sub_problem, params):
+        super().__init__(master_problem, sub_problem, params)
+
+    def generate(self) -> list[CombinatorialOC]:
+        """
+        This method generates :class:`CombinatorialOC` optimality cuts based on the current solution
+        of the master problem and the objective value obtained from the subproblem.
+        """
+        var_values = self._master_problem.get_var_values(self._complicating_vars)
+        sub_obj = self._sub_problem.get_obj()
+        estimator = self._master_problem.estimators[0]
+        theta_lb = self._master_problem.get_estimator_values()[estimator]
+
+        cut = CombinatorialOC(var_values, sub_obj, big_m=sub_obj - theta_lb)
+        return [cut]
 
 
 class LShapedOCGen(CutGenerator):
@@ -472,14 +480,6 @@ class IntegerLShapedFCGen(CutGenerator):
         cut = NoGoodFC(bin_var_values)
 
         return [cut]
-
-
-# class LogicBasedOC(OptimalityCut):
-#     ...
-#
-#
-# class SolverCut:
-#     ...
 
 
 if __name__ == '__main__':
