@@ -1,7 +1,7 @@
 # coding:utf-8
 
 """
-Classical Benders Decomposition
+Simple Classical Benders Example
 ==================================
 
 """
@@ -90,6 +90,7 @@ if __name__ == '__main__':
     print("\nBenders Decomposition Solution:")
     # print(BD.result.solution)
     print(f"Obj: {BD.result.obj}\n")
+
 
 # %%
 #

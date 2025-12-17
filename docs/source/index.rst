@@ -34,7 +34,7 @@ BendersLib requires the following packages (``requirements.txt``), which will be
     gurobipy>=12.0.0
 
 
-Quick Start
+Quickstart
 -----------------------------------
 
 BendersLib make you easy to switch from a standard MIP model to Benders decomposition by only a few lines of code.
@@ -219,7 +219,7 @@ Contents
    :maxdepth: 1
    :hidden:
 
+   Getting Help <https://github.com/phguo/BendersLib/issues?q=is%3Aissue>
    BendersLib@GitHub <https://github.com/phguo/BendersLib>
    BendersLib@PyPI <https://pypi.org/project/BendersLib/>
-   Bug/Feature Report <https://github.com/phguo/BendersLib/issues>
    Author's Website <https://guo.ph>

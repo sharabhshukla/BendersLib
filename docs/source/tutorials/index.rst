@@ -111,8 +111,8 @@ Contents
    lshape.rst
    ilshape.rst
    lbbd.rst
-   nested.rst
    gbd.rst
+   nested.rst
    enhance.rst
 
 References

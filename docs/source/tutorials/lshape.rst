@@ -58,6 +58,8 @@ has a clear **"L" shape**. The first-stage constraint matrix :math:`A` forms the
 matrices :math:`T_\omega` stack vertically below it. The recourse matrix :math:`W` forms a block-diagonal pattern,
 and the top-right of the overall matrix is all zeros.
 
+.. _tutorials-lshape-block:
+
 .. math::
    \begin{pmatrix}
        A      & 0      & 0      & \cdots & 0   \\

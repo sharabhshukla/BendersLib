@@ -5,19 +5,6 @@ Benders Methods
 
 .. currentmodule:: benderslib
 
-A specific Benders method is composed of a master problem, one or more
-subproblems, and a Benders algorithm that orchestrates the solution process.
-The master and subproblems are instances of :class:`MasterProblem` and
-:class:`SubProblem`/:class:`SubProblems`, respectively, while the Benders algorithm is an instance
-of a class derived from :class:`BendersSolver`.
-The Benders algorithm iteratively solves the master problem and subproblems,
-adding Benders cuts to the master problem based on the solutions of the
-subproblems until convergence is achieved.
-What make different Benders methods different are the specific types of
-Benders cuts used.
-In this section, we present several Benders methods implemented in
-BendersLib, each with its own unique Benders cuts.
-
 .. _api-classical:
 
 Classical Benders Decomposition

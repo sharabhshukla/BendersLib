@@ -764,11 +764,17 @@ class Cut:
         assert sense in {CST.LE, CST.GE, CST.EQ}, f"sense {sense} must be one of: {{CST.LE, CST.GE, CST.EQ}}"
 
         self.vars = vars
+        """A list of variable names involved in the cut."""
         self.coefs = coefs
+        """A list of coefficients corresponding to the variables in the cut."""
         self.rhs = rhs
+        """The right-hand side value of the cut."""
         self.sense = sense
+        """The sense of the cut, must be :attr:`BendersConsts.LE`, :attr:`BendersConsts.GE`, or :attr:`BendersConsts.EQ`."""
         self.ctype = ctype
+        """:attr:`BendersConsts.OPTIMALITY` or :attr:`BendersConsts.FEASIBILITY`."""
         self.name = name
+        """A name for the cut."""
 
     def __repr__(self):
         return (f"{self.name} ({self.ctype}): "
@@ -977,8 +983,16 @@ class BendersSolver:
         sub_problem.params = params
 
         self.master_problem = master_problem
+        """An instance of :class:`MasterProblem` representing the master problem."""
         self.sub_problem = sub_problem
+        """An instance of :class:`SubProblem` or :class:`SubProblems` representing the subproblem(s)."""
         self.complicating_vars = complicating_vars
+        """A list of names of the complicating variables in the master problem."""
+
+        self.optimality_cut = None
+        """An instance of :class:`CutGenerator` for generating optimality cuts."""
+        self.feasibility_cut = None
+        """An instance of :class:`CutGenerator` for generating feasibility cuts."""
 
         if inspect.isfunction(optimality_cut):
             self.optimality_cut = _FuncWrapperCut(master_problem, sub_problem, optimality_cut, params)
@@ -1001,6 +1015,7 @@ class BendersSolver:
         assert self.optimality_cut or self.feasibility_cut, "Provide at least <optimality_cut> or <feasibility_cut>."
 
         self.params = params
+        """An instance of :class:`BendersParams` containing parameters for the Benders decomposition process."""
 
         # Attributes
         self.result = BendersResult()

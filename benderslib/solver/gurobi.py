@@ -180,6 +180,31 @@ class Gurobi(SolverBase):
         }
         self.status = _grb_status_map.get(self.model.Status, CST.ERROR)
 
+    @staticmethod
+    def is_available() -> bool:
+        """
+        Check if Gurobi solver is available in the current environment.
+
+        Returns
+        ---------------
+        bool
+            True if Gurobi is available, False otherwise.
+
+        Example
+        ---------------
+        .. code-block:: python
+
+            if Gurobi.is_available():
+                print("Gurobi solver is available.")
+            else:
+                print("Gurobi solver is not available.")
+        """
+        try:
+            import gurobipy  # noqa: F401
+            return True
+        except ImportError:
+            return False
+
     def make_master_problem(self, master_vars: list[str]) -> Model:
         """
         Generating the master problem from the original problem by extracting the specified master problem variables,
