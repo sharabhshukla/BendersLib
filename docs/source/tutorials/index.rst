@@ -1,25 +1,6 @@
 Tutorials
 =============
 
-Benders Decomposition is a powerful mathematical programming technique for optimization problems
-with block structure, developed by Jacques Benders (1941-2017) in 1962 [1]_.
-The method decomposes a complex problem into smaller, more manageable master problem and subproblem,
-which can be solved iteratively to find the optimal solution to the original problem.
-
-
-From 1962 to 2025, there are over tens of thousands of research articles on Benders Decomposition,
-covering a wide range of applications in various fields, including supply chain management,
-energy systems, transportation, finance, and many others.
-Despite its popularity (**1000 papers per year on average**, according to
-`Google Scholar <https://scholar.google.com/scholar?q=Benders+Decomposition>`_),
-there is no software library specializing in Benders Decomposition and its variants.
-This project aims to fill this gap by providing a user-friendly and extensible library for Benders Decomposition
-- **BendersLib**, which can be easily integrated with existing optimization solvers and frameworks.
-Although this library is designed to be extended with user-defined Benders cuts, acceleration techniques,
-and algorithms, it also implements several representative Benders Decomposition variants for
-rapid prototyping and benchmarking.
-
-
 This tutorial section offers an overview of the Benders Decomposition theory,
 covering its development over more than fifty years.
 There are several important variants of Benders Decomposition listed below.

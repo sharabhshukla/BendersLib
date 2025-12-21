@@ -93,6 +93,7 @@ Please refer to :doc:`solver` for a list of supported solvers and detailed instr
 .. list-table:: Solvers Installation
     :widths: 15 70 70
     :header-rows: 1
+    :name: solver-installation-table
 
     * - Solver
       - pip

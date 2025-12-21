@@ -13,48 +13,104 @@ Supported Solvers
 
 BendersLib supports the following solvers.
 Installation instructions can be found in the manual under :ref:`Installing Solvers <manual_installing_solver>`.
+Guide on building solver models can be found in the official documentation of each solver.
 
 .. list-table:: Built-in Solvers Interfaces
     :widths: 15 15 15 50 50
     :header-rows: 1
+    :name: solver-table
 
     * - Solver
       - Class
       - Type
-      - Website
+      - Documentation
       - Note
-    * - Gurobi
+    * - **Gurobi**
       - :class:`Gurobi`
       - MP
       - https://docs.gurobi.com
       - Commercial solver with free academic license.
 
-*MP: Mathematical Programming, CP: Constraint Programming.*
+*\* Note: MP: Mathematical Programming, CP: Constraint Programming.*
 
-If you want to use a solver not listed here,
-you can implement your own solver interface by inheriting from :class:`SolverBase` and implement
-the abstract methods defined.
+.. admonition:: Mathematical Programming vs. Constraint Programming
+    :class: tip
 
-.. note::
+    Mathematical Programming and Constraint Programming are two different paradigms for solving optimization problems.
+    They have distinct approaches and are suited for different types of problems.
+    A wise choice between the two can lead to more efficient problem-solving.
 
-   *Contributing solver interfaces to BendersLib is welcome!*
-   See :ref:`manual_custom_solver_interface` and :doc:`contribution` for guidelines.
+    .. list-table::
+       :widths: 25 37 38
+       :header-rows: 1
 
-Mathematical Programming vs. Constraint Programming
-----------------------------------------------------
+       * - Feature
+         - Mathematical Programming
+         - Constraint Programming
+       * - **Origin**
+         - Operations Research (OR)
+         - Artificial Intelligence (AI)
+       * - **Core Idea**
+         - Optimize a specific objective function subject to a set of constraints.
+         - Find a feasible solution that satisfies all constraints, without necessarily having an objective function.
+       * - **Typical Techniques**
+         - Simplex method, interior-point methods.
+         - Backtracking, constraint propagation, and local search.
+       * - **Best Suited For**
+         - Problems with quantitative variables and linear/nonlinear relationships.
+         - Problems with combinatorial structures and discrete variables.
+
+    There are many successful attempts that **combing both paradigms**.
+    Specifically in the :doc:`../tutorials/lbbd` famework,
+    master problems are often modeled using Mathematical Programming,
+    while subproblems can be modeled using Constraint Programming to leverage its strengths in handling combinatorial constraints.
+
+**Using a solver not listed here? No worries!**
+
+See the next section on how to create a custom solver interface,
+and see :ref:`Custom Subproblem <manual_custom_sub>` for even simpler ways to use custom solvers for subproblems.
 
 ====
+
+.. _manual_custom_solver_interface:
 
 Customization
 -------------------------------------------
 
-Lightweight Custom Solver Interface
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+BendersLib is designed to be extensible, allowing you to integrate solvers that are not natively supported.
+This is achieved by creating a custom solver interface.
 
-.. _manual_custom_solver_interface:
+To add a new solver, you need to create a class that inherits from :class:`SolverBase`.
+This base class serves as a template for all solver interfaces in BendersLib.
+The :class:`SolverBase` is an `Abstract Base Class (ABC) <https://docs.python.org/3/library/abc.html>`_,
+a feature from Python.
+ABCs are used to define interfaces,
+meaning a concrete class that inherits from an ABC must implement all of its
+`abstract methods <https://docs.python.org/3/library/abc.html#abc.abstractmethod>`_.
+This ensures that every solver interface in BendersLib provides a consistent set of functionalities.
+When you create your custom solver class,
+you must inherit from :class:`SolverBase` and provide implementations for all methods decorated with ``@abstractmethod``,
+and define all attributes defined in :class:`SolverBase`.
 
-Fully Featured Custom Solver Interface
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+While :class:`SolverBase` defines several abstract methods that you must implement,
+two methods, :meth:`~SolverBase.make_master_problem` and :meth:`~SolverBase.make_sub_problem`,
+have special considerations.
+These methods are essential for the :class:`AnnotationBenders` class,
+which automates the decomposition process.
+If you do not intend to use :class:`AnnotationBenders`,
+you might not need to implement the full logic for these methods.
+However, for a solver interface to be considered for contribution to the official BendersLib repository,
+a complete and functional implementation of these methods is required to ensure full compatibility with all library features.
+
+To see a practical implementation, you can refer to the source code of the built-in solver interfaces,
+such as :class:`Gurobi`.
+Examining how it inherits from :class:`SolverBase` and implements the required methods will provide a clear
+and effective template for creating your own custom solver.
+
+.. note::
+
+   *Contributing solver interfaces to BendersLib is welcome!*
+   See :doc:`contribution` for guidelines.
 
 ====
 
@@ -72,18 +128,19 @@ See :class:`SolverBase` for the comprehensive API reference, and :doc:`built-in 
     :caption: Solver Interface Inheritance Diagram
     :align: center
 
-    flowchart TD
-        Gurobi -->|inherits| SolverBase
-        COPT -->|inherits| SolverBase
-        HiGHS -->|inherits| SolverBase
-        Pyomo -->|inherits| SolverBase
+    flowchart TB
+        Gurobi -- inherits --> SolverBase
+        COPT -- inherits --> SolverBase
+        HiGHS -- inherits --> SolverBase
+        Pyomo -- inherits --> SolverBase
 
-.. seealso::
+.. attention::
 
-    * Base Class: :class:`SolverBase`
-    * Solver Interfaces: :class:`Gurobi`
+    The solver interfaces are not designed to be used directly by end-users.
+    Use :class:`MasterProblem` and :class:`SubProblem` instead,
+    which internally utilize the solver interfaces to interact with the optimization solvers.
 
-.. rubric:: Attributes
+.. rubric:: :class:`SolverBase` - Attributes
 
 .. autosummary::
    :nosignatures:
@@ -97,7 +154,11 @@ See :class:`SolverBase` for the comprehensive API reference, and :doc:`built-in 
    ~SolverBase._var_bounds
    ~SolverBase._rhs
 
-.. rubric:: Methods
+.. tip::
+
+    Use :attr:`SolverBase._solver_model` to access to more attributes.
+
+.. rubric:: :class:`SolverBase` - Methods
 
 .. autosummary::
    :nosignatures:
@@ -118,3 +179,8 @@ See :class:`SolverBase` for the comprehensive API reference, and :doc:`built-in 
    ~SolverBase.solve
    ~SolverBase.make_master_problem
    ~SolverBase.make_sub_problem
+
+.. seealso::
+
+    * Base Class: :class:`SolverBase`
+    * Solver Interfaces: :class:`Gurobi`

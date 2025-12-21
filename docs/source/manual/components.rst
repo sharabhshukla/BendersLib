@@ -128,7 +128,7 @@ Detailed API for each component can be found in the :doc:`API reference <../api/
       :class:`LShapedOCGen`, :class:`LShapedFCGen`,
       :class:`IntegerLShapedOCGen`, :class:`IntegerLShapedFCGen`
 
-    *"FC" means feasibility cut, and "OC" means optimality cut.*
+    *\* Note: "OC" stands for Optimality Cut, and "FC" stands for Feasibility Cut.*
 
 * :doc:`benders`: This is the core controller that executes the Benders decomposition algorithm.
   It orchestrates the entire process: iteratively solving the master problem and subproblem(s),

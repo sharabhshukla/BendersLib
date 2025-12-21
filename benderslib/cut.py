@@ -4,8 +4,8 @@ from .core import OptimalityCut, FeasibilityCut, CutGenerator, CST
 
 
 class ClassicalOC(OptimalityCut):
-    """
-    The classical optimality cut for Benders decomposition. Please refer to :doc:`../tutorials/classical`.
+    """The optimality cut for :doc:`../tutorials/classical`.
+
     The cut uses the optimal dual solution to form a valid lower bound on the subproblem's cost,
     represented by the variable :math:`\\eta` in the master problem.
 
@@ -28,6 +28,25 @@ class ClassicalOC(OptimalityCut):
         A list of dual variable values obtained from solving the subproblem.
     rhs : list
         A list of right-hand side values of the subproblem constraints.
+
+    Example
+    ----------
+
+    .. code-block:: python
+
+        from benderslib import ClassicalOC
+
+        # Assuming we have the following data from the subproblem
+        vars = ['x1', 'x2']         # Complicating variables
+        var_coefs = {
+            'x1': [2, 3],           # Coefficients of x1 in subproblem constraints
+            'x2': [1, 4],           # Coefficients of x2 in subproblem constraints
+        }
+        dual_values = [0.5, 1.0]    # Optimal dual values from the subproblem
+        rhs = [10, 20]              # Right-hand side values of the subproblem constraints
+
+        # Create the optimality cut
+        cut = ClassicalOC(vars, var_coefs, dual_values, rhs)
     """
 
     def __init__(self, vars: list[str], var_coefs: dict, dual_values: list, rhs: list, estimator=CST.ESTIMATOR_NAME):
@@ -38,8 +57,8 @@ class ClassicalOC(OptimalityCut):
 
 
 class ClassicalFC(FeasibilityCut):
-    """
-    The classical feasibility cut for Benders decomposition. Please refer to :doc:`../tutorials/classical`.
+    """The feasibility cut for :doc:`../tutorials/classical`.
+
     The cut is derived from an extreme ray of the subproblem, which acts as a certificate of infeasibility.
     It is defined as follows to cut off the region of master solutions that leads to this infeasibility.
 
@@ -63,6 +82,25 @@ class ClassicalFC(FeasibilityCut):
         A list representing an extreme ray of the subproblem's feasible region.
     rhs : list
         A list of right-hand side values of the subproblem constraints.
+
+    Example
+    ----------
+
+    .. code-block:: python
+
+        from benderslib import ClassicalFC
+
+        # Assuming we have the following data from the subproblem
+        vars = ['x1', 'x2']  # Complicating variables
+        var_coefs = {
+            'x1': [2, 3],  # Coefficients of x1 in subproblem constraints
+            'x2': [1, 4],  # Coefficients of x2 in subproblem constraints
+        }
+        extreme_ray = [1.0, 0.5]  # Extreme ray from the dual subproblem
+        rhs = [10, 20]  # Right-hand side values of the subproblem constraints
+
+        # Create the feasibility cut
+        cut = ClassicalFC(vars, var_coefs, extreme_ray, rhs)
     """
 
     def __init__(self, vars: list[str], var_coefs: dict, extreme_ray: list, rhs: list):
@@ -81,8 +119,8 @@ class ClassicalFC(FeasibilityCut):
 
 
 class NoGoodFC(FeasibilityCut):
-    """
-    The no-good cut (feasibility cut) for Combinatorial Benders Decomposition. Please refer to :doc:`../tutorials/cbd`.
+    """The feasibility cut for :doc:`../tutorials/cbd`.
+
     It is defined as follows to ensure at least one binary variable changes its value in the next iteration,
 
     .. math::
@@ -104,6 +142,28 @@ class NoGoodFC(FeasibilityCut):
     ----------
     bin_var_values : dict
         A dictionary mapping binary variable names to their values in the current master problem solution.
+
+    Example
+    ----------
+
+    .. code-block:: python
+
+        from benderslib import NoGoodFC
+
+        # Assuming we have the following binary variable values from the master problem
+        bin_var_values = {
+            'x1': 1,  # Binary variable x1 is 1
+            'x2': 0,  # Binary variable x2 is 0
+            'x3': 1,  # Binary variable x3 is 1
+        }
+
+        # Create the no-good feasibility cut
+        cut = NoGoodFC(bin_var_values)
+
+    .. hint::
+
+        ``bin_var_values`` should ideally be a small subset of all binary variables in the master problem,
+        only including those that are relevant to the infeasibility of the subproblem.
     """
 
     def __init__(self, bin_var_values: dict):
@@ -118,8 +178,8 @@ class NoGoodFC(FeasibilityCut):
 
 
 class CombinatorialOC(OptimalityCut):
-    """
-    The combinatorial optimality cut for Combinatorial Benders Decomposition. Please refer to :doc:`../tutorials/cbd`.
+    """The optimality cut for  :doc:`../tutorials/cbd`.
+
     It is defined as follows to lower bound the estimator :math:`\\theta` for subproblem in the master problem.
 
     .. math::
@@ -148,6 +208,7 @@ class CombinatorialOC(OptimalityCut):
 
     Parameters
     ----------
+
     bin_var_values : dict
         A dictionary mapping binary variable names to their values in the current master problem solution.
     sub_obj : float
@@ -156,6 +217,24 @@ class CombinatorialOC(OptimalityCut):
         A large constant used in the cut formulation.
     estimator : str, optional
         The name of the master problem variable representing the future cost.
+
+    Example
+    ----------
+
+    .. code-block:: python
+
+        from benderslib import CombinatorialOC
+
+        # Assuming we have the following binary variable values from the master problem
+        bin_var_values = {
+            'x1': 1,  # Binary variable x1 is 1
+            'x2': 0,  # Binary variable x2 is 0
+            'x3': 1,  # Binary variable x3 is 1
+        }
+        sub_obj = 50  # Objective value of the subproblem given the current master problem solution
+
+        # Create the combinatorial optimality cut
+        cut = CombinatorialOC(bin_var_values, sub_obj)
     """
 
     def __init__(
@@ -184,8 +263,8 @@ class CombinatorialOC(OptimalityCut):
 
 
 class LShapedOC(OptimalityCut):
-    """
-    An aggregated optimality cut for the :doc:`../tutorials/lshape` (single-cut version).
+    """The optimality cut for :doc:`../tutorials/lshape` (aggregated single cut).
+
     This class encapsulates the aggregation logic. It takes raw data from all
     scenarios (probabilities, duals, matrices) and computes the final cut.
     The cut represents the following inequality.
@@ -208,6 +287,38 @@ class LShapedOC(OptimalityCut):
         coefficient lists :math:`T_ω` for a scenario.
     estimator : str
         The name of the master problem variable representing the future cost.
+
+    Example
+    ----------
+
+    .. code-block:: python
+
+        from benderslib import LShapedOC
+
+        # Assuming we have the following data from multiple scenarios
+        vars = ['x1', 'x2']     # Complicating variables
+        probs = [0.5, 0.5]      # Probabilities for each scenario
+        duals = [               # Dual variable values for each scenario
+            [0.5, 1.0],         # Scenario 1 duals
+            [0.3, 0.7]          # Scenario 2 duals
+        ]
+        rhss = [                # Right-hand side (RHS) values for each scenario
+            [10, 20],           # Scenario 1 RHS
+            [15, 25]            # Scenario 2 RHS
+        ]
+        var_coefs_list = [      # Coefficient lists for each scenario
+            {                   # Scenario 1 coefficients
+                'x1': [2, 3],
+                'x2': [1, 4]
+            },
+            {                   # Scenario 2 coefficients
+                'x1': [3, 2],
+                'x2': [4, 1]
+            }
+        ]
+
+        # Create the L-shaped optimality cut
+        cut = LShapedOC(vars, probs, duals, rhss, var_coefs_list)
     """
 
     def __init__(
@@ -253,6 +364,7 @@ class LShapedOC(OptimalityCut):
 
 
 class ClassicalOCGen(CutGenerator):
+    """The optimality cut generator for :doc:`../tutorials/classical`."""
 
     def __init__(self, master_problem, sub_problem, params):
         super().__init__(master_problem, sub_problem, params)
@@ -272,6 +384,7 @@ class ClassicalOCGen(CutGenerator):
 
 
 class ClassicalFCGen(CutGenerator):
+    """The feasibility cut generator for :doc:`../tutorials/classical`."""
 
     def __init__(self, master_problem, sub_problem, params):
         super().__init__(master_problem, sub_problem, params)
@@ -291,6 +404,7 @@ class ClassicalFCGen(CutGenerator):
 
 
 class CombinatorialFCGen(CutGenerator):
+    """The feasibility cut generator for :doc:`../tutorials/cbd`."""
 
     def __init__(self, master_problem, sub_problem, params):
         super().__init__(master_problem, sub_problem, params)
@@ -307,6 +421,7 @@ class CombinatorialFCGen(CutGenerator):
 
 
 class CombinatorialOCGen(CutGenerator):
+    """The optimality cut generator for :doc:`../tutorials/cbd`."""
 
     def __init__(self, master_problem, sub_problem, params):
         super().__init__(master_problem, sub_problem, params)
@@ -326,6 +441,7 @@ class CombinatorialOCGen(CutGenerator):
 
 
 class LShapedOCGen(CutGenerator):
+    """The optimality cut generator for :doc:`../tutorials/lshape`."""
 
     def __init__(self, master_problem, sub_problem, params):
         super().__init__(master_problem, sub_problem, params)
@@ -387,6 +503,7 @@ class LShapedOCGen(CutGenerator):
 
 
 class LShapedFCGen(CutGenerator):
+    """The feasibility cut generator for :doc:`../tutorials/lshape`."""
 
     def __init__(self, master_problem, sub_problem, params):
         super().__init__(master_problem, sub_problem, params)
@@ -420,6 +537,7 @@ class LShapedFCGen(CutGenerator):
 
 
 class IntegerLShapedOCGen(CutGenerator):
+    """The optimality cut generator for :doc:`../tutorials/ilshape`."""
 
     def __init__(self, master_problem, sub_problem, params):
         super().__init__(master_problem, sub_problem, params)
@@ -467,6 +585,7 @@ class IntegerLShapedOCGen(CutGenerator):
 
 
 class IntegerLShapedFCGen(CutGenerator):
+    """The feasibility cut generator for :doc:`../tutorials/ilshape`."""
 
     def __init__(self, master_problem, sub_problem, params):
         super().__init__(master_problem, sub_problem, params)

@@ -3,6 +3,8 @@ Quickstart
 
 .. currentmodule:: benderslib
 
+.. _suitable-problem:
+
 Is Benders Decomposition suitable for your problem?
 -----------------------------------------------------
 

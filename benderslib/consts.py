@@ -1,10 +1,10 @@
 # coding:utf-8
 
 class BendersConsts:
-    """
-    Constants used in BendersLib.
+    """Immutable Constants used in BendersLib.
+
     The constants can be used like ``CST.OPTIMAL``, where ``CST`` is a global alias
-    for ``BendersConsts``. These constants cannot (and should not) be modified.
+    for ``BendersConsts``.
 
     Example
     -----------

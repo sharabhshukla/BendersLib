@@ -34,3 +34,8 @@ div.sphx-glr-download a:hover {
 a:visited:hover {
     color: var(--color-link) !important;
 }
+
+/*Customize autosummary style*/
+table.autosummary {
+    width: 100%;
+}

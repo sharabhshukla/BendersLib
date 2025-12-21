@@ -6,23 +6,24 @@ from ..consts import BendersConsts as CST
 
 
 class SolverBase(ABC):
-    """
-    This is an abstract base class for solver interfaces in BendersLib.
+    """The abstract base class for solver interfaces in BendersLib.
+
     It defines the essential methods and attributes that any solver interface must implement
     to be compatible with BendersLib.
 
     Parameters
     ---------------
     model :
-        An instance of the solver's model class (e.g., Gurobi's ```gurobipy.Model```).
+        An instance of the solver's model class (e.g., Gurobi's ``gurobipy.Model``).
     """
 
     def __init__(self, model):
         self.model = model
         self.status = CST.UNSOLVED
-        """
-        The status of the last solve attempt, initialized to :const:`BendersConsts.UNSOLVED`.
-        It should be updated to :const:`BendersConsts.OPTIMAL` or :const:`BendersConsts.INFEASIBLE`, 
+        """The status of the last solve attempt.
+        
+        It is initialized to :const:`BendersConsts.UNSOLVED`,
+        and it should be updated to :const:`BendersConsts.OPTIMAL` or :const:`BendersConsts.INFEASIBLE`, 
         after calling the :func:`SolverBase.solve` method.
 
         .. caution::
@@ -31,14 +32,16 @@ class SolverBase(ABC):
             would impact convergence of Benders decomposition.
         """
         self._solver_model = model
-        """A copy of the original solver model instance (:data:`model`), 
-        used to access the original model data and methods."""
+        """A copy of the original solver model instance.
+        
+        This attribute is exactly the solver-specific model instance passed during initialization.
+        It allows direct access to solver-specific features (attributes and methods) not covered by the abstract interface.
+        Refer to :ref:`solver-table` for supported solvers, and their documentation.
+        """
 
         # Attributes to be set in the subclass
         self._sense = CST.MIN
-        """It specifies if the model is a minimization problem
-         (:const:`BendersConsts.MIN`) or a maximization problem (:const:`BendersConsts.MAX`).
-        """
+        """An indicator of the objective sense of the model."""
         self._all_vars: list[str] = []
         """A list of all variable names in the model."""
         self._int_vars: list[str] = []
@@ -46,14 +49,13 @@ class SolverBase(ABC):
         self._bin_vars: list[str] = []
         """A list of all binary variable names in the model."""
         self._var_bounds: dict[str, tuple[float, float]] = {}
-        """A dictionary mapping variable names to their (lower_bound, upper_bound) tuples."""
+        """A dictionary mapping variable names to their lower and upper bounds."""
         self._rhs: list[float] = []
         """A list of right-hand side values for all constraints in the model."""
 
     @abstractmethod
     def add_vars(self, var_names: list[str], var_types: list[str], lb: list[float], ub: list[float]) -> list[str]:
-        """
-        Add new variables to the model.
+        """Add new variables to the model.
 
         Parameters
         ---------------
@@ -82,8 +84,7 @@ class SolverBase(ABC):
 
     @abstractmethod
     def get_obj_expr(self) -> dict[str, float]:
-        """
-        Get the objective function expression of the model.
+        """Get the objective function expression of the model.
 
         Returns
         ---------------
@@ -101,8 +102,7 @@ class SolverBase(ABC):
 
     @abstractmethod
     def set_obj(self, var_coefs: dict[str, float]) -> None:
-        """
-        Set the objective function of the model.
+        """Set the objective function of the model.
 
         Parameters
         ---------------
@@ -120,8 +120,7 @@ class SolverBase(ABC):
 
     @abstractmethod
     def fix_vars(self, var_values: dict[str, float]) -> None:
-        """
-        Fix the values of specified variables in the model.
+        """Fix the values of specified variables in the model.
 
         Parameters
         ---------------
@@ -139,8 +138,7 @@ class SolverBase(ABC):
 
     @abstractmethod
     def unfix_vars(self, vars: list[str]) -> None:
-        """
-        Unfix the specified variables in the model, restoring their original bounds.
+        """Unfix the specified variables in the model by restoring their original bounds.
 
         Parameters
         ---------------
@@ -158,8 +156,7 @@ class SolverBase(ABC):
 
     @abstractmethod
     def get_var_values(self, vars: list[str] | None = None) -> dict[str, float]:
-        """
-        Get the current values of specified variables in the model.
+        """Get the current values of specified variables in the model.
 
         Parameters
         ---------------
@@ -185,8 +182,7 @@ class SolverBase(ABC):
 
     @abstractmethod
     def get_var_coefs(self, vars: list[str] | None = None) -> dict[str, list]:
-        """
-        Get the coefficients of specified variables in all the constraints of the model.
+        """Get the coefficients of specified variables in all the constraints of the model.
 
         Parameters
         ---------------
@@ -210,8 +206,7 @@ class SolverBase(ABC):
 
     @abstractmethod
     def get_rhs(self) -> list[float]:
-        """
-        Get the right-hand side values of all constraints in the model.
+        """Get the right-hand side values of all constraints in the model.
 
         Returns
         ---------------
@@ -228,10 +223,9 @@ class SolverBase(ABC):
 
     @abstractmethod
     def get_dual_values(self) -> list[float]:
-        """
-        Get the dual values (shadow prices) of all constraints in the model.
-        This is essential for generating Classical Benders optimality cuts,
-        which are used by :class:`ClassicalBenders`.
+        """Get the dual values (shadow prices) of all constraints in the model.
+
+        This is essential for generating :class:`Classical Benders optimality cuts <ClassicalOC>`.
 
         Returns
         ---------------
@@ -248,10 +242,9 @@ class SolverBase(ABC):
 
     @abstractmethod
     def get_extreme_ray(self) -> list[float]:
-        """
-        Get the extreme ray of the model.
-        This is essential for generating Classical Benders feasibility cuts,
-        which are used by :class:`ClassicalBenders`.
+        """Get the extreme ray of the model.
+
+        This is essential for generating :class:`Classical Benders feasibility cuts <ClassicalFC>`.
 
         Returns
         ---------------
@@ -268,8 +261,7 @@ class SolverBase(ABC):
 
     @abstractmethod
     def get_obj(self) -> float:
-        """
-        Get the objective value of the model after solving.
+        """Get the objective value of the model after solving.
 
         Returns
         ---------------
@@ -286,8 +278,7 @@ class SolverBase(ABC):
 
     @abstractmethod
     def add_cut(self, cut, name) -> None:
-        """
-        Add a BendersLib :class:`Cut` instance to the solver's model as a constraint.
+        """Add a Benders cut to the solver's model as a constraint.
 
         Parameters
         ---------------
@@ -309,8 +300,7 @@ class SolverBase(ABC):
 
     @abstractmethod
     def remove_cut(self, cut_name: str) -> None:
-        """
-        Remove a constraint from the solver's model by its name.
+        """Remove a constraint from the solver's model by its name.
 
         Parameters
         ---------------
@@ -327,8 +317,8 @@ class SolverBase(ABC):
 
     @abstractmethod
     def solve(self) -> None:
-        """
-        Solve the optimization model using the solver's built-in optimization method.
+        """Solve the optimization model using the solver's built-in optimization method.
+
         Solver-specific parameters can be set in this method,
         such as hiding the solver's output log in the console.
         After solving, ``status`` should be updated accordingly
@@ -342,8 +332,7 @@ class SolverBase(ABC):
         ...
 
     def make_master_problem(self, complicating_vars: list[str]) -> object:
-        """
-        Create a master problem by extracting the complicating variables from the original model.
+        """Build the master problem from the original problem.
 
         Parameters
         ---------------
@@ -364,8 +353,7 @@ class SolverBase(ABC):
         ...
 
     def make_sub_problem(self, complicating_vars: list[str]) -> object:
-        """
-        Create a subproblem by fixing the complicating variables in the original model.
+        """Build the subproblem from the original problem.
 
         Parameters
         ---------------

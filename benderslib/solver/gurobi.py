@@ -7,7 +7,8 @@ from gurobipy import Model, GRB, LinExpr
 
 
 class Gurobi(SolverBase):
-    """
+    """Gurobi solver interface for BendersLib.
+
     This class provides an interface to the Gurobi solver for use with BendersLib.
     It implements the abstract methods defined in the :class:`SolverBase` class.
     Two additional methods, :func:`make_master_problem` and :func:`make_sub_problem`,
@@ -16,7 +17,7 @@ class Gurobi(SolverBase):
     Parameters
     ---------------
     model: gurobipy.Model
-        An instance of Gurobi's ```gurobipy.Model```.
+        An instance of Gurobi's ``gurobipy.Model``.
     """
 
     def __init__(self, model: Model) -> None:
@@ -182,8 +183,7 @@ class Gurobi(SolverBase):
 
     @staticmethod
     def is_available() -> bool:
-        """
-        Check if Gurobi solver is available in the current environment.
+        """Check if Gurobi is available in the current environment.
 
         Returns
         ---------------
@@ -206,14 +206,16 @@ class Gurobi(SolverBase):
             return False
 
     def make_master_problem(self, master_vars: list[str]) -> Model:
-        """
-        Generating the master problem from the original problem by extracting the specified master problem variables,
+        """Build the master problem from the original problem.
+        
+        This function generates the master problem from the original problem by extracting 
+        the specified master problem variables,
         constraints that only involve these variables, objective terms associated with these variables.
 
         .. Note::
            This method is required for :class:`AnnotationBenders`, which automatically decomposes the original problem
-           into master and sub problems based on the provided complicating variables.
-           This suggests that you do not need to implement this method when manually defining master and sub problems.
+           into master and subproblems based on the provided complicating variables.
+           This suggests that you do not need to implement this method when manually defining master and subproblems.
 
         Parameters
         ---------------
@@ -270,16 +272,17 @@ class Gurobi(SolverBase):
         return master
 
     def make_sub_problem(self, master_vars: list[str]) -> Model:
-        """
-        Generating the sub problem from the original problem by extracting all variables from the original problem
+        """Build the subproblem from the original problem.
+        
+        This function generates the subproblem from the original problem by extracting all variables from the original problem
         (master problem variables are treated as continuous and their ``lb`` and ``ub`` are fixed based on the
         master problem solution), constraints excepting those that only involve master problem variables,
         and the objective terms associated with the non-master problem variables.
 
         .. Note::
            This method is required for :class:`AnnotationBenders`, which automatically decomposes the original problem
-           into master and sub problems based on the provided complicating variables.
-           This suggests that you do not need to implement this method when manually defining master and sub problems.
+           into master and subproblems based on the provided complicating variables.
+           This suggests that you do not need to implement this method when manually defining master and subproblems.
 
         Parameters
         ---------------
@@ -289,7 +292,7 @@ class Gurobi(SolverBase):
         Returns
         ---------------
         ``gurobipy.Model``
-            A Gurobi Model object representing the sub problem.
+            A Gurobi Model object representing the subproblem.
 
         Example
         ---------------

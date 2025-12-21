@@ -102,6 +102,20 @@ class AnnotationBenders:
         -------
         tuple[MasterProblem, SubProblem] | tuple[object, object]
             A tuple containing the master problem and subproblem instances.
+
+        Example
+        --------
+
+        .. code-block:: python
+
+            from benderslib import AnnotationBenders, Gurobi
+
+            master, sub = AnnotationBenders._decompose(
+                original_problem=original_problem,
+                solver=Gurobi,
+                complicating_vars=complicating_vars,
+                solver_model=False  # (Default) Returns MasterProblem and SubProblem instances
+            )
         """
         solver_backend = solver(original_problem)
         master = solver_backend.make_master_problem(complicating_vars)

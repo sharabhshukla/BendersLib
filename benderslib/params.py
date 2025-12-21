@@ -7,8 +7,8 @@ from .consts import BendersConsts as CST
 
 @dataclass
 class BendersParams:
-    """
-    Parameters for BendersLib that can be manipulated by the users.
+    """Parameters for BendersLib that can be manipulated by the users.
+
     A :class:`BendersParams` instance is passed to the Benders algorithm during its initialization.
     The users may initialize a :class:`BendersParams` instance with customized parameters
     and then pass it to the Benders algorithm.

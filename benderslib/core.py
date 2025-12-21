@@ -15,8 +15,16 @@ from .logger import BendersLogger
 
 @dataclass
 class BendersResult:
-    """
-    Includes the results and statistics from the Benders decomposition process.
+    """Results and statistics from the Benders Decomposition process.
+
+    Example
+    -----------
+
+    .. code-block:: python
+
+        BD = BendersSolver(...)
+        BD.solve()
+        print(BD.result.obj)
     """
 
     lb: float = -float('Inf')
@@ -75,26 +83,30 @@ class BendersResult:
 
 
 class ProblemBase:
-    """
-    The base class for :class:`MasterProblem` and :class:`SubProblem` in Benders decomposition.
+    """The base class for :class:`MasterProblem` and :class:`SubProblem` in Benders decomposition.
 
     Parameters
     ----------
     solver_backend : SolverBase
         An instance of a solver backend (e.g., :class:`Gurobi`) that implements the :class:`SolverBase` interface.
     complicating_vars : list, optional
-        A list of names of the complicating variables in the master problem.
+        A list of names of the complicating variables.
     """
 
     def __init__(self, solver_backend: SolverBase):
         self.model: SolverBase = solver_backend
-        """The solver backend instance (e.g., :class:`Gurobi`) that implements the :class:`SolverBase`"""
+        """An instance of the solver backend (see classes in :ref:`solver-table`)."""
         self._solver_model = self.model._solver_model
-        """The underlying solver model instance (e.g., ``gurobipy.Model``)."""
+        """A copy of the original solver model instance.
+        
+        This attribute is exactly the solver-specific model instance passed during initialization.
+        It allows direct access to solver-specific features (attributes and methods) not covered by the abstract interface.
+        Refer to :ref:`solver-table` for supported solvers, and their documentation.
+        """
         self.status = CST.UNSOLVED
-        """The status of the problem, see :class:`BendersConsts` for possible values."""
+        """The status of the problem (see :class:`BendersConsts` for possible values)."""
         self.params = None
-        """An instance of :class:`BendersParams` containing parameters for the Benders decomposition process."""
+        """The parameters that can be set by the user (see :class:`BendersParams`)."""
 
     def __repr__(self):
         n_vars = len(self.model._all_vars)
@@ -206,7 +218,7 @@ class ProblemBase:
 
     def unfix_vars(self, vars: list[str]) -> None:
         """
-        Unfix the specified variables in the model, restoring their original bounds.
+        Unfix the specified variables in the model by restoring their original bounds.
 
         Parameters
         ---------------
@@ -346,35 +358,34 @@ class ProblemBase:
 
     def solve(self) -> None:
         """
-        Solve :attr:`model` by calling :func:`SolverBase.solve()` and update the :attr:`status` attribute.
+        Solve the problem and update the :attr:`status` attribute.
         """
         self.model.solve()
         self.status = self.model.status
 
 
 class MasterProblem(ProblemBase):
-    """
-    The master problem in Benders decomposition.
+    """The master problem in Benders decomposition.
 
     Parameters
     ----------
     solver_backend : SolverBase
         An instance of a solver backend (e.g., :class:`Gurobi`) that implements the :class:`SolverBase` interface.
     complicating_vars : list, optional
-        A list of names of the complicating variables in the master problem.
+        A list of names of the complicating variables.
     """
 
     def __init__(self, solver_backend: SolverBase, complicating_vars: list = None):
         self.complicating_vars = complicating_vars
-        """A list of names of the complicating variables in the master problem."""
+        """A list of names of the complicating variables."""
         super().__init__(solver_backend)
 
         self.optimality_cuts: list[Cut] = []
-        """List of optimality cuts (:class:`OptimalityCut`) added to the master problem."""
+        """A list of optimality cuts added to the master problem."""
         self.feasibility_cuts: list[Cut] = []
-        """List of feasibility cuts (:class:`FeasibilityCut`) added to the master problem."""
+        """A list of feasibility cuts added to the master problem."""
         self.estimators: list[str] = []
-        """List of estimator variable names added to the master problem."""
+        """A list of estimator variable names added to the master problem."""
 
         self.__oc_id = itertools.count(1)
         self.__fc_id = itertools.count(1)
@@ -415,8 +426,7 @@ class MasterProblem(ProblemBase):
         self.estimators = estimators
 
     def get_estimator_values(self) -> dict[str, float]:
-        """
-        Get the current values of the estimator variables in the master problem.
+        """Get the current values of the estimator variables in the master problem.
 
         Returns
         ---------------
@@ -426,9 +436,7 @@ class MasterProblem(ProblemBase):
         return self.get_var_values(self.estimators)
 
     def add_cut(self, cut) -> str | None:
-        """
-        Add a cut (optimality or feasibility) to the master problem, and update the corresponding cut lists
-        :attr:`optimality_cuts` or :attr:`feasibility_cuts`.
+        """Add a Benders cut to the master problem.
 
         Parameters
         ----------
@@ -458,8 +466,7 @@ class MasterProblem(ProblemBase):
         return cut_name
 
     def remove_cut(self, cut_name: str) -> None:
-        """
-        Remove a constraint from the solver's model by its name.
+        """Remove a cut from the master problem by its name.
 
         Parameters
         ---------------
@@ -476,26 +483,25 @@ class MasterProblem(ProblemBase):
 
 
 class SubProblem(ProblemBase):
-    """
-    The sub problem in Benders decomposition.
+    """The sub problem in Benders decomposition.
 
     Parameters
     ----------
     solver_backend : SolverBase
         An instance of a solver backend (e.g., :class:`Gurobi`) that implements the :class:`SolverBase` interface.
     complicating_vars : list, optional
-        A list of names of the complicating variables in the master problem.
+        A list of names of the complicating variables.
     """
 
     def __init__(self, solver_backend: SolverBase, complicating_vars: list = None):
         self.complicating_vars = complicating_vars
-        """A list of names of the complicating variables in the master problem."""
+        """A list of names of the complicating variables."""
         super().__init__(solver_backend)
 
 
 class LogicBasedSubProblem(ABC):
-    """
-    The abstract base class for the subproblem in the Logic-based Benders Decomposition.
+    """The abstract base class for the subproblem in the Logic-based Benders Decomposition.
+
     To implement a customized subproblem, at least :meth:`solve` required to be overridden,
     as it will be called during the Benders solving process after :meth:`BendersSolver.solve` is invoked.
     Other methods and attributes can be added as needed, based on the specific implementation of :class:`CutGenerator`.
@@ -503,33 +509,49 @@ class LogicBasedSubProblem(ABC):
     Parameters
     ----------
     complicating_vars : list[str]
-        A list of names of the complicating variables in the master problem.
+        A list of names of the complicating variables.
     params : BendersParams, optional
-        An instance of :class:`BendersParams` containing parameters for the Benders decomposition process.
+        The parameters that can be set by the user (see :class:`BendersParams`).
+        If not provided, default parameters will be used.
     """
 
     def __init__(self, complicating_vars: list[str], params: BendersParams = BendersParams()):
-        self.complicating_vars = complicating_vars
-        """A list of names of the complicating variables in the master problem."""
-        self.complicating_var_values = {}
-        """A dictionary to store the values of complicating variables fixed from the master problem.
-           After calling :meth:`BendersSolver.solve`, this attribute will be updated via :meth:`fix_vars`
-           after the master problem is solved. Therefore, users do not need to set it manually, 
-           and can directly use it when implementing :meth:`solve`."""
-        self.obj = None
+        self.complicating_vars: list[str] = complicating_vars
+        """A list of names of the complicating variables.
+        
+        Example
+        ---------------
+        
+        .. code-block:: python
+
+            complicating_vars = ['x1', 'x2', 'x3']
+        """
+        self.complicating_var_values: dict[str, float | int] = {}
+        """The values of complicating variables provided by the master problem.
+        
+        After calling :meth:`BendersSolver.solve`, this attribute will be updated via :meth:`fix_vars`
+        after the master problem is solved. Therefore, users do not need to set it manually, 
+        and can directly use it when implementing :meth:`solve`.
+           
+        Example
+        ---------------
+        
+        .. code-block:: python
+        
+            complicating_var_values = {'x1': 10, 'x2': 5.5, 'x3': 0}
+        """
+        self.obj: float | int | None = None
         """The objective value of the subproblem after solving."""
-        self.var_values = {}
-        """A dictionary to store the current values of variables in the subproblem."""
+        self.var_values: dict[str, float | int] = {}
+        """The values of variables in the subproblem after solving."""
         self.status = CST.UNSOLVED
-        """The status of the problem, see :class:`BendersConsts` for possible values."""
+        """The status of the problem (see :class:`BendersConsts` for possible values)."""
         self.params = params
-        """An instance of :class:`BendersParams` containing parameters for the Benders decomposition process."""
+        """The parameters that can be set by the user (see :class:`BendersParams`)."""
 
     @abstractmethod
     def solve(self) -> None:
-        """
-        This method is **required** to be implemented.
-        It solves the subproblem and update the :attr:`status`, :attr:`obj`, and :attr:`var_values` attributes.
+        """Solve the subproblem and update the :attr:`status`, :attr:`obj`, and :attr:`var_values` attributes (**required** to be implemented).
 
         *   :attr:`status` is used in :meth:`SubProblems.solve` to indicate if the subproblem is
             optimal (:attr:`BendersConsts.OPTIMAL`) or infeasible (:attr:`BendersConsts.INFEASIBLE`),
@@ -562,20 +584,19 @@ class LogicBasedSubProblem(ABC):
         ...
 
     def fix_vars(self, var_values: dict[str, float]) -> None:
-        """
-        Pass the values of complicating variables from the master problem to the subproblem.
-        It is used when calling :meth:`BendersSolver.solve`.
-        This method simply update :attr:`complicating_var_values`,
-        users do not need to override it.
+        """Fix the values of specified variables in the model (do **not** override it).
+
+        This method simply update :attr:`complicating_var_values`.
+        It ise used by :meth:`BendersSolver.solve`.
         """
         self.complicating_var_values = var_values
 
     def get_var_values(self, vars: list[str] = None) -> dict[str, float]:
-        """
-        Get the current values of specified variables in the subproblem.
+        """Get the current values of specified variables in the model (do **not** override it).
+
         It is used for saving the final solution.
-        This method simply return :attr:`var_values`, which should be updated in :meth:`solve`,
-        users do not need to override it.
+        This method simply return :attr:`var_values`, which should be updated in :meth:`solve`.
+        It ise used by :meth:`BendersSolver.solve`.
         """
         if vars is None:
             return self.var_values
@@ -583,10 +604,10 @@ class LogicBasedSubProblem(ABC):
             return {var: self.var_values[var] for var in vars}
 
     def get_obj(self) -> float:
-        """
-        Get the objective value of the subproblem after solving.
-        This method simply return :attr:`obj`, which should be updated in :meth:`solve`,
-        users do not need to override it.
+        """Get the objective value of the model after solving (do **not** override it).
+
+        This method simply return :attr:`obj`, which should be updated in :meth:`solve`.
+        It ise used by :meth:`BendersSolver.solve`.
         """
         return self.obj
 
@@ -598,9 +619,7 @@ class LogicBasedSubProblem(ABC):
 
 
 class _FuncWrapperSub(LogicBasedSubProblem):
-    """
-    A wrapper class to allow using a function as a logic-based subproblem.
-    """
+    """A wrapper class to allow using a function as a logic-based subproblem."""
 
     def __init__(self, complicating_vars, func: Callable, params: BendersParams = BendersParams()):
         self._func = func
@@ -620,20 +639,24 @@ class _FuncWrapperSub(LogicBasedSubProblem):
 
 
 class SubProblems:
+    """A collection of multiple subproblems in Benders decomposition for stochastic programming."""
+
     def __init__(
             self,
             sub_problems: Iterable,
             prob: list[float] | None = None,
     ):
         self.sub_problems = list(sub_problems)
-        """A list of :class:`SubProblem` instances representing the subproblems."""
+        """A list of :class:`SubProblem` or :class:`LogicBasedSubProblem` instances."""
         self.prob = prob or [1.0 / len(self.sub_problems)] * len(self.sub_problems)
-        """A list of probabilities or weights associated with each subproblem. If None, equal weights are assumed."""
+        """A list of probabilities or weights associated with each subproblem. 
+        
+        If None, equal weights are assumed.
+        """
         self.params = None
-        """An instance of :class:`BendersParams` containing parameters for the Benders decomposition process."""
-
+        """The parameters that can be set by the user (see :class:`BendersParams`)."""
         self.status = CST.UNSOLVED
-        """The status of the problem, see :class:`BendersConsts` for possible values."""
+        """The status of the problem (see :class:`BendersConsts` for possible values)."""
 
     def __repr__(self):
         return (
@@ -649,8 +672,9 @@ class SubProblems:
         return len(self.sub_problems)
 
     def get_obj(self) -> float:
-        """
-        Get the :attr:`prob` weighted objective value of all subproblems.
+        """Get the :attr:`prob` weighted objective value of all subproblems.
+
+        It ise used by :meth:`BendersSolver.solve`.
 
         Returns
         ---------------
@@ -667,8 +691,9 @@ class SubProblems:
         return sum(obj * p for obj, p in zip(objs, self.prob))
 
     def fix_vars(self, var_values: dict[str, float]) -> None:
-        """
-        Fix the values of specified variables in all subproblems.
+        """Fix the values of specified variables in all subproblems.
+
+        It ise used by :meth:`BendersSolver.solve`.
 
         Parameters
         ---------------
@@ -686,8 +711,9 @@ class SubProblems:
             sub.fix_vars(var_values)
 
     def get_var_values(self, vars: list[str] = None) -> dict[int, dict[str, float]]:
-        """
-        Get the current values of specified variables in all subproblems.
+        """Get the current values of specified variables in all subproblems.
+
+        It ise used by :meth:`BendersSolver.solve`.
 
         Parameters
         ---------------
@@ -713,10 +739,12 @@ class SubProblems:
         return var_values
 
     def solve(self) -> None:
-        """
-        Solve all subproblems and update the :attr:`status` attribute.
+        """Solve all subproblems and update the :attr:`status` attribute.
+
         If any subproblem is infeasible and :attr:`BendersParams.multi_feas_cut` is `False`,
         the solving process will stop early.
+
+        It ise used by :meth:`BendersSolver.solve`.
         """
         for sub in self.sub_problems:
             sub.solve()
@@ -733,23 +761,22 @@ class SubProblems:
 
 
 class Cut:
-    """
-    The base class for Benders cuts (:class:`OptimalityCut` or :class:`FeasibilityCut`) in Benders decomposition.
+    """The base class for Benders cuts in Benders decomposition.
 
     Parameters
     ----------
     vars : list[str]
-        A list of variable names involved in the cut.
+        The list of variable names involved in the cut.
     coefs : list[float | int]
-        A list of coefficients corresponding to the variables in the cut.
+        The list of coefficients corresponding to the variables in the cut.
     rhs : float | int
         The right-hand side value of the cut.
     sense : str
-        The sense of the cut, must be :attr:`BendersConsts.LE`, :attr:`BendersConsts.GE`, or :attr:`BendersConsts.EQ`.
+        The sense of the cut (:attr:`BendersConsts.LE`, :attr:`BendersConsts.GE`, or :attr:`BendersConsts.EQ`).
     ctype : str
-        :attr:`BendersConsts.OPTIMALITY` or :attr:`BendersConsts.FEASIBILITY`.
+        It should be :attr:`BendersConsts.OPTIMALITY` or :attr:`BendersConsts.FEASIBILITY`.
     name : str
-        A name for the cut.
+        The name for the cut.
     """
 
     def __init__(
@@ -763,18 +790,24 @@ class Cut:
     ):
         assert sense in {CST.LE, CST.GE, CST.EQ}, f"sense {sense} must be one of: {{CST.LE, CST.GE, CST.EQ}}"
 
-        self.vars = vars
-        """A list of variable names involved in the cut."""
-        self.coefs = coefs
-        """A list of coefficients corresponding to the variables in the cut."""
-        self.rhs = rhs
+        self.vars: list[str] = vars
+        """The list of variable names involved in the cut."""
+        self.coefs: list[float | int] = coefs
+        """The list of coefficients corresponding to the variables in the cut."""
+        self.rhs: float | int = rhs
         """The right-hand side value of the cut."""
-        self.sense = sense
-        """The sense of the cut, must be :attr:`BendersConsts.LE`, :attr:`BendersConsts.GE`, or :attr:`BendersConsts.EQ`."""
-        self.ctype = ctype
-        """:attr:`BendersConsts.OPTIMALITY` or :attr:`BendersConsts.FEASIBILITY`."""
-        self.name = name
-        """A name for the cut."""
+        self.sense: str = sense
+        """The sense of the cut.
+        
+        It must be :attr:`BendersConsts.LE`, :attr:`BendersConsts.GE`, or :attr:`BendersConsts.EQ`.
+        """
+        self.ctype: Union[CST.OPTIMAL, CST.FEASIBILITY] = ctype
+        """The indicator of the cut type.
+        
+        It should be either :attr:`BendersConsts.OPTIMALITY` or :attr:`BendersConsts.FEASIBILITY`.
+        """
+        self.name: str = name
+        """The name for the cut."""
 
     def __repr__(self):
         return (f"{self.name} ({self.ctype}): "
@@ -803,8 +836,7 @@ class Cut:
 
 
 class OptimalityCut(Cut):
-    """
-    Class for optimality cuts in Benders decomposition.
+    """The class of optimality cuts in Benders decomposition.
 
     Parameters
     ----------
@@ -825,8 +857,7 @@ class OptimalityCut(Cut):
 
 
 class FeasibilityCut(Cut):
-    """
-    Class for feasibility cuts in Benders decomposition.
+    """The class of feasibility cuts in Benders decomposition.
 
     Parameters
     ----------
@@ -847,8 +878,8 @@ class FeasibilityCut(Cut):
 
 
 class CutGenerator(ABC):
-    """
-    A base class for cut generators in Benders decomposition.
+    """The base class for cut generators in Benders decomposition.
+
     Any specific cut generation method (e.g., :class:`ClassicalOC`) should inherit from this class
     and implement the abstract method :meth:`generate`.
     Attributes that will not change during the Benders process should be ideally initialized in ``__init__``
@@ -862,7 +893,8 @@ class CutGenerator(ABC):
         An instance of :class:`SubProblem` representing the subproblem,
         or :class:`SubProblems` for multiple subproblems.
     params : BendersParams, optional
-        An instance of :class:`BendersParams` containing parameters for the Benders decomposition process.
+        The parameters that can be set by the user (see :class:`BendersParams`).
+        If not provided, default parameters will be used.
     """
 
     def __init__(
@@ -876,20 +908,21 @@ class CutGenerator(ABC):
         self._sub_problem = sub_problem
         """The subproblem instance."""
         self._complicating_vars = master_problem.complicating_vars
-        """List of names of the complicating variables."""
+        """A list of names of the complicating variables."""
         self.params = params
-        """An instance of :class:`BendersParams` containing parameters for the Benders decomposition process."""
+        """The parameters that can be set by the user (see :class:`BendersParams`)."""
 
         assert set(self._complicating_vars) == set(sub_problem.complicating_vars), \
             "Complicating variables in master and subproblem must match."
 
     @abstractmethod
     def generate(self) -> list['OptimalityCut'] | list['FeasibilityCut']:
-        """
-        This method should be implemented to generate cuts based on the current state of the master and subproblem(s).
+        """Generate a list of Benders cuts based on the current state of the master and subproblem(s) (**required** to be implemented).
+
         This method generates and returns a list of cuts (either :class:`OptimalityCut` or :class:`FeasibilityCut`)
         with the information from :attr:`_master_problem` and :attr:`_sub_problem`, which are updated during
         the Benders solving process.
+
         Example implementations can be found in the source code of :class:`ClassicalOCGen` and :class:`ClassicalFCGen`.
 
         .. note::
@@ -911,9 +944,7 @@ class CutGenerator(ABC):
 
 
 class _FuncWrapperCut(CutGenerator):
-    """
-    A wrapper class to allow using a function as a cut generator.
-    """
+    """A wrapper class to allow using a function as a cut generator."""
 
     def __init__(self, master_problem, sub_problem, func: Callable, params: BendersParams = BendersParams()):
         self._func = func
@@ -924,8 +955,8 @@ class _FuncWrapperCut(CutGenerator):
 
 
 class BendersSolver:
-    """
-    The core class for Benders decomposition methods.
+    """The core class for Benders decomposition methods.
+
     Any specific Benders decomposition method (e.g., :class:`ClassicalBenders`) is inherited from this class.
 
     Parameters
@@ -936,7 +967,7 @@ class BendersSolver:
         An instance of :class:`SubProblem` representing the subproblem,
         or :class:`SubProblems` for multiple subproblems.
     complicating_vars : list[str]
-        A list of names of the complicating variables in the master problem.
+        A list of names of the complicating variables.
     optimality_cut : Type[CutGenerator], optional
         An abstract class that inherits from :class:`CutGenerator` to be used for generating optimality
         cuts.
@@ -948,7 +979,7 @@ class BendersSolver:
         It also accepts a function with signature ``func(master_problem, sub_problem) -> list[FeasibilityCut]``.
         If `None`, no feasibility cuts will be added.
     params : BendersParams, optional
-        An instance of :class:`BendersParams` containing parameters for the Benders decomposition process.
+        The parameters that can be set by the user (see :class:`BendersParams`).
         If not provided, default parameters will be used.
 
     Caution
@@ -987,7 +1018,7 @@ class BendersSolver:
         self.sub_problem = sub_problem
         """An instance of :class:`SubProblem` or :class:`SubProblems` representing the subproblem(s)."""
         self.complicating_vars = complicating_vars
-        """A list of names of the complicating variables in the master problem."""
+        """A list of names of the complicating variables."""
 
         self.optimality_cut = None
         """An instance of :class:`CutGenerator` for generating optimality cuts."""
@@ -1015,7 +1046,7 @@ class BendersSolver:
         assert self.optimality_cut or self.feasibility_cut, "Provide at least <optimality_cut> or <feasibility_cut>."
 
         self.params = params
-        """An instance of :class:`BendersParams` containing parameters for the Benders decomposition process."""
+        """The parameters that can be set by the user (see :class:`BendersParams`)."""
 
         # Attributes
         self.result = BendersResult()
@@ -1037,8 +1068,7 @@ class BendersSolver:
             prob: list[float] | None = None,
             params: BendersParams = BendersParams()
     ):
-        """
-        Class method to create a :class:`BendersSolver` instance directly from solver models.
+        """Class method to create a :class:`BendersSolver` instance directly from solver models.
 
         Parameters
         ----------
@@ -1051,7 +1081,7 @@ class BendersSolver:
         sub_solver : Type[SolverBase]
             An abstract class that inherits from :class:`SolverBase` to be used as the solver backend for the subproblem.
         complicating_vars : list[str]
-            A list of names of the complicating variables in the master problem.
+            A list of names of the complicating variables.
         optimality_cut : Type[CutGenerator], optional
             An abstract class that inherits from :class:`CutGenerator` to be used for generating optimality
             cuts.
@@ -1065,8 +1095,32 @@ class BendersSolver:
         prob : list[float], optional
             A list of probabilities (or weights) for each subproblem when using multiple subproblems (L-shaped method).
         params : BendersParams, optional
-            An instance of :class:`BendersParams` containing parameters for the Benders decomposition process.
+            The parameters that can be set by the user (see :class:`BendersParams`).
             If not provided, default parameters will be used.
+
+        Example
+        ---------------
+
+        .. code-block:: python
+
+            from benderslib import BendersSolver, Gurobi
+            from gurobipy import Model
+
+            # Create master and subproblem models using Gurobi
+            master_model = Model()
+            # ... (define master problem variables, constraints, and objective)
+            sub_model = Model()
+            # ... (define subproblem variables, constraints, and objective)
+            complicating_vars = ['x1', 'x2']
+
+            # Create BendersSolver instance from models
+            benders_solver = BendersSolver.from_models(
+                master_model = master_model,
+                master_solver = Gurobi,
+                sub_model = sub_model,
+                sub_solver = Gurobi,
+                complicating_vars = complicating_vars
+            )
         """
         master_problem = MasterProblem(master_solver(master_model))
 
@@ -1186,8 +1240,8 @@ class BendersSolver:
         ...
 
     def solve(self, callback=None) -> None:
-        """
-        Solve the Benders decomposition problem using the specified Benders decomposition method.
+        """Solve the problem using Benders decomposition.
+
         This method implements the main Benders decomposition algorithm, iteratively solving the master and
         subproblems, adding cuts, and updating the results until convergence or stopping criteria are met.
 

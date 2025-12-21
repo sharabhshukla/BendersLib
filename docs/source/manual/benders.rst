@@ -3,10 +3,63 @@ Benders Methods
 
 .. currentmodule:: benderslib
 
+Create a Benders Decomposition Instance
+-------------------------------------------
+
+To create a Benders decomposition instance, you need to provide :ref:`a master problem <manual_master_create>`,
+:ref:`a subproblem <manual_sub_create>`, and a list of complicating variable names.
+BendersLib will then build a Benders decomposition framework to your problem.
+
+.. code-block:: python
+    :emphasize-lines: 9-
+
+    from benderslib import ClassicalBenders, MasterProblem, SubProblem
+
+    # Assume master_problem and sub_problem are already defined
+    master_problem: MasterProblem = ...
+    sub_problem: SubProblem = ...
+    complicating_vars: list[str] = ...
+
+    # Create a Benders Decomposition instance
+    benders_solver = ClassicalBenders(
+        master_problem=master_problem,
+        sub_problem=sub_problem,
+        complicating_vars=complicating_vars
+    )
+
+Alternatively, you can create a Benders decomposition instance directly
+from your models using the :meth:`~BendersSolver.from_models`
+:abbr:`class method (a method bound to the class, not the instance)`.
+This method is a convenient way to instantiate a Benders solver without manually
+creating :class:`MasterProblem` and :class:`SubProblem` objects.
+
+.. code-block:: python
+    :emphasize-lines: 9-
+
+    from benderslib import ClassicalBenders, Gurobi
+
+    # Assume master_model and sub_model are already defined
+    master_model = ...
+    sub_model = ...
+    complicating_vars: list[str] = ...
+
+    # Create a Benders Decomposition instance from models
+    benders_solver = ClassicalBenders.from_models(
+        master_model=master_model,
+        master_solver=Gurobi,
+        sub_model=sub_model,
+        sub_solver=Gurobi,
+        complicating_vars=complicating_vars
+    )
+
+BendersLib offers several built-in Benders decomposition methods, each designed for specific problem structures.
+These methods are subclasses of :class:`BendersSolver` and come pre-configured with appropriate cut generators.
+Each of the classes (except :class:`LogicBasedBenders`)
+is a ready-to-use implementation of a Benders decomposition variant.
+
 .. _manual_builtin_benders:
 
-Built-in Benders Methods
--------------------------------------------
+.. rubric:: Built-in Benders Decomposition Methods
 
 .. autosummary::
    :nosignatures:
@@ -17,34 +70,193 @@ Built-in Benders Methods
    ~IntegerLShaped
    ~LogicBasedBenders
 
-Create a Benders Decomposition Instance
--------------------------------------------
+.. seealso::
 
-Classical Benders Decomposition
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Combinatorial Benders Decomposition
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    For more details on the specific arguments and implementations,
+    please refer to the :doc:`API Reference <../api/benders>`.
 
 Options for Benders Decomposition
 -------------------------------------------
 
+Please refer to :class:`BendersParams` for the available options to customize
+the behavior of BendersLib's Benders Decomposition methods.
+
+These options are set after creating a Benders Decomposition instance,
+but before calling the :meth:`BendersSolver.solve` method.
+
+.. code-block:: python
+    :emphasize-lines: 7
+
+    from benderslib import ClassicalBenders, BendersParams
+
+    # Create Benders Decomposition instance
+    benders_solver = ClassicalBenders(master_problem, sub_problem, complicating_vars)
+
+    # Customize Benders parameters
+    benders_solver.params.time_limit = 600  # Set time limit to 600 seconds
+
+Alternatively, you can pass a BendersParams instance as an argument when creating the Benders Decomposition instance.
+
+.. code-block:: python
+    :emphasize-lines: 4-5
+
+    from benderslib import ClassicalBenders, BendersParams
+
+    # Customize Benders parameters
+    params = BendersParams()
+    params.time_limit = 600  # Set time limit to 600 seconds
+
+    # Create Benders Decomposition instance with custom parameters
+    benders_solver = ClassicalBenders(
+        master_problem, sub_problem, complicating_vars,
+        params=params
+    )
+
+.. seealso::
+
+    See :class:`BendersParams` for all available options.
+
 Solve the Benders Decomposition Instance
 -------------------------------------------
+
+After creating and customizing a Benders Decomposition instance,
+you can solve it using the :meth:`BendersSolver.solve` method.
+
+.. code-block:: python
+
+    # Solve the Benders Decomposition instance
+    result = benders_solver.solve()
+
+The output in the console will display the progress of the Benders Decomposition algorithm,
+including iteration details and convergence information.
+
+.. code-block:: console
+
+    ====================================================================================
+    BendersLib (v0.1.0, GPL-3.0, https://benders.dev) by Peng-Hui Guo (Copyright 2025)
+    ------------------------------------------------------------------------------------
+    Benders Decomposition:
+     - Method:                  ClassicalBenders
+     - Complicating Var. No.:   1 [Integer: 1, Binary: 0, Continuous: 0]
+     - Optimality Cut:          ClassicalOCGen
+     - Feasibility Cut:         ClassicalFCGen
+    Master Problem:
+     - Variable No.:            2 [Integer: 1, Binary: 0]
+     - Constraint No.:          0
+     - Solver:                  Gurobi
+    Sub Problem:
+     - Variable No.:            1 [Integer: 0, Binary: 0]
+     - Constraint No.:          2
+     - Solver:                  Gurobi
+    Benders Parameters:
+     - All default
+    ------------------------------------------------------------------------------------
+           Iter.,           LB,           UB,         Obj.,       Gap(%),   Runtime(s)
+    ------------------------------------------------------------------------------------
+               1,         0.00,        60.00,        60.00,       100.00,         0.00
+    ------------------------------------------------------------------------------------
+    Benders Result:
+      - Status:                  OPTIMAL
+      - Incumbent:               45.0000
+      - Bound:                   45.0000
+      - Gap (abs.):              0.0000
+      - Gap (rel.):              0.00%
+      - Solutions No.:           2
+      - Iteration No.:           2
+      - Cuts No.:                1 [Optimality: 1, Feasibility: 0]
+      - Solve Time (sec.):       0.01 [Master: 0.01, Sub: 0.00]
+    ====================================================================================
+
+The console output provides a summary of the Benders decomposition process, starting with a header displaying library and copyright information;
+followed by problem information detailing the decomposition setup, including the method, complicating variables, and cut generators;
+an iteration log tracking the lower and upper bounds, objective value, and runtime;
+and a final results section summarizing the outcome with the solution status, incumbent value, and performance metrics.
 
 Access Additional Statistics
 -------------------------------------------
 
-Stochastic Benders Decomposition
--------------------------------------------
+To access additional statistics after solving,
+you can use the :attr:`BendersSolver.result` attribute, which contains various information about the solution process.
+This attribute is an instance of the :class:`BendersResult` class.
 
-Nested Benders Decomposition
--------------------------------------------
+.. code-block:: python
+
+    # Access Benders result statistics
+    print(f"Status: {benders_solver.result.status}")
+    print(f"Objective: {benders_solver.result.obj}")
+    print(f"Lower Bound: {benders_solver.result.lb}")
+    print(f"Upper Bound: {benders_solver.result.ub}")
+    print(f"Gap (abs.): {benders_solver.result.gap_abs}")
+    print(f"Gap (rel.): {benders_solver.result.gap:.2%}")
+    print(f"Number of Solutions: {benders_solver.result.n_sol}")
+    print(f"Number of Iterations: {benders_solver.result.n_iter}")
+    print(f"Number of Cuts: {benders_solver.result.n_cuts} (Opt: {benders_solver.result.n_opt_cuts}, Feas: {benders_solver.result.n_feas_cuts})")
+    print(f"Solve Time (sec.): {benders_solver.result.runtime}")
+    print(f"Solution: {benders_solver.result.solution}")
+
+.. seealso::
+
+    See :class:`BendersResult` for all available statistics.
 
 Automated Decomposition
 -------------------------------------------
 
-====
+BendersLib provides an automated decomposition feature through the :class:`AnnotationBenders` class.
+This allows you to decompose a problem by simply providing the original model and specifying the complicating variables.
+BendersLib will then automatically create the master problem and subproblem.
+
+Here's how to use the automated decomposition feature.
+
+.. code-block:: python
+
+    from benderslib import Gurobi, AnnotationBenders, ClassicalBenders
+    from gurobipy import Model, GRB
+
+    # Define the original problem
+    def make_original_problem():
+        model = Model("Original")
+        y = model.addVar(name="y", lb=0, ub=40, vtype=GRB.INTEGER)
+        z = model.addVar(name="z", lb=0, ub=40, vtype=GRB.CONTINUOUS)
+        model.addConstr(y + z <= 50)
+        model.addConstr(2 * y <= 20)
+        model.addConstr(2 * y + z >= 10)
+        model.setObjective(2 * y + 3 * z, sense=GRB.MINIMIZE)
+        model.update()
+        complicating_vars = [y.VarName]
+        return model, complicating_vars
+
+    # Create an AnnotationBenders instance
+    original_problem, complicating_vars = make_original_problem()
+    benders_solver = AnnotationBenders(
+        original_problem=original_problem,
+        solver=Gurobi,
+        complicating_vars=complicating_vars,
+        benders=ClassicalBenders,
+    )
+
+    # Solve the problem
+    benders_solver.solve()
+    print(f"Objective: {benders_solver.result.obj}")
+    print(f"Solution: {benders_solver.result.solution}")
+
+
+In this example, :class:`AnnotationBenders` takes the complete optimization model,
+identifies the master-only and subproblem-only variables and constraints based on the provided ``complicating_vars``,
+and then constructs the master problem and subproblem.
+Finally, it uses the specified Benders method (:class:`ClassicalBenders` in this case) to solve the decomposed problem.
+
+.. caution::
+
+    You are responsible for **ensuring the type of the master problem and subproblem
+    are compatible with the chosen Benders Decomposition method**, based on the given complicating variables
+    For example, if your subproblem contains integer variables, and you choose :class:`ClassicalBenders`,
+    the algorithm will not function correctly since :class:`ClassicalBenders` assumes a Linear Programming subproblem.
+
+.. seealso::
+
+    - :ref:`manual_decompose`.
+    - For more details on the class, see :class:`AnnotationBenders`.
+    - **Executable Example**: :doc:`../examples/annotation_benders`
 
 Customization
 -------------------------------------------
@@ -90,7 +302,7 @@ and :class:`CutGenerator` instances to handle their respective functionalities.
 Below are the attributes and methods of the :class:`BendersSolver` class.
 Please refer to :doc:`API Reference <../api/benders>` for the attributes and methods of specific implementations.
 
-.. rubric:: Attributes
+.. rubric:: :class:`BendersSolver` - Attributes
 
 .. autosummary::
    :nosignatures:
@@ -103,7 +315,7 @@ Please refer to :doc:`API Reference <../api/benders>` for the attributes and met
    ~BendersSolver.params
    ~BendersSolver.result
 
-.. rubric:: Methods
+.. rubric:: :class:`BendersSolver` - Methods
 
 .. autosummary::
    :nosignatures:

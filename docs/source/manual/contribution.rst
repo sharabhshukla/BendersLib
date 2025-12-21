@@ -1,5 +1,8 @@
 Contributor Guide
 ============================
 
-Adding Solver Interfaces
+Guidelines
+----------------------------
+
+Checklist
 ----------------------------

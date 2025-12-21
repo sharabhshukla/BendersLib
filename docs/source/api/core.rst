@@ -41,6 +41,10 @@ Master and Sub Problem
    :inherited-members:
    :show-inheritance:
 
+.. autoclass:: LogicBasedSubProblem
+   :inherited-members:
+   :show-inheritance:
+
 Benders Algorithm
 -----------------------------------------
 
