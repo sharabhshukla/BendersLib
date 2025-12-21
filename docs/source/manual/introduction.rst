@@ -93,11 +93,15 @@ Consider one of these alternatives if BendersLib does not meet your requirements
       - Language
       - License
     * - `SCIP <https://www.scipopt.org>`_
-      -
+      - A framework for constraint integer programming and branch-cut-and-price that supports Benders Decomposition.
       - C/C++
       - `Apache 2.0 <https://www.scipopt.org/index.php#license>`_
+    * - `GCG <https://gcg.or.rwth-aachen.de/>`_
+      - A generic decomposition solver for mixed-integer programs that has the capability of automatically Benders decomposition (part of the SCIP Optimization Suit).
+      - C/C++
+      - LGPL
     * - `Coluna.jl <https://atoptima.github.io/Coluna.jl>`_
-      -
+      - A branch-and-price-and-cut framework that supports Benders Decomposition.
       - Julia
       - `MPL 2.0 <https://github.com/atoptima/Coluna.jl?tab=License-1-ov-file#readme>`_
     * - `mpi-sppy <https://mpi-sppy.readthedocs.io/>`_
@@ -105,9 +109,16 @@ Consider one of these alternatives if BendersLib does not meet your requirements
       - Python
       - `BSD 3 Clause <https://github.com/Pyomo/mpi-sppy/blob/main/LICENSE.md>`_
     * - `SDDP.jl <https://sddp.dev/>`_
-      - Stochastic Dual Dynamic Programming methods (nested Benders methods) for Multistage Stochastic Programming problems.
+      - A package for solving Multistage Stochastic Programming using Stochastic Dual Dynamic Programming (nested Benders methods).
       - Julia
       - `MPL 2.0 <https://github.com/odow/SDDP.jl?tab=License-1-ov-file#readme>`_
+    * - `FortSP <http://dev.optirisk-systems.com/products/solver-systems/fortsp/>`_
+      - A solver for stochastic programming that supports L-shaped method and nested Benders decomposition.
+      - C
+      - Commercial
+
+*\* Note: SCIP has a Python interface namely* `PySCIPOpt <https://pyscipopt.readthedocs.io>`_;
+*GCG has a Python interface namely* `PyGCGOpt <https://scipopt.github.io/PyGCGOpt/>`_.
 
 References
 ------------------------------------------------
