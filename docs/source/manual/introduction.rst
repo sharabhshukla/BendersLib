@@ -103,7 +103,7 @@ Consider one of these alternatives if BendersLib does not meet your requirements
     * - `Coluna.jl <https://atoptima.github.io/Coluna.jl>`_
       - A branch-and-price-and-cut framework that supports Benders Decomposition.
       - Julia
-      - `MPL 2.0 <https://github.com/atoptima/Coluna.jl?tab=License-1-ov-file#readme>`_
+      - `MPL 2.0 <https://github.com/atoptima/Coluna.jl?tab=License-1-ov-file#readme>`__
     * - `mpi-sppy <https://mpi-sppy.readthedocs.io/>`_
       - A package for solving Stochastic Programming problems with L-shaped method and other decomposition algorithms.
       - Python
@@ -111,10 +111,14 @@ Consider one of these alternatives if BendersLib does not meet your requirements
     * - `SDDP.jl <https://sddp.dev/>`_
       - A package for solving Multistage Stochastic Programming using Stochastic Dual Dynamic Programming (nested Benders methods).
       - Julia
-      - `MPL 2.0 <https://github.com/odow/SDDP.jl?tab=License-1-ov-file#readme>`_
+      - `MPL 2.0 <https://github.com/odow/SDDP.jl?tab=License-1-ov-file#readme>`__
     * - `FortSP <http://dev.optirisk-systems.com/products/solver-systems/fortsp/>`_
       - A solver for stochastic programming that supports L-shaped method and nested Benders decomposition.
       - C
+      - Commercial
+    * - `CPLEX <https://www.ibm.com/docs/en/icos/22.1.1?topic=optimizers-users-manual-cplex>`_
+      - An optimization solver that supports annotated Benders decomposition.
+      - C/C++, Java, .NET
       - Commercial
 
 *\* Note: SCIP has a Python interface namely* `PySCIPOpt <https://pyscipopt.readthedocs.io>`_;
