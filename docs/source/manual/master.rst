@@ -107,7 +107,9 @@ Here is an example of how to create a master/sub problem from an annotated model
 
     **Executable Examples**: :doc:`../examples/annotation_benders`, :doc:`../examples/decompose`
 
-Add Benders Cut to Master Problem
+.. _manual_master_add_cut:
+
+Add Benders Cuts to Master Problem
 ------------------------------------------------
 
 Benders cuts are added to the master problem to iteratively refine the solution space.

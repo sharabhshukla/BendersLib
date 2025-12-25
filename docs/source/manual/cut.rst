@@ -68,7 +68,8 @@ providing convenient ways to define standard Benders cuts.
 
 .. seealso::
 
-    For details on how to define these cuts, please refer to the :doc:`API reference <../api/cut>`.
+    - For details on how to define these cuts, please refer to the :doc:`API reference <../api/cut>`.
+    - :ref:`manual_master_add_cut`
 
 Cut Generator
 -------------------------------------------
