@@ -53,7 +53,7 @@ def second_stage_model(n_plants, scenarios, penalty):
 
 
 # %%
-# Alternatively, define the second-stage problem using LogicBasedSubProblem and SubProblems:
+# Alternatively, define the second-stage problem using :class:`LogicBasedSubProblem` and :class:`SubProblems`:
 class Sub(LogicBasedSubProblem):
     def __init__(self, complicating_vars, model: Model):
         self.model = model

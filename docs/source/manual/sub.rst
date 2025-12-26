@@ -154,14 +154,141 @@ After solving, you can get the values of the decision variables, objective value
 Customization
 -------------------------------------------
 
-Custom Subproblem Solver (class-based)
+For certain problems, especially in the context of logic-based Benders decomposition,
+the subproblem may not be a standard optimization model that can be handled by a conventional solver.
+Instead, it might be solved by a combinatorial algorithm, a heuristic, or some other custom logic.
+BendersLib provides a flexible way to handle such cases through custom subproblem implementations.
+
+Custom Subproblem (class-based)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Custom Subproblem Solver (function-based)
+You can create a custom subproblem solver by defining a class that inherits from the abstract base class :class:`LogicBasedSubProblem`.
+You must implement the :meth:`LogicBasedSubProblem.solve` method, where you define the logic for solving the subproblem.
+Inside this method, you should update the following attributes:
+
+- :attr:`~LogicBasedSubProblem.status`: :attr:`BendersConsts.OPTIMAL` or :attr:`BendersConsts.INFEASIBLE`.
+- :attr:`~LogicBasedSubProblem.obj`: The objective value of the subproblem solution.
+- :attr:`~LogicBasedSubProblem.var_values`: A dictionary mapping variable names to their values in the subproblem solution.
+
+The values of the complicating variables from the master problem
+are available in the :attr:`~LogicBasedSubProblem.complicating_var_values` attribute.
+
+.. code-block:: python
+
+    from benderslib import LogicBasedSubProblem, CST
+
+    class MyCustomSubproblem(LogicBasedSubProblem):
+        def solve(self):
+            # Access master variables' values
+            x_val = self.complicating_var_values['x']
+
+            # Implement your custom solving logic here
+            # and set the status, obj, and var_values attributes
+            if x_val > 5:
+                self.status = CST.INFEASIBLE
+                self.obj = None
+                self.var_values = {}
+            else:
+                self.status = CST.OPTIMAL
+                self.obj = 10 - x_val
+                self.var_values = {'y': 2 * x_val}
+
+    custom_subproblem = MyCustomSubproblem(complicating_vars=['x'])
+
+.. seealso::
+
+    Please refer to the :meth:`LogicBasedSubProblem.solve` documentation for more details.
+
+Custom Subproblem (function-based)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Custom Subproblems
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+For simpler, stateless subproblems, you can define a function instead of a class.
+The function must accept a dictionary of the complicating variables' values and return
+a tuple containing the status, objective value, and a dictionary of variable values.
+This function can be passed directly to a Benders solver that accepts a callable.
+
+.. code-block:: python
+
+    from benderslib import CST
+
+    def subproblem_solver(master_vars: dict[str, float]) -> tuple[str, float, dict[str, float]]:
+        # Access master variables' values
+        x_val = master_vars['x']
+
+        # Implement your custom solving logic here
+        if x_val > 5:
+            status = CST.INFEASIBLE
+            obj = None
+            var_values = {}
+        else:
+            status = CST.OPTIMAL
+            obj = 10 - x_val
+            var_values = {'y': 2 * x_val}
+
+        # Return status, objective value, and variable values (as a dict)
+        return status, obj, var_values
+
+.. note::
+    Using a function is convenient for simple cases.
+    For more complex subproblems that require maintaining state across iterations (e.g., caching results),
+    the class-based approach is recommended.
+
+.. seealso::
+
+    - **Executable Example**: See :doc:`../examples/lbbd_location` for how to implement a custom subproblem solver
+      with a function, using logic-based Benders decomposition.
+    - Please refer to the :meth:`LogicBasedSubProblem.solve` documentation for more details.
+
+Multiple Custom Subproblems (class-based)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+When your problem involves multiple scenarios that are solved with custom logic (e.g., stochastic programming with a combinatorial subproblem), you can manage them using the :class:`SubProblems` class.
+Simply create instances of your custom subproblem class for each scenario and pass them to :class:`SubProblems`.
+
+.. code-block:: python
+
+    from benderslib import SubProblems, LogicBasedSubProblem, CST
+
+    class MyScenarioSubproblem(LogicBasedSubProblem):
+        def __init__(self, complicating_vars, scenario_data):
+            super().__init__(complicating_vars)
+            self.scenario_data = scenario_data
+
+        def solve(self):
+            # Access master variables' values
+            x_val = self.complicating_var_values['x']
+
+            # Use ``self.scenario_data`` in the solving logic
+            if x_val > self.scenario_data:
+                self.status = CST.INFEASIBLE
+                self.obj = None
+                self.var_values = {}
+            else:
+                self.status = CST.OPTIMAL
+                self.obj = self.scenario_data - x_val
+                self.var_values = {'y': 2 * x_val}
+
+    scenarios = [1, 2, 3]
+    probs = [0.3, 0.4, 0.3]
+    subproblem_instances = [MyScenarioSubproblem(['x'], s) for s in scenarios]
+    sub_problems = SubProblems(subproblem_instances, prob=probs)
+
+.. seealso::
+
+    **Executable Example**: See :doc:`../examples/lbbd_lshape` for how to implement the L-shaped method,
+    which involves multiple subproblems, using logic-based Benders decomposition with custom subproblem classes.
+
+Multiple Custom Subproblems (function-based)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Currently, BendersLib does not support function-based custom subproblems.
+But you can define the logic of solving multiple subproblems within a function,
+then using that function as a subproblem in a Benders decomposition algorithm.
+
+.. seealso::
+
+    **Executable Example**: See :doc:`../examples/lbbd_sp` for how to solve multiple subproblems
+    with a function, using logic-based Benders decomposition.
 
 ====
 

@@ -565,6 +565,31 @@ class LogicBasedSubProblem(ABC):
             * Always update :attr:`status`, :attr:`obj`, and :attr:`var_values` after solving the subproblem.
               Returning values from this method will be ignored.
 
+        Example
+        ---------------
+
+        .. code-block:: python
+
+            from benderslib import LogicBasedSubProblem, CST
+
+            class MyCustomSubproblem(LogicBasedSubProblem):
+                def solve(self):
+                    # Access master variables' values
+                    x_val = self.complicating_var_values['x']
+
+                    # Implement your custom solving logic here
+                    # and set the status, obj, and var_values attributes
+                    if x_val > 5:
+                        self.status = CST.INFEASIBLE
+                        self.obj = None
+                        self.var_values = {}
+                    else:
+                        self.status = CST.OPTIMAL
+                        self.obj = 10 - x_val
+                        self.var_values = {'y': 2 * x_val}
+
+            custom_subproblem = MyCustomSubproblem(complicating_vars=['x'])
+
         .. note::
            Alternatively, BendersLib allows using a lightweight function
            (instead of the class :class:`LogicBasedSubProblem`) as the subproblem solver.
@@ -572,14 +597,30 @@ class LogicBasedSubProblem(ABC):
 
            .. code-block:: python
 
-                def sub_solver(complicating_var_values: dict[str, float]) -> tuple[str, float, dict[str, float]]:
-                    ... # implement the subproblem solving logic here
-                    status = CST.OPTIMAL  # or CST.INFEASIBLE
-                    obj = 100.0  # objective value if optimal, None if infeasible
-                    var_values = {'y1': 10.0, 'y2': 5.0}  # variable values if optimal, {} if infeasible
+                from benderslib import CST
+
+                def subproblem_solver(master_vars: dict[str, float]) -> tuple[str, float, dict[str, float]]:
+                    # Access master variables' values
+                    x_val = master_vars['x']
+
+                    # Implement your custom solving logic here
+                    if x_val > 5:
+                        status = CST.INFEASIBLE
+                        obj = None
+                        var_values = {}
+                    else:
+                        status = CST.OPTIMAL
+                        obj = 10 - x_val
+                        var_values = {'y': 2 * x_val}
+
+                    # Return status, objective value, and variable values (as a dict)
                     return status, obj, var_values
 
            To maintain state, implement a class inherited from :class:`LogicBasedSubProblem` instead.
+
+        .. seealso::
+
+            Please refer to :ref:`Custom subproblem & Multiple custom subproblems <manual_custom_sub>` for the manual.
         """
         ...
 
