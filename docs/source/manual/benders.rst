@@ -261,11 +261,59 @@ Finally, it uses the specified Benders method (:class:`ClassicalBenders` in this
 Customization
 -------------------------------------------
 
-Custom Benders Decomposition
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+BendersLib is highly customizable, allowing you to tailor the decomposition process to your specific needs.
+You can :ref:`create custom cut (generators) <manual_custom_cut>`
+and :ref:`define your own subproblem logic <manual_custom_sub>`.
+A common use case for customization is :doc:`../tutorials/lbbd` where Benders cuts and subproblem solver are problem-specific.
+Here is a code snippet showing how to set up a :class:`LogicBasedBenders` instance.
 
-Custom Stochastic Benders Decomposition
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. code-block:: python
+
+    from benderslib import LogicBasedBenders, MasterProblem, LogicBasedSubProblem, Gurobi, CutGenerator
+
+    # Define master problem model
+    master_model = ...  # Define your master problem model here
+    mp = MasterProblem(Gurobi(master_model))
+
+    # Define a custom logic-based subproblem
+    class MyLogicBasedSubProblem(LogicBasedSubProblem):
+        def solve():
+            # Implement the logic to solve the subproblem given the complicating variable values
+            self.status = ...
+            self.obj = ...
+            self.var_values = ...
+
+    sp = MyLogicBasedSubProblem()
+
+    # Define a custom optimality cut generator
+    class MyOptimalityCutGenerator(CutGenerator):
+        def generate_cut(self, master_solution, subproblem):
+            cuts = []
+            # Implement the logic to generate an optimality cut
+            cut = ...
+            cuts.append(cut)
+            return cuts
+
+    # Define complicating variables
+    complicating_vars = ['x1', 'x2', 'x3']
+
+    # Initialize and solve
+    BD = LogicBasedBenders(mp, sp, complicating_vars, optimality_cut=MyOptimalityCutGenerator)
+    BD.solve()
+
+.. hint::
+
+    Use only custom cut generator or custom subproblem if needed.
+
+.. seealso::
+
+    - Abstract base classes for customization:
+      :class:`CutGenerator` and :class:`LogicBasedSubProblem`.
+    - Class- and function-based customization manul:
+      :ref:`Custom Cut (Generator) <manual_custom_cut>` and :ref:`Custom Subproblem(s) <manual_custom_sub>`.
+    - The class :class:`LogicBasedBenders` for logic-based Benders decomposition.
+    - **Executable Examples** (logic-based Benders decomposition):
+      :doc:`../examples/lbbd_sp`, :doc:`../examples/lbbd_lshape`, and :doc:`../examples/lbbd_location`.
 
 ====
 
