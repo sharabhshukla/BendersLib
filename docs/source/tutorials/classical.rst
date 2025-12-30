@@ -109,7 +109,7 @@ Optimality Cut
 .. note::
 
     *   This cut tells the master problem: "For any future choice of :math:`x`, the cost of the corresponding subproblem
-         :math:`\eta` will be at least :math:`\bar{\pi}^T (b - A x)`."
+        :math:`\eta` will be at least :math:`\bar{\pi}^T (b - A x)`."
 
     *   It can also be seen as a first-order
         Taylor approximation (or linearization) of :math:`\eta` around :math:`\bar{x}`, since the cut is equivalent to
@@ -220,7 +220,7 @@ Given the set of complicating variables, the classical Benders Decomposition met
 formulate the master problem, subproblem, and Benders cuts.
 Therefore, these procedures can be automated, and users only need to provide the original problem
 and specify which variables are complicating variables.
-We implemented the manual method in :ref:`api-classical`, and automated it in
+We implemented the method in :ref:`api-classical`, and automated it in
 :ref:`api-annotation`.
 
 .. seealso::
