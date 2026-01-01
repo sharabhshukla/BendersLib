@@ -12,7 +12,7 @@ class ClassicalOC(OptimalityCut):
     .. math::
         \\eta \\geq \\bar{\\pi}^T (b - A x)
 
-    where :math:`\\eta` is the variable representing the subproblem's cost, :math:`\\bar{\\pi}` is the optimal solution
+    In this cut, :math:`\\eta` is the variable representing the subproblem's cost, :math:`\\bar{\\pi}` is the optimal solution
     to the dual subproblem (dual values of primal constraints), :math:`A` and :math:`b` are the matrices that define
     the subproblem constraints, and :math:`x` are the master problem variables.
     This cut can be interpreted as a first-order Taylor approximation or a supporting hyperplane for the value
@@ -355,12 +355,82 @@ class LShapedOC(OptimalityCut):
         super().__init__(vars=final_vars, coefs=final_coefs, rhs=aggregated_rhs, sense='>=', name="LShapedOC")
 
 
-# class LogicBasedOC(OptimalityCut):
-#     ...
-#
-#
-# class SolverCut:
-#     ...
+class GeneralizedOC(OptimalityCut):
+    """The optimality cut for :doc:`../tutorials/gbd`.
+
+    This cut uses the Lagrange multipliers from the subproblem to form a valid lower bound
+    on the subproblem's cost, represented by the variable :math:`\\eta` in the master problem.
+    It is assumed that the original problem is linearly separable into master and subproblem components,
+    and the constraints (and objective) of the master problem are linear.
+    These assumptions are necessary for **linear** generalized optimality cuts.
+
+    .. math::
+        \\eta \\geq f_y(\\bar{y}) - \\bar{\\lambda}^T A (x - \\bar{x})
+
+    In this cut,
+    :math:`\\eta` is the variable representing the subproblem's cost.
+    :math:`f_y(\\bar{y})` is the objective value of the subproblem given the current master problem solution :math:`\\bar{x}`.
+    :math:`\\bar{\\lambda}` are the Lagrange multipliers (dual variable values) obtained from solving the subproblem.
+    :math:`A` is the matrix that defines the subproblem constraints, and :math:`x` are the complicating variables.
+
+    Parameters
+    ----------
+
+    vars : list[str]
+        A list of variable names of the complicating variables.
+    var_values : dict[str, float]
+        A dictionary mapping variable names to their current values in the master problem.
+    var_coefs : dict[str, list[float]]
+        A dictionary mapping variable names to their coefficients in the subproblem constraints.
+    sub_obj : float
+        The objective value of the subproblem given the current master problem solution.
+    multipliers : list[float]
+        A list of Lagrange multipliers (dual variable values) obtained from solving the subproblem.
+    estimator : str, optional
+        The name of the master problem variable representing the subproblem's cost.
+
+    Example
+    ----------
+
+    .. code-block:: python
+
+        from benderslib import GeneralizedOC
+
+        # Assuming we have the following data from the subproblem
+        vars = ['x1', 'x2']         # Complicating variables
+        var_values = {              # Current values of complicating variables in the master problem
+            'x1': 5,
+            'x2': 10
+        }
+        var_coefs = {               # Coefficients of complicating variables in subproblem constraints
+            'x1': [2, 3],           # Coefficients of x1 in subproblem constraints
+            'x2': [1, 4],           # Coefficients of x2 in subproblem constraints
+        }
+        sub_obj = 100               # Objective value of the subproblem given the current master problem solution
+        multipliers = [0.5, 1.0]    # Lagrange multipliers from the subproblem
+
+        # Create the generalized optimality cut
+        cut = GeneralizedOC(vars, var_values, var_coefs, sub_obj, multipliers)
+    """
+
+    def __init__(
+            self,
+            vars: list[str],
+            var_values: dict[str, float],
+            var_coefs: dict[str, list[float]],
+            sub_obj: float,
+            multipliers: list[float],
+            estimator=CST.ESTIMATOR_NAME
+    ):
+        coefs = [sum(a * b for a, b in zip(multipliers, var_coefs)) for var, var_coefs in var_coefs.items()]
+        cut_rhs = sum(a * var_values[var] for a, var in zip(coefs, var_coefs.keys())) + sub_obj
+
+        super().__init__(vars=vars + [estimator], coefs=coefs + [1.0], rhs=cut_rhs, sense=">=", name="GeneralizedOC")
+
+
+class GeneralizedFC(FeasibilityCut):
+    """The feasibility cut for :doc:`../tutorials/gbd`."""
+    ...
 
 
 class ClassicalOCGen(CutGenerator):
@@ -599,6 +669,41 @@ class IntegerLShapedFCGen(CutGenerator):
         cut = NoGoodFC(bin_var_values)
 
         return [cut]
+
+
+class GeneralizedOCGen(CutGenerator):
+    """The optimality cut generator for :doc:`../tutorials/gbd`."""
+
+    def __init__(self, master_problem, sub_problem, params):
+        super().__init__(master_problem, sub_problem, params)
+
+        self.var_coefs = sub_problem.get_var_coefs(self._complicating_vars)
+
+    def generate(self) -> list[GeneralizedOC]:
+        """This method generates :class:`GeneralizedOC` optimality cuts."""
+        sub_obj = self._sub_problem.get_obj()
+        lagrange_multipliers = self._sub_problem.get_dual_values()
+        master_vars_values = self._master_problem.get_var_values(self._complicating_vars)
+
+        cut = GeneralizedOC(
+            self._complicating_vars,
+            master_vars_values,
+            self.var_coefs,
+            sub_obj,
+            lagrange_multipliers,
+        )
+        return [cut]
+
+
+class GeneralizedFCGen(CutGenerator):
+    """The feasibility cut generator for :doc:`../tutorials/gbd`."""
+
+    def __init__(self, master_problem, sub_problem, params):
+        super().__init__(master_problem, sub_problem, params)
+
+    def generate(self) -> list[GeneralizedFC]:
+        """This method generates :class:`GeneralizedFC` feasibility cuts."""
+        ...
 
 
 if __name__ == '__main__':

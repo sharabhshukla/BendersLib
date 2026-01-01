@@ -69,6 +69,7 @@ is a ready-to-use implementation of a Benders decomposition variant.
    ~LShaped
    ~IntegerLShaped
    ~LogicBasedBenders
+   ~GeneralizedBenders
 
 .. seealso::
 

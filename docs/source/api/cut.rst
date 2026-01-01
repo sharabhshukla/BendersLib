@@ -29,3 +29,13 @@ Benders Cuts
    :inherited-members:
    :show-inheritance:
    :exclude-members: vars, coefs, rhs, sense, ctype, name
+
+.. autoclass:: GeneralizedOC
+   :inherited-members:
+   :show-inheritance:
+   :exclude-members: vars, coefs, rhs, sense, ctype, name
+
+.. autoclass:: GeneralizedFC
+   :inherited-members:
+   :show-inheritance:
+   :exclude-members: vars, coefs, rhs, sense, ctype, name

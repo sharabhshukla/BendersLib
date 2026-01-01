@@ -34,12 +34,16 @@ from .core import (
 )
 
 from .cut import (
+    # Cut types
     ClassicalOC,
     ClassicalFC,
     NoGoodFC,
     CombinatorialOC,
     LShapedOC,
+    GeneralizedOC,
+    GeneralizedFC,
 
+    # Cut generators
     ClassicalFCGen,
     ClassicalOCGen,
     CombinatorialFCGen,
@@ -48,6 +52,8 @@ from .cut import (
     LShapedFCGen,
     IntegerLShapedOCGen,
     IntegerLShapedFCGen,
+    GeneralizedOCGen,
+    GeneralizedFCGen
 )
 
 from .benders import (
@@ -55,7 +61,8 @@ from .benders import (
     CombinatorialBenders,
     LShaped,
     IntegerLShaped,
-    LogicBasedBenders
+    LogicBasedBenders,
+    GeneralizedBenders
 )
 
 from .annotation import (
@@ -71,6 +78,7 @@ __all__ = [
     "SolverBase",
     "Gurobi",
 
+    # Core
     "ProblemBase",
     "MasterProblem",
     "SubProblem",
@@ -83,12 +91,16 @@ __all__ = [
     "BendersResult",
     "BendersSolver",
 
+    # Cut types
     "ClassicalOC",
     "ClassicalFC",
     "NoGoodFC",
     "CombinatorialOC",
     "LShapedOC",
+    "GeneralizedOC",
+    "GeneralizedFC",
 
+    # Cut generators
     "ClassicalFCGen",
     "ClassicalOCGen",
     "CombinatorialFCGen",
@@ -97,12 +109,16 @@ __all__ = [
     "LShapedFCGen",
     "IntegerLShapedOCGen",
     "IntegerLShapedFCGen",
+    "GeneralizedOCGen",
+    "GeneralizedFCGen",
 
+    # Benders methods
     "ClassicalBenders",
     "CombinatorialBenders",
     "LShaped",
     "IntegerLShaped",
     "LogicBasedBenders",
+    "GeneralizedBenders",
 
     "AnnotationBenders",
 ]

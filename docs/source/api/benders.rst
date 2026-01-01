@@ -55,6 +55,16 @@ Logic-based Benders Decomposition
     :show-inheritance:
     :exclude-members: master_problem, sub_problem, complicating_vars, optimality_cut, feasibility_cut, params, result
 
+.. _api-gbd:
+
+Generalized Benders Decomposition
+--------------------------------------
+
+.. autoclass:: GeneralizedBenders
+    :inherited-members:
+    :show-inheritance:
+    :exclude-members: master_problem, sub_problem, complicating_vars, optimality_cut, feasibility_cut, params, result
+
 Cut Generators
 --------------------------------------
 
@@ -80,4 +90,10 @@ Cut Generators
    :show-inheritance:
 
 .. autoclass:: IntegerLShapedFCGen
+   :show-inheritance:
+
+.. autoclass:: GeneralizedOCGen
+   :show-inheritance:
+
+.. autoclass:: GeneralizedFCGen
    :show-inheritance:

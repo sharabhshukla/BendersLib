@@ -68,6 +68,8 @@ explicit_order = [
     'lbbd.py',
     'lbbd_sp.py',
     'lbbd_lshape.py',
+    'gbd.py',
+
     'lbbd_location.py',
 
     'custom_template.py',

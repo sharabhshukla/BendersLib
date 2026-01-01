@@ -63,6 +63,8 @@ providing convenient ways to define standard Benders cuts.
    ~CombinatorialOC
    ~NoGoodFC
    ~LShapedOC
+   ~GeneralizedOC
+   ~GeneralizedFC
 
 *\* Note: "OC" stands for Optimality Cut, and "FC" stands for Feasibility Cut.*
 
@@ -176,6 +178,8 @@ Here are a couple of examples to illustrate how they work.
    ~LShapedFCGen
    ~IntegerLShapedOCGen
    ~IntegerLShapedFCGen
+   ~GeneralizedOCGen
+   ~GeneralizedFCGen
 
 *\* Note: "OC" stands for Optimality Cut, and "FC" stands for Feasibility Cut.*
 
