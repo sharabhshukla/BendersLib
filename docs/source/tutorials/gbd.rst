@@ -12,10 +12,10 @@ Generalized Benders Decomposition
 
     BendersLib currently supports only **linear** Benders cuts.
     Therefore, the user must ensure that the problem is **linearly separable** as described
-    in the special cases for both optimality and feasibility cuts below.
+    in the special cases for both optimality and feasibility cuts.
 
 The Generalized Benders Decomposition (GBD) [#]_ extends the :doc:`classical` from
-Mixed-Integer Linear Programming (MILP) to a broader class of Mixed-Integer Nonlinear Programming (MINLP).
+Mixed-Integer Linear Programming (MILP) to a broader class of Mixed-Integer Non-Linear Programming (MINLP).
 It maintains the same core idea of decomposing the problem into a master problem
 and a subproblem but uses more general principles from *convex optimization*.
 
@@ -189,64 +189,61 @@ Generalized Optimality Cut
 
     **2. Linearity in x**
 
-    If we further assume the functions are linear with respect to :math:`x`, i.e., :math:`f_x(x) = c^T x` and :math:`g_x(x) = A x`, the cut simplifies to a linear expression
+    If we further assume the functions are linear with respect to :math:`x`, i.e., :math:`f_x(x) = c^T x`
+    and :math:`g_x(x) = - A x`, the cut simplifies to a linear expression
 
-    .. math:: \eta \geq c^T x + \bar{\lambda}^T A x + K(\bar{\lambda}),
+    .. math:: \eta \geq c^T x - \bar{\lambda}^T A x + K(\bar{\lambda}),
         :label: gbd_opt_cut_linear
 
-    where :math:`K(\bar{\lambda}) = \inf_{y \in Y} \{ f_y(y) + \bar{\lambda}^T g_y(y) \}` is a constant.
-    If the objective value of the Lagrangian dual subproblem is available (denoted as :math:`obj*`),
-    then :math:`K(\bar{\lambda})` can be computed as :math:`obj* - (c^T \bar{x} + \bar{\lambda}^T A \bar{x})`.
-    We have the coefficients of the linear cut entirely.
+    where :math:`K(\bar{\lambda}) = \inf_{y \in Y} \{ f_y(y) + \bar{\lambda}^T g_y(y) \}` is a constant,
+    implying the cut is a linear inequality in :math:`x`.
+    Note that here we use :math:`-A` as coefficient matrix to be consistent with the :doc:`classical` formulation.
+    Consider the constraint :math:`Ax + Dy \geq b` (:math:`\geq` constraint) in the :doc:`classical`.
+    It can be rewritten as :math:`b - Ax - Dy \leq 0` (:math:`\leq` constraint) in the :math:`g(x,y) \leq 0` format used here.
+    Therefore, the coefficient matrix for :math:`x` in :math:`g(x,y)` is :math:`-A`.
 
-
-
-.. important::
-
-    When the **linearly separable** condition is satisfied,
-    and we have a **black-box nonlinear solver** that can provide the **optimal objective value and Lagrange multipliers**
-    of convex Non-Linear Programming problems, the generalized optimality cut can be implemented using :eq:`gbd_opt_cut_linear`.
-
-.. admonition:: Extend: Transforming to Classical Benders Cut
+.. admonition:: Transforming to Classical Benders Cut
     :class: note
 
-    **If the linearly separable conditions are met, the generalized optimality cut can be transformed into the first-order Taylor approximation form of classical Benders optimality cut.**
+    **If the linearly separable conditions are met, the generalized optimality cut can be transformed into
+    the first-order Taylor approximation form of classical Benders optimality cut.**
 
     For a given :math:`\bar{x}`, let (:math:`\bar{y}`, :math:`\bar{\lambda}`) be the optimal dual solution.
     The primal subproblem objective is :math:`f_x(\bar{x}) + f_y(\bar{y})`.
     The dual subproblem objective is :math:`f_x(\bar{x}) + \bar{\lambda}^T g_x(\bar{x}) + \inf_{y \in Y} \{ f_y(y) + \bar{\lambda}^T g_y(y) \}`.
-    By **strong duality**, they are equal.
-    Using the definitions :math:`f_x(x) = c^T x`, :math:`g_x(x) = A x`, and :math:`K(\bar{\lambda}) = \inf_{y \in Y} \{ f_y(y) + \bar{\lambda}^T g_y(y) \}`, we get
+    By strong duality, they are equal.
+    Using the definitions :math:`f_x(x) = c^T x`, :math:`g_x(x) = - A x`, and :math:`K(\bar{\lambda}) = \inf_{y \in Y} \{ f_y(y) + \bar{\lambda}^T g_y(y) \}`, we get
 
     .. math::
-       c^T \bar{x} + f_y(\bar{y}) = c^T \bar{x} + \bar{\lambda}^T A \bar{x} + K(\bar{\lambda}).
+       c^T \bar{x} + f_y(\bar{y}) = c^T \bar{x} - \bar{\lambda}^T A \bar{x} + K(\bar{\lambda}).
 
     This simplifies to an expression for :math:`K(\bar{\lambda})`
 
     .. math::
-       K(\bar{\lambda}) = f_y(\bar{y}) - \bar{\lambda}^T A \bar{x}.
+       K(\bar{\lambda}) = f_y(\bar{y}) + \bar{\lambda}^T A \bar{x}.
 
     Substituting this back into :eq:`gbd_opt_cut_linear`, we have
 
     .. math::
-       \eta \geq c^T x + \bar{\lambda}^T A x + (f_y(\bar{y}) - \bar{\lambda}^T A \bar{x}).
+       \eta \geq c^T x - \bar{\lambda}^T A x + (f_y(\bar{y}) + \bar{\lambda}^T A \bar{x}).
 
     By rearranging terms, we get
 
     .. math::
-       \eta - c^T x \geq f_y(\bar{y}) + \bar{\lambda}^T A (x - \bar{x}).
+       \eta - c^T x \geq f_y(\bar{y}) - \bar{\lambda}^T A (x - \bar{x}).
 
-    This simplifies to the classical Benders optimality cut form
+    This simplifies to the classical Benders optimality cut (first-order Taylor approximation form)
 
-    .. math:: \eta' \geq f_y(\bar{y}) + \bar{\lambda}^T A (x - \bar{x}),
+    .. math:: \eta' \geq f_y(\bar{y}) - \bar{\lambda}^T A (x - \bar{x}) \quad \text{[Optimality Cut]}
+        :label: gbd_oc
 
-    where :math:`\eta' = \eta - c^T x` is the estimator variable with the same definition as in :doc:`classical`.
+    where :math:`\eta' = \eta - c^T x` is the estimator variable with the same definition in the :doc:`classical`.
 
-    The sign of the Lagrange multiplier :math:`\bar{\lambda}` appear opposite to the dual variables in
-    Linear Programming duality.
-    This is because the Lagrangian is defined for constraints of the form :math:`g(x, y) \leq 0`,
-    while Linear Programming dual variables are often associated with constraints like :math:`A y \geq b`.
-    A change of sign in the constraint formulation leads to a corresponding sign change in the dual/multiplier.
+.. tip::
+
+    When the **linearly separable** condition is satisfied,
+    and we have a **black-box nonlinear solver** that can provide the **optimal objective value and Lagrange multipliers**
+    of convex Non-Linear Programming problems, the generalized optimality cut can be implemented using :eq:`gbd_oc`.
 
 Generalized Feasibility Cut
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -270,8 +267,13 @@ Generalized Feasibility Cut
     The feasibility cut forces any new candidate solution :math:`x` to satisfy the condition
     that would have made the subproblem feasible. The cut added to the master problem is
 
-    .. math::
-       \inf_{y \in Y} \{ \bar{\mu}^T g(x, y) \} \leq 0.
+    .. math:: \inf_{y \in Y} \{ \bar{\mu}^T g(x, y) \} \leq 0.
+        :label: gbd_feas_cut
+
+.. caution::
+
+    BendersLib currently supports only **linear** Benders cuts.
+    Therefore, the user must ensure that the problem is **linearly separable** as described below.
 
 .. admonition:: Special Case: Linear Feasibility Cuts
     :class: example
@@ -295,19 +297,57 @@ Generalized Feasibility Cut
 
     If we further assume :math:`g_x(x) = A x`, the cut simplifies to a linear inequality
 
-    .. math:: \bar{\mu}^T A x + K'(\bar{\mu}) \leq 0,
+    .. math:: \bar{\mu}^T A x + K'(\bar{\mu}) \leq 0, \quad \text{[Feasibility Cut]}
         :label: gbd_feas_cut_linear
 
     where :math:`K'(\bar{\mu}) = \inf_{y \in Y} \{ \bar{\mu}^T g_y(y) \}` is a constant that can be computed separately
     using unconstrained optimization methods over :math:`y`.
 
-.. important::
+.. admonition:: Obtaining the Farkas Multiplier :math:`\bar{\mu}`
+    :class: note
+
+    For a general convex Non-Linear Programming subproblem, you can solve an auxiliary "feasibility-seeking" problem
+    to find :math:`\bar{\mu}`. A common approach is to introduce slack variables and minimize their sum.
+
+    .. math::
+       \begin{aligned}
+       \min_{y, s} \quad & \sum_i s_i \\
+       \text{s.t.} \quad & g_i(\bar{x}, y) \leq s_i, \quad \forall i \\
+                         & s_i \geq 0, \quad \forall i \\
+                         & y \in Y
+       \end{aligned}
+
+    If the original subproblem is infeasible, the optimal objective of this auxiliary problem will be positive.
+    The optimal Lagrange multipliers associated with the constraints :math:`g_i(\bar{x}, y) \leq s_i` are
+    the components of the Farkas multiplier vector :math:`\bar{\mu}`.
+
+.. tip::
 
     When the **linearly separable** condition is satisfied,
     and we have a **black-box nonlinear solver** that can provide a :math:`\bar{\mu}`
     for infeasible convex Non-Linear Programming problems,
     we can solve :math:`\min_{y \in Y} \{ \bar{\mu}^T g_y(y) \}`
     to compute :math:`K'(\bar{\mu})` and implement :eq:`gbd_feas_cut_linear`.
+
+.. admonition:: Transforming to Classical Benders Cut
+    :class: note
+
+    **When the subproblem is a Linear Programming problem, the generalized feasibility cut simplifies to the classical Benders feasibility cut.**
+
+    Consider a subproblem with constraints :math:`Dy \geq b - Ax`, which in the format :math:`g(x,y) \leq 0`
+    is :math:`b - Ax - Dy \leq 0`.
+    The generalized cut :eq:`gbd_feas_cut` is :math:`\bar{\mu}^T (b - Ax) + \inf_{y \geq 0} \{ -\bar{\mu}^T Dy \} \leq 0`.
+    The key is to show that :math:`\inf_{y \geq 0} \{ -\bar{\mu}^T Dy \} = 0`.
+
+    The Farkas multiplier :math:`\bar{\mu}` is an extreme ray from the dual of the subproblem,
+    satisfying :math:`D^T \bar{\mu} \leq 0` and :math:`\bar{\mu} \geq 0`.
+    From :math:`D^T \bar{\mu} \leq 0`, we get :math:`\bar{\mu}^T D \leq 0`.
+    Since :math:`y \geq 0`, the term :math:`\bar{\mu}^T D y` is always non-positive.
+    Therefore, :math:`-\bar{\mu}^T D y` is always non-negative.
+    The infimum of a non-negative expression that can be zero (e.g., at :math:`y=0`) is zero.
+
+    This reduces the generalized cut to :math:`\bar{\mu}^T (b - Ax) \leq 0`,
+    which is the feasibility cut in the :doc:`classical`.
 
 Algorithm
 --------------------------------------------
