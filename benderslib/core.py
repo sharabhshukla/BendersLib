@@ -9,7 +9,7 @@ import inspect
 
 from .consts import BendersConsts as CST
 from .params import BendersParams
-from .solver import SolverBase
+from .solvers import SolverBase
 from .logger import BendersLogger
 
 

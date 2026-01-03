@@ -14,7 +14,7 @@ from .params import (
     BendersParams,
 )
 
-from .solver import (
+from .solvers import (
     SolverBase,
     Gurobi,
 )

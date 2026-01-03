@@ -27,7 +27,8 @@ with subproblem being a convex Quadratic Programming (QP) problem
 import gurobipy as gp
 from gurobipy import GRB
 
-from benderslib import GeneralizedBenders, Gurobi, MasterProblem, SubProblem, ClassicalBenders
+from benderslib import GeneralizedBenders, MasterProblem, SubProblem, ClassicalBenders
+from benderslib.solvers import Gurobi
 import random
 
 

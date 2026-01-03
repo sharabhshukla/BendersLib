@@ -2,8 +2,8 @@
 
 import pytest
 
-from benderslib.solver.gurobi import Gurobi
-from benderslib.solver.base import SolverBase
+from benderslib.solvers.gurobi import Gurobi
+from benderslib.solvers.base import SolverBase
 from benderslib.consts import BendersConsts as CST
 from benderslib.core import Cut
 

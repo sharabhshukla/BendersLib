@@ -2,7 +2,7 @@
 
 from typing import Type
 
-from .solver import SolverBase
+from .solvers import SolverBase
 from .core import BendersParams, MasterProblem, SubProblem, BendersSolver
 
 
