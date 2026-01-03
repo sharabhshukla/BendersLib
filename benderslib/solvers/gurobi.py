@@ -150,7 +150,19 @@ class Gurobi(SolverBase):
         return self.model.getAttr('Pi', self.model.getConstrs())
 
     def get_extreme_ray(self) -> list[float]:
-        return self.model.FarkasDual
+        if self.model.IsQCP:
+            # FarkasDual cannot be obtained from Quadratically Constrained models
+            raise Exception("FarkasDual is only available for linear model from Gurobi, QCP is given.")
+        elif self.model.IsQP:
+            # For model with only quadratic objective and linear constraints,
+            # FarkasDual can be obtained by solving a linear system with zero objective.
+            _m = self.model.copy()
+            _m.setObjective(0)
+            _m.computeIIS()
+            return _m.FarkasDual
+        else:
+            # For linear models, FarkasDual can be directly obtained after optimization
+            return self.model.FarkasDual
 
     def get_obj(self) -> float:
         return self.model.ObjVal
@@ -182,7 +194,8 @@ class Gurobi(SolverBase):
             GRB.OPTIMAL: CST.OPTIMAL,
             GRB.INFEASIBLE: CST.INFEASIBLE,
         }
-        self.status = _grb_status_map.get(self.model.Status, CST.ERROR)
+        # self.status = _grb_status_map.get(self.model.Status, CST.ERROR)
+        self.status = _grb_status_map.get(self.model.Status, CST.INFEASIBLE)
 
     def make_master_problem(self, master_vars: list[str]) -> Model:
         """Build the master problem from the original problem.

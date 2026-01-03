@@ -27,7 +27,7 @@ with subproblem being a convex Quadratic Programming (QP) problem
 import gurobipy as gp
 from gurobipy import GRB
 
-from benderslib import GeneralizedBenders, MasterProblem, SubProblem, ClassicalBenders
+from benderslib import GeneralizedBenders, MasterProblem, SubProblem, ClassicalBenders, ClassicalFCGen
 from benderslib.solvers import Gurobi
 import random
 
@@ -63,7 +63,7 @@ def create_sub_problem(warehouse_num, demand, max_shortage_ratio, liner=False):
     model.addConstrs(shortage[i] >= demand[i] - inventory[i] for i in range(warehouse_num))
 
     # Constraints: limit maximum shortage ratio
-    # model.addConstrs(shortage[i] <= max_shortage_ratio * demand[i] for i in range(warehouse_num))
+    model.addConstrs(shortage[i] <= max_shortage_ratio * demand[i] for i in range(warehouse_num))
 
     model.update()
     return model
@@ -85,7 +85,7 @@ def create_complete_model(warehouse_num, price, budget, demand, max_shortage_rat
     model.addConstrs(shortage[i] >= demand[i] - x[i] for i in range(warehouse_num))
 
     # Constraints from subproblem: limit maximum shortage ratio
-    # model.addConstrs(shortage[i] <= max_shortage_ratio * demand[i] for i in range(warehouse_num))
+    model.addConstrs(shortage[i] <= max_shortage_ratio * demand[i] for i in range(warehouse_num))
 
     # Combined objective
     master_obj = gp.quicksum(price[i] * x[i] for i in range(warehouse_num))
@@ -127,7 +127,8 @@ if __name__ == "__main__":
     benders = GeneralizedBenders(
         master_problem=master_problem,
         sub_problem=sub_problem,
-        complicating_vars=complicating_vars
+        complicating_vars=complicating_vars,
+        feasibility_cut=ClassicalFCGen
     )
     benders.solve()
 
