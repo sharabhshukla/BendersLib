@@ -188,14 +188,16 @@ class Gurobi(SolverBase):
         # Get Model.FarkasDual requires InfUnbdInfo = 1
         self.model.Params.InfUnbdInfo = 1
 
+        # Gurobi model status code 4 (INF_OR_UNBD)
+        self.model.Params.DualReductions = 0
+
         self.model.optimize()
 
         _grb_status_map = {
             GRB.OPTIMAL: CST.OPTIMAL,
             GRB.INFEASIBLE: CST.INFEASIBLE,
         }
-        # self.status = _grb_status_map.get(self.model.Status, CST.ERROR)
-        self.status = _grb_status_map.get(self.model.Status, CST.INFEASIBLE)
+        self.status = _grb_status_map.get(self.model.Status, CST.ERROR)
 
     def make_master_problem(self, master_vars: list[str]) -> Model:
         """Build the master problem from the original problem.
