@@ -63,3 +63,4 @@ Contents
    core.rst
    cut.rst
    benders.rst
+   exceptions.rst

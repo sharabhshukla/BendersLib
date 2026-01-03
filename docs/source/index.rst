@@ -223,4 +223,4 @@ Contents
    Getting Help <https://github.com/phguo/BendersLib/issues?q=is%3Aissue>
    BendersLib@GitHub <https://github.com/phguo/BendersLib>
    BendersLib@PyPI <https://pypi.org/project/BendersLib/>
-   Author's Website <https://guo.ph>
+   Author <https://guo.ph>
