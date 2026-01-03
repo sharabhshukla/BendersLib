@@ -29,7 +29,8 @@ Gurobi
     :emphasize-lines: 12-
 
     from gurobipy import Model, GRB
-    from benderslib import SubProblem, Gurobi
+    from benderslib import SubProblem
+    from benderslib.solvers import Gurobi
 
     # Create a Gurobi model for the subproblem
     sub_model = Model("Sub")
@@ -66,7 +67,8 @@ This class takes an iterable of :class:`SubProblem` instances and their correspo
     :emphasize-lines: 19-
 
     from gurobipy import Model, GRB
-    from benderslib import SubProblem, SubProblems, Gurobi
+    from benderslib import SubProblem, SubProblems
+    from benderslib.solvers import Gurobi
 
     # Assume we have two scenarios
     scenarios = [10, 20]

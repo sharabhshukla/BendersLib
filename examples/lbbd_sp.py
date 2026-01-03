@@ -12,7 +12,8 @@ with custom subproblem solver using BendersLib.
 
 # %%
 # Define the master problem:
-from benderslib import CST, MasterProblem, Gurobi, LogicBasedBenders, CombinatorialFCGen
+from benderslib import CST, MasterProblem, LogicBasedBenders, CombinatorialFCGen
+from benderslib.solvers import Gurobi
 from gurobipy import Model, GRB
 import random
 

@@ -24,7 +24,8 @@ we demonstrate how to define a custom subproblem solver and a custom cut generat
 import random
 from gurobipy import Model, GRB, quicksum
 from itertools import product
-from benderslib import LogicBasedBenders, MasterProblem, Gurobi, CST, Cut
+from benderslib import LogicBasedBenders, MasterProblem, CST, Cut
+from benderslib.solvers import Gurobi
 
 
 # %%

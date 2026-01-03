@@ -10,7 +10,8 @@ with customized Benders cuts.
 
 # %%
 # Define the original problem:
-from benderslib import Gurobi, AnnotationBenders, CombinatorialBenders, NoGoodFC, MasterProblem, SubProblem
+from benderslib import AnnotationBenders, CombinatorialBenders, NoGoodFC, MasterProblem, SubProblem
+from benderslib.solvers import Gurobi
 from gurobipy import Model, GRB
 import matplotlib.pyplot as plt
 

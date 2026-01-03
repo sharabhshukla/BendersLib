@@ -16,7 +16,6 @@ from .params import (
 
 from .solvers import (
     SolverBase,
-    Gurobi,
 )
 
 from .core import (
@@ -76,7 +75,6 @@ __all__ = [
     "BendersParams",
 
     "SolverBase",
-    "Gurobi",
 
     # Core
     "ProblemBase",

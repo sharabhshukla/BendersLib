@@ -3,16 +3,19 @@
 from ..consts import BendersConsts as CST
 from .base import SolverBase
 
-from gurobipy import Model, GRB, LinExpr
+try:
+    from gurobipy import Model, GRB, LinExpr
+except ImportError:
+    raise ImportError("Gurobi is not installed. Please install it to use the Gurobi solver interface.")
 
 
 class Gurobi(SolverBase):
     """Gurobi solver interface for BendersLib.
 
     This class provides an interface to the Gurobi solver for use with BendersLib.
-    It implements the abstract methods defined in the :class:`SolverBase` class.
+    It implements the abstract methods defined in the :class:`~benderslib.SolverBase` class.
     Two additional methods, :func:`make_master_problem` and :func:`make_sub_problem`,
-    are provided for automatic decomposition by :class:`AnnotationBenders`.
+    are provided for automatic decomposition by :class:`~benderslib.AnnotationBenders`.
 
     Parameters
     ---------------

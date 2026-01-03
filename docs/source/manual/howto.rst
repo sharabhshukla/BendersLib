@@ -14,11 +14,12 @@ In such cases, users can utilize the attribute :attr:`ProblemBase._solver_model`
 (the base class for :class:`MasterProblem` and :class:`SubProblem`)
 to access the underlying solver model directly.
 
-For example, if you are using :class:`Gurobi`, you can access the Gurobi model as follows.
+For example, if you are using :class:`~.solvers.Gurobi`, you can access the Gurobi model as follows.
 
 .. code-block:: python
 
-    from benderslib import Gurobi, AnnotationBenders, ClassicalBenders
+    from benderslib import AnnotationBenders, ClassicalBenders
+    from benderslib.solvers import Gurobi
     from gurobipy import Model, GRB
 
     # Create a standard Gurobi model

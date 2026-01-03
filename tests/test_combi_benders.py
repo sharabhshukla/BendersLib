@@ -1,7 +1,8 @@
 # coding:utf-8
 
 import pytest
-from benderslib import AnnotationBenders, CombinatorialBenders, Gurobi
+from benderslib import AnnotationBenders, CombinatorialBenders
+from benderslib.solvers import Gurobi
 from gurobipy import Model, GRB
 
 

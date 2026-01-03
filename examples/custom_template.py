@@ -7,8 +7,8 @@ Template for Customizing Benders Decomposition
 """
 
 from gurobipy import Model
-from benderslib import BendersSolver, Cut, CutGenerator, Gurobi, MasterProblem, SubProblem, BendersParams
-
+from benderslib import BendersSolver, Cut, CutGenerator, MasterProblem, SubProblem, BendersParams
+from benderslib.solvers import Gurobi
 
 # %%
 # Define master problem and subproblem using your preferred solver interface:

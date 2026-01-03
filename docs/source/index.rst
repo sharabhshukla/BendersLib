@@ -43,7 +43,8 @@ Here is a simple example of solving a gurobi MIP model with BendersLib:
 .. code-block:: python
    :emphasize-lines: 17-22
 
-    from benderslib import Gurobi, AnnotationBenders, ClassicalBenders
+    from benderslib import AnnotationBenders, ClassicalBenders
+    from benderslib.solvers import Gurobi
     from gurobipy import Model, GRB
 
     # Create a standard Gurobi model
@@ -160,10 +161,10 @@ The BendersLib project is organized as follows:
     *   ``benders.py``: Implementations of different Benders decomposition variants like `ClassicalBenders`.
     *   ``annotation.py``: The logic for the automatic decomposition feature.
     *   ``cut.py``: Module for defining Benders cuts.
-    *   ``cut_manager.py``: Module for managing Benders cuts.
-    *   ``solver/``: A sub-package containing interfaces to different solvers.
+    *   ``solvers/``: A sub-package containing interfaces to different solvers.
     *   ``params.py``: Data classes for configuring the decomposition process.
-    *   ``constants.py``: Definitions of constants used throughout the library.
+    *   ``consts.py``: Definitions of constants used throughout the library.
+    *   ``logger.py``: Logging utilities for tracking the decomposition process.
 
 *   ``docs/``: Contains the documentation source files.
 *   ``examples/``: A collection of scripts demonstrating various features.

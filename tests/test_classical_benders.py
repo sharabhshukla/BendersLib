@@ -1,7 +1,8 @@
 # coding:utf-8
 
 import pytest
-from benderslib import BendersParams, MasterProblem, SubProblem, Gurobi, ClassicalBenders
+from benderslib import BendersParams, MasterProblem, SubProblem, ClassicalBenders
+from benderslib.solvers import Gurobi
 from gurobipy import Model, GRB
 
 

@@ -37,7 +37,8 @@ class ClassicalBenders(BendersSolver):
 
     .. code-block:: python
 
-        from benderslib import ClassicalBenders, MasterProblem, SubProblem, Gurobi
+        from benderslib import ClassicalBenders, MasterProblem, SubProblem
+        from benderslib.solvers import Gurobi
 
         # Define master and subproblem models
         master_model = ...  # Define your master problem model here
@@ -128,7 +129,8 @@ class CombinatorialBenders(BendersSolver):
 
     .. code-block:: python
 
-        from benderslib import CombinatorialBenders, MasterProblem, SubProblem, Gurobi
+        from benderslib import CombinatorialBenders, MasterProblem, SubProblem
+        from benderslib.solvers import Gurobi
 
         # Define master and subproblem models
         master_model = ...  # Define your master problem model here
@@ -224,7 +226,8 @@ class LShaped(BendersSolver):
 
     .. code-block:: python
 
-        from benderslib import LShaped, MasterProblem, SubProblems, Gurobi
+        from benderslib import LShaped, MasterProblem, SubProblems
+        from benderslib.solvers import Gurobi
 
         # Define master and subproblem models
         master_model = ...  # Define your master problem model here
@@ -323,7 +326,8 @@ class IntegerLShaped(BendersSolver):
 
     .. code-block:: python
 
-        from benderslib import IntegerLShaped, MasterProblem, SubProblems, Gurobi
+        from benderslib import IntegerLShaped, MasterProblem, SubProblems
+        from benderslib.solvers import Gurobi
 
         # Define master and subproblem models
         master_model = ...  # Define your master problem model here
@@ -419,7 +423,8 @@ class LogicBasedBenders(BendersSolver):
 
     .. code-block:: python
 
-        from benderslib import LogicBasedBenders, MasterProblem, LogicBasedSubProblem, Gurobi, CutGenerator
+        from benderslib import LogicBasedBenders, MasterProblem, LogicBasedSubProblem, CutGenerator
+        from benderslib.solvers import Gurobi
 
         # Define master problem model
         master_model = ...  # Define your master problem model here
@@ -507,7 +512,8 @@ class GeneralizedBenders(BendersSolver):
 
     .. code-block:: python
 
-        from benderslib import GeneralizedBenders, MasterProblem, SubProblem, Gurobi
+        from benderslib import GeneralizedBenders, MasterProblem, SubProblem
+        from benderslib.solvers import Gurobi
 
         # Define master and subproblem models
         master_model = ...  # Define your linear master problem model here

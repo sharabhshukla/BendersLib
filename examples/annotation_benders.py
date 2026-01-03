@@ -12,8 +12,8 @@ Annotation Benders Decomposition
 # the classical Benders decomposition method.
 #
 # Define the original problem:
-from benderslib import Gurobi, AnnotationBenders, ClassicalBenders
-
+from benderslib import AnnotationBenders, ClassicalBenders
+from benderslib.solvers import Gurobi
 from gurobipy import Model, GRB
 import matplotlib.pyplot as plt
 

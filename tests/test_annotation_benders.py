@@ -2,7 +2,8 @@
 
 import pytest
 from gurobipy import Model, GRB
-from benderslib import AnnotationBenders, ClassicalBenders, Gurobi
+from benderslib import AnnotationBenders, ClassicalBenders
+from benderslib.solvers import Gurobi
 
 
 class TestAnnotationBenders:

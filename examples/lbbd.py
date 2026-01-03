@@ -16,7 +16,8 @@ For custom cut generators, please refer to :doc:`../examples/cbd_iis` and :doc:`
 
 # %%
 # Define the master problem:
-from benderslib import CST, MasterProblem, Gurobi, LogicBasedBenders, CombinatorialFCGen, LogicBasedSubProblem, NoGoodFC
+from benderslib import CST, MasterProblem, LogicBasedBenders, CombinatorialFCGen, LogicBasedSubProblem, NoGoodFC
+from benderslib.solvers import Gurobi
 from gurobipy import Model, GRB
 
 

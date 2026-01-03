@@ -13,7 +13,8 @@ The L-shaped method requires the second-stage problem to be a Linear Program.
 
 import random
 
-from benderslib import MasterProblem, SubProblem, SubProblems, Gurobi, LShaped, BendersParams
+from benderslib import MasterProblem, SubProblem, SubProblems, LShaped, BendersParams
+from benderslib.solvers import Gurobi
 from gurobipy import Model, GRB
 from matplotlib import pyplot as plt
 

@@ -10,7 +10,8 @@ This method is suitable for problems where the complicating variables are binary
 
 # %%
 # Define the original problem:
-from benderslib import Gurobi, AnnotationBenders, CombinatorialBenders
+from benderslib import AnnotationBenders, CombinatorialBenders
+from benderslib.solvers import Gurobi
 from gurobipy import Model, GRB
 from matplotlib import pyplot as plt
 

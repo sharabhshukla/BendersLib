@@ -26,7 +26,7 @@ Guide on building solver models can be found in the official documentation of ea
       - Documentation
       - Note
     * - **Gurobi**
-      - :class:`Gurobi`
+      - :class:`~.solvers.Gurobi`
       - MP
       - https://docs.gurobi.com
       - Commercial solver with free academic license.
@@ -103,7 +103,7 @@ However, for a solver interface to be considered for contribution to the officia
 a complete and functional implementation of these methods is required to ensure full compatibility with all library features.
 
 To see a practical implementation, you can refer to the source code of the built-in solver interfaces,
-such as :class:`Gurobi`.
+such as :class:`~.solvers.Gurobi`.
 Examining how it inherits from :class:`SolverBase` and implements the required methods will provide a clear
 and effective template for creating your own custom solver.
 
@@ -118,7 +118,7 @@ Attributes & Methods
 -------------------------------------------
 
 Below are the attributes and methods of the base solver interface :class:`SolverBase`.
-Any built-in solver interface (e.g., :class:`Gurobi`) is inherited from this base class,
+Any built-in solver interface (e.g., :class:`~.solvers.Gurobi`) is inherited from this base class,
 meaning they have these attributes and methods.
 Adding a new solver interface requires implementing these attributes and methods,
 especially the `abstract methods <https://docs.python.org/3/library/abc.html#abc.abstractmethod>`_.
@@ -183,4 +183,4 @@ See :class:`SolverBase` for the comprehensive API reference, and :doc:`built-in 
 .. seealso::
 
     * Base Class: :class:`SolverBase`
-    * Solver Interfaces: :class:`Gurobi`
+    * Solver Interfaces: :class:`~.solvers.Gurobi`

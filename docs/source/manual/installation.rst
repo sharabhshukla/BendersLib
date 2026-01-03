@@ -98,7 +98,7 @@ Please refer to :doc:`solver` for a list of supported solvers and detailed instr
     * - Solver
       - pip
       - conda
-    * - :class:`Gurobi`
+    * - :class:`~.solvers.Gurobi`
       - ``pip install gurobipy``
       - ``conda install -c gurobi gurobi``
 
@@ -109,12 +109,9 @@ To verify that a specific solver is correctly installed and accessible, you can 
 
 .. code-block:: python
 
-    from benderslib import Gurobi
+    from benderslib.solvers import Gurobi
 
-    print("Gurobi installed:", Gurobi.is_available())
-
-If the output is ``True``, it indicates that the Gurobi solver is correctly installed and accessible.
-Otherwise, it will return ``False``.
+An error will be raised if ``gurobipy`` is not installed.
 
 Troubleshooting
 ------------------------------------

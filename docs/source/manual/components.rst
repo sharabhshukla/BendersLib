@@ -83,7 +83,7 @@ Detailed API for each component can be found in the :doc:`API reference <../api/
     :class: seealso
 
     * Abstraction: :class:`SolverBase`
-    * Solvers: :class:`Gurobi`
+    * Solvers: :class:`~.solvers.Gurobi`
 
 * :doc:`master`:
   The master problem component represents the high-level problem in the Benders decomposition.

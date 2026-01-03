@@ -36,7 +36,8 @@ creating :class:`MasterProblem` and :class:`SubProblem` objects.
 .. code-block:: python
     :emphasize-lines: 9-
 
-    from benderslib import ClassicalBenders, Gurobi
+    from benderslib import ClassicalBenders
+    from benderslib.solvers import Gurobi
 
     # Assume master_model and sub_model are already defined
     master_model = ...
@@ -210,7 +211,8 @@ Here's how to use the automated decomposition feature.
 
 .. code-block:: python
 
-    from benderslib import Gurobi, AnnotationBenders, ClassicalBenders
+    from benderslib import AnnotationBenders, ClassicalBenders
+    from benderslib.solvers import Gurobi
     from gurobipy import Model, GRB
 
     # Define the original problem
@@ -270,7 +272,8 @@ Here is a code snippet showing how to set up a :class:`LogicBasedBenders` instan
 
 .. code-block:: python
 
-    from benderslib import LogicBasedBenders, MasterProblem, LogicBasedSubProblem, Gurobi, CutGenerator
+    from benderslib import LogicBasedBenders, MasterProblem, LogicBasedSubProblem, CutGenerator
+    from benderslib.solvers import Gurobi
 
     # Define master problem model
     master_model = ...  # Define your master problem model here

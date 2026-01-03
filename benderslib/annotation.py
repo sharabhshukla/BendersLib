@@ -18,7 +18,7 @@ class AnnotationBenders:
     original_problem:
         The original optimization problem in a solver-specific format.
     solver: Type[SolverBase]
-        The solver class to be used for solving the master and subproblems, e.g., :class:`Gurobi`.
+        The solver class to be used for solving the master and subproblems, e.g., :class:`~.solvers.Gurobi`.
         It should be compatible with the :attr:`original_problem`.
     complicating_vars: list[str]
         A list of variable names that are considered complicating variables for the decomposition.
@@ -33,7 +33,8 @@ class AnnotationBenders:
     .. code-block:: python
         :emphasize-lines: 5, 7
 
-        from benderslib import AnnotationBenders, ClassicalBenders, Gurobi, BendersParams
+        from benderslib import AnnotationBenders, ClassicalBenders, BendersParams
+        from benderslib.solvers import Gurobi
 
         benders_solver = AnnotationBenders(
             original_problem=original_problem,
@@ -108,7 +109,8 @@ class AnnotationBenders:
 
         .. code-block:: python
 
-            from benderslib import AnnotationBenders, Gurobi
+            from benderslib import AnnotationBenders
+            from benderslib.solvers import Gurobi
 
             master, sub = AnnotationBenders._decompose(
                 original_problem=original_problem,

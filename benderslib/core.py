@@ -88,7 +88,7 @@ class ProblemBase:
     Parameters
     ----------
     solver_backend : SolverBase
-        An instance of a solver backend (e.g., :class:`Gurobi`) that implements the :class:`SolverBase` interface.
+        An instance of a solver backend (e.g., :class:`~.solvers.Gurobi`) that implements the :class:`SolverBase` interface.
     complicating_vars : list, optional
         A list of names of the complicating variables.
     """
@@ -370,7 +370,7 @@ class MasterProblem(ProblemBase):
     Parameters
     ----------
     solver_backend : SolverBase
-        An instance of a solver backend (e.g., :class:`Gurobi`) that implements the :class:`SolverBase` interface.
+        An instance of a solver backend (e.g., :class:`~.solvers.Gurobi`) that implements the :class:`SolverBase` interface.
     complicating_vars : list, optional
         A list of names of the complicating variables.
     """
@@ -488,7 +488,7 @@ class SubProblem(ProblemBase):
     Parameters
     ----------
     solver_backend : SolverBase
-        An instance of a solver backend (e.g., :class:`Gurobi`) that implements the :class:`SolverBase` interface.
+        An instance of a solver backend (e.g., :class:`~.solvers.Gurobi`) that implements the :class:`SolverBase` interface.
     complicating_vars : list, optional
         A list of names of the complicating variables.
     """
@@ -1144,7 +1144,8 @@ class BendersSolver:
 
         .. code-block:: python
 
-            from benderslib import BendersSolver, Gurobi
+            from benderslib import BendersSolver
+            from benderslib.solvers import Gurobi
             from gurobipy import Model
 
             # Create master and subproblem models using Gurobi

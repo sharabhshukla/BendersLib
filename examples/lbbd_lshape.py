@@ -14,8 +14,9 @@ import random
 
 random.seed(1)
 
-from benderslib import MasterProblem, Gurobi, LogicBasedBenders, SubProblems, SubProblem, IntegerLShapedOCGen, \
+from benderslib import MasterProblem, LogicBasedBenders, SubProblems, SubProblem, IntegerLShapedOCGen, \
     LogicBasedSubProblem, CST
+from benderslib.solvers import Gurobi
 
 from gurobipy import Model, GRB
 

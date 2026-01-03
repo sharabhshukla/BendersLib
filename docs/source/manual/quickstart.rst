@@ -108,11 +108,12 @@ such as Gurobi (see :doc:`solver` for other supported solvers).
 
     complicating_vars = [v.VarName for v in y.values()]  # List of complicating variable names
 
-Wrap the solver model with BendersLib's :class:`Gurobi` interface and the :class:`MasterProblem` class.
+Wrap the solver model with BendersLib's :class:`~.solvers.Gurobi` interface and the :class:`MasterProblem` class.
 
 .. code-block:: python
 
-    from benderslib import Gurobi, MasterProblem
+    from benderslib import MasterProblem
+    from benderslib.solvers import Gurobi
 
     master_problem = MasterProblem(Gurobi(master_model))
     print(master_problem)
@@ -150,11 +151,12 @@ The subproblem can use a different solver from the master problem.
     Internally, BendersLib treats them as parameters in the subproblem by setting their lower and upper bounds
     to the values given by the master problem at each iteration.
 
-Wrap the solver model with BendersLib's :class:`Gurobi` interface and the :class:`SubProblem` class.
+Wrap the solver model with BendersLib's :class:`~.solvers.Gurobi` interface and the :class:`SubProblem` class.
 
 .. code-block:: python
 
-    from benderslib import Gurobi, SubProblem
+    from benderslib import SubProblem
+    from benderslib.solvers import Gurobi
 
     subproblem = SubProblem(Gurobi(subproblem_model))
     print(subproblem)

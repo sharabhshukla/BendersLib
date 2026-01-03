@@ -13,7 +13,8 @@ without manually defining the master and sub problems.
 # %%
 # Import necessary modules:
 from gurobipy import Model, GRB
-from benderslib import AnnotationBenders, Gurobi
+from benderslib import AnnotationBenders
+from benderslib.solvers import Gurobi
 
 
 # %%

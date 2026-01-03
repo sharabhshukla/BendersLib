@@ -10,7 +10,8 @@ Simple Classical Benders Example
 # This example explicitly defines master problem and subproblem for Benders decomposition.
 #
 # Define a simple MILP problem:
-from benderslib import BendersParams, MasterProblem, SubProblem, Gurobi, ClassicalBenders
+from benderslib import BendersParams, MasterProblem, SubProblem, ClassicalBenders
+from benderslib.solvers  import Gurobi
 from gurobipy import Model, GRB
 
 

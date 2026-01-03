@@ -14,7 +14,8 @@ However, the complicating variables must be pure binary.
 
 import random
 
-from benderslib import Gurobi, IntegerLShaped
+from benderslib import IntegerLShaped
+from benderslib.solvers import Gurobi
 from gurobipy import Model, GRB
 from matplotlib import pyplot as plt
 

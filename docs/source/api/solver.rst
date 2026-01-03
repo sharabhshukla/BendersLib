@@ -14,6 +14,6 @@ Base Class
 Built-in Gurobi Interface
 ----------------------------
 
-.. autoclass:: Gurobi
+.. autoclass:: benderslib.solvers.Gurobi
    :inherited-members:
    :show-inheritance:

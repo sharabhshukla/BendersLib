@@ -30,7 +30,8 @@ Gurobi
     :emphasize-lines: 12-
 
     from gurobipy import Model, GRB
-    from benderslib import MasterProblem, Gurobi
+    from benderslib import MasterProblem
+    from benderslib.solvers import Gurobi
 
     # Create a Gurobi model for the master problem
     master_model = Model("Master")
@@ -76,7 +77,8 @@ Here is an example of how to create a master/sub problem from an annotated model
     :emphasize-lines: 16-
 
     from gurobipy import Model, GRB
-    from benderslib import MasterProblem, SubProblem, Gurobi, AnnotationBenders
+    from benderslib import MasterProblem, SubProblem, AnnotationBenders
+    from benderslib.solvers import Gurobi
 
     # Create an original model
     original_model = Model("Original")

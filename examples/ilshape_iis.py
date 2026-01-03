@@ -15,7 +15,8 @@ This example using the Irreducible Infeasible Subsystem (IIS) to generate strong
 
 import random
 
-from benderslib import Gurobi, IntegerLShaped, NoGoodFC, CST, SubProblems, MasterProblem
+from benderslib import IntegerLShaped, NoGoodFC, CST, SubProblems, MasterProblem
+from benderslib.solvers import Gurobi
 from gurobipy import Model, GRB
 import matplotlib.pyplot as plt
 

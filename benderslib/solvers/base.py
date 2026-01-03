@@ -22,12 +22,14 @@ class SolverBase(ABC):
         self.status = CST.UNSOLVED
         """The status of the last solve attempt.
         
-        It is initialized to :const:`BendersConsts.UNSOLVED`,
-        and it should be updated to :const:`BendersConsts.OPTIMAL` or :const:`BendersConsts.INFEASIBLE`, 
-        after calling the :func:`SolverBase.solve` method.
+        It is initialized to :const:`~benderslib.BendersConsts.UNSOLVED`,
+        and it should be updated to :const:`~benderslib.BendersConsts.OPTIMAL` 
+        or :const:`~benderslib.BendersConsts.INFEASIBLE`, 
+        after calling the :func:`~benderslib.SolverBase.solve` method.
 
         .. caution::
-            ``status`` should only be set to :const:`BendersConsts.OPTIMAL` or :const:`BendersConsts.INFEASIBLE`,
+            :attr:`status` should only be set to :const:`~benderslib.BendersConsts.OPTIMAL` 
+            or :const:`~benderslib.BendersConsts.INFEASIBLE`,
             since it is not clear how other statuses (e.g., feasible but not optimal)
             would impact convergence of Benders decomposition.
         """
@@ -282,8 +284,9 @@ class SolverBase(ABC):
 
         Parameters
         ---------------
-        cut : :class:`Cut`
-            An instance of a :class:`Cut`, either :class:`OptimalityCut` or :class:`FeasibilityCut`.
+        cut : :class:`~benderslib.Cut`
+            An instance of a :class:`~benderslib.Cut`,
+            either :class:`~benderslib.OptimalityCut` or :class:`~benderslib.FeasibilityCut`.
         name : str
             The name of the constraint to be added.
 
@@ -321,11 +324,12 @@ class SolverBase(ABC):
 
         Solver-specific parameters can be set in this method,
         such as hiding the solver's output log in the console.
-        After solving, ``status`` should be updated accordingly
-        to :const:`BendersConsts.OPTIMAL` or :const:`BendersConsts.INFEASIBLE`.
+        After solving, :attr:`status` should be updated accordingly
+        to :const:`~benderslib.BendersConsts.OPTIMAL` or :const:`~benderslib.BendersConsts.INFEASIBLE`.
 
         .. caution::
-            ``status`` should only be set to :const:`BendersConsts.OPTIMAL` or :const:`BendersConsts.INFEASIBLE`,
+            :attr:`status` should only be set to :const:`~benderslib.BendersConsts.OPTIMAL`
+            or :const:`~benderslib.BendersConsts.INFEASIBLE`,
             since it is not clear how other statuses (e.g., feasible but not optimal)
             would impact convergence of Benders decomposition.
         """
