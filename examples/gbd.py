@@ -16,10 +16,10 @@ with subproblem being a convex Quadratic Programming (QP) problem
     To get coefficients of Benders cuts from Gurobi, the subproblem must satisfy certain conditions.
 
     - **Optimality Cuts**:
-      The subproblem must be a convex Quadratically Constrained Quadratic Programming (QCQP) problem
+      The subproblem must be a convex linearly constrained Quadratic Programming (QP) problem
       to obtain dual variables of constraints.
     - **Feasibility Cuts**:
-      The subproblem must be a Linear Programming (LP) problem to obtain Farkas duals.
+      The subproblem's constraints must be a linear system to obtain Farkas duals.
 """
 
 # %%
@@ -109,16 +109,16 @@ if __name__ == "__main__":
     random.seed(1)
     price = [random.randrange(10, 50) for _ in range(warehouse_num)]
     demand = [random.randrange(20, 100) for _ in range(warehouse_num)]
-    budget = 50000
-    max_shortage_ratio = 0.3
-    linear = False
+    budget = 500
+    max_shortage_ratio = 1
+    linear_obj = False
 
     # Create master problem
     master_problem_model, complicating_vars = create_master_problem(warehouse_num, price, budget)
     master_problem = MasterProblem(Gurobi(master_problem_model))
 
     # Create sub problem
-    sub_problem_model = create_sub_problem(warehouse_num, demand, max_shortage_ratio, linear)
+    sub_problem_model = create_sub_problem(warehouse_num, demand, max_shortage_ratio, linear_obj)
     sub_problem = SubProblem(Gurobi(sub_problem_model))
 
     # Create Benders decomposition instance
@@ -133,9 +133,10 @@ if __name__ == "__main__":
     benders.solve()
 
     # Complete model for validation
-    complete_model = create_complete_model(warehouse_num, price, budget, demand, max_shortage_ratio, linear)
+    complete_model = create_complete_model(warehouse_num, price, budget, demand, max_shortage_ratio, linear_obj)
     complete_model.optimize()
-    print(f"\nComplete model objective: {complete_model.ObjVal:.2f}")
+    if complete_model.Status == GRB.OPTIMAL:
+        print(f"\nComplete model objective: {complete_model.ObjVal:.2f}")
 
 # %%
 #
