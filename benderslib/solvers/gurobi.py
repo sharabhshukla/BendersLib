@@ -4,7 +4,7 @@ from ..consts import BendersConsts as CST
 from .base import SolverBase
 
 try:
-    from gurobipy import Model, GRB, LinExpr
+    from gurobipy import Model, LinExpr, GRB
 except ImportError:
     raise ImportError("Gurobi is not installed. Please install it to use the Gurobi solver interface.")
 

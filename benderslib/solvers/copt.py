@@ -4,8 +4,7 @@ from ..consts import BendersConsts as CST
 from .base import SolverBase
 
 try:
-    import coptpy as cp
-    from coptpy import COPT
+    from coptpy import Model, LinExpr, COPT
 except ImportError:
     raise ImportError("COPT is not installed. Please install it to use the COPT solver interface.")
 
@@ -24,7 +23,7 @@ class Copt(SolverBase):
         An instance of COPT's ``coptpy.Model``.
     """
 
-    def __init__(self, model: cp.Model) -> None:
+    def __init__(self, model: Model) -> None:
         # model.update()
         super().__init__(model)
 
@@ -140,7 +139,7 @@ class Copt(SolverBase):
         return self.model.objval
 
     def add_cut(self, cut, name=None) -> None:
-        lhs = cp.LinExpr()
+        lhs = LinExpr()
         for var, coef in zip(cut.vars, cut.coefs):
             lhs.addTerm(self.model.getVarByName(var), coef)
 
