@@ -19,8 +19,6 @@ from gurobipy import Model, GRB
 from matplotlib import pyplot as plt
 
 
-# random.seed(1)
-
 def first_stage_model(n_plants):
     model = Model("FirstStage")
 
@@ -85,8 +83,9 @@ def deterministic_equivalent_model(n_plants, scenarios, probs, total_capacity):
 # Solve the problem using the deterministic equivalent (for clarity and verification):
 if __name__ == '__main__':
     # Data
+    random.seed(5)
     n_plants = 5
-    n_scenarios = 2
+    n_scenarios = 30
     total_capacity = 10
     scenarios = [[random.randint(10, 220) for _ in range(n_plants)] for _ in range(n_scenarios)]
     probs = [1.3 for _ in range(n_scenarios)]

@@ -12,8 +12,6 @@ and multiple estimator variables.
 """
 import random
 
-random.seed(1)
-
 from benderslib import MasterProblem, LogicBasedBenders, SubProblems, SubProblem, IntegerLShapedOCGen, \
     LogicBasedSubProblem, CST
 from benderslib.solvers import Gurobi
@@ -86,6 +84,7 @@ class Sub(LogicBasedSubProblem):
 
 if __name__ == '__main__':
     # Data
+    random.seed(1)
     n_plants = 7
     n_scenarios = 3
     penalty = 2

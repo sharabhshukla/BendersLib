@@ -11,7 +11,7 @@ Simple Classical Benders Example
 #
 # Define a simple MILP problem:
 from benderslib import BendersParams, MasterProblem, SubProblem, ClassicalBenders
-from benderslib.solvers  import Gurobi
+from benderslib.solvers import Gurobi
 from gurobipy import Model, GRB
 
 
@@ -91,7 +91,6 @@ if __name__ == '__main__':
     print("\nBenders Decomposition Solution:")
     # print(BD.result.solution)
     print(f"Obj: {BD.result.obj}\n")
-
 
 # %%
 #

@@ -21,8 +21,6 @@ from gurobipy import Model, GRB
 import matplotlib.pyplot as plt
 
 
-# random.seed(1)
-
 def first_stage_model(n_plants):
     model = Model("FirstStage")
 
@@ -110,6 +108,7 @@ def cut_generator(master_problem: MasterProblem, sub_problem: SubProblems):
 # Solve the problem using the deterministic equivalent (for clarity and verification):
 if __name__ == '__main__':
     # Data
+    # random.seed(1)
     n_plants = 9
     n_scenarios = 2
     scenarios = [[random.choice([0, 1]) for _ in range(n_plants)] for _ in range(n_scenarios)]
