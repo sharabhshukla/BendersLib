@@ -289,9 +289,7 @@ It is inherited from the base class :class:`ProblemBase`, but tailored for maste
    ~MasterProblem.add_cut
    ~MasterProblem.remove_cut
    ~MasterProblem.get_estimator_values
-   ~MasterProblem.add_vars
-   ~MasterProblem.get_obj_expr
-   ~MasterProblem.set_obj
+   ~MasterProblem.add_estimators
    ~MasterProblem.fix_vars
    ~MasterProblem.unfix_vars
    ~MasterProblem.get_var_values

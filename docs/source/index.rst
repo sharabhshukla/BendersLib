@@ -138,8 +138,7 @@ Please see :doc:`examples/index` for more information.
 
 **Built-in Solvers Interfaces:**
 
-*   Gurobi: :ref:`API Reference <api-gurobi>`
-
+*   :class:`~benderslib.solvers.gurobi.Gurobi`, :class:`~benderslib.solvers.copt.Copt`
 
 Structure
 -----------------------------------

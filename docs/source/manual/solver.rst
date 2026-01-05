@@ -15,8 +15,8 @@ BendersLib supports the following solvers.
 Installation instructions can be found in the manual under :ref:`Installing Solvers <manual_installing_solver>`.
 Guide on building solver models can be found in the official documentation of each solver.
 
-.. list-table:: Built-in Solvers Interfaces
-    :widths: 15 15 15 50 50
+.. list-table:: Built-in Solver and Modeling Language Interfaces
+    :widths: 20 15 15 50 50
     :header-rows: 1
     :name: solver-table
 
@@ -29,9 +29,66 @@ Guide on building solver models can be found in the official documentation of ea
       - :class:`~.solvers.Gurobi`
       - MP
       - https://docs.gurobi.com
-      - Commercial solver with free academic license.
+      - Commercial (free academic license)
+    * - **COPT**
+      - :class:`~.solvers.Copt`
+      - MP
+      - https://guide.coap.online/copt/en-doc/
+      - Commercial (free academic license)
+    * - HiGHS
+      -
+      - MP
+      -
+      - Open-source
+    * - SCIP
+      -
+      - MP
+      -
+      - Open-source
+    * - IPOPT
+      -
+      - MP (NLP)
+      -
+      - Open-source
+    * - MOSEK
+      -
+      - MP (NLP)
+      -
+      - Commercial (free academic license)
+    * - KNITRO
+      -
+      - MP (NLP)
+      -
+      - Commercial
+    * - Baron
+      -
+      - MP (NLP)
+      -
+      - Commercial
+    * - OR-Tools
+      -
+      - CP
+      -
+      - Open-source CP/SAT solver.
+    * - Pyomo
+      -
+      - ML
+      -
+      - Open-source modeling language supporting
+        `multiple MP solvers <https://pyomo.readthedocs.io/en/stable/getting_started/solvers.html>`_.
+    * - CVXPY
+      -
+      - ML
+      -
+      - Open-source modeling language.
+    * - AMPL
+      -
+      - ML
+      -
+      - Commercial modeling language supporting
+        `multiple MP solvers <https://dev.ampl.com/solvers/index.html>`__.
 
-*\* Note: MP: Mathematical Programming, CP: Constraint Programming.*
+*\* Note: MP: Mathematical Programming, CP: Constraint Programming, ML: Modeling Language.*
 
 .. admonition:: Mathematical Programming vs. Constraint Programming
     :class: tip
@@ -163,9 +220,7 @@ See :class:`SolverBase` for the comprehensive API reference, and :doc:`built-in 
 .. autosummary::
    :nosignatures:
 
-   ~SolverBase.add_vars
-   ~SolverBase.get_obj_expr
-   ~SolverBase.set_obj
+   ~SolverBase.add_estimators
    ~SolverBase.fix_vars
    ~SolverBase.unfix_vars
    ~SolverBase.get_var_values
@@ -183,4 +238,4 @@ See :class:`SolverBase` for the comprehensive API reference, and :doc:`built-in 
 .. seealso::
 
     * Base Class: :class:`SolverBase`
-    * Solver Interfaces: :class:`~.solvers.Gurobi`
+    * Solver Interfaces: :class:`~.solvers.Gurobi`, :class:`~.solvers.Copt`

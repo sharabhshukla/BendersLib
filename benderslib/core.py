@@ -127,76 +127,36 @@ class ProblemBase:
         # Make attributes of the solver backend accessible directly
         return getattr(self.model, name)
 
-    def add_vars(self, var_names: list[str], var_types: list[str], lb: list[float], ub: list[float]) -> list[str]:
-        """
-        Add variables to the model.
+    def add_estimators(self, estimators: list[str], prob: list[float] = None, lb: float = 0) -> None:
+        """Add estimator variable(s) to the objective function of the model.
 
         Parameters
         ---------------
-        var_names : list
-            A list of variable names to be added.
-        var_types : list
-            A list of variable types corresponding to `var_names`. Each type should be one of:
-            :attr:`BendersConsts.CONTINUOUS`, :attr:`BendersConsts.INTEGER`, or :attr:`BendersConsts.BINARY`.
-        lb : list
-            A list of lower bounds for the variables.
-        ub : list
-            A list of upper bounds for the variables.
-
-        Returns
-        ---------------
-        list[str]
-            A list of names of the added variables.
+        estimators : list[str]
+            A list of names for the estimator variables to be added.
+        prob : list[float]
+            A list of probabilities (weights) associated with each estimator variable.
+            The length of ``prob`` should match that of ``estimators``.
+            If None, equal weights are assigned to all estimator variables.
+            Note that the sum of probabilities does not need to equal 1.
+        lb : float
+            The lower bound for the estimator variables. Default is 0.
 
         Example
         ---------------
-
         .. code-block:: python
 
-                added_vars = problem.add_vars(
-                    var_names=['x1', 'x2'],
-                    var_types=[CST.CONTINUOUS, CST.INTEGER],
-                    lb=[0, 0],
-                    ub=[10, 5]
+                # Adding multiple estimators with specified probabilities
+                solver.add_estimators(
+                    estimators=['theta1', 'theta2'],
+                    prob=[0.3, 0.7],
+                    lb=0.0
                 )
+
+                # Adding a single estimator
+                solver.add_estimators(['theta'])
         """
-        return self.model.add_vars(var_names, var_types, lb, ub)
-
-    def get_obj_expr(self) -> dict[str, float]:
-        """
-        Get the objective function expression of the model.
-
-        Returns
-        ---------------
-        dict[str, float]
-            A dictionary mapping variable names to their coefficients in the objective function.
-
-        Example
-        ---------------
-
-        .. code-block:: python
-
-                obj_expr = problem.get_obj_expr()
-        """
-        return self.model.get_obj_expr()
-
-    def set_obj(self, var_coefs: dict[str, float]) -> None:
-        """
-        Set the objective function of the model.
-
-        Parameters
-        ---------------
-        var_coefs : dict
-            A dictionary mapping variable names to their coefficients in the objective function.
-
-        Example
-        ---------------
-
-        .. code-block:: python
-
-                problem.set_obj({'x1': 1.0, 'x2': 2.0})
-        """
-        self.model.set_obj(var_coefs)
+        self.model.add_estimators(estimators, prob, lb)
 
     def fix_vars(self, var_values: dict[str, float]) -> None:
         """
@@ -410,19 +370,10 @@ class MasterProblem(ProblemBase):
         # Number of estimator variables
         _num = len(prob) if multiple else 1
 
-        # Add estimator variable(s)
+        # Define estimator variable names
         estimators = [CST.ESTIMATOR_FORMAT.format(i + 1) for i in range(_num)] if multiple else [CST.ESTIMATOR_NAME]
-        var_types = [CST.CONTINUOUS] * len(estimators)
-        lb = [lb] * len(estimators)
-        ub = [float('Inf')] * len(estimators)
-        self.add_vars(estimators, var_types, lb, ub)
 
-        # Update objective function
-        _update = {est: p for est, p in zip(estimators, prob)} if multiple else {estimators[0]: 1.0}
-        obj_expr = self.get_obj_expr()
-        obj_expr.update(_update)
-        self.set_obj(obj_expr)
-
+        self.add_estimators(estimators=estimators, prob=prob, lb=lb)
         self.estimators = estimators
 
     def get_estimator_values(self) -> dict[str, float]:
@@ -1182,10 +1133,9 @@ class BendersSolver:
         )
 
     def __str__(self):
-        all_model_com_vars = {self.master_problem._solver_model.getVarByName(v) for v in self.complicating_vars}
-        integer_num = len([v for v in all_model_com_vars if v.VType == 'I'])
-        binary_num = len([v for v in all_model_com_vars if v.VType == 'B'])
-        continuous_num = len([v for v in all_model_com_vars if v.VType == 'C'])
+        integer_num = len(self.master_problem.model._int_vars)
+        binary_num = len(self.master_problem.model._bin_vars)
+        continuous_num = len(self.master_problem.model._all_vars) - integer_num - binary_num
 
         return (
             f"Benders Decomposition:\n"
@@ -1194,7 +1144,6 @@ class BendersSolver:
             f" [Integer: {integer_num}, Binary: {binary_num}, Continuous: {continuous_num}]\n"
             f" - {'Optimality Cut:'.ljust(CST.LOG_NAME_WIDTH)}{self.optimality_cut.__class__.__name__ or None}\n"
             f" - {'Feasibility Cut:'.ljust(CST.LOG_NAME_WIDTH)}{self.feasibility_cut.__class__.__name__ or None}"
-
         )
 
     def __add_optimality_cut(self):

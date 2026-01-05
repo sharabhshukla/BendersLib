@@ -7,15 +7,13 @@ __license__ = "GPL-3.0"
 __url__ = "https://benders.dev"
 __copyright__ = "Copyright 2025, https://guo.ph"
 
-from .base import (
-    SolverBase,
-)
+from .base import SolverBase
 
-from .gurobi import (
-    Gurobi,
-)
+from .gurobi import Gurobi
+from .copt import Copt
 
 __all__ = [
     "SolverBase",
     "Gurobi",
+    "Copt",
 ]

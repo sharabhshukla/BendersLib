@@ -345,9 +345,7 @@ Below are the attributes and methods :class:`SubProblem`, :class:`SubProblems`, 
 .. autosummary::
    :nosignatures:
 
-   ~SubProblem.add_vars
-   ~SubProblem.get_obj_expr
-   ~SubProblem.set_obj
+   ~SubProblem.add_estimators
    ~SubProblem.fix_vars
    ~SubProblem.unfix_vars
    ~SubProblem.get_var_values

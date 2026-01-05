@@ -69,37 +69,19 @@ class Gurobi(SolverBase):
                 self.model.addConstr(var <= ub)
                 var.ub = GRB.INFINITY
 
-    def add_vars(self, var_names: list[str], var_types: list[str], lb: list[float], ub: list[float]) -> list[str]:
-        _var_type_map = {
-            CST.BINARY: GRB.BINARY,
-            CST.INTEGER: GRB.INTEGER,
-            CST.CONTINUOUS: GRB.CONTINUOUS
-        }
+    def add_estimators(self, estimators: list[str], prob: list[float] = None, lb: float = 0) -> None:
+        if prob is None:
+            if len(estimators) == 1:
+                prob = [1]
+            else:
+                prob = [1 / len(estimators)] * len(estimators)
+        else:
+            if len(prob) != len(estimators):
+                raise ValueError("Length of 'prob' must match length of 'estimators'.")
 
-        for var_name, var_type, lower, upper in zip(var_names, var_types, lb, ub):
-            grb_var_type = _var_type_map.get(var_type, GRB.CONTINUOUS)
-            self.model.addVar(lb=lower, ub=upper, vtype=grb_var_type, name=var_name)
+        for name, obj in zip(estimators, prob):
+            self.model.addVar(lb=lb, vtype=GRB.CONTINUOUS, obj=obj, name=name)
 
-            if var_type == CST.BINARY:
-                self._bin_vars.append(var_name)
-            elif var_type == CST.INTEGER:
-                self._int_vars.append(var_name)
-            self._all_vars.append(var_name)
-            self._var_bounds[var_name] = (lower, upper)
-
-        self.model.update()
-        return var_names
-
-    def get_obj_expr(self) -> dict[str, float]:
-        expr = self.model.getObjective()
-        res = {expr.getVar(i).VarName: expr.getCoeff(i) for i in range(expr.size())}
-        return res
-
-    def set_obj(self, var_coefs: dict[str, float]) -> None:
-        coefs = list(var_coefs.values())
-        vars = [self.model.getVarByName(var) for var in var_coefs.keys()]
-        obj_expr = LinExpr(coefs, vars)
-        self.model.setObjective(obj_expr, sense=GRB.MINIMIZE if self._sense == CST.MIN else GRB.MAXIMIZE)
         self.model.update()
 
     def fix_vars(self, var_values: dict[str, float]) -> None:
@@ -169,6 +151,7 @@ class Gurobi(SolverBase):
 
     def add_cut(self, cut, name=None) -> None:
         lhs = sum(coef * self.model.getVarByName(var) for var, coef in zip(cut.vars, cut.coefs))
+
         if cut.sense == CST.EQ:
             self.model.addConstr(lhs == cut.rhs, name=name)
         elif cut.sense == CST.LE:

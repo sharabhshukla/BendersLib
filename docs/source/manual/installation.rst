@@ -101,6 +101,9 @@ Please refer to :doc:`solver` for a list of supported solvers and detailed instr
     * - :class:`~.solvers.Gurobi`
       - ``pip install gurobipy``
       - ``conda install -c gurobi gurobi``
+    * - :class:`~.solvers.Copt`
+      - ``pip install coptpy``
+      -
 
 Verifying the Installation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
