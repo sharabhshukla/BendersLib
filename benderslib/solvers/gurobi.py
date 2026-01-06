@@ -174,6 +174,9 @@ class Gurobi(SolverBase):
         # Gurobi model status code 4 (INF_OR_UNBD)
         self.model.Params.DualReductions = 0
 
+        # QCPi requires QCPDual = 1
+        # self.model.Params.QCPDual = 1
+
         self.model.optimize()
 
         _grb_status_map = {
@@ -182,135 +185,54 @@ class Gurobi(SolverBase):
         }
         self.status = _grb_status_map.get(self.model.Status, CST.ERROR)
 
-    def make_master_problem(self, master_vars: list[str]) -> Model:
-        """Build the master problem from the original problem.
-        
-        This function generates the master problem from the original problem by extracting 
-        the specified master problem variables,
-        constraints that only involve these variables, objective terms associated with these variables.
+    @staticmethod
+    def make_master_problem(original_model: Model, master_vars: list[str]) -> Model:
+        master = original_model.copy()
 
-        .. Note::
-           This method is required for :class:`AnnotationBenders`, which automatically decomposes the original problem
-           into master and subproblems based on the provided complicating variables.
-           This suggests that you do not need to implement this method when manually defining master and subproblems.
+        # Non-master variables
+        non_master_vars = set(master.getAttr('VarName', master.getVars())) - set(master_vars)
 
-        Parameters
-        ---------------
-        master_vars : list[str]
-            Complicating variables that only appear in the master problem.
+        # Remove non-master variables & remove them from objective (will be handled automatically)
+        for var_name in non_master_vars:
+            var = master.getVarByName(var_name)
+            master.remove(var)
 
-        Returns
-        ---------------
-        ``gurobipy.Model``
-            A Gurobi Model object representing the master problem.
-
-        Example
-        ---------------
-        .. code-block:: python
-
-            original_problem = Model()
-            Model.addVar(...)
-            Model.addConstr(...)
-            Model.setObjective(...)
-
-            master_vars = ['x1', 'x2']
-            Solver = Gurobi(original_problem)
-            master_problem = Solver.make_master_problem(master_vars)
-        """
-        vars_dict = {var: self.model.getVarByName(var) for var in master_vars}
-        cons_dict = {con.ConstrName: con for con in self.model.getConstrs()}
-
-        master = Model()
-        # Copy variables to master model
-        for v in vars_dict.values():
-            master.addVar(lb=v.lb, ub=v.ub, obj=v.obj, vtype=v.vtype, name=v.VarName, column=None)
-        master.update()
-        master_vars_dict = {var.VarName: var for var in master.getVars()}
-
-        # Copy constraints to master model
-        for c in cons_dict.values():
-            expr = self.model.getRow(c)
-            var_set = {expr.getVar(i).VarName for i in range(expr.size())}
-            if var_set.issubset(set(master_vars)):
-                # Only involve constraints with master variables
-                var_list = [master_vars_dict[expr.getVar(i).VarName] for i in range(expr.size())]
-                coefficient_list = [expr.getCoeff(i) for i in range(expr.size())]
-                new_expr = LinExpr(coefficient_list, var_list)
-                master.addLConstr(new_expr, c.Sense, c.RHS, name=c.ConstrName)
-
-        # Copy objective to master model
-        obj_expr = LinExpr(
-            [v.Obj for v in master_vars_dict.values()],
-            [v for v in master_vars_dict.values()]
-        )
-        master.setObjective(obj_expr)
+        # remove constraints that contains non-master variables
+        for constr in master.getConstrs():
+            row = master.getRow(constr)
+            contains_non_master = False
+            for i in range(row.size()):
+                var = row.getVar(i)
+                if var.VarName in non_master_vars:
+                    contains_non_master = True
+                    break
+            if contains_non_master:
+                master.remove(constr)
 
         master.update()
         return master
 
-    def make_sub_problem(self, master_vars: list[str]) -> Model:
-        """Build the subproblem from the original problem.
-        
-        This function generates the subproblem from the original problem by extracting all variables from the original problem
-        (master problem variables are treated as continuous and their ``lb`` and ``ub`` are fixed based on the
-        master problem solution), constraints excepting those that only involve master problem variables,
-        and the objective terms associated with the non-master problem variables.
+    @staticmethod
+    def make_sub_problem(original_model: Model, master_vars: list[str]) -> Model:
+        sub = original_model.copy()
 
-        .. Note::
-           This method is required for :class:`AnnotationBenders`, which automatically decomposes the original problem
-           into master and subproblems based on the provided complicating variables.
-           This suggests that you do not need to implement this method when manually defining master and subproblems.
+        # Set master variables to continuous & remove them from objective
+        for var_name in master_vars:
+            var = sub.getVarByName(var_name)
+            var.vtype = GRB.CONTINUOUS
+            var.obj = 0
 
-        Parameters
-        ---------------
-        master_vars : list[str]
-            Complicating variables that only appear in the master problem.
-
-        Returns
-        ---------------
-        ``gurobipy.Model``
-            A Gurobi Model object representing the subproblem.
-
-        Example
-        ---------------
-        .. code-block:: python
-
-            original_problem = Model()
-            Model.addVar(...)
-            Model.addConstr(...)
-            Model.setObjective(...)
-
-            master_vars = ['x1', 'x2']
-            Solver = Gurobi(original_problem)
-            sub_problem = Solver.make_sub_problem(master_vars)
-        """
-        cons_dict = {con.ConstrName: con for con in self.model.getConstrs()}
-
-        sub = Model()
-        # Copy variables to sub model
-        for v in self.model.getVars():
-            vtype = GRB.CONTINUOUS if v.VarName in master_vars else v.vtype
-            sub.addVar(lb=v.lb, ub=v.ub, obj=v.obj, vtype=vtype, name=v.VarName, column=None)
-        sub.update()
-        sub_vars_dict = {var.VarName: var for var in sub.getVars()}
-
-        # Copy constraints to sub model
-        for c in cons_dict.values():
-            expr = self.model.getRow(c)
-            var_set = {expr.getVar(i).VarName for i in range(expr.size())}
-            if not var_set.issubset(set(master_vars)):
-                # Ignoring constraints with only master variables
-                var_list = [sub_vars_dict[expr.getVar(i).VarName] for i in range(expr.size())]
-                coefficient_list = [expr.getCoeff(i) for i in range(expr.size())]
-                new_expr = LinExpr(coefficient_list, var_list)
-                sub.addLConstr(new_expr, c.Sense, c.RHS, name=c.ConstrName)
-
-        # Copy objective to sub model
-        obj_expr = LinExpr(
-            [v.Obj for v in sub_vars_dict.values() if v.VarName not in master_vars],
-            [v for v in sub_vars_dict.values() if v.VarName not in master_vars]
-        )
-        sub.setObjective(obj_expr)
+        # Remove constraints that contains only master variables
+        for constr in sub.getConstrs():
+            row = sub.getRow(constr)
+            is_master_only = True
+            for i in range(row.size()):
+                var = row.getVar(i)
+                if var.VarName not in master_vars:
+                    is_master_only = False
+                    break
+            if is_master_only:
+                sub.remove(constr)
 
         sub.update()
         return sub

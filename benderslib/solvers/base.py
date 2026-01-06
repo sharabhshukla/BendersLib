@@ -302,13 +302,30 @@ class SolverBase(ABC):
         """
         ...
 
-    def make_master_problem(self, complicating_vars: list[str]) -> object:
+    @staticmethod
+    def make_master_problem(original_model, master_vars: list[str]) -> object:
         """Build the master problem from the original problem.
+
+        The master problem is built from a copy of the original problem, following these steps.
+
+        1. In the variable set, remove all non-master variables.
+        2. In the objective function, remove all terms involving non-master variables.
+        3. In the constraints, remove constraints that contains non-master variables.
+
+        .. admonition:: Master problem variables vs. complicating variables
+            :class: note
+
+            The **master problem variables** are variables that appears only in the master problem.
+            It has a subset, **complicating variables**, which are variables that are passed to the subproblem
+            as known parameters.
+            Though they are *sometimes identical*, the decomposition is based on the former.
 
         Parameters
         ---------------
-        complicating_vars : list[str]
-            A list of variable names that are considered complicating variables.
+        original_model :
+            An instance of a solver's model class (e.g., Gurobi's ``gurobipy.Model``).
+        master_vars : list[str]
+            A list of variable names that are considered master problem variables.
 
         Returns
         ---------------
@@ -319,17 +336,39 @@ class SolverBase(ABC):
         ---------------
         .. code-block:: python
 
-                master_model = solver.make_master_problem(['x1', 'x2'])
+                from benderslib.solvers import Gurobi
+
+                original_model = ...
+                # It is a static method, which can be called without initializing an instance
+                master_model = Gurobi.make_master_problem(original_model, ['x1', 'x2'])
         """
         ...
 
-    def make_sub_problem(self, complicating_vars: list[str]) -> object:
+    @staticmethod
+    def make_sub_problem(original_model, master_vars: list[str]) -> object:
         """Build the subproblem from the original problem.
+
+        The subproblem is built from a copy of the original problem, following these steps.
+
+        1. In the variable set, make the master variables be continuous variables.
+           They will be fixed later when solving the subproblem.
+        2. In the objective function, remove all terms involving master variables.
+        3. In the constraints, remove constraints that contains only master variables.
+
+        .. admonition:: Master problem variables vs. complicating variables
+            :class: note
+
+            The **master problem variables** are variables that appears only in the master problem.
+            It has a subset, **complicating variables**, which are variables that are passed to the subproblem
+            as known parameters.
+            Though they are *sometimes identical*, the decomposition is based on the former.
 
         Parameters
         ---------------
-        complicating_vars : list[str]
-            A list of variable names that are considered complicating variables.
+        original_model :
+            An instance of a solver's model class (e.g., Gurobi's ``gurobipy.Model``).
+        master_vars : list[str]
+            A list of variable names that are considered master problem variables.
 
         Returns
         ---------------
@@ -340,7 +379,11 @@ class SolverBase(ABC):
         ---------------
         .. code-block:: python
 
-                sub_model = solver.make_sub_problem(['x1', 'x2'])
+                from benderslib.solvers import Gurobi
+
+                original_model = ...
+                # It is a static method, which can be called without initializing an instance
+                master_model = Gurobi.make_master_problem(original_model, ['x1', 'x2'])
         """
         ...
 

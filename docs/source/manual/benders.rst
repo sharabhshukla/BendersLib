@@ -200,13 +200,14 @@ This attribute is an instance of the :class:`BendersResult` class.
 
     See :class:`BendersResult` for all available statistics.
 
+.. _manual_decompose_solve:
+
 Automated Decomposition
 -------------------------------------------
 
 BendersLib provides an automated decomposition feature through the :class:`AnnotationBenders` class.
-This allows you to decompose a problem by simply providing the original model and specifying the complicating variables.
+This allows you to decompose a problem by simply providing the original model and specifying the complicating/master variables.
 BendersLib will then automatically create the master problem and subproblem.
-
 Here's how to use the automated decomposition feature.
 
 .. code-block:: python
@@ -233,8 +234,8 @@ Here's how to use the automated decomposition feature.
     benders_solver = AnnotationBenders(
         original_problem=original_problem,
         solver=Gurobi,
-        complicating_vars=complicating_vars,
         benders=ClassicalBenders,
+        complicating_vars=complicating_vars,
     )
 
     # Solve the problem

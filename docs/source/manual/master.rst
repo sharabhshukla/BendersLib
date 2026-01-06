@@ -57,24 +57,14 @@ Create a Master Problem from an Annotated Model
 
 Alternatively, you can create a master/sub problem by decomposing an existing model.
 This is useful when you have a complete model and want to apply Benders decomposition.
-The :class:`AnnotationBenders` class provides a static method :meth:`AnnotationBenders._decompose`
-that splits a model into a master problem and a subproblem based on a list of complicating variables.
-The logic generally follows these steps.
-
-**Master Problem Creation**
-    *   **Variables**: Only the user-specified ``complicating_vars`` are included in the master problem. Their original properties (type, bounds, etc.) are preserved.
-    *   **Constraints**: Only the constraints from the original model that exclusively involve the ``complicating_vars`` are added to the master problem.
-    *   **Objective**: The objective function of the master problem only includes the parts of the original objective that correspond to the ``complicating_vars``. An additional "estimator" variable (e.g., theta) is typically added to represent the future cost of the subproblem.
-
-**Subproblem Creation**
-    *   **Variables**: All variables from the original model are included. However, the ``complicating_vars`` are treated as fixed parameters (their values will be provided by the master problem's solution in each iteration).
-    *   **Constraints**: All constraints from the original model are included, *except* for those that only involve the ``complicating_vars`` (which were moved to the master problem).
-    *   **Objective**: The objective function of the subproblem includes the parts of the original objective that correspond to the non-complicating variables.
-
+The :class:`AnnotationBenders` class provides a static method :meth:`~AnnotationBenders._decompose`
+that splits a model into a master problem and a subproblem based on a list of master variable names.
+Refer to :meth:`SolverBase.make_master_problem` and :meth:`SolverBase.make_sub_problem` for the logic
+of creating master and sub problems.
 Here is an example of how to create a master/sub problem from an annotated model.
 
 .. code-block:: python
-    :emphasize-lines: 16-
+    :emphasize-lines: 17-
 
     from gurobipy import Model, GRB
     from benderslib import MasterProblem, SubProblem, AnnotationBenders
@@ -96,7 +86,7 @@ Here is an example of how to create a master/sub problem from an annotated model
     master_model, sub_model = AnnotationBenders._decompose(
         original_model,
         Gurobi,
-        complicating_vars,
+        master_vars=complicating_vars,
         solver_model=True  # Return a solver model
         # solver_model=False  # (Default) Return a MasterProblem instance directly
     )
@@ -107,7 +97,8 @@ Here is an example of how to create a master/sub problem from an annotated model
 
 .. seealso::
 
-    **Executable Examples**: :doc:`../examples/annotation_benders`, :doc:`../examples/decompose`
+    - :ref:`manual_decompose_solve`
+    - **Executable Examples**: :doc:`../examples/annotation_benders`, :doc:`../examples/decompose`
 
 .. _manual_master_add_cut:
 

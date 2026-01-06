@@ -1,7 +1,7 @@
 # coding:utf-8
 
 class BendersConsts:
-    """Immutable Constants used in BendersLib.
+    """Immutable constants used in BendersLib.
 
     The constants can be used like ``CST.OPTIMAL``, where ``CST`` is a global alias
     for ``BendersConsts``.
