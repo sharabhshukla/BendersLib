@@ -41,23 +41,24 @@ class Copt(SolverBase):
         self._all_vars = [v.getName() for v in variables]
         self._bin_vars = [v for v, t in zip(self._all_vars, vtypes) if t == COPT.BINARY]
         self._int_vars = [v for v, t in zip(self._all_vars, vtypes) if t == COPT.INTEGER]
-        self._var_bounds = {v: (lb, ub) for v, lb, ub in zip(self._all_vars, lbs, ubs) if
-                            lb != 0 or ub != COPT.INFINITY}
+        self._var_bounds = {v: (lb, ub) for v, lb, ub in zip(self._all_vars, lbs, ubs)
+                            if lb != 0 or ub != COPT.INFINITY}
         self.__standardize()
         self._rhs = self.get_rhs()
 
     def __standardize(self):
-        # self.__sense_to_minimize()
+        self.__sense_to_minimize()
         self.__bounds_to_constrs()
 
     def __sense_to_minimize(self):
         # BendersLib will automatically convert maximization problems to minimization problems
         if self.model.objsense == COPT.MAXIMIZE:
-            self.model.setObjective(-self.model.getObjective(), sense=COPT.MINIMIZE)
+            raise NotImplementedError("BendersLib currently only supports minimization problems.")
+            # self.model.setObjective(-self.model.getObjective(), sense=COPT.MINIMIZE)
 
     def __bounds_to_constrs(self):
         if any([lb < 0 or ub < 0 for lb, ub in self._var_bounds.values()]):
-            raise ValueError("COPT interface currently only supports non-negative variable bounds.")
+            raise NotImplementedError("BendersLib currently only supports non-negative variable bounds.")
 
         # BendersLib will automatically convert variable bounds to explicit constraints
         for var_name, (lb, ub) in self._var_bounds.items():

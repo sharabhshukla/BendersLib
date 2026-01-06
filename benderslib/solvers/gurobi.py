@@ -41,23 +41,25 @@ class Gurobi(SolverBase):
         self._all_vars = self.model.getAttr('VarName', vars)
         self._bin_vars = [v for v, t in zip(self._all_vars, vtypes) if t == GRB.BINARY]
         self._int_vars = [v for v, t in zip(self._all_vars, vtypes) if t == GRB.INTEGER]
-        self._var_bounds = {v: (lb, ub) for v, lb, ub in zip(self._all_vars, lbs, ubs) if lb != 0 or ub != GRB.INFINITY}
+        self._var_bounds = {v: (lb, ub) for v, lb, ub in zip(self._all_vars, lbs, ubs)
+                            if lb != 0 or ub != GRB.INFINITY}
         self.__standardize()
         self._rhs = self.get_rhs()
 
     def __standardize(self):
-        # self.__sense_to_minimize()
+        self.__sense_to_minimize()
         self.__bounds_to_constrs()
         self.model.update()
 
     def __sense_to_minimize(self):
         # BendersLib will automatically convert maximization problems to minimization problems
         if self.model.ModelSense == GRB.MAXIMIZE:
-            self.model.setObjective(-self.model.getObjective(), sense=GRB.MINIMIZE)
+            raise NotImplementedError("BendersLib currently only supports minimization problems.")
+            # self.model.setObjective(-self.model.getObjective(), sense=GRB.MINIMIZE)
 
     def __bounds_to_constrs(self):
         if any([lb < 0 or ub < 0 for lb, ub in self._var_bounds.values()]):
-            raise ValueError("Gurobi interface currently only supports non-negative variable bounds.")
+            raise NotImplementedError("BendersLib currently only supports non-negative variable bounds.")
 
         # BendersLib will automatically convert variable bounds to explicit constraints
         for var_name, (lb, ub) in self._var_bounds.items():
