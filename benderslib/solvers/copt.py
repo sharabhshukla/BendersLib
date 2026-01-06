@@ -48,13 +48,12 @@ class Copt(SolverBase):
 
     def __standardize(self):
         # self.__sense_to_minimize()
-        # self.__bounds_to_constrs()
-        ...
+        self.__bounds_to_constrs()
 
     def __sense_to_minimize(self):
         # BendersLib will automatically convert maximization problems to minimization problems
         if self.model.objsense == COPT.MAXIMIZE:
-            self.model.setObjective(self.model.getObjective(), sense=COPT.MINIMIZE)
+            self.model.setObjective(-self.model.getObjective(), sense=COPT.MINIMIZE)
 
     def __bounds_to_constrs(self):
         if any([lb < 0 or ub < 0 for lb, ub in self._var_bounds.values()]):
@@ -159,7 +158,7 @@ class Copt(SolverBase):
         self.model.setParam(COPT.Param.Logging, 0)
         self.model.setParam(COPT.Param.LogToConsole, 0)
 
-        # Request Farkas dual for infeasibility model
+        # Request Farkas dual for infeasible problems
         self.model.setParam(COPT.Param.ReqFarkasRay, 1)
 
         self.model.solve()
@@ -170,11 +169,55 @@ class Copt(SolverBase):
         }
         self.status = _copt_status_map.get(self.model.status, CST.ERROR)
 
-    def make_master_problem(self, complicating_vars: list[str]) -> object:
-        raise NotImplementedError("Automatic master problem creation is not implemented for COPT.")
+    @staticmethod
+    def make_master_problem(original_model: Model, master_vars: list[str]) -> Model:
+        master = original_model.clone()
 
-    def make_sub_problem(self, complicating_vars: list[str]) -> object:
-        raise NotImplementedError("Automatic subproblem creation is not implemented for COPT.")
+        # Non-master variables
+        non_master_vars = set(v.getName() for v in master.getVars()) - set(master_vars)
+
+        # Remove non-master variables
+        for var_name in non_master_vars:
+            var = master.getVarByName(var_name)
+            master.remove(var)
+
+        # Remove constraints that contains non-master variables
+        for constr in master.getConstrs():
+            expr = master.getRow(constr)
+            contains_non_master = False
+            for i in range(expr.getSize()):
+                var = expr.getVar(i)
+                if var.getName() in non_master_vars:
+                    contains_non_master = True
+                    break
+            if contains_non_master:
+                master.remove(constr)
+
+        return master
+
+    @staticmethod
+    def make_sub_problem(original_model: Model, master_vars: list[str]) -> Model:
+        sub = original_model.clone()
+
+        # Set master variables to continuous & remove them from objective
+        for var_name in master_vars:
+            var = sub.getVarByName(var_name)
+            var.vtype = COPT.CONTINUOUS
+            var.obj = 0
+
+        # Remove constraints that contains only master variables
+        for constr in sub.getConstrs():
+            expr = sub.getRow(constr)
+            is_master_only = True
+            for i in range(expr.getSize()):
+                var = expr.getVar(i)
+                if var.getName() not in master_vars:
+                    is_master_only = False
+                    break
+            if is_master_only:
+                sub.remove(constr)
+
+        return sub
 
 
 if __name__ == '__main__':

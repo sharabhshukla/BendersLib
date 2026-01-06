@@ -46,7 +46,7 @@ class Gurobi(SolverBase):
         self._rhs = self.get_rhs()
 
     def __standardize(self):
-        self.__sense_to_minimize()
+        # self.__sense_to_minimize()
         self.__bounds_to_constrs()
         self.model.update()
 
@@ -197,7 +197,7 @@ class Gurobi(SolverBase):
             var = master.getVarByName(var_name)
             master.remove(var)
 
-        # remove constraints that contains non-master variables
+        # Remove constraints that contains non-master variables
         for constr in master.getConstrs():
             row = master.getRow(constr)
             contains_non_master = False
