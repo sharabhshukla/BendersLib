@@ -50,3 +50,48 @@ For example, if you are using :class:`~.solvers.Gurobi`, you can access the Guro
 .. seealso::
 
     Refer to the :ref:`documentation of the specific solver <solver-table>` for more available attributes.
+
+How to build master/sub problems from a monolithic model?
+--------------------------------------------------------------
+
+BendersLib offers two ways to decompose a monolithic optimization model into master and sub problems.
+You can either use the :meth:`AnnotationBenders._decompose` method,
+or the solver-specific methods like :meth:`~.SolverBase.make_master_problem` and :meth:`~.SolverBase.make_sub_problem`.
+The following example demonstrates both approaches.
+
+.. code-block:: python
+
+    from benderslib import AnnotationBenders, MasterProblem, SubProblem
+    from gurobipy import Model, GRB
+
+    # Use other solver interfaces (e.g., Copt, etc) as needed
+    from benderslib.solvers import Gurobi
+
+    # Create a standard Gurobi model
+    model = Model()
+    x = model.addVar(name="x", vtype=GRB.INTEGER)
+    y = model.addVar(name="y", vtype=GRB.CONTINUOUS)
+    model.addConstr(x + y >= 15)
+    model.addConstr(2 * x + 5 * y >= 30)
+    model.setObjective(3 * x + 4 * y)
+    model.update()
+
+    # Define master variables for decomposition
+    master_vars = ["x"]
+
+    # Approach 1:
+    master_problem, sub_problem = AnnotationBenders._decompose(
+        original_problem=model,
+        solver=Gurobi,
+        master_vars=master_vars,
+        # You can also get the raw solver models
+        # solver_model=True
+    )
+
+    # Approach 2:
+    master_model_manual = Gurobi.make_master_problem(model, master_vars)
+    sub_model_manual = Gurobi.make_sub_problem(model, master_vars)
+
+    # These models can then be used to create MasterProblem and SubProblem instances
+    master_problem_manual = MasterProblem(Gurobi(master_model_manual))
+    sub_problem_manual = SubProblem(Gurobi(sub_model_manual))
