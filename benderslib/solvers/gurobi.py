@@ -49,7 +49,6 @@ class Gurobi(SolverBase):
     def __standardize(self):
         self.__sense_to_minimize()
         self.__bounds_to_constrs()
-        self.model.update()
 
     def __sense_to_minimize(self):
         # BendersLib will automatically convert maximization problems to minimization problems
@@ -70,6 +69,8 @@ class Gurobi(SolverBase):
             if ub < GRB.INFINITY:
                 self.model.addConstr(var <= ub)
                 var.ub = GRB.INFINITY
+
+        self.model.update()
 
     def add_estimators(self, estimators: list[str], prob: list[float] = None, lb: float = 0) -> None:
         if prob is None:
