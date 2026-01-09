@@ -114,10 +114,10 @@ if __name__ == "__main__":
     random.seed(1)
     price = [random.randrange(10, 50) for _ in range(warehouse_num)]
     demand = [random.randrange(20, 100) for _ in range(warehouse_num)]
-    budget = 500
-    max_shortage_ratio = 1000
+    budget = 50000
+    max_shortage_ratio = .8
     linear_obj = False
-    linear_con = False
+    linear_con = True
 
     # Create master problem
     master_problem_model, complicating_vars = create_master_problem(warehouse_num, price, budget)
@@ -131,13 +131,13 @@ if __name__ == "__main__":
     benders = GeneralizedBenders(
         master_problem=master_problem,
         sub_problem=sub_problem,
-        complicating_vars=complicating_vars,
-        feasibility_cut=ClassicalFCGen
+        complicating_vars=complicating_vars
     )
     benders.solve()
 
     # Complete model for validation
-    complete_model = create_complete_model(warehouse_num, price, budget, demand, max_shortage_ratio, linear_obj, linear_con)
+    complete_model = create_complete_model(
+        warehouse_num, price, budget, demand, max_shortage_ratio, linear_obj, linear_con)
     complete_model.optimize()
     if complete_model.Status == GRB.OPTIMAL:
         print(f"\nComplete model objective: {complete_model.ObjVal:.2f}")

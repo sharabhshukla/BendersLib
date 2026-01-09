@@ -431,9 +431,56 @@ class GeneralizedOC(OptimalityCut):
         super().__init__(vars=vars + [estimator], coefs=coefs + [1.0], rhs=cut_rhs, sense=">=", name="GeneralizedOC")
 
 
-class GeneralizedFC(FeasibilityCut):
-    """The feasibility cut for :doc:`../tutorials/gbd`."""
-    ...
+class GeneralizedFC(ClassicalFC):
+    """The feasibility cut for :doc:`../tutorials/gbd`.
+
+    The cut is derived from an extreme ray of the subproblem, which acts as a certificate of infeasibility.
+    It is defined as follows to cut off the region of master solutions that leads to this infeasibility.
+
+    .. math::
+        0 \\geq \\bar{r}^T (b - A x)
+
+    where :math:`\\bar{r}` is an extreme ray of the dual subproblem, :math:`A` and :math:`b` are the matrices
+    that define the subproblem constraints, and :math:`x` are the complicating variables.
+    This cut is a direct application of Farkas' Lemma. The extreme ray :math:`\\bar{r}` is typically
+    provided by the LP solver when it determines the primal subproblem is infeasible
+    (and thus the dual is unbounded). It informs the master problem that any future choice of :math:`x`
+    violating this constraint will also result in an infeasible subproblem.
+
+    Parameters
+    ----------
+    vars : list[str]
+        A list of complicating variable names.
+    var_coefs : dict
+        A dictionary mapping complicating variable names to their coefficients in the subproblem constraints.
+    extreme_ray : list
+        A list representing an extreme ray of the subproblem's feasible region.
+    rhs : list
+        A list of right-hand side values of the subproblem constraints.
+
+    Example
+    ----------
+
+    .. code-block:: python
+
+        from benderslib import GeneralizedFC
+
+        # Assuming we have the following data from the subproblem
+        vars = ['x1', 'x2']         # Complicating variables
+        var_coefs = {
+            'x1': [2, 3],           # Coefficients of x1 in subproblem constraints
+            'x2': [1, 4],           # Coefficients of x2 in subproblem constraints
+        }
+        extreme_ray = [1.0, 0.5]    # Extreme ray from the dual subproblem
+        rhs = [10, 20]              # Right-hand side values of the subproblem constraints
+
+        # Create the feasibility cut
+        cut = GeneralizedFC(vars, var_coefs, extreme_ray, rhs)
+    """
+
+    def __init__(self, vars: list[str], var_coefs: dict, extreme_ray: list, rhs: list):
+        super().__init__(vars, var_coefs, extreme_ray, rhs)
+        self.name = "GeneralizedFC"
 
 
 class ClassicalOCGen(CutGenerator):
@@ -704,9 +751,15 @@ class GeneralizedFCGen(CutGenerator):
     def __init__(self, master_problem, sub_problem, params):
         super().__init__(master_problem, sub_problem, params)
 
-    def generate(self) -> list[GeneralizedFC]:
+        self.var_coefs = sub_problem.get_var_coefs(self._complicating_vars)
+        self.rhs = sub_problem.get_rhs()
+
+    def generate(self) -> list[ClassicalFC]:
         """This method generates :class:`GeneralizedFC` feasibility cuts."""
-        ...
+        extreme_ray = self._sub_problem.get_extreme_ray()
+
+        cut = GeneralizedFC(self._complicating_vars, self.var_coefs, extreme_ray, self.rhs)
+        return [cut]
 
 
 if __name__ == '__main__':
