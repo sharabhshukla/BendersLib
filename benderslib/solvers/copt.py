@@ -122,13 +122,33 @@ class Copt(SolverBase):
         return rhs
 
     def get_dual_values(self) -> list[float]:
+        # ONLY available for LP problems
         return self.model.getDuals()
 
     def get_extreme_ray(self) -> list[float]:
-        ray = self.model.getInfo(COPT.Info.DualFarkas, self.model.getConstrs())
-        # COPT returns Farkas Dual with opposite sign to Gurobi
-        ray = [-r for r in ray]
-        return ray
+        has_nl_cons = not self.model.getAttr("Rows") == len(self.model.getConstrs())
+
+        if has_nl_cons:
+            raise Exception("Unable to obtain FarkasDual from COPT model with nonlinear constraints.")
+
+        else:
+            has_nl_obj = (
+                    self.model.getAttr("HasQObj")
+                    or self.model.getAttr("HasNLObj")
+                    or self.model.getAttr("HasPSDObj")
+            )
+
+            if has_nl_obj:
+                _m = self.model.clone()
+                _m.setObjective(0, sense=COPT.MINIMIZE)
+                _m.solve()
+                ray = _m.getInfo(COPT.Info.DualFarkas, _m.getConstrs())
+            else:
+                ray = self.model.getInfo(COPT.Info.DualFarkas, self.model.getConstrs())
+
+            # COPT returns Farkas Dual with opposite sign to Gurobi
+            ray = [-r for r in ray]
+            return ray
 
     def get_obj(self) -> float:
         return self.model.objval
