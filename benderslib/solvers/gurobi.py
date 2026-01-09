@@ -129,15 +129,20 @@ class Gurobi(SolverBase):
         return res
 
     def get_rhs(self) -> list[float]:
-        return self.model.getAttr('RHS', self.model.getConstrs())
+        l_rhs = self.model.getAttr('RHS', self.model.getConstrs())
+        q_rhs = self.model.getAttr('QCRHS', self.model.getQConstrs())
+        return l_rhs + q_rhs
 
     def get_dual_values(self) -> list[float]:
-        return self.model.getAttr('Pi', self.model.getConstrs())
+        l_dual = self.model.getAttr('Pi', self.model.getConstrs())
+        q_dual = self.model.getAttr('QCPi', self.model.getQConstrs())
+        return l_dual + q_dual
 
     def get_extreme_ray(self) -> list[float]:
         if self.model.IsQCP:
             # FarkasDual cannot be obtained from Quadratically Constrained models
-            raise Exception("FarkasDual is only available for linear model from Gurobi, QCP is given.")
+            raise Exception("Unable to obtain FarkasDual from Gurobi model with quadratic constraints.")
+
         elif self.model.IsQP:
             # For model with only quadratic objective and linear constraints,
             # FarkasDual can be obtained by solving a linear system with zero objective.
@@ -145,6 +150,7 @@ class Gurobi(SolverBase):
             _m.setObjective(0)
             _m.computeIIS()
             return _m.FarkasDual
+
         else:
             # For linear models, FarkasDual can be directly obtained after optimization
             return self.model.FarkasDual
@@ -178,7 +184,7 @@ class Gurobi(SolverBase):
         self.model.Params.DualReductions = 0
 
         # QCPi requires QCPDual = 1
-        # self.model.Params.QCPDual = 1
+        self.model.Params.QCPDual = 1
 
         self.model.optimize()
 

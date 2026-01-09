@@ -47,14 +47,13 @@ def create_master_problem(warehouse_num, price, budget):
     return model, complicating_vars
 
 
-def create_sub_problem(warehouse_num, demand, max_shortage_ratio, liner=False):
+def create_sub_problem(warehouse_num, demand, max_shortage_ratio, linear_obj, linear_con):
     model = gp.Model("subproblem")
     shortage = model.addVars(range(warehouse_num), lb=0, vtype=GRB.CONTINUOUS, name="shortage")
-    # NOTICE: Complicating variables should be continuous for obtaining Constr.Pi from Gurobi
     inventory = model.addVars(range(warehouse_num), vtype=GRB.CONTINUOUS, name="inventory")
 
     # Objective: minimize shortage cost
-    if liner:
+    if linear_obj:
         model.setObjective(gp.quicksum(shortage[i] for i in range(warehouse_num)), GRB.MINIMIZE)
     else:
         model.setObjective(gp.quicksum(shortage[i] * shortage[i] for i in range(warehouse_num)), GRB.MINIMIZE)
@@ -63,7 +62,10 @@ def create_sub_problem(warehouse_num, demand, max_shortage_ratio, liner=False):
     model.addConstrs(shortage[i] >= demand[i] - inventory[i] for i in range(warehouse_num))
 
     # Constraints: limit maximum shortage ratio
-    model.addConstrs(shortage[i] <= max_shortage_ratio * demand[i] for i in range(warehouse_num))
+    if linear_con:
+        model.addConstrs(shortage[i] <= max_shortage_ratio * demand[i] for i in range(warehouse_num))
+    else:
+        model.addConstrs(shortage[i] * shortage[i] <= max_shortage_ratio * demand[i] for i in range(warehouse_num))
 
     model.update()
     return model
@@ -71,7 +73,7 @@ def create_sub_problem(warehouse_num, demand, max_shortage_ratio, liner=False):
 
 # %%
 # Define complete model for validation:
-def create_complete_model(warehouse_num, price, budget, demand, max_shortage_ratio, liner=False):
+def create_complete_model(warehouse_num, price, budget, demand, max_shortage_ratio, linear_obj, linear_cone):
     model = gp.Model("complete")
 
     # Variables from master and subproblem
@@ -85,11 +87,14 @@ def create_complete_model(warehouse_num, price, budget, demand, max_shortage_rat
     model.addConstrs(shortage[i] >= demand[i] - x[i] for i in range(warehouse_num))
 
     # Constraints from subproblem: limit maximum shortage ratio
-    model.addConstrs(shortage[i] <= max_shortage_ratio * demand[i] for i in range(warehouse_num))
+    if linear_con:
+        model.addConstrs(shortage[i] <= max_shortage_ratio * demand[i] for i in range(warehouse_num))
+    else:
+        model.addConstrs(shortage[i] * shortage[i] <= max_shortage_ratio * demand[i] for i in range(warehouse_num))
 
     # Combined objective
     master_obj = gp.quicksum(price[i] * x[i] for i in range(warehouse_num))
-    if liner:
+    if linear_obj:
         sub_obj = gp.quicksum(shortage[i] for i in range(warehouse_num))
     else:
         sub_obj = gp.quicksum(shortage[i] * shortage[i] for i in range(warehouse_num))
@@ -110,20 +115,19 @@ if __name__ == "__main__":
     price = [random.randrange(10, 50) for _ in range(warehouse_num)]
     demand = [random.randrange(20, 100) for _ in range(warehouse_num)]
     budget = 500
-    max_shortage_ratio = 1
+    max_shortage_ratio = 1000
     linear_obj = False
+    linear_con = False
 
     # Create master problem
     master_problem_model, complicating_vars = create_master_problem(warehouse_num, price, budget)
     master_problem = MasterProblem(Gurobi(master_problem_model))
 
     # Create sub problem
-    sub_problem_model = create_sub_problem(warehouse_num, demand, max_shortage_ratio, linear_obj)
+    sub_problem_model = create_sub_problem(warehouse_num, demand, max_shortage_ratio, linear_obj, linear_con)
     sub_problem = SubProblem(Gurobi(sub_problem_model))
 
     # Create Benders decomposition instance
-    # NOTICE: When linear = True, both ClassicalBenders and GeneralizedBenders can be used.
-    # NOTICE: When linear = False, only GeneralizedBenders can be used, because ClassicalOC requires LP subproblem
     benders = GeneralizedBenders(
         master_problem=master_problem,
         sub_problem=sub_problem,
@@ -133,7 +137,7 @@ if __name__ == "__main__":
     benders.solve()
 
     # Complete model for validation
-    complete_model = create_complete_model(warehouse_num, price, budget, demand, max_shortage_ratio, linear_obj)
+    complete_model = create_complete_model(warehouse_num, price, budget, demand, max_shortage_ratio, linear_obj, linear_con)
     complete_model.optimize()
     if complete_model.Status == GRB.OPTIMAL:
         print(f"\nComplete model objective: {complete_model.ObjVal:.2f}")
