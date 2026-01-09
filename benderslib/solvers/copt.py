@@ -100,16 +100,11 @@ class Copt(SolverBase):
         return {var_name: self.model.getVarByName(var_name).x for var_name in vars_to_get}
 
     def get_var_coefs(self, vars: list[str] | None = None) -> dict[str, list]:
-        A_matrix = self.model.getA()
-        model_vars = self.model.getVars()
-        var_to_col_idx = {v.name: i for i, v in enumerate(model_vars)}
-        vars_to_process = vars or self._all_vars
         res = {}
-        for v_name in vars_to_process:
-            col_idx = var_to_col_idx.get(v_name)
-            if col_idx is not None:
-                var_coeffs = A_matrix[:, col_idx]
-                res[v_name] = var_coeffs.toarray().flatten().tolist()
+        for v in vars:
+            var = self.model.getVarByName(v)
+            coefs = [self.model.getCoeff(cons, var) for cons in self.model.getConstrs()]
+            res[v] = coefs
         return res
 
     def get_rhs(self) -> list[float]:
