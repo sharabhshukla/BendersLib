@@ -14,16 +14,16 @@ class ClassicalOC(OptimalityCut):
 
     In this cut, :math:`\\eta` is the variable representing the subproblem's cost, :math:`\\bar{\\pi}` is the optimal solution
     to the dual subproblem (dual values of primal constraints), :math:`A` and :math:`b` are the matrices that define
-    the subproblem constraints, and :math:`x` are the master problem variables.
+    the subproblem constraints, and :math:`x` are the complicating variables.
     This cut can be interpreted as a first-order Taylor approximation or a supporting hyperplane for the value
     function of the subproblem.
 
     Parameters
     ----------
     vars : list[str]
-        A list of variable names of the complicating variables.
+        A list of complicating variable names.
     var_coefs : dict
-        A dictionary mapping variable names to their coefficients in the subproblem constraints.
+        A dictionary mapping complicating variable names to their coefficients in the subproblem constraints.
     dual_values : list
         A list of dual variable values obtained from solving the subproblem.
     rhs : list
@@ -68,7 +68,7 @@ class ClassicalFC(FeasibilityCut):
         0 \\geq \\bar{r}^T (b - A x)
 
     where :math:`\\bar{r}` is an extreme ray of the dual subproblem, :math:`A` and :math:`b` are the matrices
-    that define the subproblem constraints, and :math:`x` are the master problem variables.
+    that define the subproblem constraints, and :math:`x` are the complicating variables.
     This cut is a direct application of Farkas' Lemma. The extreme ray :math:`\\bar{r}` is typically
     provided by the LP solver when it determines the primal subproblem is infeasible
     (and thus the dual is unbounded). It informs the master problem that any future choice of :math:`x`
@@ -77,9 +77,9 @@ class ClassicalFC(FeasibilityCut):
     Parameters
     ----------
     vars : list[str]
-        A list of variable names of the complicating variables.
+        A list of complicating variable names.
     var_coefs : dict
-        A dictionary mapping variable names to their coefficients in the subproblem constraints.
+        A dictionary mapping complicating variable names to their coefficients in the subproblem constraints.
     extreme_ray : list
         A list representing an extreme ray of the subproblem's feasible region.
     rhs : list
@@ -93,13 +93,13 @@ class ClassicalFC(FeasibilityCut):
         from benderslib import ClassicalFC
 
         # Assuming we have the following data from the subproblem
-        vars = ['x1', 'x2']  # Complicating variables
+        vars = ['x1', 'x2']         # Complicating variables
         var_coefs = {
-            'x1': [2, 3],  # Coefficients of x1 in subproblem constraints
-            'x2': [1, 4],  # Coefficients of x2 in subproblem constraints
+            'x1': [2, 3],           # Coefficients of x1 in subproblem constraints
+            'x2': [1, 4],           # Coefficients of x2 in subproblem constraints
         }
-        extreme_ray = [1.0, 0.5]  # Extreme ray from the dual subproblem
-        rhs = [10, 20]  # Right-hand side values of the subproblem constraints
+        extreme_ray = [1.0, 0.5]    # Extreme ray from the dual subproblem
+        rhs = [10, 20]              # Right-hand side values of the subproblem constraints
 
         # Create the feasibility cut
         cut = ClassicalFC(vars, var_coefs, extreme_ray, rhs)
@@ -363,7 +363,7 @@ class GeneralizedOC(OptimalityCut):
     This cut uses the Lagrange multipliers from the subproblem to form a valid lower bound
     on the subproblem's cost, represented by the variable :math:`\\eta` in the master problem.
     It is assumed that the original problem is linearly separable into master and subproblem components,
-    and the constraints (and objective) of the master problem are linear.
+    and the constraints of the master problem are linear.
     These assumptions are necessary for **linear** generalized optimality cuts.
 
     .. math::
@@ -373,17 +373,18 @@ class GeneralizedOC(OptimalityCut):
     :math:`\\eta` is the variable representing the subproblem's cost.
     :math:`f_y(\\bar{y})` is the objective value of the subproblem given the current master problem solution :math:`\\bar{x}`.
     :math:`\\bar{\\lambda}` are the Lagrange multipliers (dual variable values) obtained from solving the subproblem.
-    :math:`A` is the matrix that defines the subproblem constraints, and :math:`x` are the complicating variables.
+    :math:`A` represents the coefficients of complicating variables in the subproblem constraints,
+    and :math:`x` are the complicating variables.
 
     Parameters
     ----------
 
     vars : list[str]
-        A list of variable names of the complicating variables.
+        A list of complicating variable names.
     var_values : dict[str, float]
         A dictionary mapping variable names to their current values in the master problem.
     var_coefs : dict[str, list[float]]
-        A dictionary mapping variable names to their coefficients in the subproblem constraints.
+        A dictionary mapping complicating variable names to their coefficients in the subproblem constraints.
     sub_obj : float
         The objective value of the subproblem given the current master problem solution.
     multipliers : list[float]
