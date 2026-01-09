@@ -28,6 +28,8 @@ class ClassicalOC(OptimalityCut):
         A list of dual variable values obtained from solving the subproblem.
     rhs : list
         A list of right-hand side values of the subproblem constraints.
+    estimator : str, optional
+        The name of the master problem variable representing the subproblem's cost.
 
     Example
     ----------
@@ -216,7 +218,7 @@ class CombinatorialOC(OptimalityCut):
     big_m : float, optional, default=sub_obj
         A large constant used in the cut formulation.
     estimator : str, optional
-        The name of the master problem variable representing the future cost.
+        The name of the master problem variable representing the subproblem's cost.
 
     Example
     ----------
@@ -285,8 +287,8 @@ class LShapedOC(OptimalityCut):
     var_coefs_list : list[dict]
         A list of dictionaries. Each dictionary maps variable names to their
         coefficient lists :math:`T_ω` for a scenario.
-    estimator : str
-        The name of the master problem variable representing the future cost.
+    estimator : str, optional
+        The name of the master problem variable representing the subproblem's cost.
 
     Example
     ----------
