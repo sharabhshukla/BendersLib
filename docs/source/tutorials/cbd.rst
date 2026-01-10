@@ -195,7 +195,9 @@ as this is problem-dependent and crucial for the algorithm's efficiency.
     *   Rahmaniani et al. [5]_ discussed Benders decomposition with discrete subproblems.
     *   Combinatorial Benders Decomposition is suitable for what kind of problems: `StackExchange/OR <https://or.stackexchange.com/questions/185/how-to-determine-if-a-given-problem-seems-to-be-a-good-fit-to-be-solved-using-co>`_
     *   Combinatorial Benders Decomposition for assembly line balancing (without using BendersLib): `GitHub/hw23 <https://github.com/phguo/hw23>`_
-    *   **Examples**: :doc:`../examples/cbd`, :doc:`../examples/cbd_iis`
+    *   BendersLib's implementation of optimality and feasibility cuts: :class:`CombinatorialOC` and :class:`NoGoodFC`.
+    *   BendersLib's implementation of the Benders method: :class:`CombinatorialBenders`.
+    *   **Examples**: :doc:`../examples/cbd` and :doc:`../examples/cbd_iis`.
 
 References
 --------------------------------------------

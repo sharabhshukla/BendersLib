@@ -274,10 +274,13 @@ Users may formulate their problems to deterministic equivalents manually for com
 
 .. seealso::
     * Birge and Louveaux [#]_ and Shapiro et al. [#]_ provide textbooks on stochastic programming, covering the L-shaped method.
-    * BendersLib's implementation of the L-shaped optimality: :class:`LShapedOC` (single-cut) and :class:`ClassicalOC` (multi-cut).
+    * BendersLib's implementation of the L-shaped optimality cuts:
+      :class:`LShapedOC` (single-cut & linear recourse), :class:`ClassicalOC` (multi-cut & linear recourse),
+      :class:`GeneLShapedOC` (single-cut & convex recourse), and :class:`GeneralizedOC` (multi-cut & convex recourse).
     * BendersLib's implementation of the feasibility cut: :class:`ClassicalFC`.
-    * BendersLib's implementation of the Benders algorithm: :func:`BendersSolver.solve`.
-    * **Example**: :doc:`../examples/lshape`.
+    * BendersLib's implementation of the L-shaped methods:
+      :class:`LShaped` (linear recourse) and :class:`GeneLShaped` (convex recourse).
+    * **Examples**: :doc:`../examples/lshape` and :doc:`../examples/glshape`.
 
 
 References

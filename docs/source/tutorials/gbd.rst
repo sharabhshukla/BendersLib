@@ -413,6 +413,8 @@ and specify which variables are complicating variables.
     - See :doc:`classical` for basic concepts of Benders decomposition.
     - An in-depth introduction to `GBD theory <https://mp.weixin.qq.com/s/cmxRNhrlIzEiJi2PTtUOOA>`_ (in Chinese).
     - **Papers using GBD**: facility location [#]_; budgeting [#]_; inventory management [#]_.
+    - BendersLib's implementation of optimality and feasibility cuts: :class:`GeneralizedOC` and :class:`GeneralizedFC`.
+    - BendersLib's implementation of the Benders method: :class:`GeneralizedBenders`.
     - **Example**: :doc:`../examples/gbd`.
 
 References
