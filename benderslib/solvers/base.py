@@ -66,10 +66,10 @@ class SolverBase(ABC):
         prob : list[float]
             A list of probabilities (weights) associated with each estimator variable.
             The length of ``prob`` should match that of ``estimators``.
-            If None, equal weights are assigned to all estimator variables.
+            If ``None``, equal weights are assigned to all estimator variables.
             Note that the sum of probabilities does not need to equal 1.
         lb : float
-            The lower bound for the estimator variables. Default is 0.
+            The lower bound for the estimator variables. Default is ``0.0``.
 
         Example
         ---------------
@@ -130,7 +130,7 @@ class SolverBase(ABC):
         Parameters
         ---------------
         vars : list[str] or None
-            A list of variable names to retrieve values for. If None, retrieves values for all variables
+            A list of variable names to retrieve values for. If ``None``, retrieves values for all variables
 
         Returns
         ---------------
@@ -156,7 +156,7 @@ class SolverBase(ABC):
         Parameters
         ---------------
         vars : list[str] or None
-            A list of variable names to retrieve coefficients for. If None, retrieves coefficients for all variables.
+            A list of variable names to retrieve coefficients for. If ``None``, retrieves coefficients for all variables.
 
         Returns
         ---------------

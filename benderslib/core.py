@@ -137,10 +137,10 @@ class ProblemBase:
         prob : list[float]
             A list of probabilities (weights) associated with each estimator variable.
             The length of ``prob`` should match that of ``estimators``.
-            If None, equal weights are assigned to all estimator variables.
+            If ``None``, equal weights are assigned to all estimator variables.
             Note that the sum of probabilities does not need to equal 1.
         lb : float
-            The lower bound for the estimator variables. Default is 0.
+            The lower bound for the estimator variables. Default is ``0.0``.
 
         Example
         ---------------
@@ -201,7 +201,7 @@ class ProblemBase:
         Parameters
         ---------------
         vars : list[str] or None
-            A list of variable names to retrieve values for. If None, retrieves values for all variables
+            A list of variable names to retrieve values for. If ``None``, retrieves values for all variables
 
         Returns
         ---------------
@@ -227,7 +227,7 @@ class ProblemBase:
         Parameters
         ---------------
         vars : list[str] or None
-            A list of variable names to retrieve coefficients for. If None, retrieves coefficients for all variables.
+            A list of variable names to retrieve coefficients for. If ``None``, retrieves coefficients for all variables.
 
         Returns
         ---------------
@@ -359,13 +359,13 @@ class MasterProblem(ProblemBase):
         Parameters
         ----------
         multiple : bool, optional
-            If True, add multiple estimator variables (only for stochastic Benders);
-            if False, add a single estimator variable. Default is False.
+            If ``True``, add multiple estimator variables (only for stochastic Benders);
+            if ``False``, add a single estimator variable. Default is ``False``.
         prob : list[float], optional
-            A list of probabilities (or weights) for each estimator variable when `multiple` is True.
-            Default is None.
+            A list of probabilities (or weights) for each estimator variable when ``multiple`` is ``True``.
+            Default is ``None``.
         lb : float, optional
-            The lower bound for the estimator variable(s). Default is 0.0.
+            The lower bound for the estimator variable(s). Default is ``0.0``.
         """
         # Number of estimator variables
         _num = len(prob) if multiple else 1
@@ -643,7 +643,7 @@ class SubProblems:
         self.prob = prob or [1.0 / len(self.sub_problems)] * len(self.sub_problems)
         """A list of probabilities or weights associated with each subproblem. 
         
-        If None, equal weights are assumed.
+        If ``None``, equal weights are assumed.
         """
         self.params = None
         """The parameters that can be set by the user (see :class:`BendersParams`)."""
@@ -710,7 +710,7 @@ class SubProblems:
         Parameters
         ---------------
         vars : list[str], optional
-            A list of variable names to retrieve values for. If None, retrieves values for all variables.
+            A list of variable names to retrieve values for. If ``None``, retrieves values for all variables.
 
         Returns
         ---------------
@@ -733,7 +733,7 @@ class SubProblems:
     def solve(self) -> None:
         """Solve all subproblems and update the :attr:`status` attribute.
 
-        If any subproblem is infeasible and :attr:`BendersParams.multi_feas_cut` is `False`,
+        If any subproblem is infeasible and :attr:`BendersParams.multi_feas_cut` is ``False``,
         the solving process will stop early.
 
         It ise used by :meth:`BendersSolver.solve`.
@@ -964,12 +964,12 @@ class BendersSolver:
         An abstract class that inherits from :class:`CutGenerator` to be used for generating optimality
         cuts.
         It also accepts a function with signature ``func(master_problem, sub_problem) -> list[OptimalityCut]``.
-        If `None`, no optimality cuts will be added.
+        If ``None``, no optimality cuts will be added.
     feasibility_cut : Type[CutGenerator], optional
         An abstract class that inherits from :class:`CutGenerator` to be used for generating feasibility
         cuts.
         It also accepts a function with signature ``func(master_problem, sub_problem) -> list[FeasibilityCut]``.
-        If `None`, no feasibility cuts will be added.
+        If ``None``, no feasibility cuts will be added.
     params : BendersParams, optional
         The parameters that can be set by the user (see :class:`BendersParams`).
         If not provided, default parameters will be used.
@@ -1078,12 +1078,12 @@ class BendersSolver:
             An abstract class that inherits from :class:`CutGenerator` to be used for generating optimality
             cuts.
             It also accepts a function with signature ``func(master_problem, sub_problem) -> list[OptimalityCut]``.
-            If `None`, no optimality cuts will be added.
+            If ``None``, no optimality cuts will be added.
         feasibility_cut : Type[CutGenerator], optional
             An abstract class that inherits from :class:`CutGenerator` to be used for generating feasibility
             cuts.
             It also accepts a function with signature ``func(master_problem, sub_problem) -> list[FeasibilityCut]``.
-            If `None`, no feasibility cuts will be added.
+            If ``None``, no feasibility cuts will be added.
         prob : list[float], optional
             A list of probabilities (or weights) for each subproblem when using multiple subproblems (L-shaped method).
         params : BendersParams, optional

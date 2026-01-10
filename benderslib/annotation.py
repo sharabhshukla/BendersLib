@@ -137,8 +137,8 @@ class AnnotationBenders:
         master_vars: list[str]
             A list of variable names to be included in the master problem.
         solver_model: bool, optional
-            If True, return the master and subproblem in the solver-specific format;
-            If False, return instances of :class:`MasterProblem` and :class:`SubProblem`.
+            If ``True``, return the master and subproblem in the solver-specific format;
+            If ``False``, return instances of :class:`MasterProblem` and :class:`SubProblem`.
 
         Returns
         -------
