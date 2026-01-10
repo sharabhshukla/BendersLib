@@ -1,7 +1,7 @@
 # coding:utf-8
 
 from ..core import BendersParams, MasterProblem, SubProblems, BendersSolver
-from ..cut import LShapedFCGen, GeneLShapedOCGen
+from ..cuts import LShapedFCGen, GeneLShapedOCGen
 
 
 class GeneLShaped(BendersSolver):

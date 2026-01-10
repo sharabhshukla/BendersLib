@@ -1,7 +1,7 @@
 # coding:utf-8
 
 from ..core import BendersParams, MasterProblem, SubProblem, BendersSolver
-from ..cut import CombinatorialFCGen, CombinatorialOCGen
+from ..cuts import CombinatorialFCGen, CombinatorialOCGen
 
 
 class CombinatorialBenders(BendersSolver):

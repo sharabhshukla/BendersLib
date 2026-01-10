@@ -1,7 +1,7 @@
 # coding:utf-8
 
 from ..core import BendersParams, MasterProblem, SubProblems, BendersSolver
-from ..cut import IntegerLShapedOCGen, IntegerLShapedFCGen
+from ..cuts import IntegerLShapedOCGen, IntegerLShapedFCGen
 
 
 class IntegerLShaped(BendersSolver):

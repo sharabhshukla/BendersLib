@@ -32,7 +32,7 @@ from .core import (
     BendersSolver
 )
 
-from .cut import (
+from .cuts import (
     # Cut types
     ClassicalOC,
     ClassicalFC,

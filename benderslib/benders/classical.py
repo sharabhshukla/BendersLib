@@ -1,7 +1,7 @@
 # coding:utf-8
 
 from ..core import BendersParams, MasterProblem, SubProblem, BendersSolver
-from ..cut import ClassicalOCGen, ClassicalFCGen
+from ..cuts import ClassicalOCGen, ClassicalFCGen
 
 
 class ClassicalBenders(BendersSolver):
