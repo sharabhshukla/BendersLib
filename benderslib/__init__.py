@@ -9,14 +9,10 @@ __copyright__ = "Copyright 2025"
 
 from .consts import BendersConsts
 from .consts import BendersConsts as CST
+from .params import BendersParams
+from .result import BendersResult
 
-from .params import (
-    BendersParams,
-)
-
-from .solvers import (
-    SolverBase,
-)
+from .solvers import SolverBase
 
 from .core import (
     ProblemBase,
@@ -28,7 +24,6 @@ from .core import (
     OptimalityCut,
     FeasibilityCut,
     CutGenerator,
-    BendersResult,
     BendersSolver
 )
 
@@ -69,11 +64,13 @@ from .benders import (
 )
 
 __all__ = [
+    # Data
     "BendersConsts",
     "CST",
-
     "BendersParams",
+    "BendersResult",
 
+    # Solver
     "SolverBase",
 
     # Core
@@ -86,7 +83,6 @@ __all__ = [
     "OptimalityCut",
     "FeasibilityCut",
     "CutGenerator",
-    "BendersResult",
     "BendersSolver",
 
     # Cut types
