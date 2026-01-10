@@ -3,8 +3,16 @@
 import inspect
 from typing import Callable, Type
 
-from ..core import BendersParams, MasterProblem, SubProblem, SubProblems, BendersSolver, LogicBasedSubProblem, \
-    CutGenerator, _FuncWrapperSub
+from ..core import (
+    BendersParams,
+    MasterProblem,
+    SubProblem,
+    SubProblems,
+    BendersSolver,
+    LogicBasedSubProblem,
+    CutGenerator,
+    _FuncWrapperSub
+)
 
 
 class LogicBasedBenders(BendersSolver):
