@@ -2,8 +2,8 @@
 
 from typing import Type
 
-from .solvers import SolverBase
-from .core import BendersParams, MasterProblem, SubProblem, BendersSolver
+from ..solvers import SolverBase
+from ..core import BendersParams, MasterProblem, SubProblem, BendersSolver
 
 
 class AnnotationBenders:

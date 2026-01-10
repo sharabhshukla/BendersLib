@@ -58,6 +58,7 @@ from .cut import (
 )
 
 from .benders import (
+    AnnotationBenders,
     ClassicalBenders,
     CombinatorialBenders,
     LShaped,
@@ -65,10 +66,6 @@ from .benders import (
     LogicBasedBenders,
     GeneralizedBenders,
     GeneLShaped
-)
-
-from .annotation import (
-    AnnotationBenders,
 )
 
 __all__ = [
@@ -116,6 +113,7 @@ __all__ = [
     "GeneLShapedOCGen",
 
     # Benders methods
+    "AnnotationBenders",
     "ClassicalBenders",
     "CombinatorialBenders",
     "LShaped",
@@ -123,6 +121,4 @@ __all__ = [
     "LogicBasedBenders",
     "GeneralizedBenders",
     "GeneLShaped",
-
-    "AnnotationBenders",
 ]
