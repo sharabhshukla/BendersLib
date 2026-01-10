@@ -83,4 +83,4 @@ if __name__ == '__main__':
 #
 # .. admonition:: References
 #
-#     This example uses the following classes: :ref:`api-annotation`, :ref:`api-classical`
+#     This example uses the following classes: :class:`~benderslib.AnnotationBenders`, :class:`~benderslib.ClassicalBenders`

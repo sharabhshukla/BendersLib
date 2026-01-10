@@ -143,7 +143,7 @@ if __name__ == '__main__':
 # .. admonition:: References
 #
 #     * Tutorial of the L-shaped method: :doc:`../tutorials/lshape`
-#     * This example uses the following class: :ref:`api-lshape`
+#     * This example uses the following class: :class:`~benderslib.LShaped`
 #
 # .. seealso::
 #

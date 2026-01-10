@@ -97,7 +97,7 @@ if __name__ == '__main__':
 # .. admonition:: References
 #
 #     * Tutorial of Classical Benders Decomposition: :doc:`../tutorials/classical`
-#     * This example uses the following class: :ref:`api-classical`
+#     * This example uses the following class: :class:`~benderslib.ClassicalBenders`
 #
 # .. seealso::
 #

@@ -59,9 +59,9 @@ print(master)
 #
 # .. admonition:: References
 #
-#     * This example uses the following class: :ref:`api-annotation`
-#     * See :func:`benderslib.Gurobi.make_master_problem` for details on how the master problem is constructed.
-#     * See :func:`benderslib.Gurobi.make_sub_problem` for details on how the subproblem is constructed.
+#     * This example uses the following class: :class:`~benderslib.AnnotationBenders`
+#     * See :func:`~benderslib.solvers.Gurobi.make_master_problem` for details on how the master problem is constructed.
+#     * See :func:`~benderslib.solvers.Gurobi.make_sub_problem` for details on how the subproblem is constructed.
 #
 # .. seealso::
 #

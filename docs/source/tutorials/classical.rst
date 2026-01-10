@@ -220,8 +220,8 @@ Given the set of complicating variables, the classical Benders Decomposition met
 formulate the master problem, subproblem, and Benders cuts.
 Therefore, these procedures can be automated, and users only need to provide the original problem
 and specify which variables are complicating variables.
-We implemented the method in :ref:`api-classical`, and automated it in
-:ref:`api-annotation`.
+We implemented the method in :class:`~benderslib.ClassicalBenders`, and automated it in
+:class:`~benderslib.AnnotationBenders`.
 
 .. seealso::
 

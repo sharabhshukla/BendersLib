@@ -132,7 +132,7 @@ if __name__ == '__main__':
 #
 #     * Tutorial of the Logic-based Benders Decomposition: :doc:`../tutorials/lbbd`
 #     * Tutorial of the L-shaped method: :doc:`../tutorials/lshape`
-#     * This example uses the following class: :ref:`api-lbbd`
+#     * This example uses the following class: :class:`LogicBasedBenders`
 #
 # .. seealso::
 #

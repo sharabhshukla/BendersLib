@@ -118,4 +118,4 @@ if __name__ == '__main__':
 # .. admonition:: References
 #
 #     * Tutorial of Combinatorial Benders Decomposition: :doc:`../tutorials/cbd`
-#     * This example uses the following classes: :ref:`api-annotation`, :ref:`api-cbd`
+#     * This example uses the following classes: :class:`~benderslib.AnnotationBenders`, :class:`~benderslib.CombinatorialBenders`

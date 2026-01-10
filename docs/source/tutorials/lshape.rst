@@ -268,7 +268,7 @@ The L-shaped algorithm proceeds as follows, shown here for the single-cut and mu
 
 
 The L-shaped method requires master and subproblem formulations that align with the two-stage stochastic programming structure.
-We implemented it in :ref:`api-lshape`.
+We implemented it in :class:`LShaped`.
 Users may formulate their problems to deterministic equivalents manually for comparison or benchmarking purposes.
 
 
