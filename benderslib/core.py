@@ -1307,15 +1307,6 @@ class BendersSolver:
         self.result.n_cuts = self.result.n_opt_cuts + self.result.n_feas_cuts
         self.__logger.log_end()
 
-    # def save_result(self):
-    #     pass
-    #
-    # def save_checkpoint(self):
-    #     pass
-    #
-    # def load_checkpoint(self):
-    #     pass
-
 
 if __name__ == '__main__':
     pass
