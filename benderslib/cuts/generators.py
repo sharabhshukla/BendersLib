@@ -339,7 +339,6 @@ class GeneLShapedOCGen(CutGenerator):
 
             # Add the cut only if it is violated
             if sub.get_obj() > self._master_problem.get_estimator_values()[estimator]:
-                print(sub.get_obj(), self._master_problem.get_estimator_values()[estimator])
                 cut = GeneralizedOC(
                     vars=self._complicating_vars,
                     var_values=var_values,
