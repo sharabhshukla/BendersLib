@@ -47,7 +47,7 @@ model, complicating_vars = make_original_problem()
 master, sub = AnnotationBenders._decompose(
     original_problem=model,
     solver=Gurobi,
-    complicating_vars=complicating_vars,
+    master_vars=complicating_vars,
     # True: return solver model instances;
     # False: return benderslib MasterProblem and SubProblem instances.
     solver_model=True
@@ -65,4 +65,4 @@ print(master)
 #
 # .. seealso::
 #
-#     * Automated decomposition based on complicating variables: :doc:`annotation_benders`
+#     * Automated decomposition based on master problem variables: :doc:`annotation_benders`
