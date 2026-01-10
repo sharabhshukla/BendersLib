@@ -69,6 +69,7 @@ explicit_order = [
     'lbbd_sp.py',
     'lbbd_lshape.py',
     'gbd.py',
+    'glshape.py',
 
     'lbbd_location.py',
 

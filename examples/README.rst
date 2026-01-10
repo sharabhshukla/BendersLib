@@ -21,6 +21,7 @@ Stochastic
 - :doc:`ilshape_iis`: Integer L-shaped method with IIS for stronger, customized no-good cuts.
 - :doc:`lbbd_sp`: Logic-based Benders decomposition for two-stage stochastic programming with custom subproblem solver.
 - :doc:`lbbd_lshape`: Implementation of the L-shaped method using Logic-based Benders Decomposition.
+- :doc:`glshape`: L-shaped method for two-stage stochastic programming with non-linear subproblems.
 
 Applications
 ----------------------

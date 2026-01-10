@@ -265,7 +265,7 @@ class CombinatorialOC(OptimalityCut):
 
 
 class LShapedOC(OptimalityCut):
-    """The optimality cut for :doc:`../tutorials/lshape` (aggregated single cut).
+    """The optimality cut for :doc:`../tutorials/lshape` (single-cut & linear recourse).
 
     This class encapsulates the aggregation logic. It takes raw data from all
     scenarios (probabilities, duals, matrices) and computes the final cut.
@@ -483,6 +483,132 @@ class GeneralizedFC(ClassicalFC):
         self.name = "GeneralizedFC"
 
 
+class GeneLShapedOC(OptimalityCut):
+    """The optimality cut for :doc:`../tutorials/lshape` (single-cut & convex recourse).
+
+    It extends the L-shaped method to handle convex subproblems, acting as a hybrid
+    of :class:`GeneralizedOC` and :class:`LShapedOC`. While :class:`LShapedOC` aggregates cuts from
+    multiple linear subproblems, this class applies the principles of :class:`GeneralizedOC`
+    (for single convex problems) to a multi-scenario setting.
+
+    It constructs a single, aggregated optimality cut by taking a probability-weighted average
+    of the generalized cuts from each convex subproblem. This enables the :class:`GeneLShaped`
+    method to solve problems with multiple independent convex subproblems (e.g., stochastic
+    programs with convex recourse), extending the capability of the standard :class:`LShaped`
+    method which is limited to linear subproblems.
+
+    The aggregated cut is of the form
+
+    .. math::
+
+        \\theta \\geq \\sum_{\\omega \\in \\Omega} p_\\omega \\left( f_\\omega(\\bar{x}) + \\nabla f_\\omega(\\bar{x})^T (x - \\bar{x}) \\right)
+
+    where
+    :math:`\\theta` is the estimator variable for the total subproblem cost in the master problem.
+    :math:`\\Omega` is the set of all scenarios.
+    :math:`p_\\omega` is the probability of scenario :math:`\\omega`.
+    :math:`f_\\omega(\\bar{x})` is the objective value of the subproblem for scenario :math:`\\omega`
+    at the complicating variable values :math:`\\bar{x}`.
+    :math:`\\nabla f_\\omega(\\bar{x})` is the gradient of the subproblem objective function with respect to :math:`x`,
+    evaluated at :math:`\\bar{x}`.
+    It is computed as :math:`-\\lambda_\\omega^T T_\\omega`, where :math:`\\lambda_\\omega` are
+    the Lagrange multipliers (duals) and :math:`T_\\omega` are the coefficients of :math:`x` in the subproblem constraints.
+
+    Parameters
+    ----------
+
+    vars : list[str]
+        A list of complicating variable names (:math:`x`).
+    probs : list[float]
+        A list of probabilities (:math:`p_\\omega`) for each scenario.
+    var_values : dict[str, float]
+        A dictionary mapping complicating variable names to their current values (:math:`\\bar{x}`).
+    var_coefs_list : list[dict[str, list[float]]]
+        A list of dictionaries, where each dictionary contains the coefficients (:math:`T_\\omega`) of the complicating variables for a scenario.
+    sub_obj_list : list[float]
+        A list of subproblem objective values (:math:`f_\\omega(\\bar{x})`) for each scenario.
+    multipliers_list : list[list[float]]
+        A list of Lagrange multipliers (:math:`\\lambda_\\omega`) for each scenario's constraints.
+    estimator : str, optional
+        The name of the master problem variable representing the subproblem's cost (:math:`\\theta`).
+
+    Example
+    ----------
+
+    .. code-block:: python
+
+        from benderslib import GeneLShapedOC
+
+        # Data from two convex subproblems (scenarios)
+        complicating_vars = ['x1', 'x2']
+        master_solution = {'x1': 10, 'x2': 5}
+        probs = [0.4, 0.6]
+
+        # Scenario 1 results
+        sub_obj_1 = 150.0
+        var_coefs_1 = {'x1': [2.0, 1.0], 'x2': [1.5, 3.0]}
+        multipliers_1 = [10.0, 5.0]
+
+        # Scenario 2 results
+        sub_obj_2 = 200.0
+        var_coefs_2 = {'x1': [2.2, 1.1], 'x2': [1.8, 3.3]}
+        multipliers_2 = [8.0, 12.0]
+
+        # Create the generalized L-shaped optimality cut
+        cut = GeneLShapedOC(
+            vars=complicating_vars,
+            probs=probs,
+            var_values=master_solution,
+            var_coefs_list=[var_coefs_1, var_coefs_2],
+            sub_obj_list=[sub_obj_1, sub_obj_2],
+            multipliers_list=[multipliers_1, multipliers_2]
+        )
+    """
+
+    def __init__(
+            self,
+            vars: list[str],
+            probs: list[float],
+            var_values: dict[str, float],
+            var_coefs_list: list[dict[str, list[float]]],
+            sub_obj_list: list[float],
+            multipliers_list: list[list[float]],
+            estimator=CST.ESTIMATOR_NAME
+    ):
+        aggregated_rhs = 0.0
+        aggregated_x_coefs_dict = {var: 0.0 for var in vars}
+
+        for i in range(len(probs)):
+            prob = probs[i]
+            sub_obj = sub_obj_list[i]
+            multipliers = multipliers_list[i]
+            var_coefs = var_coefs_list[i]
+
+            # For a single scenario, the cut is: eta >= f(x_bar) + grad(f(x_bar))^T * (x - x_bar)
+            # The gradient is grad(f(x_bar))^T = -lambda^T * T
+            # The cut is: eta >= f(x_bar) - (lambda^T * T) * x + (lambda^T * T) * x_bar
+            # Rewritten: eta + (lambda^T * T) * x >= f(x_bar) + (lambda^T * T) * x_bar
+
+            # Calculate the coefficient for x variables: (lambda^T * T)
+            scenario_x_coefs = [sum(m * c for m, c in zip(multipliers, var_coefs[var])) for var in vars]
+
+            # Calculate the constant part for this scenario's cut: f(x_bar) + (lambda^T * T) * x_bar
+            scenario_rhs = sub_obj + sum(c * var_values[var] for c, var in zip(scenario_x_coefs, vars))
+
+            # Aggregate the right-hand side, weighted by probability
+            aggregated_rhs += prob * scenario_rhs
+
+            # Aggregate the x coefficients, weighted by probability
+            for j, var in enumerate(vars):
+                aggregated_x_coefs_dict[var] += prob * scenario_x_coefs[j]
+
+        final_aggregated_x_coefs = [aggregated_x_coefs_dict[var] for var in vars]
+        final_vars = vars + [estimator]
+        final_coefs = final_aggregated_x_coefs + [1.0]
+
+        super().__init__(vars=final_vars, coefs=final_coefs, rhs=aggregated_rhs, sense='>=', name="GeneLShapedOC")
+
+
 class ClassicalOCGen(CutGenerator):
     """The optimality cut generator for :doc:`../tutorials/classical`."""
 
@@ -561,7 +687,7 @@ class CombinatorialOCGen(CutGenerator):
 
 
 class LShapedOCGen(CutGenerator):
-    """The optimality cut generator for :doc:`../tutorials/lshape`."""
+    """The optimality cut generator for :doc:`../tutorials/lshape` (linear recourse)."""
 
     def __init__(self, master_problem, sub_problem, params):
         super().__init__(master_problem, sub_problem, params)
@@ -604,10 +730,10 @@ class LShapedOCGen(CutGenerator):
 
             vars = self._complicating_vars
             estimator = self._master_problem.estimators[i]
-            cut = ClassicalOC(vars, _var_coefs, _dual, _rhs, estimator=estimator)
 
             # Add the cut only if it is violated
             if sub.get_obj() > self._master_problem.get_estimator_values()[estimator]:
+                cut = ClassicalOC(vars, _var_coefs, _dual, _rhs, estimator=estimator)
                 cuts.append(cut)
 
         return cuts
@@ -760,6 +886,76 @@ class GeneralizedFCGen(CutGenerator):
 
         cut = GeneralizedFC(self._complicating_vars, self.var_coefs, extreme_ray, self.rhs)
         return [cut]
+
+
+class GeneLShapedOCGen(CutGenerator):
+    """The optimality cut generator for :doc:`../tutorials/lshape` (convex recourse)."""
+
+    def __init__(self, master_problem, sub_problem, params):
+        super().__init__(master_problem, sub_problem, params)
+
+        self.var_coefs = dict()
+        for i, sub in enumerate(self._sub_problem):
+            self.var_coefs[i] = sub.get_var_coefs(self._complicating_vars)
+
+    def _single_cut(self) -> list[GeneLShapedOC]:
+        """Generates a single aggregated :class:`GeneLShapedOC` from all scenarios."""
+        complicating_vars = self._complicating_vars
+        var_values = self._master_problem.get_var_values(complicating_vars)
+
+        all_probs = []
+        all_sub_objs = []
+        all_multipliers = []
+        all_var_coefs = []
+
+        for i, sub in enumerate(self._sub_problem):
+            all_probs.append(self._sub_problem.prob[i])
+            all_sub_objs.append(sub.get_obj())
+            all_multipliers.append(sub.get_dual_values())
+            all_var_coefs.append(self.var_coefs[i])
+
+        cut = GeneLShapedOC(
+            complicating_vars,
+            all_probs,
+            var_values,
+            all_var_coefs,
+            all_sub_objs,
+            all_multipliers,
+        )
+        return [cut]
+
+    def _multi_cuts(self) -> list[GeneralizedOC]:
+        """Generates multiple :class:`GeneralizedOC` cuts, one for each subproblem (scenario)."""
+        cuts = []
+        var_values = self._master_problem.get_var_values(self._complicating_vars)
+
+        for i, sub in enumerate(self._sub_problem):
+            estimator = self._master_problem.estimators[i]
+
+            # Add the cut only if it is violated
+            if sub.get_obj() > self._master_problem.get_estimator_values()[estimator]:
+                print(sub.get_obj(), self._master_problem.get_estimator_values()[estimator])
+                cut = GeneralizedOC(
+                    vars=self._complicating_vars,
+                    var_values=var_values,
+                    var_coefs=self.var_coefs[i],
+                    sub_obj=sub.get_obj(),
+                    multipliers=sub.get_dual_values(),
+                    estimator=estimator
+                )
+                cuts.append(cut)
+
+        return cuts
+
+    def generate(self) -> list[GeneLShapedOC] | list[GeneralizedOC]:
+        """Generates optimality cuts for the generalized L-shaped method.
+
+        If :attr:`BendersParams.multi_opti_cut` is ``True``, this method calls :func:`_multi_cuts`
+        to generate multiple :class:`GeneralizedOC`, one for each violated scenario;
+        If ``False``, it calls :func:`_single_cut` to generate one aggregated
+        :class:`GeneLShapedOC` for all scenarios.
+        """
+        return self._multi_cuts() if self.params.multi_opti_cut else self._single_cut()
 
 
 if __name__ == '__main__':

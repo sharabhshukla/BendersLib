@@ -39,3 +39,8 @@ Benders Cuts
    :inherited-members:
    :show-inheritance:
    :exclude-members: vars, coefs, rhs, sense, ctype, name
+
+.. autoclass:: GeneLShapedOC
+    :inherited-members:
+    :show-inheritance:
+    :exclude-members: vars, coefs, rhs, sense, ctype, name

@@ -122,13 +122,14 @@ Detailed API for each component can be found in the :doc:`API reference <../api/
       :class:`CutGenerator`, :class:`Cut`, :class:`OptimalityCut`, :class:`FeasibilityCut`
     * Benders cut:
       :class:`ClassicalOC`, :class:`ClassicalFC`, :class:`CombinatorialOC`, :class:`NoGoodFC`, :class:`LShapedOC`,
-      :class:`GeneralizedOC`, :class:`GeneralizedFC`
+      :class:`GeneralizedOC`, :class:`GeneralizedFC`, :class:`GeneLShapedOC`
     * Cut generator:
       :class:`ClassicalOCGen`, :class:`ClassicalFCGen`,
       :class:`CombinatorialOCGen`, :class:`CombinatorialFCGen`,
       :class:`LShapedOCGen`, :class:`LShapedFCGen`,
       :class:`IntegerLShapedOCGen`, :class:`IntegerLShapedFCGen`,
-      :class:`GeneralizedOCGen`, :class:`GeneralizedFCGen`
+      :class:`GeneralizedOCGen`, :class:`GeneralizedFCGen`,
+      :class:`GeneLShapedOCGen`
 
     *\* Note: "OC" stands for Optimality Cut, and "FC" stands for Feasibility Cut.*
 
@@ -143,4 +144,5 @@ Detailed API for each component can be found in the :doc:`API reference <../api/
 
     * Abstraction: :class:`BendersSolver`,
     * Benders methods: :class:`ClassicalBenders`, :class:`CombinatorialBenders`,
-      :class:`LShaped`, :class:`IntegerLShaped`, :class:`LogicBasedBenders`, :class:`GeneralizedBenders`
+      :class:`LShaped`, :class:`IntegerLShaped`, :class:`LogicBasedBenders`, :class:`GeneralizedBenders`,
+      :class:`GeneLShaped`

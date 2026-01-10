@@ -35,6 +35,11 @@ L-shaped Method
     :show-inheritance:
     :exclude-members: master_problem, sub_problem, complicating_vars, optimality_cut, feasibility_cut, params, result
 
+.. autoclass:: GeneLShaped
+    :inherited-members:
+    :show-inheritance:
+    :exclude-members: master_problem, sub_problem, complicating_vars, optimality_cut, feasibility_cut, params, result
+
 .. _api-ilshape:
 
 Integer L-shaped Method
@@ -96,4 +101,7 @@ Cut Generators
    :show-inheritance:
 
 .. autoclass:: GeneralizedFCGen
+   :show-inheritance:
+
+.. autoclass:: GeneLShapedOCGen
    :show-inheritance:

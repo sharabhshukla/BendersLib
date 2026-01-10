@@ -82,7 +82,7 @@ def deterministic_equivalent_model(n_plants, scenarios, probs, penalty):
 
 
 # %%
-# Solve the problem using the deterministic equivalent (for clarity and verification):
+# Solve the problem using the deterministic equivalent (for clarity and verification) and the integer L-shaped method:
 if __name__ == '__main__':
     # Data
     # random.seed(1)

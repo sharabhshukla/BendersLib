@@ -41,6 +41,7 @@ from .cut import (
     LShapedOC,
     GeneralizedOC,
     GeneralizedFC,
+    GeneLShapedOC,
 
     # Cut generators
     ClassicalFCGen,
@@ -52,7 +53,8 @@ from .cut import (
     IntegerLShapedOCGen,
     IntegerLShapedFCGen,
     GeneralizedOCGen,
-    GeneralizedFCGen
+    GeneralizedFCGen,
+    GeneLShapedOCGen
 )
 
 from .benders import (
@@ -61,7 +63,8 @@ from .benders import (
     LShaped,
     IntegerLShaped,
     LogicBasedBenders,
-    GeneralizedBenders
+    GeneralizedBenders,
+    GeneLShaped
 )
 
 from .annotation import (
@@ -97,6 +100,7 @@ __all__ = [
     "LShapedOC",
     "GeneralizedOC",
     "GeneralizedFC",
+    "GeneLShapedOC",
 
     # Cut generators
     "ClassicalFCGen",
@@ -109,6 +113,7 @@ __all__ = [
     "IntegerLShapedFCGen",
     "GeneralizedOCGen",
     "GeneralizedFCGen",
+    "GeneLShapedOCGen",
 
     # Benders methods
     "ClassicalBenders",
@@ -117,6 +122,7 @@ __all__ = [
     "IntegerLShaped",
     "LogicBasedBenders",
     "GeneralizedBenders",
+    "GeneLShaped",
 
     "AnnotationBenders",
 ]

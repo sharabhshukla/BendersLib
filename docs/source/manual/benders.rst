@@ -71,6 +71,7 @@ is a ready-to-use implementation of a Benders decomposition variant.
    ~IntegerLShaped
    ~LogicBasedBenders
    ~GeneralizedBenders
+   ~GeneLShaped
 
 .. seealso::
 
