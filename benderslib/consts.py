@@ -4,12 +4,14 @@ class BendersConsts:
     """Immutable constants used in BendersLib.
 
     The constants can be used like ``CST.OPTIMAL``, where ``CST`` is a global alias
-    for ``BendersConsts``.
+    for :class:`BendersConsts`.
 
     Example
     -----------
 
     .. code-block:: python
+
+        from benderslib import CST
 
         if BD.result.status == CST.OPTIMAL:
             print("Benders algorithm found an optimal solution.")

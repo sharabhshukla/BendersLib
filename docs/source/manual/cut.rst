@@ -36,7 +36,7 @@ Here is an example of how to create a :class:`Cut` instance.
 
 .. code-block:: python
 
-    from benderslib import Cut, BendersConsts as CST
+    from benderslib import Cut, CST
 
     # Create a cut: 2*x1 + 3*x2 <= 10
     my_cut = Cut(
@@ -218,7 +218,7 @@ so your custom class can focus on providing a user-friendly ``__init__`` method.
 
    .. code-block:: python
 
-        from benderslib import FeasibilityCut, BendersConsts as CST
+        from benderslib import FeasibilityCut, CST
 
         class NoGoodFC(FeasibilityCut):
 
@@ -316,7 +316,7 @@ It should return a list of one or more cut objects.
 
    .. code-block:: python
 
-       from benderslib import Cut, BendersConsts as CST, BendersSolver
+       from benderslib import Cut, CST, BendersSolver
 
        def simple_fc_generator(master_problem, sub_problem, complicating_vars) -> list[Cut]:
            # Retrieve the values of the complicating variables from the master problem.

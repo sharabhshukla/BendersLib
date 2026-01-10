@@ -1,6 +1,7 @@
 # coding:utf-8
 
-from ..core import OptimalityCut, FeasibilityCut, CST
+from ..consts import BendersConsts as CST
+from ..core import OptimalityCut, FeasibilityCut
 
 
 class ClassicalOC(OptimalityCut):

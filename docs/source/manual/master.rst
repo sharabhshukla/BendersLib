@@ -170,8 +170,7 @@ The :class:`Cut` class requires you to explicitly define all components of a lin
 
 .. code-block:: python
 
-    from benderslib import Cut
-    from benderslib import BendersConsts as CST
+    from benderslib import Cut, CST
 
     # Define a custom cut: 2*x + 3*z >= 5
     custom_cut = Cut(

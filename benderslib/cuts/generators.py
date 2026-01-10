@@ -1,6 +1,7 @@
 # coding:utf-8
 
-from ..core import CutGenerator, CST
+from ..consts import BendersConsts as CST
+from ..core import CutGenerator
 from .cuts import (
     ClassicalOC,
     ClassicalFC,
