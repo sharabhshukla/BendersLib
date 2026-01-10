@@ -93,12 +93,12 @@ Consider one of these alternatives if BendersLib does not meet your requirements
       - Language
       - License
     * - `SCIP <https://www.scipopt.org>`_
-      - A framework for constraint integer programming and branch-cut-and-price that supports Benders Decomposition.
-      - C/C++
+      - A framework for constraint integer programming and branch-cut-and-price that supports Benders Decomposition [2]_.
+      - C/C++ *
       - `Apache 2.0 <https://www.scipopt.org/index.php#license>`_
     * - `GCG <https://gcg.or.rwth-aachen.de/>`_
       - A generic decomposition solver for mixed-integer programs that has the capability of automatically Benders decomposition (part of the SCIP Optimization Suit).
-      - C/C++
+      - C/C++ *
       - LGPL
     * - `Coluna.jl <https://atoptima.github.io/Coluna.jl>`_
       - A branch-and-price-and-cut framework that supports Benders Decomposition.
@@ -108,7 +108,7 @@ Consider one of these alternatives if BendersLib does not meet your requirements
       - A package for solving Stochastic Programming problems with L-shaped method and other decomposition algorithms.
       - Python
       - `BSD 3 Clause <https://github.com/Pyomo/mpi-sppy/blob/main/LICENSE.md>`_
-    * - `SDDP.jl <https://sddp.dev/>`_
+    * - `SDDP.jl <https://sddp.dev/>`_ [3]_
       - A package for solving Multistage Stochastic Programming using Stochastic Dual Dynamic Programming (nested Benders methods).
       - Julia
       - `MPL 2.0 <https://github.com/odow/SDDP.jl?tab=License-1-ov-file#readme>`__
@@ -128,3 +128,5 @@ References
 ------------------------------------------------
 
 .. [1] Benders, J. F. (1962). Partitioning procedures for solving mixed-variables programming problems. Numerische Mathematik, 4(1), 238–252. https://doi.org/10.1007/BF01386316
+.. [2] Maher, S. J. (2021). Implementing the branch-and-cut approach for a general purpose Benders’ decomposition framework. European Journal of Operational Research, 290(2), 479–498. https://doi.org/10.1016/j.ejor.2020.08.037
+.. [3] Dowson, O., & Kapelevich, L. (2021). SDDP.jl: A Julia Package for Stochastic Dual Dynamic Programming. INFORMS Journal on Computing, 33(1), 27–33. https://doi.org/10.1287/ijoc.2020.0987
