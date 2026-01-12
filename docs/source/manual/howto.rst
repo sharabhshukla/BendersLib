@@ -13,7 +13,6 @@ that are not directly exposed in the BendersLib API reference.
 In such cases, users can utilize the attribute :attr:`ProblemBase._solver_model`
 (the base class for :class:`MasterProblem` and :class:`SubProblem`)
 to access the underlying solver model directly.
-
 For example, if you are using :class:`~.solvers.Gurobi`, you can access the Gurobi model as follows.
 
 .. code-block:: python
@@ -21,6 +20,7 @@ For example, if you are using :class:`~.solvers.Gurobi`, you can access the Guro
     from benderslib import AnnotationBenders, ClassicalBenders
     from benderslib.solvers import Gurobi
     from gurobipy import Model, GRB
+
 
     # Create a standard Gurobi model
     model = Model()
@@ -67,6 +67,7 @@ The following example demonstrates both approaches.
     # Use other solver interfaces (e.g., Copt, etc) as needed
     from benderslib.solvers import Gurobi
 
+
     # Create a standard Gurobi model
     model = Model()
     x = model.addVar(name="x", vtype=GRB.INTEGER)
@@ -95,3 +96,53 @@ The following example demonstrates both approaches.
     # These models can then be used to create MasterProblem and SubProblem instances
     master_problem_manual = MasterProblem(Gurobi(master_model_manual))
     sub_problem_manual = SubProblem(Gurobi(sub_model_manual))
+
+How to start from standard mathematical programming files?
+--------------------------------------------------------------
+
+BendersLib can be used with models created from standard mathematical programming files (e.g., ``.mps``, ``.lp``).
+You can use the functions of the external solver to read the model file,
+and then use the :class:`AnnotationBenders` class or the :meth:`~.SolverBase.make_master_problem`
+and :meth:`~.SolverBase.make_sub_problem` methods to perform the decomposition.
+The supported file formats depend on the underlying solver being used.
+The following example shows how to read a ``.lp`` file using Gurobi and then apply Benders decomposition.
+
+.. code-block:: python
+
+    from gurobipy import read
+    from benderslib.solvers import Gurobi
+    from benderslib import AnnotationBenders, ClassicalBenders
+
+
+    # Read model from file
+    model = read("model.lp")
+
+    # The content of ``model.lp``:
+    #
+    # Minimize
+    #   3 x + 4 y
+    # Subject To
+    #   c1: x + y >= 15
+    #   c2: 2 x + 5 y >= 30
+    # Bounds
+    #   x >= 0
+    #   y >= 0
+    # Generals
+    #   x
+    # End
+
+    # Define complicating variables
+    complicating_vars = ["x"]
+
+    # Create and solve using Benders decomposition
+    benders = AnnotationBenders(
+        model,
+        solver=Gurobi,
+        complicating_vars=complicating_vars,
+        benders=ClassicalBenders
+    )
+    benders.solve()
+
+    # We can also use the make_master_problem and make_sub_problem methods
+    master_model = Gurobi.make_master_problem(model, complicating_vars)
+    sub_model = Gurobi.make_sub_problem(model, complicating_vars)
