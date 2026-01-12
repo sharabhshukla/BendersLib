@@ -35,6 +35,14 @@ class BendersParams:
     theta_lb: float = 0
     """Lower bound for the theta variable in the master problem."""
 
+    # Numerical
+    tol_obj_diff: float = 1e-6
+    """Tolerance for estimator values and subproblem objective values comparison.
+    
+    When generating optimality cuts, the cut is added only if ``sub_obj - theta > tol_obj_diff``, 
+    to avoid numerical issues. It is set to be equal to ``tol_abs`` by default.
+    """
+
     # Convergence
     tol_abs: float = 1e-6
     """Absolute tolerance for convergence, terminate when ``abs(UB - LB) <= tol_abs``."""
@@ -50,8 +58,10 @@ class BendersParams:
     """**[L-shaped method]** Whether to add multiple optimality cuts per scenario in each iteration of the L-shaped method."""
     multi_feas_cut: bool = False
     """**[L-shaped method]** Whether to add multiple feasibility cuts per scenario in each iteration of the L-shaped method.
+    
     If ``False``, one feasibility cut is added when a infeasible subproblem is found;
-    If ``True``, all extreme rays are used to generate multiple feasibility cuts."""
+    If ``True``, all extreme rays are used to generate multiple feasibility cuts.
+    """
 
     # Logging
     log_freq_sec: float = 0.5

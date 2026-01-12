@@ -15,7 +15,7 @@ problem is a convex program (e.g., a Quadratic Programming problem).
 
 import random
 
-from benderslib import MasterProblem, SubProblems, GeneLShaped
+from benderslib import MasterProblem, SubProblems, GeneLShaped, CST
 from benderslib.solvers import Gurobi
 from gurobipy import Model, GRB, QuadExpr, quicksum
 from matplotlib import pyplot as plt
@@ -91,14 +91,6 @@ if __name__ == '__main__':
     scenarios = [[random.randint(10, 220) for _ in range(n_plants)] for _ in range(n_scenarios)]
     probs = [1 / n_scenarios for _ in range(n_scenarios)]
 
-    # --- Solve with Deterministic Equivalent ---
-    de_model = deterministic_equivalent_model(n_plants, scenarios, probs)
-    de_model.optimize()
-    if de_model.Status == GRB.OPTIMAL:
-        print(f"Deterministic Equivalent Obj: {de_model.ObjVal:.4f}\n")
-    else:
-        print("Deterministic Equivalent Problem is infeasible or unbounded.\n")
-
     # --- Solve with Generalized L-shaped Method ---
     # Initialize Master and Subproblems
     fs_model, complicating_vars = first_stage_model(n_plants)
@@ -109,9 +101,7 @@ if __name__ == '__main__':
 
     # Initialize and run the Benders solver
     BD = GeneLShaped(master_problem, sub_problems, complicating_vars)
-
-    # BD.params.multi_opti_cut = True
-    # BD.params.log_freq_sec = 0.0
+    BD.params.multi_opti_cut = True
     BD.solve()
 
     # Plot convergence
@@ -123,6 +113,19 @@ if __name__ == '__main__':
     plt.legend()
     plt.grid(True)
     plt.show()
+
+    # --- Solve with Deterministic Equivalent ---
+    de_model = deterministic_equivalent_model(n_plants, scenarios, probs)
+    de_model.optimize()
+    if de_model.Status == GRB.OPTIMAL:
+        print(f"DE Obj: {de_model.ObjVal}")
+    else:
+        print("Deterministic Equivalent Problem is infeasible or unbounded.")
+
+    if BD.result.status == CST.OPTIMAL:
+        print(f"BD Obj: {BD.result.obj}")
+    else:
+        print("Benders Decomposition did not find an optimal solution.")
 
 # %%
 #

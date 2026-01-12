@@ -137,7 +137,7 @@ class LShapedOCGen(CutGenerator):
             estimator = self._master_problem.estimators[i]
 
             # Add the cut only if it is violated
-            if sub.get_obj() > self._master_problem.get_estimator_values()[estimator]:
+            if sub.get_obj() - self._master_problem.get_estimator_values()[estimator] > self.params.tol_obj_diff:
                 cut = ClassicalOC(vars, _var_coefs, _dual, _rhs, estimator=estimator)
                 cuts.append(cut)
 
@@ -215,12 +215,11 @@ class IntegerLShapedOCGen(CutGenerator):
             bin_var_values = self._master_problem.get_var_values(self._complicating_vars)
             sub_obj = sub.get_obj()
             estimator = self._master_problem.estimators[i]
-            theta_lb = self._master_problem.get_estimator_values()[estimator]
-
-            cut = CombinatorialOC(bin_var_values, sub_obj, big_m=sub_obj - theta_lb, estimator=estimator)
+            theta = self._master_problem.get_estimator_values()[estimator]
 
             # Add the cut only if it is violated
-            if sub.get_obj() > self._master_problem.get_estimator_values()[estimator]:
+            if sub_obj - theta > self.params.tol_obj_diff:
+                cut = CombinatorialOC(bin_var_values, sub_obj, big_m=sub_obj - theta, estimator=estimator)
                 cuts.append(cut)
 
         return cuts
@@ -336,14 +335,16 @@ class GeneLShapedOCGen(CutGenerator):
 
         for i, sub in enumerate(self._sub_problem):
             estimator = self._master_problem.estimators[i]
+            theta = self._master_problem.get_estimator_values()[estimator]
+            sub_obj = sub.get_obj()
 
             # Add the cut only if it is violated
-            if sub.get_obj() > self._master_problem.get_estimator_values()[estimator]:
+            if sub_obj - theta > self.params.tol_obj_diff:
                 cut = GeneralizedOC(
                     vars=self._complicating_vars,
                     var_values=var_values,
                     var_coefs=self.var_coefs[i],
-                    sub_obj=sub.get_obj(),
+                    sub_obj=sub_obj,
                     multipliers=sub.get_dual_values(),
                     estimator=estimator
                 )
