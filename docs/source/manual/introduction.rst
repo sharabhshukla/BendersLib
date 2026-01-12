@@ -108,7 +108,11 @@ Consider one of these alternatives if BendersLib does not meet your requirements
       - A package for solving Stochastic Programming problems with L-shaped method and other decomposition algorithms.
       - Python
       - `BSD 3 Clause <https://github.com/Pyomo/mpi-sppy/blob/main/LICENSE.md>`_
-    * - `SDDP.jl <https://sddp.dev/>`_ [3]_
+    * - `StochasticPrograms.jl <https://martinbiel.github.io/StochasticPrograms.jl>`_ [3]_
+      - A package for modeling and solving Stochastic Programming problems that supports the L-shaped method.
+      - Julia
+      - `MIT License <https://github.com/martinbiel/StochasticPrograms.jl/blob/master/LICENSE.md>`_
+    * - `SDDP.jl <https://sddp.dev/>`_ [4]_
       - A package for solving Multistage Stochastic Programming using Stochastic Dual Dynamic Programming (nested Benders methods).
       - Julia
       - `MPL 2.0 <https://github.com/odow/SDDP.jl?tab=License-1-ov-file#readme>`__
@@ -129,4 +133,5 @@ References
 
 .. [1] Benders, J. F. (1962). Partitioning procedures for solving mixed-variables programming problems. Numerische Mathematik, 4(1), 238–252. https://doi.org/10.1007/BF01386316
 .. [2] Maher, S. J. (2021). Implementing the branch-and-cut approach for a general purpose Benders’ decomposition framework. European Journal of Operational Research, 290(2), 479–498. https://doi.org/10.1016/j.ejor.2020.08.037
-.. [3] Dowson, O., & Kapelevich, L. (2021). SDDP.jl: A Julia Package for Stochastic Dual Dynamic Programming. INFORMS Journal on Computing, 33(1), 27–33. https://doi.org/10.1287/ijoc.2020.0987
+.. [3] Biel, M., & Johansson, M. (2022). Efficient Stochastic Programming in Julia. INFORMS Journal on Computing, 34(4), 1885–1902. https://doi.org/10.1287/ijoc.2022.1158
+.. [4] Dowson, O., & Kapelevich, L. (2021). SDDP.jl: A Julia Package for Stochastic Dual Dynamic Programming. INFORMS Journal on Computing, 33(1), 27–33. https://doi.org/10.1287/ijoc.2020.0987
