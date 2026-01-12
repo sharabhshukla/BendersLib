@@ -6,7 +6,7 @@ from .base import SolverBase
 try:
     from coptpy import Model, LinExpr, COPT
 except ImportError:
-    raise ImportError("COPT is not installed. Please install it to use the COPT solver interface.")
+    raise ImportError("COPT is not installed. Please install it via 'pip install coptpy'.")
 
 
 class Copt(SolverBase):

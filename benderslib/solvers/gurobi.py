@@ -6,7 +6,7 @@ from .base import SolverBase
 try:
     from gurobipy import Model, LinExpr, GRB
 except ImportError:
-    raise ImportError("Gurobi is not installed. Please install it to use the Gurobi solver interface.")
+    raise ImportError("Gurobi is not installed. Please install it via 'pip install gurobipy'.")
 
 
 class Gurobi(SolverBase):
