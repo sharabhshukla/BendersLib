@@ -50,7 +50,7 @@ class ProblemBase:
             f"{n}: \n"
             f" - {'Variable No.:'.ljust(CST.LOG_NAME_WIDTH)}{n_vars}"
             f" [Integer: {len(self.model._int_vars)}, Binary: {len(self.model._bin_vars)}]\n"
-            f" - {'Constraint No.:'.ljust(CST.LOG_NAME_WIDTH)}{len(self._solver_model.getConstrs())}\n"
+            # f" - {'Constraint No.:'.ljust(CST.LOG_NAME_WIDTH)}{len(self._solver_model.getConstrs())}\n"
             f" - {'Solver:'.ljust(CST.LOG_NAME_WIDTH)}{self.model.__class__.__name__}"
         )
 
@@ -1048,7 +1048,8 @@ class BendersSolver:
         """
         master_problem = MasterProblem(master_solver(master_model))
 
-        if isinstance(sub_model, Iterable):
+        # if isinstance(sub_model, Iterable):
+        if len(sub_model) > 1:
             sub_problem = (SubProblem(sub_solver(sub)) for sub in sub_model)
             sub_problem = SubProblems(sub_problem, prob=prob)
         else:
@@ -1064,15 +1065,14 @@ class BendersSolver:
         )
 
     def __str__(self):
-        integer_num = len(self.master_problem.model._int_vars)
-        binary_num = len(self.master_problem.model._bin_vars)
-        continuous_num = len(self.master_problem.model._all_vars) - integer_num - binary_num
+        integer_num = len(set(self.complicating_vars) & set(self.master_problem.model._int_vars))
+        binary_num = len(set(self.complicating_vars) & set(self.master_problem.model._bin_vars))
 
         return (
             f"Benders Decomposition:\n"
             f" - {'Method:'.ljust(CST.LOG_NAME_WIDTH)}{self.__class__.__name__}\n"
             f" - {'Complicating Var. No.:'.ljust(CST.LOG_NAME_WIDTH)}{len(self.complicating_vars)}"
-            f" [Integer: {integer_num}, Binary: {binary_num}, Continuous: {continuous_num}]\n"
+            f" [Integer: {integer_num}, Binary: {binary_num}]\n"
             f" - {'Optimality Cut:'.ljust(CST.LOG_NAME_WIDTH)}{self.optimality_cut.__class__.__name__ or None}\n"
             f" - {'Feasibility Cut:'.ljust(CST.LOG_NAME_WIDTH)}{self.feasibility_cut.__class__.__name__ or None}"
         )
