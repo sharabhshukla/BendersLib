@@ -204,7 +204,7 @@ Contents
 -----------------------------------
 
 .. toctree::
-   :maxdepth: 5
+   :maxdepth: 4
 
    self
    tutorials/index.rst

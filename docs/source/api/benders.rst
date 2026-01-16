@@ -5,9 +5,6 @@ Benders Methods
 
 .. currentmodule:: benderslib
 
-Deterministic Benders Methods
---------------------------------------
-
 .. autoclass:: ClassicalBenders
     :inherited-members:
     :show-inheritance:
@@ -22,9 +19,6 @@ Deterministic Benders Methods
     :inherited-members:
     :show-inheritance:
     :exclude-members: master_problem, sub_problem, complicating_vars, optimality_cut, feasibility_cut, params, result
-
-Stochastic Benders Methods
---------------------------------------
 
 .. autoclass:: LShaped
     :inherited-members:
