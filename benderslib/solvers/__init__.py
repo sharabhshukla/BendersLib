@@ -11,9 +11,11 @@ from .base import SolverBase
 
 from .gurobi import Gurobi
 from .copt import Copt
+from .omo import Pyomo
 
 __all__ = [
     "SolverBase",
     "Gurobi",
     "Copt",
+    "Pyomo",
 ]
