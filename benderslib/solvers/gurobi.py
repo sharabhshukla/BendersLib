@@ -1,21 +1,19 @@
 # coding:utf-8
 
-from ..consts import BendersConsts as CST
-from .base import SolverBase
-
 try:
     from gurobipy import Model, LinExpr, GRB
 except ImportError:
-    raise ImportError("Gurobi is not installed. Please install it via 'pip install gurobipy'.")
+    raise ImportError("Gurobi is not installed. Install it via 'pip install gurobipy'.")
+
+from ..consts import BendersConsts as CST
+from .base import SolverBase
 
 
 class Gurobi(SolverBase):
     """Gurobi solver interface for BendersLib.
 
     This class provides an interface to the Gurobi solver for use with BendersLib.
-    It implements the abstract methods defined in the :class:`~benderslib.SolverBase` class.
-    Two additional methods, :func:`make_master_problem` and :func:`make_sub_problem`,
-    are provided for automatic decomposition by :class:`~benderslib.AnnotationBenders`.
+    It implements the methods defined in the :class:`~benderslib.SolverBase` class.
 
     Parameters
     ---------------
@@ -41,6 +39,7 @@ class Gurobi(SolverBase):
         self._all_vars = self.model.getAttr('VarName', vars)
         self._bin_vars = [v for v, t in zip(self._all_vars, vtypes) if t == GRB.BINARY]
         self._int_vars = [v for v, t in zip(self._all_vars, vtypes) if t == GRB.INTEGER]
+        # Record only non-trivial bounds, i.e., lb != 0 or ub != +inf
         self._var_bounds = {v: (lb, ub) for v, lb, ub in zip(self._all_vars, lbs, ubs)
                             if lb != 0 or ub != GRB.INFINITY}
         self.__standardize()

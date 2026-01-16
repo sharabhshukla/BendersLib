@@ -1,21 +1,19 @@
 # coding:utf-8
 
-from ..consts import BendersConsts as CST
-from .base import SolverBase
-
 try:
     from coptpy import Model, LinExpr, COPT
 except ImportError:
-    raise ImportError("COPT is not installed. Please install it via 'pip install coptpy'.")
+    raise ImportError("COPT is not installed. Install it via 'pip install coptpy'.")
+
+from ..consts import BendersConsts as CST
+from .base import SolverBase
 
 
 class Copt(SolverBase):
     """COPT solver interface for BendersLib.
 
     This class provides an interface to the COPT solver for use with BendersLib.
-    It implements the abstract methods defined in the :class:`~benderslib.SolverBase` class.
-    Two additional methods, :func:`make_master_problem` and :func:`make_sub_problem`,
-    are provided for automatic decomposition by :class:`~benderslib.AnnotationBenders`.
+    It implements the methods defined in the :class:`~benderslib.SolverBase` class.
 
     Parameters
     ---------------
