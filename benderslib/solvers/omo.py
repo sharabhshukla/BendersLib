@@ -42,7 +42,7 @@ class Pyomo(SolverBase):
 
         self._all_vars = [v.name for v in model.component_data_objects(Var)]
         self._bin_vars = [v.name for v in model.component_data_objects(Var) if v.is_binary()]
-        self._int_vars = [v.name for v in model.component_data_objects(Var) if v.is_integer()]
+        self._int_vars = [v.name for v in model.component_data_objects(Var) if v.is_integer() and not v.is_binary()]
 
         self._var_bounds = {}
         for v in model.component_data_objects(Var):
