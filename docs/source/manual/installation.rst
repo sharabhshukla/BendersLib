@@ -91,7 +91,7 @@ You can install these solvers individually based on your needs. Installing all o
 Please refer to :doc:`solver` for a list of supported solvers and detailed instructions for each.
 
 .. list-table:: Solvers Installation
-    :widths: 15 70 70
+    :widths: 17 70 70
     :header-rows: 1
     :name: solver-installation-table
 
@@ -104,6 +104,12 @@ Please refer to :doc:`solver` for a list of supported solvers and detailed instr
     * - :class:`~.solvers.Copt`
       - ``pip install coptpy``
       -
+    * - :class:`~.solvers.Pyomo` *
+      - ``pip install pyomo``
+      - ``conda install -c conda-forge pyomo``
+
+*\* Note: Pyomo supported solvers need to be installed separately, see* `here <https://pyomo.readthedocs.io/en/stable/getting_started/solvers.html>`_.
+
 
 Verifying the Installation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

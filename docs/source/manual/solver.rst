@@ -35,11 +35,12 @@ Guide on building solver models can be found in the official documentation of ea
       - MP
       - https://guide.coap.online/copt/en-doc/
       - Commercial (free academic license)
-    * - HiGHS
-      -
-      - MP
-      -
-      - Open-source
+    * - **Pyomo** *
+      - :class:`~.solvers.Pyomo`
+      - ML
+      - https://pyomo.readthedocs.io/en/stable/
+      - Open-source modeling language supporting
+        `multiple solvers <https://pyomo.readthedocs.io/en/stable/getting_started/solvers.html>`_.
     * - SCIP
       -
       - MP
@@ -70,12 +71,6 @@ Guide on building solver models can be found in the official documentation of ea
       - CP
       -
       - Open-source CP/SAT solver.
-    * - Pyomo
-      -
-      - ML
-      -
-      - Open-source modeling language supporting
-        `multiple MP solvers <https://pyomo.readthedocs.io/en/stable/getting_started/solvers.html>`_.
     * - CVXPY
       -
       - ML
@@ -86,9 +81,11 @@ Guide on building solver models can be found in the official documentation of ea
       - ML
       -
       - Commercial modeling language supporting
-        `multiple MP solvers <https://dev.ampl.com/solvers/index.html>`__.
+        `multiple solvers <https://dev.ampl.com/solvers/index.html>`__.
 
-*\* Note: MP: Mathematical Programming, CP: Constraint Programming, ML: Modeling Language.*
+*\* Pyomo supported solvers need to be installed separately, see* `here <https://pyomo.readthedocs.io/en/stable/getting_started/solvers.html>`_.
+
+*Note: MP: Mathematical Programming, CP: Constraint Programming, ML: Modeling Language.*
 
 .. admonition:: Mathematical Programming vs. Constraint Programming
     :class: tip
@@ -188,7 +185,6 @@ See :class:`SolverBase` for the comprehensive API reference, and :doc:`built-in 
     flowchart TB
         Gurobi -- inherits --> SolverBase
         COPT -- inherits --> SolverBase
-        HiGHS -- inherits --> SolverBase
         Pyomo -- inherits --> SolverBase
 
 .. attention::
