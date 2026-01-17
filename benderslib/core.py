@@ -1058,8 +1058,8 @@ class BendersSolver:
         """
         master_problem = MasterProblem(master_solver(master_model))
 
-        # if isinstance(sub_model, Iterable):
-        if len(sub_model) > 1:
+        if isinstance(sub_model, Iterable):
+        # if len(sub_model) > 1:
             sub_problem = (SubProblem(sub_solver(sub)) for sub in sub_model)
             sub_problem = SubProblems(sub_problem, prob=prob)
         else:
