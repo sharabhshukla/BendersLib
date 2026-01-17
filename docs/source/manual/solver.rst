@@ -206,6 +206,7 @@ See :class:`SolverBase` for the comprehensive API reference, and :doc:`built-in 
    ~SolverBase._bin_vars
    ~SolverBase._var_bounds
    ~SolverBase._rhs
+   ~SolverBase._constr_num
 
 .. tip::
 

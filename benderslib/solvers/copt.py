@@ -39,10 +39,12 @@ class Copt(SolverBase):
         self._all_vars = [v.getName() for v in variables]
         self._bin_vars = [v for v, t in zip(self._all_vars, vtypes) if t == COPT.BINARY]
         self._int_vars = [v for v, t in zip(self._all_vars, vtypes) if t == COPT.INTEGER]
-        self._var_bounds = {v: (lb, ub) for v, lb, ub in zip(self._all_vars, lbs, ubs)
-                            if lb != 0 or ub != COPT.INFINITY}
+        # Record only non-trivial bounds, i.e., lb != 0 or ub != +inf
+        self._var_bounds = {
+            v: (lb, ub) for v, lb, ub in zip(self._all_vars, lbs, ubs) if lb != 0 or ub != COPT.INFINITY}
         self.__standardize()
         self._rhs = self.get_rhs()
+        self._constr_num = len(self.model.getConstrs())
 
     def __standardize(self):
         self.__sense_to_minimize()

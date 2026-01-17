@@ -39,21 +39,20 @@ class Pyomo(SolverBase):
         self.status = CST.UNSOLVED
         self._solver_model = model
         self._sense = CST.MIN if model.obj.sense == pyo.minimize else CST.MAX
-
         self._all_vars = [v.name for v in model.component_data_objects(Var)]
         self._bin_vars = [v.name for v in model.component_data_objects(Var) if v.is_binary()]
         self._int_vars = [v.name for v in model.component_data_objects(Var) if v.is_integer() and not v.is_binary()]
-
+        # Record only non-trivial bounds, i.e., lb != 0 or ub != +inf
         self._var_bounds = {}
         for v in model.component_data_objects(Var):
             lb = v.lb if v.lb is not None else -float('inf')
             ub = v.ub if v.ub is not None else float('inf')
-            # Record only non-trivial bounds, i.e., lb != 0 or ub != +inf
             if lb != 0 or ub != float('inf'):
                 self._var_bounds[v.name] = (lb, ub)
-
         self.__standardize()
         self._rhs = self.get_rhs()
+        _all_constrs = list(model.component_data_objects(Constraint, active=True))
+        self._constr_num = len(_all_constrs)
 
         # If the model has no integer and binary variables, we can access dual values
         if len(self._bin_vars) + len(self._int_vars) == 0:

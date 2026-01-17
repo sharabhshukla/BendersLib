@@ -50,7 +50,7 @@ class ProblemBase:
             f"{n}: \n"
             f" - {'Variable No.:'.ljust(CST.LOG_NAME_WIDTH)}{n_vars}"
             f" [Integer: {len(self.model._int_vars)}, Binary: {len(self.model._bin_vars)}]\n"
-            # f" - {'Constraint No.:'.ljust(CST.LOG_NAME_WIDTH)}{len(self._solver_model.getConstrs())}\n"
+            f" - {'Constraint No.:'.ljust(CST.LOG_NAME_WIDTH)}{self.model._constr_num}\n"
             f" - {'Solver:'.ljust(CST.LOG_NAME_WIDTH)}{self.model.__class__.__name__}"
         )
 

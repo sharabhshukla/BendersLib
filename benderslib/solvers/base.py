@@ -54,6 +54,8 @@ class SolverBase(ABC):
         """A dictionary mapping variable names to their lower and upper bounds."""
         self._rhs: list[float] = []
         """A list of right-hand side values for all constraints in the model."""
+        self._constr_num: int | None = None
+        """The number of constraints in the model."""
 
     @abstractmethod
     def add_estimators(self, estimators: list[str], prob: list[float] = None, lb: float = 0) -> None:
