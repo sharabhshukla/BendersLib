@@ -756,7 +756,6 @@ class Cut:
         other_sorted_pairs = tuple(sorted(zip(other.vars, other.coefs)))
 
         return (
-                self.ctype == other.ctype and
                 self.sense == other.sense and
                 self.rhs == other.rhs and
                 self_sorted_pairs == other_sorted_pairs
@@ -765,7 +764,7 @@ class Cut:
     def __hash__(self):
         # Sort by variable name to ensure hash is consistent
         sorted_pairs = tuple(sorted(zip(self.vars, self.coefs)))
-        return hash((sorted_pairs, self.rhs, self.sense, self.ctype))
+        return hash((sorted_pairs, self.rhs, self.sense))
 
 
 class OptimalityCut(Cut):
