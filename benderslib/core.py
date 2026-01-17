@@ -26,7 +26,7 @@ class ProblemBase:
 
     def __init__(self, solver_backend: SolverBase):
         self.model: SolverBase = solver_backend
-        """An instance of the solver backend (see classes in :ref:`solver-table`)."""
+        """An instance of the solver backend (see classes in :doc:`../api/solver`)."""
         self._solver_model = self.model._solver_model
         """A copy of the original solver model instance.
         
@@ -267,21 +267,23 @@ class MasterProblem(ProblemBase):
     """
 
     def __init__(self, solver_backend: SolverBase, complicating_vars: list = None):
-        self.complicating_vars = complicating_vars
-        """A list of names of the complicating variables."""
         super().__init__(solver_backend)
 
-        self.optimality_cuts: list[Cut] = []
-        """A list of optimality cuts added to the master problem."""
-        self.feasibility_cuts: list[Cut] = []
-        """A list of feasibility cuts added to the master problem."""
+        # Public attributes
+        self.complicating_vars = complicating_vars
+        """A list of names of the complicating variables."""
+        self.optimality_cuts: set[Cut] = set()
+        """A set of optimality cuts added to the master problem."""
+        self.feasibility_cuts: set[Cut] = set()
+        """A set of feasibility cuts added to the master problem."""
+        self.cuts: dict[str, Cut] = dict()
+        """A dictionary mapping cut names to their corresponding instances."""
         self.estimators: list[str] = []
         """A list of estimator variable names added to the master problem."""
 
+        # Private attributes
         self.__oc_id = itertools.count(1)
         self.__fc_id = itertools.count(1)
-
-        self.__added_cut = set()
 
     def _add_estimators(self, multiple: bool = False, prob: list[float] = None, lb: float = 0.0) -> None:
         """
@@ -330,22 +332,22 @@ class MasterProblem(ProblemBase):
         str
             The name of the added cut in the master problem.
         """
-        if cut in self.__added_cut:
+        if cut in self.optimality_cuts or cut in self.feasibility_cuts:
             BendersLogger.warning(f"Warning: Duplicate cut detected: {cut}. This cut will not be added again.")
             return None
         else:
-            self.__added_cut.add(cut)
+            if cut.ctype == CST.OPTIMALITY:
+                cut_id = f"OC{next(self.__oc_id)}"
+                cut.name = f"{cut.name}_{cut_id}"
+                self.optimality_cuts.add(cut)
+            else:
+                cut_id = f"FC{next(self.__fc_id)}"
+                cut.name = f"{cut.name}_{cut_id}"
+                self.feasibility_cuts.add(cut)
 
-        if cut.ctype == CST.OPTIMALITY:
-            cut_id = f"O_{next(self.__oc_id)}"
-            self.optimality_cuts.append(cut)
-        else:
-            cut_id = f"F_{next(self.__fc_id)}"
-            self.feasibility_cuts.append(cut)
-
-        cut_name = f"{cut.name}_{cut_id}"
-        self.model.add_cut(cut, name=cut_name)
-        return cut_name
+            self.cuts[cut.name] = cut
+            self.model.add_cut(cut, name=cut.name)
+            return cut.name
 
     def remove_cut(self, cut_name: str) -> None:
         """Remove a cut from the master problem by its name.
@@ -361,6 +363,14 @@ class MasterProblem(ProblemBase):
 
                 problem.remove_cut('BendersOC_1')
         """
+        # Remove from MasterProblem
+        # Set.discard will not raise KeyError if the cut does not exist, unlike Set.remove
+        self.optimality_cuts.discard(self.cuts[cut_name])
+        self.feasibility_cuts.discard(self.cuts[cut_name])
+        # Dict.pop will raise KeyError if the cut does not exist
+        self.cuts.pop(cut_name)
+
+        # Remove from the solver model
         self.model.remove_cut(cut_name)
 
 

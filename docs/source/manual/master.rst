@@ -265,6 +265,7 @@ It is inherited from the base class :class:`ProblemBase`, but tailored for maste
    ~MasterProblem.complicating_vars
    ~MasterProblem.optimality_cuts
    ~MasterProblem.feasibility_cuts
+   ~MasterProblem.cuts
    ~MasterProblem.estimators
 
 .. tip::
