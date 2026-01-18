@@ -13,10 +13,12 @@ Benders Cut
 .. autoclass:: OptimalityCut
    :inherited-members:
    :show-inheritance:
+   :exclude-members: ctype
 
 .. autoclass:: FeasibilityCut
    :inherited-members:
    :show-inheritance:
+   :exclude-members: ctype
 
 .. autoclass:: CutGenerator
    :inherited-members:
