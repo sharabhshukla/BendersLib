@@ -9,20 +9,22 @@ Benders Cut
 .. autoclass:: Cut
    :inherited-members:
    :show-inheritance:
+   :exclude-members: _params
 
 .. autoclass:: OptimalityCut
    :inherited-members:
    :show-inheritance:
-   :exclude-members: ctype
+   :exclude-members: ctype, _params
 
 .. autoclass:: FeasibilityCut
    :inherited-members:
    :show-inheritance:
-   :exclude-members: ctype
+   :exclude-members: ctype, _params
 
 .. autoclass:: CutGenerator
    :inherited-members:
    :show-inheritance:
+   :exclude-members: _generate
 
 Master and Sub Problem
 -----------------------------------------

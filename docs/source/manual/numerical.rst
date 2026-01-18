@@ -8,15 +8,15 @@ These can affect both the coefficients of generated cuts and the comparison of f
 BendersLib handles these challenges as follows.
 
 Comparing Objective Function Values
------------------------------------
+--------------------------------------------
 
-A core step in the Benders decomposition algorithm is to check if an optimality cut needs to be added.
+A core step in the stochastic Benders decomposition algorithm is to check if an optimality cut needs to be added.
 This is done by comparing the objective value of the subproblem (``sub_obj``) with the current value of
 the master problem's estimator variable (``theta``). A cut is added if ``sub_obj`` is *greater than* ``theta``.
 
 However, due to floating-point inaccuracies, a direct comparison like ``sub_obj > theta`` can be unreliable.
 The subproblem's objective might be trivially larger than the estimator due to numerical noise,
-leading to the addition of weak or unnecessary cuts.
+leading to the addition of unnecessary cuts.
 
 To perform a robust comparison, BendersLib involves a parameter :attr:`~BendersParams.tol_obj_diff` that defines
 a tolerance level for the difference between ``sub_obj`` and ``theta``.
@@ -26,3 +26,24 @@ This ensures that a cut is only added when the violation is significant, i.e., w
 This approach is used within BendersLib's own cut generators for Benders methods with multiple subproblems,
 such as in :class:`LShapedOCGen`, :class:`IntegerLShapedOCGen`, and :class:`GeneLShapedOCGen`,
 to ensure that only meaningful optimality cuts are added to the master problem.
+
+Determining Whether Two Cuts are Identical
+--------------------------------------------
+
+Another numerical challenge is identifying duplicate cuts. During the Benders decomposition process,
+the same cut may be generated in different iterations. Adding duplicate cuts to the master problem is
+inefficient and can slow down the solver.
+
+Due to floating-point arithmetic, the coefficients and right-hand side (RHS) values of two cuts that are
+mathematically identical might have small numerical differences.
+A simple direct comparison would fail to identify them as duplicates.
+
+To address this, BendersLib uses the :attr:`~BendersParams.tol_cut_diff` parameter.
+When checking if a new cut is a duplicate of an existing one, the algorithm compares their coefficients
+and RHS values within this tolerance. If all corresponding values are closer than ``tol_cut_diff``,
+the cuts are considered identical, and the new cut is discarded.
+
+This logic is implemented in the ``__eq__`` method of the :class:`~core.Cut` class.
+To ensure consistency, the ``__hash__`` method is also adapted. It discretizes the floating-point numbers
+(coefficients and RHS) based on the tolerance before hashing. This guarantees that cuts considered equal
+under the specified tolerance will also have the same hash value, allowing them to be managed correctly.

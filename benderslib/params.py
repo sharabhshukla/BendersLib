@@ -42,6 +42,12 @@ class BendersParams:
     When generating optimality cuts, the cut is added only if ``sub_obj - theta > tol_obj_diff``, 
     to avoid numerical issues. It is set to be equal to ``tol_abs`` by default.
     """
+    tol_cut_diff: float = 1e-8
+    """Tolerance for cut coefficients and RHS comparison.
+    
+    When adding a cut, if all coefficients and right-hand side (RHS) differ from an existing cut 
+    by no more than ``tol_cut_diff``, the new cut is considered duplicate and will not be added.
+    """
 
     # Convergence
     tol_abs: float = 1e-6
