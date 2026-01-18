@@ -108,8 +108,9 @@ Please refer to :doc:`solver` for a list of supported solvers and detailed instr
       - ``pip install pyomo``
       - ``conda install -c conda-forge pyomo``
 
-*\* Note: Pyomo supported solvers need to be installed separately, see* `here <https://pyomo.readthedocs.io/en/stable/getting_started/solvers.html>`_.
-
+*\* Note: Pyomo supported solvers need to be installed separately, see*
+`installation instruction <https://pyomo.readthedocs.io/en/stable/getting_started/solvers.html>`_
+*and* `supported solvers <https://github.com/Pyomo/pyomo/tree/main/pyomo/solvers/plugins/solvers>`_.
 
 Verifying the Installation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

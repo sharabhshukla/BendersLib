@@ -83,9 +83,10 @@ Guide on building solver models can be found in the official documentation of ea
       - Commercial modeling language supporting
         `multiple solvers <https://dev.ampl.com/solvers/index.html>`__.
 
-*\* Pyomo supported solvers need to be installed separately, see* `here <https://pyomo.readthedocs.io/en/stable/getting_started/solvers.html>`_.
-
-*Note: MP: Mathematical Programming, CP: Constraint Programming, ML: Modeling Language.*
+*\* Note: Pyomo supported solvers need to be installed separately, see*
+`installation instruction <https://pyomo.readthedocs.io/en/stable/getting_started/solvers.html>`_
+*and* `supported solvers <https://github.com/Pyomo/pyomo/tree/main/pyomo/solvers/plugins/solvers>`_.
+*MP: Mathematical Programming, CP: Constraint Programming, ML: Modeling Language.*
 
 .. admonition:: Mathematical Programming vs. Constraint Programming
     :class: tip
