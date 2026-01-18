@@ -893,7 +893,7 @@ class Cut:
             return False
 
         # Handle comparison out of Benders iterations
-        tol = self._params.tol_cut_diff if self._params else 0.0
+        tol = self._params.tol_cut_diff if self._params else BendersParams.tol_cut_diff
 
         if abs(self.rhs - other.rhs) > tol:
             return False
@@ -909,7 +909,7 @@ class Cut:
         sorted_pairs = sorted(zip(self.vars, self.coefs))
 
         # Handle comparison out of Benders iterations
-        tol = self._params.tol_cut_diff if self._params else 0.0
+        tol = self._params.tol_cut_diff if self._params else BendersParams.tol_cut_diff
 
         # Discretize floating-point values for hashing
         discretized_rhs = round(self.rhs / tol)
@@ -1134,52 +1134,46 @@ class BendersSolver:
             feasibility_cut=None,
             params: BendersParams = BendersParams()
     ):
+        # Override complicating vars in master and subproblem
         master_problem.complicating_vars = complicating_vars
         sub_problem.complicating_vars = complicating_vars
+
+        # Override params in master and subproblem
         master_problem.params = params
         sub_problem.params = params
 
+        # Public attributes
         self.master_problem = master_problem
         """An instance of :class:`MasterProblem` representing the master problem."""
         self.sub_problem = sub_problem
         """An instance of :class:`SubProblem` or :class:`SubProblems` representing the subproblem(s)."""
         self.complicating_vars = complicating_vars
         """A list of names of the complicating variables."""
-
-        self.optimality_cut = None
+        self.optimality_cut = self.__initialize_cut(optimality_cut, master_problem, sub_problem, params)
         """An instance of :class:`CutGenerator` for generating optimality cuts."""
-        self.feasibility_cut = None
+        self.feasibility_cut = self.__initialize_cut(feasibility_cut, master_problem, sub_problem, params)
         """An instance of :class:`CutGenerator` for generating feasibility cuts."""
-
-        if inspect.isfunction(optimality_cut):
-            self.optimality_cut = _FuncWrapperCut(master_problem, sub_problem, optimality_cut, params)
-        elif inspect.isclass(optimality_cut):
-            self.optimality_cut = optimality_cut(master_problem, sub_problem, params)
-        elif optimality_cut is not None:
-            raise ValueError("<optimality_cut> must be a <function> or a <class>.")
-        elif optimality_cut is None:
-            self.optimality_cut = None
-
-        if inspect.isfunction(feasibility_cut):
-            self.feasibility_cut = _FuncWrapperCut(master_problem, sub_problem, feasibility_cut, params)
-        elif inspect.isclass(feasibility_cut):
-            self.feasibility_cut = feasibility_cut(master_problem, sub_problem, params)
-        elif feasibility_cut is not None:
-            raise ValueError("<feasibility_cut> must be a <function> or a <class>.")
-        elif feasibility_cut is None:
-            self.feasibility_cut = None
-
-        assert self.optimality_cut or self.feasibility_cut, "Provide at least <optimality_cut> or <feasibility_cut>."
-
         self.params = params
         """The parameters that can be set by the user (see :class:`BendersParams`)."""
-
-        # Attributes
         self.result = BendersResult()
         """An instance of :class:`BendersResult` that stores the results and statistics."""
+
+        # Private attributes
         self.__logger = BendersLogger(self)
         """An instance of :class:`BendersLogger` for handling logging."""
         self.__prob = self.sub_problem.prob if isinstance(self.sub_problem, SubProblems) else None
+
+        # Ensure at least one cut generator is provided
+        assert self.optimality_cut or self.feasibility_cut, "Provide at least <optimality_cut> or <feasibility_cut>."
+
+    def __initialize_cut(self, cut, master_problem, sub_problem, params):
+        if inspect.isfunction(cut):
+            return _FuncWrapperCut(master_problem, sub_problem, cut, params)
+        elif inspect.isclass(cut):
+            return cut(master_problem, sub_problem, params)
+        elif cut is not None:
+            raise ValueError("<cut> must be a <function> or a <class>.")
+        return None
 
     @classmethod
     def from_models(
