@@ -8,7 +8,9 @@ Generalized Benders Decomposition
 
 .. default-role:: raw-latex
 
-.. important::
+.. danger::
+
+    **Non-linear features in BendersLib are experimental**.
 
     BendersLib currently supports only **linear** Benders cuts.
     Therefore, the user must ensure that the problem is **linearly separable** as described
