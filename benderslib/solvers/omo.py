@@ -1,4 +1,5 @@
 # coding:utf-8
+from pyomo.contrib.pynumero.examples.sqp import load_solution
 
 try:
     import pyomo.environ as pyo
@@ -20,19 +21,17 @@ class Pyomo(SolverBase):
 
     Parameters
     ---------------
+
     model: pyomo.environ.ConcreteModel
         An instance of Pyomo's ``ConcreteModel``.
+    solver: str
+        The solver to be used with Pyomo (see :ref:`supported solvers <solver-table>`).
+    solver_options: dict, optional
+        A dictionary of solver-specific options to be passed to the solver.
     """
 
-    def __init__(self, model: pyo.ConcreteModel, solver=None) -> None:
-        if not solver:
-            # solver = 'gurobi'
-            raise ValueError("A solver must be specified for the Pyomo interface.")
-        solver_name_map = {
-            'gurobi': 'gurobi_direct',
-        }
-        self.solver = solver_name_map.get(solver, solver)
-
+    def __init__(self, model: pyo.ConcreteModel, solver: str, solver_options: dict = None) -> None:
+        self.solver_factory = self.__init_solver_factory(solver, solver_options)
         super().__init__(model)
 
         # Attributes required by SolverBase
@@ -58,6 +57,30 @@ class Pyomo(SolverBase):
         if len(self._bin_vars) + len(self._int_vars) == 0:
             if not hasattr(self.model, 'dual'):
                 self.model.dual = Suffix(direction=Suffix.IMPORT)
+
+    def __init_solver_factory(self, solver: str, solver_options: dict) -> pyo.SolverFactory:
+        # Initialize Pyomo SolverFactory instance
+        _solver_name_map = {
+            # "Pyomo direct solver interfaces do not use any file io.
+            # Rather, they interface directly with the python bindings for the specific solver."
+
+            'cplex': 'cplex_direct',
+            'gurobi': 'gurobi_direct',
+            'mosek': 'mosek_direct',
+            'xpress': 'xpress_direct',
+        }
+        _solver_options = {
+            # Hide solver output
+            'gurobi': {'OutputFlag': 0, 'LogToConsole': 0, 'InfUnbdInfo': 1, 'QCPDual': 1},
+        }
+        solver_options = solver_options or {}
+        solver_options.update(_solver_options.get(solver, {}))
+
+        solver_factory = pyo.SolverFactory(
+            _solver_name_map.get(solver, solver),
+            options=solver_options,
+        )
+        return solver_factory
 
     def __standardize(self):
         self.__sense_to_minimize()
@@ -166,16 +189,14 @@ class Pyomo(SolverBase):
         self.model.del_component(cut_name)
 
     def solve(self) -> None:
-        # Hide solver output
-        options = {'OutputFlag': 0, 'LogToConsole': 0}
-        solver_factory = pyo.SolverFactory(self.solver, options=options, manage_env=True)
-
         # Solve the model
-        results = solver_factory.solve(self.model, tee=False)
+        results = self.solver_factory.solve(self.model, tee=False, load_solutions=False)
+        term_cond = results.solver.termination_condition
 
         # Update status
-        term_cond = results.solver.termination_condition
         if term_cond == pyo.TerminationCondition.optimal:
+            # Load solution back to the model
+            self.model.solutions.load_from(results)
             self.status = CST.OPTIMAL
         elif term_cond == pyo.TerminationCondition.infeasible:
             self.status = CST.INFEASIBLE
