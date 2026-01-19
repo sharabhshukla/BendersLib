@@ -40,6 +40,10 @@ table.autosummary {
     width: 100%;
 }
 
+/*Customize docutils table style*/
+table.docutils {
+    width: 100%;
+}
 
 /* Customize font sizes */
 body {

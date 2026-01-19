@@ -15,78 +15,119 @@ BendersLib supports the following solvers.
 Installation instructions can be found in the manual under :ref:`Installing Solvers <manual_installing_solver>`.
 Guide on building solver models can be found in the official documentation of each solver.
 
-.. list-table:: Built-in Solver and Modeling Language Interfaces
-    :widths: 20 15 15 50 50
+.. list-table:: Supported Solvers' Features
+    :widths: auto
     :header-rows: 1
     :name: solver-table
 
     * - Solver
       - Class
-      - Type
-      - Documentation
-      - Note
-    * - **Gurobi**
-      - :class:`~.solvers.Gurobi`
-      - MP
-      - https://docs.gurobi.com
-      - Commercial (free academic license)
+      - Doc
+      - Dual
+      - Farkas
+      - IIS
+      - License
     * - **COPT**
       - :class:`~.solvers.Copt`
-      - MP
-      - https://guide.coap.online/copt/en-doc/
-      - Commercial (free academic license)
-    * - **Pyomo** *
+      - `Doc <https://guide.coap.online/copt/en-doc/>`__
+      - ✅
+      - ✅
+      - ✅
+      - Commercial
+    * - **Gurobi**
+      - :class:`~.solvers.Gurobi`
+      - `Doc <https://docs.gurobi.com>`__
+      - ✅
+      - ✅
+      - ✅
+      - Commercial
+    * - **OR-Tools**
+      -
+      - `Doc <https://developers.google.com/optimization>`__
+      - ❌
+      - ❌
+      - ❌
+      - Open-source
+    * - **SCIP**
+      -
+      - `Doc <https://pyscipopt.readthedocs.io>`__
+      - ✅
+      - ✅
+      - ✅
+      - Open-source
+    * - Pyomo\*:
       - :class:`~.solvers.Pyomo`
-      - ML
-      - https://pyomo.readthedocs.io/en/stable/
-      - Open-source modeling language supporting
-        `multiple solvers <https://pyomo.readthedocs.io/en/stable/getting_started/solvers.html>`_.
-    * - SCIP
-      -
-      - MP
-      -
+      - `Doc <https://pyomo.readthedocs.io>`__
+      - \-
+      - \-
+      - \-
       - Open-source
-    * - IPOPT
-      -
-      - MP (NLP)
-      -
+    * - **CBC**
+      - :class:`~.solvers.Pyomo` (``'cbc'``)
+      - `Doc <https://www.coin-or.org/Cbc/cbcuserguide.html>`__
+      - ✅
+      - ❌
+      - ❌
       - Open-source
-    * - MOSEK
-      -
-      - MP (NLP)
-      -
-      - Commercial (free academic license)
-    * - KNITRO
-      -
-      - MP (NLP)
-      -
+    * - **CPLEX**
+      - :class:`~.solvers.Pyomo` (``'cplex'``)
+      - `Doc <https://www.ibm.com/docs/en/icos/22.1.2?topic=optimizers-users-manual-cplex>`__
+      - ✅
+      - ❌
+      - ✅
       - Commercial
-    * - Baron
-      -
-      - MP (NLP)
-      -
+    * - **GLPK**
+      - :class:`~.solvers.Pyomo` (``'glpk'``)
+      - `Doc <https://www.gnu.org/software/glpk/>`__
+      - ✅
+      - ❌
+      - ❌
+      - Open-source
+    * - **Gurobi**
+      - :class:`~.solvers.Pyomo` (``'gurobi'``)
+      - `Doc <https://docs.gurobi.com>`__
+      - ✅
+      - ❌
+      - ✅
       - Commercial
-    * - OR-Tools
-      -
-      - CP
-      -
-      - Open-source CP/SAT solver.
-    * - CVXPY
-      -
-      - ML
-      -
-      - Open-source modeling language.
-    * - AMPL
-      -
-      - ML
-      -
-      - Commercial modeling language supporting
-        `multiple solvers <https://dev.ampl.com/solvers/index.html>`__.
+    * - **HiGHS**
+      - :class:`~.solvers.Pyomo` (``'highs'``)
+      - `Doc <https://highs.dev>`__
+      - ✅
+      - ❌
+      - ❌
+      - Open-source
+    * - **MOSEK**
+      - :class:`~.solvers.Pyomo` (``'mosek'``)
+      - `Doc <https://docs.mosek.com>`__
+      - ✅
+      - ❌
+      - ❌
+      - Commercial
+    * - **SCIP**
+      - :class:`~.solvers.Pyomo` (``'scip'``)
+      - `Doc <https://www.scipopt.org>`__
+      - ❌
+      - ❌
+      - ❌
+      - Open-source
+    * - **Xpress**
+      - :class:`~.solvers.Pyomo` (``'xpress'``)
+      - `Doc <https://www.fico.com/en/products/fico-xpress-optimization>`__
+      - ✅
+      - ❌
+      - ✅
+      - Commercial
 
-*\* Note: Pyomo supported solvers need to be installed separately, see*
-`installation instruction <https://pyomo.readthedocs.io/en/stable/getting_started/solvers.html>`_
+.. SCIP, IPOPT, Baron, KNITRO, and MOSEK interfaces (may) will be added in future releases.
+.. CVXPY and AMPL (may) will be added in future releases.
+
+*\* Note: Pyomo is a modeling language. Supported solvers must be installed separately, see*
+:ref:`solver-installation-table` *(by BendersLib),*
+`installation instruction <https://pyomo.readthedocs.io/en/stable/getting_started/solvers.html>`_ *(by Pyomo),*
 *and* `supported solvers <https://github.com/Pyomo/pyomo/tree/main/pyomo/solvers/plugins/solvers>`_.
-*MP: Mathematical Programming, CP: Constraint Programming, ML: Modeling Language.*
+*The above list of solvers is not exhaustive. BendersLib's Pyomo interface can also utilize other solvers supported by Pyomo.*
+*Commercial solvers require valid licenses to use; ones above offer free academic licenses.*
 
 .. admonition:: Mathematical Programming vs. Constraint Programming
     :class: tip

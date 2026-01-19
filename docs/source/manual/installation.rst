@@ -90,27 +90,73 @@ BendersLib supports several popular optimization solvers.
 You can install these solvers individually based on your needs. Installing all of them is not necessary.
 Please refer to :doc:`solver` for a list of supported solvers and detailed instructions for each.
 
-.. list-table:: Solvers Installation
-    :widths: 17 70 70
+.. list-table:: Installing Solvers
+    :widths: auto
     :header-rows: 1
     :name: solver-installation-table
 
     * - Solver
       - pip
       - conda
-    * - :class:`~.solvers.Gurobi`
-      - ``pip install gurobipy``
-      - ``conda install -c gurobi gurobi``
-    * - :class:`~.solvers.Copt`
+      - Guide
+    * - **COPT**
       - ``pip install coptpy``
-      -
-    * - :class:`~.solvers.Pyomo` *
+      - N/A
+      - `Install <https://guide.coap.online/copt/en-doc/pythoninterface.html#chappythoninterface>`__
+    * - **Gurobi**
+      - ``pip install gurobipy``
+      - ``conda install gurobi::gurobi``
+      - `Install <https://support.gurobi.com/hc/en-us/articles/360044290292-How-do-I-install-Gurobi-for-Python>`__
+    * - **OR-Tools**
+      - ``pip install ortools``
+      - N/A
+      - `Install <https://developers.google.com/optimization/install/python>`__
+    * - **SCIP**
+      - ``pip install pyscipopt``
+      - ``conda install conda-forge::pyscipopt``
+      - `Install <https://pyscipopt.readthedocs.io/en/latest/install.html>`__
+    * - Pyomo\*:
       - ``pip install pyomo``
-      - ``conda install -c conda-forge pyomo``
+      - ``conda install conda-forge::pyomo``
+      - `Install <https://pyomo.readthedocs.io/en/stable/getting_started/installation.html>`__
+    * - **CBC**
+      - N/A
+      - ``conda install conda-forge::coincbc``
+      - `Install <https://github.com/coin-or/Cbc>`__
+    * - **CPLEX**
+      - ``pip install cplex``
+      - ``conda install ibmdecisionoptimization::cplex``
+      - `Install <https://www.ibm.com/docs/en/icos/22.1.2?topic=cplex-installing>`__
+    * - **GLPK**
+      - N/A
+      - ``conda install conda-forge::glpk``
+      - `Install <https://www.gnu.org/software/glpk/#downloading>`__
+    * - **Gurobi**
+      - ``pip install gurobipy``
+      - ``conda install gurobi::gurobi``
+      - `Install <https://support.gurobi.com/hc/en-us/articles/360044290292-How-do-I-install-Gurobi-for-Python>`__
+    * - **HiGHS**
+      - ``pip install highspy``
+      - ``conda install conda-forge::highspy``
+      - `Install <https://ergo-code.github.io/HiGHS/dev/interfaces/python/>`__
+    * - **MOSEK**
+      - ``pip install mosek``
+      - ``conda install mosek::MOSEK``
+      - `Install <https://docs.mosek.com/latest/install/installation.html>`__
+    * - **SCIP**
+      - N/A
+      - ``conda install conda-forge::scip``
+      - `Install <https://www.scipopt.org>`__
+    * - **Xpress**
+      - ``pip install xpress``
+      - ``conda install fico-xpress::xpress``
+      - `Install <https://www.fico.com/fico-xpress-optimization/docs/latest/installguide/dhtml/chapinst1.html>`__
 
-*\* Note: Pyomo supported solvers need to be installed separately, see*
-`installation instruction <https://pyomo.readthedocs.io/en/stable/getting_started/solvers.html>`_
+*\* Note: Pyomo is a modeling language. Supported solvers must be installed separately, see*
+`installation instruction <https://pyomo.readthedocs.io/en/stable/getting_started/solvers.html>`_ *(by Pyomo)*
 *and* `supported solvers <https://github.com/Pyomo/pyomo/tree/main/pyomo/solvers/plugins/solvers>`_.
+*The above list of solvers is not exhaustive. BendersLib's Pyomo interface can also utilize other solvers supported by Pyomo.*
+*See* :ref:`solver-table` *for solver features and license requirements.*
 
 Verifying the Installation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
