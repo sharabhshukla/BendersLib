@@ -27,8 +27,8 @@ class Pyomo(SolverBase):
     """
 
     def __init__(self, model: pyo.ConcreteModel, solver: str, solver_options: dict = None) -> None:
-        self.solver_factory = self.__init_solver_factory(solver, solver_options)
         super().__init__(model)
+        self.solver_factory = self.__init_solver_factory(solver, solver_options)
 
         # Attributes required by SolverBase
         self.status = CST.UNSOLVED
@@ -55,19 +55,23 @@ class Pyomo(SolverBase):
                 self.model.dual = Suffix(direction=Suffix.IMPORT)
 
     def __init_solver_factory(self, solver: str, solver_options: dict) -> pyo.SolverFactory:
+        if '_persistent' in solver:
+            raise NotImplementedError("Persistent solver interfaces are not supported in BendersLib yet.")
+
         # Initialize Pyomo SolverFactory instance
         _solver_name_map = {
             # "Pyomo direct solver interfaces do not use any file io.
             # Rather, they interface directly with the python bindings for the specific solver."
 
-            'cplex': 'cplex_direct',
-            'gurobi': 'gurobi_direct',
-            'mosek': 'mosek_direct',
-            'xpress': 'xpress_direct',
+            # 'cplex': 'cplex_direct',
+            # 'gurobi': 'gurobi_direct',
+            # 'mosek': 'mosek_direct',
+            # 'xpress': 'xpress_direct',
         }
         _solver_options = {
             # Hide solver output
             'gurobi': {'OutputFlag': 0, 'LogToConsole': 0, 'InfUnbdInfo': 1, 'QCPDual': 1},
+            'gurobi_direct': {'OutputFlag': 0, 'LogToConsole': 0, 'InfUnbdInfo': 1, 'QCPDual': 1},
         }
         solver_options = solver_options or {}
         solver_options.update(_solver_options.get(solver, {}))
