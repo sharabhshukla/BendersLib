@@ -210,9 +210,10 @@ class Pyomo(SolverBase):
 
         # Remove non-master variables from objective (ONLY handle linear case)
         obj = next(master.component_data_objects(Objective, active=True))
+        repn = generate_standard_repn(obj.expr)
         new_expr = sum(
             coef * master.find_component(var.name)
-            for coef, var in zip(obj.expr.linear_coefs, obj.expr.linear_vars)
+            for coef, var in zip(repn.linear_coefs, repn.linear_vars)
             if var.name in master_vars
         )
         master.del_component(obj)
@@ -222,13 +223,13 @@ class Pyomo(SolverBase):
         for constr in master.component_data_objects(Constraint, active=True):
             for var in identify_variables(constr.expr):
                 if var.name not in master_vars:
-                    master.del_component(constr)
+                    del constr
                     break
 
         # Remove non-master variables
         for var in master.component_data_objects(Var):
             if var.name not in master_vars:
-                master.del_component(var)
+                del var
 
         return master
 
@@ -244,9 +245,10 @@ class Pyomo(SolverBase):
 
         # Remove master variables from objective (ONLY handle linear case)
         obj = next(sub.component_data_objects(Objective, active=True))
+        repn = generate_standard_repn(obj.expr)
         new_expr = sum(
             coef * var
-            for coef, var in zip(obj.expr.linear_coefs, obj.expr.linear_vars)
+            for coef, var in zip(repn.linear_coefs, repn.linear_vars)
             if var.name not in master_vars
         )
         sub.del_component(obj)
@@ -260,7 +262,7 @@ class Pyomo(SolverBase):
                     is_master_only = False
                     break
             if is_master_only:
-                sub.del_component(constr)
+                del constr
 
         return sub
 
