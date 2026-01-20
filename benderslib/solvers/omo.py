@@ -1,5 +1,4 @@
 # coding:utf-8
-from pyomo.contrib.pynumero.examples.sqp import load_solution
 
 try:
     import pyomo.environ as pyo
