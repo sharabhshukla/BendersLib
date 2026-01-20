@@ -1,9 +1,6 @@
 # coding:utf-8
 
-try:
-    from gurobipy import Model, LinExpr, GRB
-except ImportError:
-    raise ImportError("Gurobi is not installed. Install it via 'pip install gurobipy'.")
+from gurobipy import Model, GRB
 
 from ..consts import BendersConsts as CST
 from .base import SolverBase

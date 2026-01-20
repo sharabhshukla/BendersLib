@@ -1,12 +1,9 @@
 # coding:utf-8
 
-try:
-    import pyomo.environ as pyo
-    from pyomo.core import Var, Objective, Constraint, Suffix
-    from pyomo.core.expr.visitor import identify_variables
-    from pyomo.repn import generate_standard_repn
-except ImportError:
-    raise ImportError("Pyomo is not installed. Install it via 'pip install pyomo'.")
+import pyomo.environ as pyo
+from pyomo.core import Var, Objective, Constraint, Suffix
+from pyomo.core.expr.visitor import identify_variables
+from pyomo.repn import generate_standard_repn
 
 from ..consts import BendersConsts as CST
 from .base import SolverBase

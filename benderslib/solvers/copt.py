@@ -1,9 +1,6 @@
 # coding:utf-8
 
-try:
-    from coptpy import Model, LinExpr, COPT
-except ImportError:
-    raise ImportError("COPT is not installed. Install it via 'pip install coptpy'.")
+from coptpy import Model, LinExpr, COPT
 
 from ..consts import BendersConsts as CST
 from .base import SolverBase
