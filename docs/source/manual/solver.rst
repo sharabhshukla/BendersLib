@@ -12,7 +12,7 @@ Supported Solvers
    You need to install the solvers separately based on your needs.
 
 BendersLib supports the following solvers.
-Installation instructions can be found in the manual under :ref:`Installing Solvers <manual_installing_solver>`.
+Installation instructions can be found in the manual under :ref:`solver-installation-table`.
 Guide on building solver models can be found in the official documentation of each solver.
 
 .. list-table:: Supported Solvers' Features
@@ -33,7 +33,7 @@ Guide on building solver models can be found in the official documentation of ea
       - ✅
       - ✅
       - ✅
-      - Commercial
+      - Commercial [2]_
     * - **Gurobi**
       - :class:`~.solvers.Gurobi`
       - `Doc <https://docs.gurobi.com>`__
@@ -55,7 +55,7 @@ Guide on building solver models can be found in the official documentation of ea
       - ✅
       - ✅
       - Open-source
-    * - Pyomo\*:
+    * - Pyomo [1]_:
       - :class:`~.solvers.Pyomo`
       - `Doc <https://pyomo.readthedocs.io>`__
       - \-
@@ -122,12 +122,12 @@ Guide on building solver models can be found in the official documentation of ea
 .. SCIP, IPOPT, Baron, KNITRO, and MOSEK interfaces (may) will be added in future releases.
 .. CVXPY and AMPL (may) will be added in future releases.
 
-*\* Note: Pyomo is a modeling language. Supported solvers must be installed separately, see*
-:ref:`solver-installation-table` *(by BendersLib),*
-`installation instruction <https://pyomo.readthedocs.io/en/stable/getting_started/solvers.html>`_ *(by Pyomo),*
-*and* `supported solvers <https://github.com/Pyomo/pyomo/tree/main/pyomo/solvers/plugins/solvers>`_.
-*The above list of solvers is not exhaustive. BendersLib's Pyomo interface can also utilize other solvers supported by Pyomo.*
-*Commercial solvers require valid licenses to use; ones above offer free academic licenses.*
+.. [1] *Pyomo is a modeling language. Supported solvers must be installed separately, see*
+       :ref:`solver-installation-table` *(by BendersLib),*
+       `installation instruction <https://pyomo.readthedocs.io/en/stable/getting_started/solvers.html>`_ *(by Pyomo),*
+       *and* `supported solvers <https://github.com/Pyomo/pyomo/tree/main/pyomo/solvers/plugins/solvers>`_.
+       *The above list of solvers is not exhaustive. BendersLib's Pyomo interface can also utilize other solvers supported by Pyomo.*
+.. [2] *Commercial solvers require valid licenses to use; ones above offer free academic licenses.*
 
 .. admonition:: Mathematical Programming vs. Constraint Programming
     :class: tip

@@ -88,7 +88,7 @@ Installing Solvers
 
 BendersLib supports several popular optimization solvers.
 You can install these solvers individually based on your needs. Installing all of them is not necessary.
-Please refer to :doc:`solver` for a list of supported solvers and detailed instructions for each.
+Please refer to :ref:`solver-table` for solver features and license requirements
 
 .. list-table:: Installing Solvers
     :widths: auto
@@ -115,7 +115,7 @@ Please refer to :doc:`solver` for a list of supported solvers and detailed instr
       - ``pip install pyscipopt``
       - ``conda install conda-forge::pyscipopt``
       - `Install <https://pyscipopt.readthedocs.io/en/latest/install.html>`__
-    * - Pyomo\*:
+    * - Pyomo [1]_:
       - ``pip install pyomo``
       - ``conda install conda-forge::pyomo``
       - `Install <https://pyomo.readthedocs.io/en/stable/getting_started/installation.html>`__
@@ -152,11 +152,10 @@ Please refer to :doc:`solver` for a list of supported solvers and detailed instr
       - ``conda install fico-xpress::xpress``
       - `Install <https://www.fico.com/fico-xpress-optimization/docs/latest/installguide/dhtml/chapinst1.html>`__
 
-*\* Note: Pyomo is a modeling language. Supported solvers must be installed separately, see*
-`installation instruction <https://pyomo.readthedocs.io/en/stable/getting_started/solvers.html>`_ *(by Pyomo)*
-*and* `supported solvers <https://github.com/Pyomo/pyomo/tree/main/pyomo/solvers/plugins/solvers>`_.
-*The above list of solvers is not exhaustive. BendersLib's Pyomo interface can also utilize other solvers supported by Pyomo.*
-*See* :ref:`solver-table` *for solver features and license requirements.*
+.. [1]  *Pyomo is a modeling language. Supported solvers must be installed separately, see*
+        `installation instruction <https://pyomo.readthedocs.io/en/stable/getting_started/solvers.html>`_ *(by Pyomo)*
+        *and* `supported solvers <https://github.com/Pyomo/pyomo/tree/main/pyomo/solvers/plugins/solvers>`_.
+        *The above list of solvers is not exhaustive. BendersLib's Pyomo interface can also utilize other solvers supported by Pyomo.*
 
 Verifying the Installation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
