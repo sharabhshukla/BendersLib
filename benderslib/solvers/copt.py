@@ -48,6 +48,7 @@ class Copt(SolverBase):
     def __standardize(self):
         self.__sense_to_minimize()
         self.__bounds_to_constrs()
+        self.__setup_model()
 
     def __sense_to_minimize(self):
         # BendersLib will automatically convert maximization problems to minimization problems
@@ -68,6 +69,14 @@ class Copt(SolverBase):
             if ub < COPT.INFINITY:
                 self.model.addConstr(var <= ub)
                 var.ub = COPT.INFINITY
+
+    def __setup_model(self):
+        # Hide solver output
+        self.model.setParam(COPT.Param.Logging, 0)
+        self.model.setParam(COPT.Param.LogToConsole, 0)
+
+        # Request Farkas dual for infeasible problems
+        self.model.setParam(COPT.Param.ReqFarkasRay, 1)
 
     def add_estimators(self, estimators: list[str], prob: list[float] = None, lb: float = 0) -> None:
         if prob is None:
@@ -168,13 +177,6 @@ class Copt(SolverBase):
         self.model.remove(con)
 
     def solve(self) -> None:
-        # Hide solver output
-        self.model.setParam(COPT.Param.Logging, 0)
-        self.model.setParam(COPT.Param.LogToConsole, 0)
-
-        # Request Farkas dual for infeasible problems
-        self.model.setParam(COPT.Param.ReqFarkasRay, 1)
-
         self.model.solve()
 
         _copt_status_map = {

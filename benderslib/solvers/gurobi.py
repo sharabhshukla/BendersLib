@@ -48,6 +48,7 @@ class Gurobi(SolverBase):
     def __standardize(self):
         self.__sense_to_minimize()
         self.__bounds_to_constrs()
+        self.__setup_model()
 
     def __sense_to_minimize(self):
         # BendersLib will automatically convert maximization problems to minimization problems
@@ -70,6 +71,20 @@ class Gurobi(SolverBase):
                 var.ub = GRB.INFINITY
 
         self.model.update()
+
+    def __setup_model(self):
+        # Hide solver output
+        self.model.Params.OutputFlag = 0
+        self.model.Params.LogToConsole = 0
+
+        # Get Model.FarkasDual requires InfUnbdInfo = 1
+        self.model.Params.InfUnbdInfo = 1
+
+        # Gurobi model status code 4 (INF_OR_UNBD)
+        self.model.Params.DualReductions = 0
+
+        # QCPi requires QCPDual = 1
+        self.model.Params.QCPDual = 1
 
     def add_estimators(self, estimators: list[str], prob: list[float] = None, lb: float = 0) -> None:
         if prob is None:
@@ -172,19 +187,6 @@ class Gurobi(SolverBase):
         self.model.remove(con)
 
     def solve(self) -> None:
-        # Hide solver output
-        self.model.Params.OutputFlag = 0
-        self.model.Params.LogToConsole = 0
-
-        # Get Model.FarkasDual requires InfUnbdInfo = 1
-        self.model.Params.InfUnbdInfo = 1
-
-        # Gurobi model status code 4 (INF_OR_UNBD)
-        self.model.Params.DualReductions = 0
-
-        # QCPi requires QCPDual = 1
-        self.model.Params.QCPDual = 1
-
         self.model.optimize()
 
         _grb_status_map = {
