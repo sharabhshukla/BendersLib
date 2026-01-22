@@ -26,7 +26,7 @@ class Pyomo(SolverBase):
         The solver to be used with Pyomo (e.g., ``'gurobi'``, ``'gurobi_direct'``, etc.,
         see :ref:`supported solvers <solver-table>`).
     solver_options: dict, optional
-        A dictionary of solver-specific options to be passed to the solver.
+        A dictionary of solver-specific options.
     """
 
     def __init__(self, model: pyo.ConcreteModel, solver: str, solver_options: dict = None) -> None:

@@ -18,9 +18,11 @@ class Gurobi(SolverBase):
     ---------------
     model: gurobipy.Model
         An instance of Gurobi's ``gurobipy.Model``.
+    solver_options: dict, optional
+        A dictionary of solver-specific options.
     """
 
-    def __init__(self, model: Model) -> None:
+    def __init__(self, model: Model, solver_options: dict = None) -> None:
         model.update()
         super().__init__(model)
 
@@ -45,10 +47,11 @@ class Gurobi(SolverBase):
         self._rhs = self.get_rhs()
         self._constr_num = len(self.model.getConstrs())
 
+        self.__setup_model(solver_options)
+
     def __standardize(self):
         self.__sense_to_minimize()
         self.__bounds_to_constrs()
-        self.__setup_model()
 
     def __sense_to_minimize(self):
         # BendersLib will automatically convert maximization problems to minimization problems
@@ -72,7 +75,7 @@ class Gurobi(SolverBase):
 
         self.model.update()
 
-    def __setup_model(self):
+    def __setup_model(self, solver_options: dict = None):
         # Hide solver output
         self.model.Params.OutputFlag = 0
         self.model.Params.LogToConsole = 0
@@ -85,6 +88,11 @@ class Gurobi(SolverBase):
 
         # QCPi requires QCPDual = 1
         self.model.Params.QCPDual = 1
+
+        # Setup solver options
+        if solver_options:
+            for option, value in solver_options.items():
+                setattr(self.model.Params, option, value)
 
     def add_estimators(self, estimators: list[str], prob: list[float] = None, lb: float = 0) -> None:
         if prob is None:

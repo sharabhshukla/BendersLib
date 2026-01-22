@@ -18,12 +18,14 @@ class Scip(SolverBase):
     ---------------
     model: pyscipopt.Model
         An instance of SCIP's ``pyscipopt.Model``.
+    solver_options: dict, optional
+        A dictionary of solver-specific options.
     """
 
     __SCIP_VAR_UB = 1e20
     """Default upper bound for SCIP variables."""
 
-    def __init__(self, model: Model) -> None:
+    def __init__(self, model: Model, solver_options: dict = None) -> None:
         super().__init__(model)
 
         # Supporting method like getVarByName and getConsByName
@@ -51,10 +53,11 @@ class Scip(SolverBase):
         self._rhs = self.get_rhs()
         self._constr_num = len(self.model.getConss(transformed=False))
 
+        self.__setup_model(solver_options)
+
     def __standardize(self):
         self.__sense_to_minimize()
         self.__bounds_to_constrs()
-        self.__setup_model()
 
     def __sense_to_minimize(self):
         if self.model.getObjectiveSense() == 'maximize':
@@ -78,7 +81,7 @@ class Scip(SolverBase):
 
         ...
 
-    def __setup_model(self):
+    def __setup_model(self, solver_options: dict = None):
         # Hide output
         self.model.hideOutput()
 
@@ -89,6 +92,10 @@ class Scip(SolverBase):
 
         # Get Farkas duals for infeasible problems
         self.model.setBoolParam("lp/alwaysgetduals", True)
+
+        # Setup solver options
+        if solver_options:
+            self.model.setParams(solver_options)
 
     def add_estimators(self, estimators: list[str], prob: list[float] = None, lb: float = 0) -> None:
         if prob is None:

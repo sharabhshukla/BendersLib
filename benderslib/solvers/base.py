@@ -15,9 +15,11 @@ class SolverBase(ABC):
     ---------------
     model :
         An instance of the solver's model class (e.g., Gurobi's ``gurobipy.Model``).
+    solver_options: dict, optional
+        A dictionary of solver-specific options.
     """
 
-    def __init__(self, model):
+    def __init__(self, model, solver_options: dict = None) -> None:
         self.model = model
         self.status = CST.UNSOLVED
         """The status of the last solve attempt.
