@@ -376,6 +376,8 @@ class MasterProblem(ProblemBase):
         """
 
         if cut in self.optimality_cuts or cut in self.feasibility_cuts:
+            # raise Exception(f"Duplicate cut detected: {cut}")
+
             BendersLogger.warning(f"Duplicate cut is ignored: {cut}")
             return None
         else:

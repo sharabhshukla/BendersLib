@@ -87,7 +87,6 @@ class Copt(SolverBase):
             var.ub = var_value
 
     def unfix_vars(self, vars: list[str]) -> None:
-        print(self._var_bounds)
         for var_name in vars:
             var = self.model.getVarByName(var_name)
             var.lb, var.ub = self._var_bounds.get(var_name, (0, COPT.INFINITY))

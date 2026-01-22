@@ -62,9 +62,15 @@ try:
 except ImportError:
     Pyomo = _create_placeholder_solver("Pyomo", "Install it via 'pip install pyomo'.")
 
+try:
+    from .scip import Scip
+except ImportError:
+    Scip = _create_placeholder_solver("SCIP", "Install it via 'pip install pyscipopt'.")
+
 __all__ = [
     "SolverBase",
     "Gurobi",
     "Copt",
     "Pyomo",
+    "Scip",
 ]

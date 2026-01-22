@@ -26,14 +26,14 @@ Guide on building solver models can be found in the official documentation of ea
       - Dual
       - Farkas
       - IIS
-      - License
+      - License [2]_
     * - **COPT**
       - :class:`~.solvers.Copt`
       - `Doc <https://guide.coap.online/copt/en-doc/>`__
       - ✅
       - ✅
       - ✅
-      - Commercial [2]_
+      - Commercial
     * - **Gurobi**
       - :class:`~.solvers.Gurobi`
       - `Doc <https://docs.gurobi.com>`__
@@ -49,9 +49,9 @@ Guide on building solver models can be found in the official documentation of ea
       - ❌
       - Open-source
     * - **SCIP**
-      -
+      - :class:`~.solvers.Scip`
       - `Doc <https://pyscipopt.readthedocs.io>`__
-      - ✅
+      - 🟦 [3]_
       - ✅
       - ✅
       - Open-source
@@ -107,7 +107,7 @@ Guide on building solver models can be found in the official documentation of ea
     * - **SCIP**
       - :class:`~.solvers.Pyomo` (``'scip'``)
       - `Doc <https://www.scipopt.org>`__
-      - ❌
+      - 🟦 [3]_
       - ❌
       - ❌
       - Open-source
@@ -128,6 +128,12 @@ Guide on building solver models can be found in the official documentation of ea
        *and* `supported solvers <https://github.com/Pyomo/pyomo/tree/main/pyomo/solvers/plugins/solvers>`_.
        *The above list of solvers is not exhaustive. BendersLib's Pyomo interface can also utilize other solvers supported by Pyomo.*
 .. [2] *Commercial solvers require valid licenses to use; ones above offer free academic licenses.*
+.. [3] *Bound constraints (constraints with only one variable) are not allowed, due to a SCIP limitation.*
+       *See the*
+       `PySCIPOpt documentation <https://pyscipopt.readthedocs.io/en/latest/tutorials/constypes.html#constraint-information>`_
+       *and*
+       `this discussion <https://stackoverflow.com/a/79562415/6729710>`_.
+       *This also means you cannot specify bounds when defining variables.*
 
 .. admonition:: Mathematical Programming vs. Constraint Programming
     :class: tip
@@ -277,4 +283,4 @@ See :class:`SolverBase` for the comprehensive API reference, and :doc:`built-in 
 .. seealso::
 
     * Base Class: :class:`SolverBase`
-    * Solver Interfaces: :class:`~.solvers.Gurobi`, :class:`~.solvers.Copt`
+    * Solver Interfaces: :class:`~.solvers.Gurobi`, :class:`~.solvers.Copt`, :class:`~.solvers.Pyomo`, :class:`~.solvers.Scip`

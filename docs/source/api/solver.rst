@@ -17,3 +17,7 @@ Solver Interfaces
 .. autoclass:: benderslib.solvers.Pyomo
    :inherited-members:
    :show-inheritance:
+
+.. autoclass:: benderslib.solvers.Scip
+   :inherited-members:
+   :show-inheritance:
