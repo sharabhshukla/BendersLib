@@ -70,7 +70,7 @@ Guide on building solver models can be found in the official documentation of ea
       - ❌
       - Open-source
     * - **CPLEX**
-      - :class:`~.solvers.Pyomo` (``'cplex'``)
+      - :class:`~.solvers.Pyomo` (``'cplex'``, ``'cplex_direct'`` [4]_)
       - `Doc <https://www.ibm.com/docs/en/icos/22.1.2?topic=optimizers-users-manual-cplex>`__
       - ✅
       - ❌
@@ -84,7 +84,7 @@ Guide on building solver models can be found in the official documentation of ea
       - ❌
       - Open-source
     * - **Gurobi**
-      - :class:`~.solvers.Pyomo` (``'gurobi'``)
+      - :class:`~.solvers.Pyomo` (``'gurobi'``, ``'gurobi_direct'`` [4]_)
       - `Doc <https://docs.gurobi.com>`__
       - ✅
       - ❌
@@ -98,7 +98,7 @@ Guide on building solver models can be found in the official documentation of ea
       - ❌
       - Open-source
     * - **MOSEK**
-      - :class:`~.solvers.Pyomo` (``'mosek'``)
+      - :class:`~.solvers.Pyomo` (``'mosek'``, ``'mosek_direct'`` [4]_)
       - `Doc <https://docs.mosek.com>`__
       - ✅
       - ❌
@@ -112,7 +112,7 @@ Guide on building solver models can be found in the official documentation of ea
       - ❌
       - Open-source
     * - **Xpress**
-      - :class:`~.solvers.Pyomo` (``'xpress'``)
+      - :class:`~.solvers.Pyomo` (``'xpress'``, ``'xpress_direct'`` [4]_)
       - `Doc <https://www.fico.com/en/products/fico-xpress-optimization>`__
       - ✅
       - ❌
@@ -134,6 +134,9 @@ Guide on building solver models can be found in the official documentation of ea
        *and*
        `this discussion <https://stackoverflow.com/a/79562415/6729710>`_.
        *This also means you cannot specify bounds when defining variables.*
+.. [4] *"(Pyomo) Direct solver interfaces do not use any file io.*
+       *Rather, they interface directly with the python bindings for the specific solver."*
+       -- `Pyomo source code <https://github.com/Pyomo/pyomo/blob/e0fcc8183406aa5afa1977c2368bcbe9bbbbe9ba/pyomo/solvers/plugins/solvers/direct_or_persistent_solver.py#L26>`_.
 
 .. admonition:: Mathematical Programming vs. Constraint Programming
     :class: tip
