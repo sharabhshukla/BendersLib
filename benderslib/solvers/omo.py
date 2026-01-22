@@ -21,7 +21,8 @@ class Pyomo(SolverBase):
     model: pyomo.environ.ConcreteModel
         An instance of Pyomo's ``ConcreteModel``.
     solver: str
-        The solver to be used with Pyomo (see :ref:`supported solvers <solver-table>`).
+        The solver to be used with Pyomo (e.g., ``'gurobi'``, ``'gurobi_direct'``, etc.,
+        see :ref:`supported solvers <solver-table>`).
     solver_options: dict, optional
         A dictionary of solver-specific options to be passed to the solver.
     """
@@ -56,7 +57,7 @@ class Pyomo(SolverBase):
 
     def __init_solver_factory(self, solver: str, solver_options: dict) -> pyo.SolverFactory:
         if '_persistent' in solver:
-            raise NotImplementedError("Persistent solver interfaces are not supported in BendersLib yet.")
+            raise NotImplementedError("BendersLib currently does not support Pyomo persistent solvers.")
 
         # Initialize Pyomo SolverFactory instance
         _solver_name_map = {
@@ -72,6 +73,7 @@ class Pyomo(SolverBase):
             # Hide solver output
             'gurobi': {'OutputFlag': 0, 'LogToConsole': 0, 'InfUnbdInfo': 1, 'QCPDual': 1},
             'gurobi_direct': {'OutputFlag': 0, 'LogToConsole': 0, 'InfUnbdInfo': 1, 'QCPDual': 1},
+            'scip': {'presolving/maxrounds': 0, 'separating/maxrounds': 0, 'propagating/maxrounds': 0},
         }
         solver_options = solver_options or {}
         solver_options.update(_solver_options.get(solver, {}))
