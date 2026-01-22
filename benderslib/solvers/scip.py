@@ -28,6 +28,9 @@ class Scip(SolverBase):
         _vars_dict = {v.name: v for v in self.model.getVars(transformed=False)}
         _cons_dict = {c.name: c for c in self.model.getConss(transformed=False)}
 
+        for var in _vars_dict.values():
+            print(var.getLbGlobal(), var.getUbGlobal())
+
         # Attributes required by SolverBase
         self.status = CST.UNSOLVED
         self._solver_model = model
@@ -35,11 +38,13 @@ class Scip(SolverBase):
         self._all_vars = list(_vars_dict.keys())
         self._bin_vars = [var_name for var_name, var in _vars_dict.items() if var.vtype() == 'BINARY']
         self._int_vars = [var_name for var_name, var in _vars_dict.items() if var.vtype() == 'INTEGER']
+
         # Record only non-trivial bounds, i.e., lb != 0 or ub != +inf
         self._var_bounds = {
             var_name: (var.getLbGlobal(), var.getUbGlobal())
             for var_name, var in _vars_dict.items()
             if var.getLbGlobal() != 0 or var.getUbGlobal() < self.SCIP_VAR_UB}
+
         self.__standardize()
         self._rhs = self.get_rhs()
         self._constr_num = len(self.model.getConss(transformed=False))
@@ -110,7 +115,7 @@ class Scip(SolverBase):
         _vars_dict = {v.name: v for v in self.model.getVars(transformed=False)}
         for var_name in vars:
             var = _vars_dict[var_name]
-            lb, ub = self._var_bounds.get(var_name, (0, None))
+            lb, ub = self._var_bounds.get(var_name, (0, self.SCIP_VAR_UB))
             self.model.chgVarLb(var, lb)
             self.model.chgVarUb(var, ub)
 
