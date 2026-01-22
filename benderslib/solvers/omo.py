@@ -198,15 +198,15 @@ class Pyomo(SolverBase):
         term_cond = results.solver.termination_condition
 
         # Update status
-        if term_cond == pyo.TerminationCondition.optimal:
+        _pyomo_status_map = {
+            pyo.TerminationCondition.optimal: CST.OPTIMAL,
+            pyo.TerminationCondition.infeasible: CST.INFEASIBLE,
+        }
+        self.status = _pyomo_status_map.get(term_cond, CST.UNKNOWN)
+
+        if self.status == CST.OPTIMAL:
             # Load solution back to the model
             self.model.solutions.load_from(results)
-            self.status = CST.OPTIMAL
-        elif term_cond == pyo.TerminationCondition.infeasible:
-            self.status = CST.INFEASIBLE
-        else:
-            self.status = CST.ERROR
-            raise Exception(f"Solver terminated with unexpected condition: {term_cond}")
 
     @staticmethod
     def make_master_problem(original_model: pyo.ConcreteModel, master_vars: list[str]) -> pyo.ConcreteModel:

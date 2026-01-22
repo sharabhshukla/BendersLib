@@ -191,7 +191,7 @@ class Copt(SolverBase):
             COPT.OPTIMAL: CST.OPTIMAL,
             COPT.INFEASIBLE: CST.INFEASIBLE,
         }
-        self.status = _copt_status_map.get(self.model.status, CST.ERROR)
+        self.status = _copt_status_map.get(self.model.status, CST.UNKNOWN)
 
     @staticmethod
     def make_master_problem(original_model: Model, master_vars: list[str]) -> Model:

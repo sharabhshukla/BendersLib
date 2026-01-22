@@ -204,7 +204,7 @@ class Scip(SolverBase):
             'optimal': CST.OPTIMAL,
             'infeasible': CST.INFEASIBLE,
         }
-        self.status = _scip_status_map.get(self.model.getStatus(), CST.ERROR)
+        self.status = _scip_status_map.get(self.model.getStatus(), CST.UNKNOWN)
 
     @staticmethod
     def make_master_problem(original_model: Model, master_vars: list[str]) -> Model:

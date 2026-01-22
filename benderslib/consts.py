@@ -31,8 +31,10 @@ class BendersConsts:
     """Status indicating the problem is infeasible."""
     TIMEOUT = 'TIMEOUT'
     """Status indicating the solver reached the time limit."""
+    UNKNOWN = 'UNKNOWN'
+    """Status indicating neither feasibility nor optimality could be determined."""
     ERROR = 'ERROR'
-    """Status indicating an unknown error occurred during solving."""
+    """Status indicating an error occurred during solving."""
 
     # Estimator
     ESTIMATOR_NAME = 'theta'

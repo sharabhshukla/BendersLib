@@ -201,7 +201,7 @@ class Gurobi(SolverBase):
             GRB.OPTIMAL: CST.OPTIMAL,
             GRB.INFEASIBLE: CST.INFEASIBLE,
         }
-        self.status = _grb_status_map.get(self.model.Status, CST.ERROR)
+        self.status = _grb_status_map.get(self.model.Status, CST.UNKNOWN)
 
     @staticmethod
     def make_master_problem(original_model: Model, master_vars: list[str]) -> Model:

@@ -803,7 +803,7 @@ class SubProblems:
         elif any(sub.status == CST.INFEASIBLE for sub in self.sub_problems):
             self.status = CST.INFEASIBLE
         else:
-            self.status = CST.ERROR
+            self.status = CST.UNKNOWN
             raise RuntimeError("SubProblems status could not be determined.")
 
 
@@ -1420,7 +1420,7 @@ class BendersSolver:
 
                 # Sub problem is neither infeasible nor optimal -> error
                 else:
-                    self.result.status = CST.ERROR
+                    self.result.status = CST.UNKNOWN
                     raise ValueError(f"Subproblem returned an unexpected status: {self.sub_problem.status}.")
 
             # Master problem is infeasible -> original problem is infeasible
@@ -1430,7 +1430,7 @@ class BendersSolver:
 
             # Master problem is neither infeasible nor optimal -> error
             else:
-                self.result.status = CST.ERROR
+                self.result.status = CST.UNKNOWN
                 raise ValueError(f"Master problem returned an unexpected status: {self.master_problem.status}.")
 
         # Finalize
