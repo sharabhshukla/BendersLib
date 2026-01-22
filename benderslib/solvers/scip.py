@@ -20,7 +20,7 @@ class Scip(SolverBase):
         An instance of SCIP's ``pyscipopt.Model``.
     """
 
-    SCIP_VAR_UB = 1e20
+    __SCIP_VAR_UB = 1e20
     """Default upper bound for SCIP variables."""
 
     def __init__(self, model: Model) -> None:
@@ -45,7 +45,7 @@ class Scip(SolverBase):
         self._var_bounds = {
             var_name: (var.getLbGlobal(), var.getUbGlobal())
             for var_name, var in _vars_dict.items()
-            if var.getLbGlobal() != 0 or var.getUbGlobal() < self.SCIP_VAR_UB}
+            if var.getLbGlobal() != 0 or var.getUbGlobal() < self.__SCIP_VAR_UB}
 
         self.__standardize()
         self._rhs = self.get_rhs()
@@ -117,7 +117,7 @@ class Scip(SolverBase):
         _vars_dict = {v.name: v for v in self.model.getVars(transformed=False)}
         for var_name in vars:
             var = _vars_dict[var_name]
-            lb, ub = self._var_bounds.get(var_name, (0, self.SCIP_VAR_UB))
+            lb, ub = self._var_bounds.get(var_name, (0, self.__SCIP_VAR_UB))
             self.model.chgVarLb(var, lb)
             self.model.chgVarUb(var, ub)
 
@@ -147,10 +147,10 @@ class Scip(SolverBase):
         res = []
         self._sense = []
         for l, r in zip(lhs, rhs):
-            if l <= -self.SCIP_VAR_UB:
+            if l <= -self.__SCIP_VAR_UB:
                 res.append(r)
                 self._sense.append('<=')
-            elif r >= self.SCIP_VAR_UB:
+            elif r >= self.__SCIP_VAR_UB:
                 res.append(l)
                 self._sense.append('>=')
 
