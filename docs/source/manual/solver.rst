@@ -51,7 +51,7 @@ Guide on building solver models can be found in the official documentation of ea
     * - **SCIP**
       - :class:`~.solvers.Scip`
       - `Doc <https://pyscipopt.readthedocs.io>`__
-      - 🟦 [3]_
+      - 🟨 [3]_
       - ✅
       - ✅
       - Open-source
@@ -107,7 +107,7 @@ Guide on building solver models can be found in the official documentation of ea
     * - **SCIP**
       - :class:`~.solvers.Pyomo` (``'scip'``)
       - `Doc <https://www.scipopt.org>`__
-      - 🟦 [3]_
+      - 🟨 [3]_
       - ❌
       - ❌
       - Open-source
@@ -128,12 +128,13 @@ Guide on building solver models can be found in the official documentation of ea
        *and* `supported solvers <https://github.com/Pyomo/pyomo/tree/main/pyomo/solvers/plugins/solvers>`_.
        *The above list of solvers is not exhaustive. BendersLib's Pyomo interface can also utilize other solvers supported by Pyomo.*
 .. [2] *Commercial solvers require valid licenses to use; ones above offer free academic licenses.*
-.. [3] *Bound constraints (constraints with only one variable) are not allowed, due to a SCIP limitation.*
+.. [3] *Partially supported, bound constraints (constraints with only one variable) are not allowed, due to a SCIP limitation.*
        *See the*
        `PySCIPOpt documentation <https://pyscipopt.readthedocs.io/en/latest/tutorials/constypes.html#constraint-information>`_
        *and*
        `this discussion <https://stackoverflow.com/a/79562415/6729710>`_.
        *This also means you cannot specify bounds when defining variables.*
+       *Violations can cause incorrect dual values, leading to incorrect Benders cuts and convergence problems.*
 .. [4] *"(Pyomo) Direct solver interfaces do not use any file io.*
        *Rather, they interface directly with the python bindings for the specific solver."*
        -- `Pyomo source code <https://github.com/Pyomo/pyomo/blob/e0fcc8183406aa5afa1977c2368bcbe9bbbbe9ba/pyomo/solvers/plugins/solvers/direct_or_persistent_solver.py#L26>`_.
