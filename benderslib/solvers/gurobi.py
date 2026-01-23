@@ -207,25 +207,27 @@ class Gurobi(SolverBase):
     def make_master_problem(original_model: Model, master_vars: list[str]) -> Model:
         master = original_model.copy()
 
-        # Non-master variables
-        non_master_vars = set(master.getAttr('VarName', master.getVars())) - set(master_vars)
-
         # Remove non-master variables & remove them from objective (will be handled automatically)
+        non_master_vars = set(master.getAttr('VarName', master.getVars())) - set(master_vars)
         for var_name in non_master_vars:
             var = master.getVarByName(var_name)
             master.remove(var)
 
         # Remove constraints that contains non-master variables
-        for constr in master.getConstrs():
+        _cons_to_remove_idx = []
+        constrs = master.getConstrs()
+
+        for idx, constr in enumerate(constrs):
             row = master.getRow(constr)
-            contains_non_master = False
             for i in range(row.size()):
                 var = row.getVar(i)
-                if var.VarName in non_master_vars:
-                    contains_non_master = True
+                if var.VarName not in master_vars:
+                    _cons_to_remove_idx.append(idx)
                     break
-            if contains_non_master:
-                master.remove(constr)
+
+        # Execute removal
+        for idx in reversed(_cons_to_remove_idx):
+            master.remove(constrs[idx])
 
         master.update()
         return master
@@ -241,7 +243,10 @@ class Gurobi(SolverBase):
             var.obj = 0
 
         # Remove constraints that contains only master variables
-        for constr in sub.getConstrs():
+        _cons_to_remove_idx = []
+        constrs = sub.getConstrs()
+
+        for idx, constr in enumerate(constrs):
             row = sub.getRow(constr)
             is_master_only = True
             for i in range(row.size()):
@@ -250,7 +255,11 @@ class Gurobi(SolverBase):
                     is_master_only = False
                     break
             if is_master_only:
-                sub.remove(constr)
+                _cons_to_remove_idx.append(idx)
+
+        # Execute removal
+        for idx in reversed(_cons_to_remove_idx):
+            sub.remove(constrs[idx])
 
         sub.update()
         return sub

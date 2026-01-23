@@ -32,9 +32,6 @@ class Scip(SolverBase):
         _vars_dict = {v.name: v for v in self.model.getVars(transformed=False)}
         _cons_dict = {c.name: c for c in self.model.getConss(transformed=False)}
 
-        for var in _vars_dict.values():
-            print(var.getLbGlobal(), var.getUbGlobal())
-
         # Attributes required by SolverBase
         self.status = CST.UNSOLVED
         self._solver_model = model
@@ -210,32 +207,30 @@ class Scip(SolverBase):
     def make_master_problem(original_model: Model, master_vars: list[str]) -> Model:
         master = Model(sourceModel=original_model)
 
-        non_master_vars = [v.name for v in master.getVars(transformed=False) if v.name not in master_vars]
-
         # Remove non-master variables & remove them from objective (will be handled automatically)
         vars = master.getVars(transformed=False)
         _vars_to_del_idx = []
+
         for i, var in enumerate(vars):
             if var.name not in master_vars:
                 _vars_to_del_idx.append(i)
 
         # Remove constraints that contains non-master variables
-        conss = master.getConss(transformed=False)
-        _conss_to_del_idx = []
-        for i, cons in enumerate(conss):
-            contains_non_master = False
-            for var in master.getConsVars(cons):
-                if var.name in non_master_vars:
-                    contains_non_master = True
-                    break
-            if contains_non_master:
-                _conss_to_del_idx.append(i)
+        _cons_to_remove_idx = []
+        constrs = master.getConss(transformed=False)
 
-        # Execute deletions in reverse order to avoid index shifting
+        for i, cons in enumerate(constrs):
+            for var in master.getConsVars(cons):
+                if var.name not in master_vars:
+                    _cons_to_remove_idx.append(i)
+                    break
+
+        # Execute removal
         for i in reversed(_vars_to_del_idx):
             master.delVar(vars[i])
-        for i in reversed(_conss_to_del_idx):
-            master.delCons(conss[i])
+
+        for i in reversed(_cons_to_remove_idx):
+            master.delCons(constrs[i])
 
         return master
 
@@ -254,20 +249,21 @@ class Scip(SolverBase):
         sub.setObjective(new_obj, 'minimize')
 
         # Remove constraints that contains only master variables
-        conss = sub.getConss(transformed=False)
-        _cons_to_del_idx = []
-        for i, cons in enumerate(conss):
+        _cons_to_remove_idx = []
+        constrs = sub.getConss(transformed=False)
+
+        for i, cons in enumerate(constrs):
             is_master_only = True
             for var in sub.getConsVars(cons):
                 if var.name not in master_vars:
                     is_master_only = False
                     break
             if is_master_only:
-                _cons_to_del_idx.append(i)
+                _cons_to_remove_idx.append(i)
 
-        # Execute deletions in reverse order to avoid index shifting
-        for i in reversed(_cons_to_del_idx):
-            sub.delCons(conss[i])
+        # Execute removal
+        for i in reversed(_cons_to_remove_idx):
+            sub.delCons(constrs[i])
 
         return sub
 

@@ -172,7 +172,9 @@ class Pyomo(SolverBase):
 
     def get_extreme_ray(self) -> list[float]:
         # Pyomo does not provide Farkas duals (extreme rays).
-        raise NotImplementedError("Farkas dual is not supported in the Pyomo interface yet.")
+        raise NotImplementedError(
+            "Farkas dual (for feasibility cuts) is not supported in the Pyomo interface yet. "
+        )
 
     def get_obj(self) -> float:
         obj = next(self.model.component_data_objects(Objective, active=True))
@@ -224,16 +226,33 @@ class Pyomo(SolverBase):
         master.obj = Objective(expr=new_expr, sense=pyo.minimize)
 
         # Remove constraints that contains non-master variables
-        for constr in master.component_data_objects(Constraint, active=True):
+        _cons_to_remove_idx = []
+        constrs = list(master.component_data_objects(Constraint, active=True))
+
+        for i, constr in enumerate(constrs):
             for var in identify_variables(constr.expr):
                 if var.name not in master_vars:
-                    del constr
+                    _cons_to_remove_idx.append(i)
                     break
 
+        # Execute removal
+        for i in reversed(_cons_to_remove_idx):
+            # constrs[i].deactivate()
+            cons = constrs[i]
+            del cons.parent_component()[cons.index()]
+
         # Remove non-master variables
-        for var in master.component_data_objects(Var):
+        _vars_to_remove_idx = []
+        vars = list(master.component_data_objects(Var, active=True))
+
+        for i, var in enumerate(vars):
             if var.name not in master_vars:
-                del var
+                _vars_to_remove_idx.append(i)
+
+        # Execute removal
+        for i in reversed(_vars_to_remove_idx):
+            var = vars[i]
+            del var.parent_component()[var.index()]
 
         return master
 
@@ -259,14 +278,23 @@ class Pyomo(SolverBase):
         sub.obj = Objective(expr=new_expr, sense=pyo.minimize)
 
         # Remove constraints that contains only master variables
-        for constr in sub.component_data_objects(Constraint, active=True):
+        _cons_to_remove_idx = []
+        constrs = list(sub.component_data_objects(Constraint, active=True))
+
+        for i, constr in enumerate(constrs):
             is_master_only = True
             for var in identify_variables(constr.expr):
                 if var.name not in master_vars:
                     is_master_only = False
                     break
             if is_master_only:
-                del constr
+                _cons_to_remove_idx.append(i)
+
+        # Execute removal
+        for i in reversed(_cons_to_remove_idx):
+            # constrs[i].deactivate()
+            cons = constrs[i]
+            del cons.parent_component()[cons.index()]
 
         return sub
 
