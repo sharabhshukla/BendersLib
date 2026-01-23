@@ -107,7 +107,7 @@ Guide on building solver models can be found in the official documentation of ea
     * - **SCIP**
       - :class:`~.solvers.Pyomo` (``'scip'``)
       - `Doc <https://www.scipopt.org>`__
-      - 🟨 [3]_
+      - ❌ [5]_
       - ❌
       - ❌
       - Open-source
@@ -137,6 +137,7 @@ Guide on building solver models can be found in the official documentation of ea
 .. [4] *"(Pyomo) Direct solver interfaces do not use any file io.*
        *Rather, they interface directly with the python bindings for the specific solver."*
        -- `Pyomo source code <https://github.com/Pyomo/pyomo/blob/e0fcc8183406aa5afa1977c2368bcbe9bbbbe9ba/pyomo/solvers/plugins/solvers/direct_or_persistent_solver.py#L26>`_.
+.. [5] *Pyomo returns all-zero dual values when using SCIP as a solver.*
 
 .. admonition:: Mathematical Programming vs. Constraint Programming
     :class: tip

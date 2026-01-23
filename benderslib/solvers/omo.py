@@ -31,7 +31,10 @@ class Pyomo(SolverBase):
 
     def __init__(self, model: pyo.ConcreteModel, solver: str, solver_options: dict = None) -> None:
         super().__init__(model)
-        self.solver_factory = self.__init_solver_factory(solver, solver_options)
+
+        self.__solver_name = solver.lower()
+        self.__solver_options = solver_options if solver_options is not None else {}
+        self.solver_factory = self.__init_solver_factory()
 
         # Attributes required by SolverBase
         self.status = CST.UNSOLVED
@@ -40,6 +43,7 @@ class Pyomo(SolverBase):
         self._all_vars = [v.name for v in model.component_data_objects(Var)]
         self._bin_vars = [v.name for v in model.component_data_objects(Var) if v.is_binary()]
         self._int_vars = [v.name for v in model.component_data_objects(Var) if v.is_integer() and not v.is_binary()]
+
         # Record only non-trivial bounds, i.e., lb != 0 or ub != +inf
         self._var_bounds = {}
         for v in model.component_data_objects(Var):
@@ -47,18 +51,18 @@ class Pyomo(SolverBase):
             ub = v.ub if v.ub is not None else float('inf')
             if lb != 0 or ub != float('inf'):
                 self._var_bounds[v.name] = (lb, ub)
+
         self.__standardize()
         self._rhs = self.get_rhs()
-        _all_constrs = list(model.component_data_objects(Constraint, active=True))
-        self._constr_num = len(_all_constrs)
+        self._constr_num = len(list(model.component_data_objects(Constraint, active=True)))
 
         # If the model has no integer and binary variables, we can access dual values
         if len(self._bin_vars) + len(self._int_vars) == 0:
             if not hasattr(self.model, 'dual'):
                 self.model.dual = Suffix(direction=Suffix.IMPORT)
 
-    def __init_solver_factory(self, solver: str, solver_options: dict) -> pyo.SolverFactory:
-        if '_persistent' in solver:
+    def __init_solver_factory(self) -> pyo.SolverFactory:
+        if '_persistent' in self.__solver_name:
             raise NotImplementedError("BendersLib currently does not support Pyomo persistent solvers.")
 
         # Initialize Pyomo SolverFactory instance
@@ -77,12 +81,11 @@ class Pyomo(SolverBase):
             'gurobi_direct': {'OutputFlag': 0, 'LogToConsole': 0, 'InfUnbdInfo': 1, 'QCPDual': 1},
             'scip': {'presolving/maxrounds': 0, 'separating/maxrounds': 0, 'propagating/maxrounds': 0},
         }
-        solver_options = solver_options or {}
-        solver_options.update(_solver_options.get(solver, {}))
+        self.__solver_options.update(_solver_options.get(self.__solver_name, {}))
 
         solver_factory = pyo.SolverFactory(
-            _solver_name_map.get(solver, solver),
-            options=solver_options,
+            _solver_name_map.get(self.__solver_name, self.__solver_name),
+            options=self.__solver_options,
         )
         return solver_factory
 
@@ -166,15 +169,16 @@ class Pyomo(SolverBase):
         return rhs
 
     def get_dual_values(self) -> list[float]:
+        if self.__solver_name == 'scip':
+            raise NotImplementedError("BendersLib cannot get correct dual values with Pyomo(solver='scip').")
+
         # Dual values are only available from a subset of Pyomo supported solvers.
         duals = [self.model.dual[c] for c in self.model.component_data_objects(Constraint, active=True)]
         return duals
 
     def get_extreme_ray(self) -> list[float]:
         # Pyomo does not provide Farkas duals (extreme rays).
-        raise NotImplementedError(
-            "Farkas dual (for feasibility cuts) is not supported in the Pyomo interface yet. "
-        )
+        raise NotImplementedError("Farkas dual (for feasibility cuts) is not supported in the Pyomo interface yet.")
 
     def get_obj(self) -> float:
         obj = next(self.model.component_data_objects(Objective, active=True))
