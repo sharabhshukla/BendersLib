@@ -66,15 +66,15 @@ class Scip(SolverBase):
         # https://stackoverflow.com/questions/79463159/unable-to-get-dual-values-from-scip-solver
 
         # If there are variable bounds
-        if self._var_bounds:
-            raise NotImplementedError(
-                "BendersLib currently does not support variable bounds in SCIP, due to a SCIP limitation.")
+        # if self._var_bounds:
+        #     raise NotImplementedError(
+        #         "BendersLib currently does not support variable bounds in SCIP, due to a SCIP limitation.")
 
         # If there are bound constraints
-        # for cons in self.model.getConss(transformed=False):
-        #     if len(self.model.getConsVars(cons)) == 1:
-        #         raise NotImplementedError(
-        #             "BendersLib currently does not support bound constraints in SCIP, due to a SCIP limitation.")
+        for cons in self.model.getConss(transformed=False):
+            if len(self.model.getConsVars(cons)) == 1:
+                raise NotImplementedError(
+                    "BendersLib currently does not support bound constraints in SCIP, due to a SCIP limitation.")
 
         ...
 

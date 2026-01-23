@@ -10,17 +10,20 @@ from pyscipopt import Model
 def make_original_problem():
     model = Model("Original")
 
-    n_vars = 30
-    y = [model.addVar(vtype="I", name=f"y_{i}") for i in range(n_vars)]
-    z = [model.addVar(vtype="C", name=f"z_{i}") for i in range(n_vars)]
+    n_vars = 20
+    y = [model.addVar(vtype="I", name=f"y_{i}", ub=40) for i in range(n_vars)]
+    z = [model.addVar(vtype="C", name=f"z_{i}", ub=40) for i in range(n_vars)]
+
+    # Workaround for incorrect dual values of bound constraints in SCIP
+    dummy = model.addVar(vtype="C", name="dummy", ub=0, lb=0, obj=0)
 
     model.setObjective(2 * sum(y) + 3 * sum(z), "minimize")
 
     model.addCons(sum(y) + sum(z) <= 50 * n_vars)
 
-    model.addConss([2 * y[i] <= 2 * (i + 1) for i in range(n_vars)])
+    model.addConss([2 * y[i] + dummy <= 2 * (i + 1) for i in range(n_vars)])
     model.addConss([2 * y[i] + z[i] >= i for i in range(n_vars)])
-    model.addConss([3 * z[i] <= 15 for i in range(n_vars)])
+    model.addConss([3 * z[i] + dummy <= 15 for i in range(n_vars)])
 
     complicating_vars = [f"y_{i}" for i in range(n_vars)]
     return model, complicating_vars

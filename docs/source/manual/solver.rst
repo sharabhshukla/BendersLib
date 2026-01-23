@@ -133,7 +133,6 @@ Guide on building solver models can be found in the official documentation of ea
        `PySCIPOpt documentation <https://pyscipopt.readthedocs.io/en/latest/tutorials/constypes.html#constraint-information>`_
        *and*
        `this discussion <https://stackoverflow.com/a/79562415/6729710>`_.
-       *This also means you cannot specify bounds when defining variables.*
        *Violations can cause incorrect dual values, leading to incorrect Benders cuts and convergence problems.*
 .. [4] *"(Pyomo) Direct solver interfaces do not use any file io.*
        *Rather, they interface directly with the python bindings for the specific solver."*
