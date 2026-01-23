@@ -107,7 +107,7 @@ class ClassicalFC(FeasibilityCut):
     """
 
     def __init__(self, vars: list[str], var_coefs: dict, extreme_ray: list, rhs: list):
-        extreme_ray = [-e for e in extreme_ray]
+        extreme_ray = [-r for r in extreme_ray]
         coefs = [sum(a * b for a, b in zip(extreme_ray, var_coefs)) for var, var_coefs in var_coefs.items()]
         cut_rhs = sum(a * b for a, b in zip(extreme_ray, rhs))
 
