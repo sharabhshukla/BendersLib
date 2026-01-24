@@ -58,7 +58,7 @@ except ImportError:
     Copt = _create_placeholder_solver("Copt", "Install it via 'pip install coptpy'.")
 
 try:
-    from .omo import Pyomo
+    from ._pyomo import Pyomo
 except ImportError:
     Pyomo = _create_placeholder_solver("Pyomo", "Install it via 'pip install pyomo'.")
 

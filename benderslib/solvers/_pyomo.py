@@ -79,7 +79,10 @@ class Pyomo(SolverBase):
             # Hide solver output
             'gurobi': {'OutputFlag': 0, 'LogToConsole': 0, 'InfUnbdInfo': 1, 'QCPDual': 1},
             'gurobi_direct': {'OutputFlag': 0, 'LogToConsole': 0, 'InfUnbdInfo': 1, 'QCPDual': 1},
-            'scip': {'presolving/maxrounds': 0, 'separating/maxrounds': 0, 'propagating/maxrounds': 0},
+            'scip': {
+                'presolving/maxrounds': 0, 'separating/maxrounds': 0, 'propagating/maxrounds': 0,
+                'lp/alwaysgetduals': True
+            },
         }
         self.__solver_options.update(_solver_options.get(self.__solver_name, {}))
 
@@ -169,8 +172,8 @@ class Pyomo(SolverBase):
         return rhs
 
     def get_dual_values(self) -> list[float]:
-        if self.__solver_name == 'scip':
-            raise NotImplementedError("BendersLib cannot get correct dual values with Pyomo(solver='scip').")
+        # if self.__solver_name == 'scip':
+        #     raise NotImplementedError("BendersLib cannot get correct dual values with Pyomo(solver='scip').")
 
         # Dual values are only available from a subset of Pyomo supported solvers.
         duals = [self.model.dual[c] for c in self.model.component_data_objects(Constraint, active=True)]
