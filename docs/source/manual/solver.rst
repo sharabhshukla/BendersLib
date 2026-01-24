@@ -259,8 +259,8 @@ See :class:`SolverBase` for the comprehensive API reference, and :doc:`built-in 
 .. autosummary::
    :nosignatures:
 
-   ~SolverBase.status
    ~SolverBase.model
+   ~SolverBase.status
 
 .. tip::
 

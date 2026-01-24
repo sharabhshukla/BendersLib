@@ -1001,7 +1001,7 @@ class FeasibilityCut(Cut):
 class CutGenerator(ABC):
     """The base class for cut generators in Benders decomposition.
 
-    Any specific cut generation method (e.g., :class:`ClassicalOC`) should inherit from this class
+    Any specific cut generation method (e.g., :class:`ClassicalOCGen`) should inherit from this class
     and implement the abstract method :meth:`generate`.
     Attributes that will not change during the Benders process should be ideally initialized in ``__init__``
     for efficiency.
@@ -1053,9 +1053,11 @@ class CutGenerator(ABC):
 
            .. code-block:: python
 
+                from benderslib import Cut, OptimalityCut, FeasibilityCut
+
                 def cut_generator(master_problem: MasterProblem, sub_problem: SubProblem) -> list[Cut]:
                     cuts = []
-                    cut = ... # implement the cut generation logic here
+                    cut = Cut(...) # implement the cut generation logic here
                     cuts.append(cut)
                     return cuts  # a list of OptimalityCut or FeasibilityCut
 
