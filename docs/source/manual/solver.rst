@@ -245,6 +245,8 @@ See :class:`SolverBase` for the comprehensive API reference, and :doc:`built-in 
         Gurobi -- inherits --> SolverBase
         COPT -- inherits --> SolverBase
         Pyomo -- inherits --> SolverBase
+        Scip -- inherits --> SolverBase
+        Cplex -- inherits --> SolverBase
 
 .. attention::
 
