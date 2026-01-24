@@ -189,7 +189,7 @@ sphinx_gallery_conf = {
 # }
 
 html_theme = "shibuya"
-html_baseurl = "https://github.com/phguo/BendersLib/docs/"
+html_baseurl = "https://benders.dev/en/latest/"
 html_copy_source = True
 html_theme_options = {
     # "accent_color": "indigo",
