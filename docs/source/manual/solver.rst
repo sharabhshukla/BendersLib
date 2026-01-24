@@ -260,18 +260,11 @@ See :class:`SolverBase` for the comprehensive API reference, and :doc:`built-in 
    :nosignatures:
 
    ~SolverBase.status
-   ~SolverBase._solver_model
-   ~SolverBase._sense
-   ~SolverBase._all_vars
-   ~SolverBase._int_vars
-   ~SolverBase._bin_vars
-   ~SolverBase._var_bounds
-   ~SolverBase._rhs
-   ~SolverBase._constr_num
+   ~SolverBase.model
 
 .. tip::
 
-    Use :attr:`SolverBase._solver_model` to access to more attributes.
+    Use :attr:`SolverBase.model` to access to more attributes.
 
 .. rubric:: :class:`SolverBase` - Methods
 

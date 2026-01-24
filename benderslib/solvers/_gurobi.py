@@ -34,8 +34,9 @@ class Gurobi(SolverBase):
         ubs = self.model.getAttr('UB', vars)
 
         # Attributes required by SolverBase
+        self.model = model
         self.status = CST.UNSOLVED
-        self._solver_model = model
+
         self._sense = CST.MIN if sense == GRB.MINIMIZE else CST.MAX
         self._all_vars = self.model.getAttr('VarName', vars)
         self._bin_vars = [v for v, t in zip(self._all_vars, vtypes) if t == GRB.BINARY]

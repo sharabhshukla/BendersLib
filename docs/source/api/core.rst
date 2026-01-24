@@ -36,6 +36,8 @@ Master and Sub Problem
 .. autoclass:: MasterProblem
    :inherited-members:
    :show-inheritance:
+   :exclude-members: _add_estimators
+
 
 .. autoclass:: SubProblem
    :inherited-members:

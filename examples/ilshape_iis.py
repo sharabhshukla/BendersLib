@@ -86,7 +86,7 @@ def cut_generator(master_problem: MasterProblem, sub_problem: SubProblems):
     for i, sub in enumerate(sub_problem):
         if sub.status == CST.INFEASIBLE:
             # Compute the IIS of the subproblem
-            sp = sub.model._solver_model
+            sp = sub.model
             sp.Params.OutputFlag = 0
             sp.Params.LogToConsole = 0
             sp.computeIIS()

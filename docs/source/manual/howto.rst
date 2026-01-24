@@ -10,7 +10,7 @@ How to access to attributes not listed in the API reference?
 
 Sometimes, users may want to access to certain attributes of the underlying solver model
 that are not directly exposed in the BendersLib API reference.
-In such cases, users can utilize the attribute :attr:`ProblemBase._solver_model`
+In such cases, users can utilize the attribute :attr:`ProblemBase.model`
 (the base class for :class:`MasterProblem` and :class:`SubProblem`)
 to access the underlying solver model directly.
 For example, if you are using :class:`~.solvers.Gurobi`, you can access the Gurobi model as follows.
@@ -44,7 +44,7 @@ For example, if you are using :class:`~.solvers.Gurobi`, you can access the Guro
     benders.solve()
 
     # Access the underlying Gurobi model
-    gurobi_model = benders.master_problem._solver_model
+    gurobi_model = benders.master_problem.model
     print(f"Gurobi Model Status: {gurobi_model.Status}")
 
 .. seealso::

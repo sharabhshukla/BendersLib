@@ -33,8 +33,9 @@ class Scip(SolverBase):
         _cons_dict = {c.name: c for c in self.model.getConss(transformed=False)}
 
         # Attributes required by SolverBase
+        self.model = model
         self.status = CST.UNSOLVED
-        self._solver_model = model
+
         self._sense = CST.MIN if self.model.getObjectiveSense() == 'minimize' else CST.MAX
         self._all_vars = list(_vars_dict.keys())
         self._bin_vars = [var_name for var_name, var in _vars_dict.items() if var.vtype() == 'BINARY']

@@ -26,9 +26,9 @@ class ProblemBase:
     """
 
     def __init__(self, solver_backend: SolverBase):
-        self.model: SolverBase = solver_backend
+        self.solver: SolverBase = solver_backend
         """An instance of the solver backend (see classes in :doc:`../api/solver`)."""
-        self._solver_model = self.model._solver_model
+        self.model = self.solver.model
         """A copy of the original solver model instance.
         
         This attribute is exactly the solver-specific model instance passed during initialization.
@@ -39,7 +39,7 @@ class ProblemBase:
         """The status of the problem (see :class:`BendersConsts` for possible values)."""
 
     def __repr__(self):
-        n_vars = len(self.model._all_vars)
+        n_vars = len(self.solver._all_vars)
         n = "Master Problem"
         if self.__class__.__name__ == "SubProblem":
             n_vars -= len(self.complicating_vars)
@@ -48,14 +48,14 @@ class ProblemBase:
         return (
             f"{n}: \n"
             f" - {'Variable No.:'.ljust(CST.LOG_NAME_WIDTH)}{n_vars}"
-            f" [Integer: {len(self.model._int_vars)}, Binary: {len(self.model._bin_vars)}]\n"
-            f" - {'Constraint No.:'.ljust(CST.LOG_NAME_WIDTH)}{self.model._constr_num}\n"
-            f" - {'Solver:'.ljust(CST.LOG_NAME_WIDTH)}{self.model.__class__.__name__}"
+            f" [Integer: {len(self.solver._int_vars)}, Binary: {len(self.solver._bin_vars)}]\n"
+            f" - {'Constraint No.:'.ljust(CST.LOG_NAME_WIDTH)}{self.solver._constr_num}\n"
+            f" - {'Solver:'.ljust(CST.LOG_NAME_WIDTH)}{self.solver.__class__.__name__}"
         )
 
     def __getattr__(self, name):
         # Make attributes of the solver backend accessible directly
-        return getattr(self.model, name)
+        return getattr(self.solver, name)
 
     def add_estimators(self, estimators: list[str], prob: list[float] = None, lb: float = 0) -> None:
         """Add estimator variable(s) to the objective function of the model.
@@ -88,7 +88,7 @@ class ProblemBase:
                 # Adding a single estimator
                 solver.add_estimators(['theta'])
         """
-        self.model.add_estimators(estimators, prob, lb)
+        self.solver.add_estimators(estimators, prob, lb)
 
     def fix_vars(self, var_values: dict[str, float]) -> None:
         """
@@ -107,7 +107,7 @@ class ProblemBase:
 
                 problem.fix_vars({'x1': 10, 'x2': 5.5})
         """
-        self.model.fix_vars(var_values)
+        self.solver.fix_vars(var_values)
 
     def unfix_vars(self, vars: list[str]) -> None:
         """
@@ -126,7 +126,7 @@ class ProblemBase:
 
                 problem.unfix_vars(['x1', 'x2'])
         """
-        self.model.unfix_vars(vars)
+        self.solver.unfix_vars(vars)
 
     def get_var_values(self, vars: list[str] | None = None) -> dict[str, float]:
         """
@@ -154,7 +154,7 @@ class ProblemBase:
                 all_values = problem.get_var_values()
 
         """
-        return self.model.get_var_values(vars)
+        return self.solver.get_var_values(vars)
 
     def get_var_coefs(self, vars: list[str] | None = None) -> dict[str, list]:
         """
@@ -181,7 +181,7 @@ class ProblemBase:
                 # or get coefficients for all variables
                 all_coefs = problem.get_var_coefs()
         """
-        return self.model.get_var_coefs(vars)
+        return self.solver.get_var_coefs(vars)
 
     def get_rhs(self) -> list[float]:
         """
@@ -200,7 +200,7 @@ class ProblemBase:
 
                 rhs = problem.get_rhs()
         """
-        return self.model.get_rhs()
+        return self.solver.get_rhs()
 
     def get_dual_values(self) -> list[float]:
         """
@@ -221,7 +221,7 @@ class ProblemBase:
 
                 pi = problem.get_dual_values()
         """
-        return self.model.get_dual_values()
+        return self.solver.get_dual_values()
 
     def get_extreme_ray(self) -> list[float]:
         """
@@ -242,7 +242,7 @@ class ProblemBase:
 
                 ray = problem.get_extreme_ray()
         """
-        return self.model.get_extreme_ray()
+        return self.solver.get_extreme_ray()
 
     def get_obj(self) -> float:
         """
@@ -261,12 +261,12 @@ class ProblemBase:
 
                 obj_val = problem.get_obj()
         """
-        return self.model.get_obj()
+        return self.solver.get_obj()
 
     def solve(self) -> None:
         """Solve the problem and update the :attr:`status` attribute."""
-        self.model.solve()
-        self.status = self.model.status
+        self.solver.solve()
+        self.status = self.solver.status
 
 
 class MasterProblem(ProblemBase):
@@ -391,7 +391,7 @@ class MasterProblem(ProblemBase):
                 self.feasibility_cuts.add(cut)
 
             self.cuts[cut.name] = cut
-            self.model.add_cut(cut, name=cut.name)
+            self.solver.add_cut(cut, name=cut.name)
             return cut.name
 
     def remove_cut(self, cut_name: str) -> None:
@@ -418,7 +418,7 @@ class MasterProblem(ProblemBase):
         self.cuts.pop(cut_name)
 
         # Remove from the solver model
-        self.model.remove_cut(cut_name)
+        self.solver.remove_cut(cut_name)
 
 
 class SubProblem(ProblemBase):
@@ -1266,8 +1266,8 @@ class BendersSolver:
         )
 
     def __str__(self):
-        integer_num = len(set(self.complicating_vars) & set(self.master_problem.model._int_vars))
-        binary_num = len(set(self.complicating_vars) & set(self.master_problem.model._bin_vars))
+        integer_num = len(set(self.complicating_vars) & set(self.master_problem.solver._int_vars))
+        binary_num = len(set(self.complicating_vars) & set(self.master_problem.solver._bin_vars))
 
         return (
             f"Benders Decomposition:\n"

@@ -10,7 +10,7 @@ import pyomo.environ as pyo
 def make_original_problem():
     model = pyo.ConcreteModel("Original")
 
-    n_vars = 15
+    n_vars = 7
     model.y = pyo.Var(range(n_vars), domain=pyo.Integers, bounds=(1, 40))
     model.z = pyo.Var(range(n_vars), domain=pyo.Reals, bounds=(1, 40))
 
@@ -50,17 +50,18 @@ if __name__ == '__main__':
         'highs',
         'mosek',
         'mosek_direct',
-        # 'scip',  # Unable to obtain correct duals with bound constraints
         'xpress',
-        'xpress_direct'
+        'xpress_direct',
+
+        # 'scip',  # Unable to obtain correct duals with bound constraints
     ]
 
     for solver in solvers:
         print(f"Solving with solver: {solver}")
 
-        # solver_factory = pyo.SolverFactory(solver)
-        # result = solver_factory.solve(original_model)
-        # print(result)
+        solver_factory = pyo.SolverFactory(solver)
+        result = solver_factory.solve(original_model)
+        print(result)
 
         master = Pyomo.make_master_problem(original_model, complicating_vars)
         sub = Pyomo.make_sub_problem(original_model, complicating_vars)

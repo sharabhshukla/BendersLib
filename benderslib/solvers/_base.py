@@ -21,6 +21,12 @@ class SolverBase(ABC):
 
     def __init__(self, model, solver_options: dict = None) -> None:
         self.model = model
+        """A copy of the original solver model instance.
+
+                This attribute is exactly the solver-specific model instance passed during initialization.
+                It allows direct access to solver-specific features (attributes and methods) not covered by the abstract interface.
+                Refer to :ref:`solver-table` for supported solvers, and their documentation.
+                """
         self.status = CST.UNSOLVED
         """The status of the last solve attempt.
         
@@ -34,13 +40,6 @@ class SolverBase(ABC):
             or :const:`~benderslib.BendersConsts.INFEASIBLE`,
             since it is not clear how other statuses (e.g., feasible but not optimal)
             would impact convergence of Benders decomposition.
-        """
-        self._solver_model = model
-        """A copy of the original solver model instance.
-        
-        This attribute is exactly the solver-specific model instance passed during initialization.
-        It allows direct access to solver-specific features (attributes and methods) not covered by the abstract interface.
-        Refer to :ref:`solver-table` for supported solvers, and their documentation.
         """
 
         # Attributes to be set in the subclass

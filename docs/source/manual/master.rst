@@ -258,8 +258,8 @@ It is inherited from the base class :class:`ProblemBase`, but tailored for maste
 .. autosummary::
    :nosignatures:
 
+   ~MasterProblem.solver
    ~MasterProblem.model
-   ~MasterProblem._solver_model
    ~MasterProblem.status
    ~MasterProblem.params
    ~MasterProblem.complicating_vars
@@ -270,7 +270,7 @@ It is inherited from the base class :class:`ProblemBase`, but tailored for maste
 
 .. tip::
 
-    Use :attr:`MasterProblem._solver_model` to access to more attributes.
+    Use :attr:`MasterProblem.model` to access to more attributes.
 
 .. rubric:: :class:`MasterProblem` - Methods
 

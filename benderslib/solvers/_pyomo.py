@@ -37,8 +37,9 @@ class Pyomo(SolverBase):
         self.solver_factory = self.__init_solver_factory()
 
         # Attributes required by SolverBase
+        self.model = model
         self.status = CST.UNSOLVED
-        self._solver_model = model
+
         self._sense = CST.MIN if model.obj.sense == pyo.minimize else CST.MAX
         self._all_vars = [v.name for v in model.component_data_objects(Var)]
         self._bin_vars = [v.name for v in model.component_data_objects(Var) if v.is_binary()]

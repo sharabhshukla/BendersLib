@@ -330,15 +330,15 @@ Below are the attributes and methods :class:`SubProblem`, :class:`SubProblems`, 
 .. autosummary::
    :nosignatures:
 
+   ~SubProblem.solver
    ~SubProblem.model
-   ~SubProblem._solver_model
    ~SubProblem.status
    ~SubProblem.params
    ~SubProblem.complicating_vars
 
 .. tip::
 
-    Use :attr:`SubProblem._solver_model` to access to more attributes.
+    Use :attr:`SubProblem.model` to access to more attributes.
 
 .. rubric:: :class:`SubProblem` - Methods
 

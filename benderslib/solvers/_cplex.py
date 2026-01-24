@@ -33,8 +33,9 @@ class Cplex(SolverBase):
         ubs = self.model.variables.get_upper_bounds(vars)
 
         # Attributes required by SolverBase
+        self.model = model
         self.status = CST.UNSOLVED
-        self._solver_model = model
+
         self._sense = CST.MIN if sense == self.model.objective.sense.minimize else CST.MAX
         self._all_vars = vars
         self._bin_vars = [v for v, t in zip(self._all_vars, vtypes) if t == self.model.variables.type.binary]

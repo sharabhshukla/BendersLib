@@ -23,7 +23,6 @@ class Copt(SolverBase):
     """
 
     def __init__(self, model: Model, solver_options: dict = None) -> None:
-        # model.update()
         super().__init__(model)
 
         # Attributes in COPT Model
@@ -34,8 +33,9 @@ class Copt(SolverBase):
         ubs = [v.getInfo(COPT.Info.UB) for v in variables]
 
         # Attributes required by SolverBase
+        self.model = model
         self.status = CST.UNSOLVED
-        self._solver_model = model
+
         self._sense = CST.MIN if sense == COPT.MINIMIZE else CST.MAX
         self._all_vars = [v.getName() for v in variables]
         self._bin_vars = [v for v, t in zip(self._all_vars, vtypes) if t == COPT.BINARY]

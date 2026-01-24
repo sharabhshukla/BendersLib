@@ -48,7 +48,7 @@ def cut_generator(master_problem: MasterProblem, sub_problem: SubProblem):
     """
 
     # Compute the IIS of the subproblem
-    sp = sub_problem.model._solver_model
+    sp = sub_problem.model
     sp.computeIIS()
     # Save IIS to file
     # sp.write("subproblem.ilp")
