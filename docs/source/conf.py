@@ -192,6 +192,8 @@ sphinx_gallery_conf = {
 
 html_theme = "shibuya"
 html_baseurl = "https://benders.dev/en/latest/"
+# html_logo = '_static/benderslib.svg'
+html_favicon = '_static/icon.ico'
 html_copy_source = True
 html_theme_options = {
     # "accent_color": "indigo",
