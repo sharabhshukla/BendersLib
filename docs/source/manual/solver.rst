@@ -34,6 +34,13 @@ Guide on building solver models can be found in the official documentation of ea
       - ✅
       - ✅
       - Commercial
+    * - **CPLEX**
+      - :class:`~.solvers.Cplex`
+      - `Doc <https://www.ibm.com/docs/en/icos/22.1.2?topic=optimizers-users-manual-cplex>`__
+      - ✅
+      - ✅
+      - ✅
+      - Commercial
     * - **Gurobi**
       - :class:`~.solvers.Gurobi`
       - `Doc <https://docs.gurobi.com>`__
@@ -287,4 +294,6 @@ See :class:`SolverBase` for the comprehensive API reference, and :doc:`built-in 
 .. seealso::
 
     * Base Class: :class:`SolverBase`
-    * Solver Interfaces: :class:`~.solvers.Gurobi`, :class:`~.solvers.Copt`, :class:`~.solvers.Pyomo`, :class:`~.solvers.Scip`
+    * Solver Interfaces:
+      :class:`~.solvers.Gurobi`, :class:`~.solvers.Copt`, :class:`~.solvers.Pyomo`, :class:`~.solvers.Scip`,
+      :class:`~.solvers.Cplex`

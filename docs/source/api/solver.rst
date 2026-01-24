@@ -21,3 +21,7 @@ Solver Interfaces
 .. autoclass:: benderslib.solvers.Scip
    :inherited-members:
    :show-inheritance:
+
+.. autoclass:: benderslib.solvers.Cplex
+   :inherited-members:
+   :show-inheritance:

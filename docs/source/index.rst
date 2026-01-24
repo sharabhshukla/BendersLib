@@ -6,8 +6,6 @@
 Home
 ===================================
 
-*Last updated: 2025-10-06, Version: 0.1.0*
-
 BendersLib is a powerful and extensible Python library for solving large-scale optimization problems using Benders decomposition. It provides a flexible framework for implementing various Benders decomposition variants and can be easily integrated with different solvers.
 
 Installation
