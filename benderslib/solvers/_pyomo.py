@@ -65,16 +65,6 @@ class Pyomo(SolverBase):
         if '_persistent' in self.__solver_name:
             raise NotImplementedError("BendersLib currently does not support Pyomo persistent solvers.")
 
-        # Initialize Pyomo SolverFactory instance
-        _solver_name_map = {
-            # "Pyomo direct solver interfaces do not use any file io.
-            # Rather, they interface directly with the python bindings for the specific solver."
-
-            # 'cplex': 'cplex_direct',
-            # 'gurobi': 'gurobi_direct',
-            # 'mosek': 'mosek_direct',
-            # 'xpress': 'xpress_direct',
-        }
         _solver_options = {
             # Hide solver output
             'gurobi': {'OutputFlag': 0, 'LogToConsole': 0, 'InfUnbdInfo': 1, 'QCPDual': 1},
@@ -84,12 +74,10 @@ class Pyomo(SolverBase):
                 'lp/alwaysgetduals': True
             },
         }
-        self.__solver_options.update(_solver_options.get(self.__solver_name, {}))
+        _options = _solver_options.get(self.__solver_name, {})
+        _options.update(self.__solver_options)
 
-        solver_factory = pyo.SolverFactory(
-            _solver_name_map.get(self.__solver_name, self.__solver_name),
-            options=self.__solver_options,
-        )
+        solver_factory = pyo.SolverFactory(self.__solver_name, options=_options)
         return solver_factory
 
     def __standardize(self):
