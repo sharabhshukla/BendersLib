@@ -1,5 +1,15 @@
 # coding:utf-8
 
+"""
+Pyomo
+=======================================
+
+"""
+
+# %%
+# Using :class:`~benderslib.solvers.Pyomo` as a solver backend.
+
+
 from benderslib import ClassicalBenders, MasterProblem, SubProblem
 from benderslib.solvers import Pyomo
 from benderslib.utils import draw_curve

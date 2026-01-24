@@ -77,12 +77,14 @@ explicit_order = [
     'lbbd_location.py',
 
     'custom_template.py',
-    'decompose.py'
+    'decompose.py',
+
+    '*'
 ]
 
 sphinx_gallery_conf = {
-    'examples_dirs': '../../examples',  # path to your example scripts
-    'gallery_dirs': 'examples',  # path to where to save gallery generated output
+    'examples_dirs': ['../../examples', '../../examples/solvers'],  # path to your example scripts
+    'gallery_dirs': ['examples', 'examples/solvers'],  # path to where to save gallery generated output
     # 'download_all_examples': False,
     'capture_repr': ('__repr__', '__str__', '_repr_html_'),
     'filename_pattern': r'\.py',

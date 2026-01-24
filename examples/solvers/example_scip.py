@@ -1,5 +1,14 @@
 # coding:utf-8
 
+"""
+SCIP
+=======================================
+
+"""
+
+# %%
+# Using :class:`~benderslib.solvers.Scip` as a solver backend.
+
 from benderslib import ClassicalBenders, AnnotationBenders
 from benderslib.solvers import Scip
 from benderslib.utils import draw_curve
@@ -10,7 +19,7 @@ from pyscipopt import Model
 def make_original_problem():
     model = Model("Original")
 
-    n_vars = 20
+    n_vars = 10
     y = [model.addVar(vtype="I", name=f"y_{i}", ub=40) for i in range(n_vars)]
     z = [model.addVar(vtype="C", name=f"z_{i}", ub=40) for i in range(n_vars)]
 

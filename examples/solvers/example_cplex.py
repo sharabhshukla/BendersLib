@@ -1,5 +1,14 @@
 # coding:utf-8
 
+"""
+CPLEX
+=======================================
+
+"""
+
+# %%
+# Using :class:`~benderslib.solvers.Cplex` as a solver backend.
+
 from benderslib import AnnotationBenders, ClassicalBenders
 from benderslib.solvers import Cplex
 from benderslib.utils import draw_curve
@@ -21,7 +30,7 @@ def make_original_problem():
 
 def make_model():
     model = cplex.Cplex()
-    n_vars = 22
+    n_vars = 10
 
     # Add variables
     y_names = [f"y_{i}" for i in range(n_vars)]

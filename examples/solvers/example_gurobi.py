@@ -1,5 +1,14 @@
 # coding:utf-8
 
+"""
+Gurobi
+=======================================
+
+"""
+
+# %%
+# Using :class:`~benderslib.solvers.Gurobi` as a solver backend.
+
 from benderslib import AnnotationBenders, ClassicalBenders
 from benderslib.solvers import Gurobi
 from benderslib.utils import draw_curve

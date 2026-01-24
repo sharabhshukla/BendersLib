@@ -1,5 +1,14 @@
 # coding:utf-8
 
+"""
+COPT
+=======================================
+
+"""
+
+# %%
+# Using :class:`~benderslib.solvers.Copt` as a solver backend.
+
 from benderslib import AnnotationBenders, ClassicalBenders
 from benderslib.solvers import Copt
 from benderslib.utils import draw_curve
