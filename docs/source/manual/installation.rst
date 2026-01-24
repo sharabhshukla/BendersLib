@@ -122,39 +122,39 @@ Please refer to :ref:`solver-table` for solver features and license requirements
       - ``pip install pyscipopt``
       - ``conda install conda-forge::pyscipopt``
       - `Install <https://pyscipopt.readthedocs.io/en/latest/install.html>`__
-    * - Pyomo [1]_:
+    * - **Pyomo** [1]_:
       - ``pip install pyomo``
       - ``conda install conda-forge::pyomo``
       - `Install <https://pyomo.readthedocs.io/en/stable/getting_started/installation.html>`__
-    * - **CBC**
+    * - CBC
       - N/A
       - ``conda install conda-forge::coincbc``
       - `Install <https://github.com/coin-or/Cbc>`__
-    * - **CPLEX**
+    * - CPLEX
       - ``pip install cplex``
       - ``conda install ibmdecisionoptimization::cplex``
       - `Install <https://www.ibm.com/docs/en/icos/22.1.2?topic=cplex-installing>`__
-    * - **GLPK**
+    * - GLPK
       - N/A
       - ``conda install conda-forge::glpk``
       - `Install <https://www.gnu.org/software/glpk/#downloading>`__
-    * - **Gurobi**
+    * - Gurobi
       - ``pip install gurobipy``
       - ``conda install gurobi::gurobi``
       - `Install <https://support.gurobi.com/hc/en-us/articles/360044290292-How-do-I-install-Gurobi-for-Python>`__
-    * - **HiGHS**
+    * - HiGHS
       - ``pip install highspy``
       - ``conda install conda-forge::highspy``
       - `Install <https://ergo-code.github.io/HiGHS/dev/interfaces/python/>`__
-    * - **MOSEK**
+    * - MOSEK
       - ``pip install mosek``
       - ``conda install mosek::MOSEK``
       - `Install <https://docs.mosek.com/latest/install/installation.html>`__
-    * - **SCIP**
+    * - SCIP
       - N/A
       - ``conda install conda-forge::scip``
       - `Install <https://www.scipopt.org>`__
-    * - **Xpress**
+    * - Xpress
       - ``pip install xpress``
       - ``conda install fico-xpress::xpress``
       - `Install <https://www.fico.com/fico-xpress-optimization/docs/latest/installguide/dhtml/chapinst1.html>`__

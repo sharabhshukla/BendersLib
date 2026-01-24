@@ -62,63 +62,63 @@ Guide on building solver models can be found in the official documentation of ea
       - ✅
       - ✅
       - Open-source
-    * - Pyomo [1]_:
+    * - **Pyomo** [1]_:
       - :class:`~.solvers.Pyomo`
       - `Doc <https://pyomo.readthedocs.io>`__
       - \-
       - \-
       - \-
       - Open-source
-    * - **CBC**
+    * - CBC
       - :class:`~.solvers.Pyomo` (``'cbc'``)
       - `Doc <https://www.coin-or.org/Cbc/cbcuserguide.html>`__
       - ✅
       - ❌
       - ❌
       - Open-source
-    * - **CPLEX**
+    * - CPLEX
       - :class:`~.solvers.Pyomo` (``'cplex'``, ``'cplex_direct'`` [4]_)
       - `Doc <https://www.ibm.com/docs/en/icos/22.1.2?topic=optimizers-users-manual-cplex>`__
       - ✅
       - ❌
       - ✅
       - Commercial
-    * - **GLPK**
+    * - GLPK
       - :class:`~.solvers.Pyomo` (``'glpk'``)
       - `Doc <https://www.gnu.org/software/glpk/>`__
       - ✅
       - ❌
       - ❌
       - Open-source
-    * - **Gurobi**
+    * - Gurobi
       - :class:`~.solvers.Pyomo` (``'gurobi'``, ``'gurobi_direct'`` [4]_)
       - `Doc <https://docs.gurobi.com>`__
       - ✅
       - ❌
       - ✅
       - Commercial
-    * - **HiGHS**
+    * - HiGHS
       - :class:`~.solvers.Pyomo` (``'highs'``)
       - `Doc <https://highs.dev>`__
       - ✅
       - ❌
       - ❌
       - Open-source
-    * - **MOSEK**
+    * - MOSEK
       - :class:`~.solvers.Pyomo` (``'mosek'``, ``'mosek_direct'`` [4]_)
       - `Doc <https://docs.mosek.com>`__
       - ✅
       - ❌
       - ❌
       - Commercial
-    * - **SCIP**
+    * - SCIP
       - :class:`~.solvers.Pyomo` (``'scip'``)
       - `Doc <https://www.scipopt.org>`__
       - ❌ [5]_
       - ❌
       - ❌
       - Open-source
-    * - **Xpress**
+    * - Xpress
       - :class:`~.solvers.Pyomo` (``'xpress'``, ``'xpress_direct'`` [4]_)
       - `Doc <https://www.fico.com/en/products/fico-xpress-optimization>`__
       - ✅
