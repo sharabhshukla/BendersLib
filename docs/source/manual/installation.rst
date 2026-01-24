@@ -29,25 +29,28 @@ for BendersLib before installing it.
     # Activate the new environment
     conda activate bendersenv
 
-Installing via ``pip``
+Installing BendersLib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. code-block:: bash
+.. tabs::
 
-    pip install benderslib
+   .. tab:: pip
 
-    # Upgrade to the latest version
-    # pip install --upgrade benderslib
+     .. code-block:: bash
 
-Installing via ``conda``
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        pip install benderslib
 
-.. code-block:: bash
+        # Upgrade to the latest version
+        # pip install benderslib --upgrade
 
-    conda install -c conda-forge benderslib
+   .. tab:: conda
 
-    # Upgrade to the latest version
-    # conda update -c conda-forge benderslib
+      .. code-block:: bash
+
+         conda install -c conda-forge benderslib
+
+         # Upgrade to the latest version
+         # conda update -c conda-forge benderslib
 
 Verifying the Installation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -103,6 +106,10 @@ Please refer to :ref:`solver-table` for solver features and license requirements
       - ``pip install coptpy``
       - N/A
       - `Install <https://guide.coap.online/copt/en-doc/pythoninterface.html#chappythoninterface>`__
+    * - **CPLEX**
+      - ``pip install cplex``
+      - ``conda install ibmdecisionoptimization::cplex``
+      - `Install <https://www.ibm.com/docs/en/icos/22.1.2?topic=cplex-installing>`__
     * - **Gurobi**
       - ``pip install gurobipy``
       - ``conda install gurobi::gurobi``

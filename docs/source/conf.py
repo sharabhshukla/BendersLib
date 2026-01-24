@@ -13,8 +13,10 @@ sys.path.insert(0, pathlib.Path(__file__).parents[2].resolve().as_posix())
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
+today_date = __import__('datetime').datetime.now().strftime('%Y-%m-%d')
+
 project = 'BendersLib'
-copyright = '2025, Peng-Hui Guo'
+copyright = f'Copyright © 2025, Peng-Hui Guo (Latest update: {today_date})'
 author = 'Peng-Hui Guo'
 release = '0.0.1'
 
@@ -30,6 +32,7 @@ extensions = [
     'sphinx_copybutton',  # Add copy button to code blocks
     'sphinx_gallery.gen_gallery',  # Generate a gallery of examples
     'sphinxcontrib.mermaid',  # Mermaid diagrams
+    'sphinx_tabs.tabs'  # Tabbed content
 ]
 
 autodoc_default_options = {
@@ -162,28 +165,51 @@ sphinx_gallery_conf = {
 #
 # }
 
-html_theme = "furo"
-html_title = "BendersLib"
-html_favicon = '_static/icon.png'
-blue = "#0066CC"
-# blue = "#0064a2"
-html_theme_options = {
-    "light_css_variables": {
-        "color-sidebar-link-text--top-level": blue,
-        "color-toc-item-text--active": blue,
-        "color-link": blue,
-        "color-link--visited": "var(--color-link)",
-        "color-link--hover": "var(--color-link)",
-    },
-    "dark_css_variables": {
-        "color-sidebar-link-text--top-level": blue,
-        "color-toc-item-text--active": blue,
-        "color-link": blue,
-        "color-link--visited": "var(--color-link)",
-        "color-link--hover": "var(--color-link)",
-    },
-}
+# html_theme = "furo"
+# html_title = "BendersLib"
+# html_favicon = '_static/icon.png'
+# blue = "#0066CC"
+# # blue = "#0064a2"
+# html_theme_options = {
+#     "light_css_variables": {
+#         "color-sidebar-link-text--top-level": blue,
+#         "color-toc-item-text--active": blue,
+#         "color-link": blue,
+#         "color-link--visited": "var(--color-link)",
+#         "color-link--hover": "var(--color-link)",
+#     },
+#     "dark_css_variables": {
+#         "color-sidebar-link-text--top-level": blue,
+#         "color-toc-item-text--active": blue,
+#         "color-link": blue,
+#         "color-link--visited": "var(--color-link)",
+#         "color-link--hover": "var(--color-link)",
+#     },
+#     # "announcement": "This is an Alpha release, the API may change in future and there might be bugs."
+# }
 
+html_theme = "shibuya"
+html_baseurl = "https://github.com/phguo/BendersLib/docs/"
+html_copy_source = True
+html_theme_options = {
+    # "accent_color": "indigo",
+    "accent_color": "blue",
+    # "announcement": "This is a Beta release, the API may change in future and there might be bugs.",
+    "github_url": "https://github.com/phguo/BendersLib",
+    # "discussion_url": "https://github.com/phguo/BendersLib/discussions",
+
+    "show_ai_links": True,
+    "open_in_chatgpt": True,
+    "open_in_claude": True,
+    "open_in_perplexity": True,
+}
+# html_context = {
+#     "source_type": "github",
+#     "source_user": "phguo",
+#     "source_repo": "BendersLib",
+# }
+
+# html_theme = 'insipid'
 
 # html_theme = 'sphinx_book_theme'
 # html_title = 'BendersLib'
@@ -197,6 +223,7 @@ html_theme_options = {
 #     # "use_issues_button": True,
 #     # "use_edit_page_button": False,
 #     # "path_to_docs": "docs/",
+#     "show_toc_level": 5,
 # }
 
 

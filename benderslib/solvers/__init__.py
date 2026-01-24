@@ -67,10 +67,16 @@ try:
 except ImportError:
     Scip = _create_placeholder_solver("SCIP", "Install it via 'pip install pyscipopt'.")
 
+try:
+    from ._cplex import Cplex
+except ImportError:
+    Cplex = _create_placeholder_solver("Cplex", "Install it via 'pip install cplex'.")
+
 __all__ = [
     "SolverBase",
     "Gurobi",
     "Copt",
     "Pyomo",
     "Scip",
+    "Cplex",
 ]
