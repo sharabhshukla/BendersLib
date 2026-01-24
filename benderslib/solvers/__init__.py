@@ -9,7 +9,7 @@ __copyright__ = "Copyright 2025, https://guo.ph"
 
 from abc import ABCMeta
 
-from .base import SolverBase
+from ._base import SolverBase
 
 
 def _create_placeholder_solver(name: str, install_message: str):
@@ -48,12 +48,12 @@ def _create_placeholder_solver(name: str, install_message: str):
 
 
 try:
-    from .gurobi import Gurobi
+    from ._gurobi import Gurobi
 except ImportError:
     Gurobi = _create_placeholder_solver("Gurobi", "Install it via 'pip install gurobipy'.")
 
 try:
-    from .copt import Copt
+    from ._copt import Copt
 except ImportError:
     Copt = _create_placeholder_solver("Copt", "Install it via 'pip install coptpy'.")
 
@@ -63,7 +63,7 @@ except ImportError:
     Pyomo = _create_placeholder_solver("Pyomo", "Install it via 'pip install pyomo'.")
 
 try:
-    from .scip import Scip
+    from ._scip import Scip
 except ImportError:
     Scip = _create_placeholder_solver("SCIP", "Install it via 'pip install pyscipopt'.")
 

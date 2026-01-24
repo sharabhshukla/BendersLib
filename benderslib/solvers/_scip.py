@@ -3,7 +3,7 @@
 from pyscipopt import Model, Expr, SCIP_PARAMSETTING
 
 from ..consts import BendersConsts as CST
-from .base import SolverBase
+from ._base import SolverBase
 
 
 class Scip(SolverBase):

@@ -6,7 +6,7 @@ from pyomo.core.expr.visitor import identify_variables
 from pyomo.repn import generate_standard_repn
 
 from ..consts import BendersConsts as CST
-from .base import SolverBase
+from ._base import SolverBase
 
 
 class Pyomo(SolverBase):

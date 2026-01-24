@@ -3,7 +3,7 @@
 from cplex import Cplex as CplexModel, infinity as CPLEX_INFINITY
 
 from ..consts import BendersConsts as CST
-from .base import SolverBase
+from ._base import SolverBase
 
 
 class Cplex(SolverBase):
