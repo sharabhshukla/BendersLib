@@ -1,7 +1,7 @@
 # coding:utf-8
 
 from benderslib import AnnotationBenders, ClassicalBenders
-from benderslib.solvers.copt import Copt
+from benderslib.solvers import Copt
 from benderslib.utils import draw_curve
 
 from coptpy import COPT

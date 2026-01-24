@@ -136,7 +136,7 @@ Please see :doc:`examples/index` for more information.
 
 **Built-in Solvers Interfaces:**
 
-*   :class:`~benderslib.solvers.gurobi.Gurobi`, :class:`~benderslib.solvers.copt.Copt`
+*   :class:`~benderslib.solvers.Gurobi`, :class:`~benderslib.solvers.Copt`
 
 Structure
 -----------------------------------

@@ -1,7 +1,7 @@
 # coding:utf-8
 
 from benderslib import AnnotationBenders, ClassicalBenders
-from benderslib.solvers.gurobi import Gurobi
+from benderslib.solvers import Gurobi
 from benderslib.utils import draw_curve
 
 
