@@ -126,8 +126,17 @@ Guide on building solver models can be found in the official documentation of ea
       - ✅
       - Commercial
 
-.. SCIP, IPOPT, Baron, KNITRO, and MOSEK interfaces (may) will be added in future releases.
-.. CVXPY and AMPL (may) will be added in future releases.
+.. IPOPT, Minotaur, Baron, and KNITRO nonlinear solvers (may) will be added in future releases.
+.. MiniZinc, PuLP, CVXPY, GEKKO, GAMS, and AMPL (may) will be added in future releases.
+
+.. https://news.ycombinator.com/item?id=45671176
+
+.. Solver List by Pyomo:        https://pyomo.readthedocs.io/en/stable/getting_started/solvers.html
+.. Solver List by AMPL:         https://dev.ampl.com/solvers/index.html
+.. Solver List by JuMP:         https://jump.dev/JuMP.jl/stable/installation/#Supported-solvers
+.. Solver List by YALMIP:       https://yalmip.github.io/allsolvers/
+.. Solver List by PySCIPOpt:    https://pyscipopt.readthedocs.io/en/latest/solvers.html
+.. Solver List by CBC:          https://github.com/coin-or/Cbc
 
 .. [1] *Pyomo is a modeling language. Supported solvers must be installed separately, see*
        :ref:`solver-installation-table` *(by BendersLib),*
