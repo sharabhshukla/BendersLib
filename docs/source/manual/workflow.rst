@@ -14,6 +14,7 @@ and the necessary :doc:`Benders cuts <../api/cut>` and :doc:`cut generators <../
 
 .. mermaid::
   :caption: Basic Usage Workflow
+  :align: center
 
    sequenceDiagram
        actor User
@@ -60,6 +61,7 @@ as it allows the subproblem to be any type of optimization problem without a sta
 
 .. mermaid::
    :caption: Advanced Usage Workflow
+   :align: center
 
    sequenceDiagram
        actor User

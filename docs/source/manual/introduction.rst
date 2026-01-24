@@ -12,6 +12,7 @@ The method decomposes a complex problem into smaller, more manageable master pro
 which can be solved iteratively to find the optimal solution to the original problem.
 
 .. mermaid::
+   :align: center
 
    xychart-beta
      title "Benders Decomposition Publications"

@@ -33,6 +33,7 @@ The following diagram illustrates the relationships between the main components 
 
 .. mermaid::
     :caption: BendersLib Components
+    :align: center
 
     graph TD
         subgraph "Benders Decomposition"
