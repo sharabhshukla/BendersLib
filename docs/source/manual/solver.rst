@@ -9,10 +9,28 @@ Supported Solvers
 .. attention::
 
    BendersLib will **NOT** install any solver to your environment automatically.
-   You need to install the solvers separately based on your needs.
+   You need to :ref:`install the solvers <solver-installation-table>` separately based on your needs.
 
 BendersLib supports the following solvers.
-Installation instructions can be found in the manual under :ref:`solver-installation-table`.
+The features listed in the table are essential for Benders decomposition.
+A Benders decomposition variant usually require one or two features to work properly.
+
+* **Dual**:
+  The solver can provide dual values of constraints. This is essential for generating *classical optimality cuts*.
+  This feature can be required by :doc:`../tutorials/classical` and :doc:`../tutorials/lshape` implemented
+  with :class:`ClassicalBenders` and :class:`LShaped`, respectively, if the user wants to add optimality cuts.
+* **Farkas**:
+  The solver can provide a Farkas certificate of infeasibility (an extreme ray of the dual).
+  This is used to generate *classical feasibility cuts*.
+  This feature can be required by :doc:`../tutorials/classical` and :doc:`../tutorials/lshape` implemented
+  with :class:`ClassicalBenders` and :class:`LShaped`, respectively, if the user wants to add feasibility cuts.
+* **IIS**:
+  The solver can find an Irreducible Inconsistent Subsystem (IIS).
+  This helps building stronger *no-good cuts*.
+  This feature usually works with :doc:`../tutorials/cbd` and :doc:`../tutorials/lbbd` implemented
+  with :class:`CombinatorialBenders` and :class:`LogicBasedBenders`, respectively, if the user wants to add no-good
+  feasibility cuts.
+
 Guide on building solver models can be found in the official documentation of each solver.
 
 .. list-table:: Supported Solvers' Features
@@ -49,7 +67,7 @@ Guide on building solver models can be found in the official documentation of ea
       - ✅
       - Commercial
     * - **OR-Tools**
-      - :class:`~.solvers.Ortools`
+      - :class:`~.solvers.Ortools` [6]_
       - `Doc <https://developers.google.com/optimization/cp>`__
       - ❌
       - ❌
@@ -154,9 +172,10 @@ Guide on building solver models can be found in the official documentation of ea
        *Rather, they interface directly with the python bindings for the specific solver."*
        -- `Pyomo source code <https://github.com/Pyomo/pyomo/blob/e0fcc8183406aa5afa1977c2368bcbe9bbbbe9ba/pyomo/solvers/plugins/solvers/direct_or_persistent_solver.py#L26>`_.
 .. [5] *Pyomo returns all-zero dual values when using SCIP as a solver.*
+.. [6] *Here we only use the CP-SAT solver provided by OR-Tools for Constraint Programming (CP).*
 
 .. admonition:: Mathematical Programming vs. Constraint Programming
-    :class: tip
+    :class: note
 
     Mathematical Programming and Constraint Programming are two different paradigms for solving optimization problems.
     They have distinct approaches and are suited for different types of problems.
@@ -256,6 +275,7 @@ See :class:`SolverBase` for the comprehensive API reference, and :doc:`built-in 
         Pyomo -- inherits --> SolverBase
         Scip -- inherits --> SolverBase
         Cplex -- inherits --> SolverBase
+        Ortools -- inherits --> SolverBase
 
 .. attention::
 
@@ -300,4 +320,4 @@ See :class:`SolverBase` for the comprehensive API reference, and :doc:`built-in 
     * Base Class: :class:`SolverBase`
     * Solver Interfaces:
       :class:`~.solvers.Gurobi`, :class:`~.solvers.Copt`, :class:`~.solvers.Pyomo`, :class:`~.solvers.Scip`,
-      :class:`~.solvers.Cplex`
+      :class:`~.solvers.Cplex`, :class:`~.solvers.Ortools`
