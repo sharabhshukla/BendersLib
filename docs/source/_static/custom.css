@@ -92,7 +92,74 @@ h2::before {
 
 /* Customize font sizes */
 
-/*override SHIBUYA theme brand color*/
-html[data-accent-color='blue'] {
-    --accent-9: #0066CC;
+/*!*override SHIBUYA theme brand color*!*/
+:root, .light, .light-theme {
+  --blue-1: #fcfdfe;
+  --blue-2: #f6faff;
+  --blue-3: #eaf3fe;
+  --blue-4: #dcebff;
+  --blue-5: #cae2ff;
+  --blue-6: #b6d5fe;
+  --blue-7: #9dc3f6;
+  --blue-8: #78abee;
+  --blue-9: #06c;
+  --blue-10: #0057bc;
+  --blue-11: #0769cf;
+  --blue-12: #0e325e;
+
+  --blue-a1: #0055aa03;
+  --blue-a2: #0072ff09;
+  --blue-a3: #006ef315;
+  --blue-a4: #006eff23;
+  --blue-a5: #0074ff35;
+  --blue-a6: #006dfc49;
+  --blue-a7: #0063e862;
+  --blue-a8: #0061df87;
+  --blue-a9: #0066cc;
+  --blue-a10: #0057bc;
+  --blue-a11: #0065cef8;
+  --blue-a12: #002655f1;
+
+  --blue-contrast: #fff;
+  --blue-surface: #f4f9ffcc;
+  --blue-indicator: #06c;
+  --blue-track: #06c;
 }
+
+@supports (color: color(display-p3 1 1 1)) {
+  @media (color-gamut: p3) {
+    :root, .light, .light-theme {
+      --blue-1: oklch(99.4% 0.0022 255.8);
+      --blue-2: oklch(98.2% 0.0084 255.8);
+      --blue-3: oklch(96% 0.0175 255.8);
+      --blue-4: oklch(93.6% 0.0338 255.8);
+      --blue-5: oklch(90.5% 0.0502 255.8);
+      --blue-6: oklch(86.3% 0.0672 255.8);
+      --blue-7: oklch(80.8% 0.0841 255.8);
+      --blue-8: oklch(73.2% 0.1124 255.8);
+      --blue-9: oklch(52.2% 0.1771 255.8);
+      --blue-10: oklch(47.4% 0.1771 255.8);
+      --blue-11: oklch(53.2% 0.1771 255.8);
+      --blue-12: oklch(31.8% 0.0894 255.8);
+
+      --blue-a1: color(display-p3 0.0235 0.349 0.6745 / 0.012);
+      --blue-a2: color(display-p3 0.0196 0.3882 0.8784 / 0.032);
+      --blue-a3: color(display-p3 0.0078 0.3725 0.898 / 0.075);
+      --blue-a4: color(display-p3 0.0078 0.3804 0.9412 / 0.126);
+      --blue-a5: color(display-p3 0.0078 0.3804 0.9412 / 0.189);
+      --blue-a6: color(display-p3 0.0039 0.3608 0.9255 / 0.263);
+      --blue-a7: color(display-p3 0.0039 0.3255 0.8588 / 0.353);
+      --blue-a8: color(display-p3 0.0039 0.3176 0.8235 / 0.487);
+      --blue-a9: color(display-p3 0 0.2706 0.7294 / 0.836);
+      --blue-a10: color(display-p3 0 0.2314 0.6627 / 0.863);
+      --blue-a11: color(display-p3 0 0.2745 0.7373 / 0.82);
+      --blue-a12: color(display-p3 0 0.1098 0.2902 / 0.906);
+
+      --blue-contrast: #fff;
+      --blue-surface: color(display-p3 0.9569 0.9725 0.9961 / 0.8);
+      --blue-indicator: oklch(52.2% 0.1771 255.8);
+      --blue-track: oklch(52.2% 0.1771 255.8);
+    }
+  }
+}
+/*!*override SHIBUYA theme brand color*!*/
