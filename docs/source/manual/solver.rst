@@ -49,8 +49,8 @@ Guide on building solver models can be found in the official documentation of ea
       - ✅
       - Commercial
     * - **OR-Tools**
-      -
-      - `Doc <https://developers.google.com/optimization>`__
+      - :class:`~.solvers.Ortools`
+      - `Doc <https://developers.google.com/optimization/cp>`__
       - ❌
       - ❌
       - ❌
