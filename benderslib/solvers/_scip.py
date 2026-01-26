@@ -10,7 +10,6 @@ class Scip(SolverBase):
     """SCIP solver interface for BendersLib.
 
     This class provides an interface to the SCIP solver for use with BendersLib.
-    It implements the methods defined in the :class:`~benderslib.SolverBase` class.
     Refer to :ref:`solver-table` for the supported features of this solver interface
     and the link to the backend solver's official documentation.
 

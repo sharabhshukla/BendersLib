@@ -1,0 +1,109 @@
+# coding:utf-8
+
+from ..consts import BendersConsts as CST
+from ._base import SolverCPBase
+
+from docplex.cp.model import CpoModel
+from docplex.cp.solution import CpoSolveResult
+
+
+class CplexCP(SolverCPBase):
+    """CPLEX CP solver interface for BendersLib.
+
+    This class provides an interface to the CPLEX CP solver for use with BendersLib.
+    Refer to :ref:`solver-table` for the supported features of this solver interface
+    and the link to the backend solver's official documentation.
+
+    .. warning::
+
+        Constraint Programming (CP) solvers does not technically support dual or extreme rays like
+        Mathematical Programming (MP) solvers. Therefore, dual-based Benders methods like
+        :class:`~benderslib.ClassicalBenders` are not compatible with :class:`CplexCP`.
+        :class:`CplexCP` is typically used with :class:`~benderslib.CombinatorialBenders` and
+        :class:`~benderslib.LogicBasedBenders` for solving subproblems modeled as CP problems.
+
+    Parameters
+    ---------------
+    model: docplex.cp.model.CpoModel
+        An instance of CPLEX's ``CpoModel``.
+    vars_map: dict[str, object]
+        A dictionary mapping **all** (not only complicating) variable names to CPLEX variable objects.
+    solver_options: dict, optional
+        A dictionary of solver-specific options.
+    """
+
+    def __init__(self, model: CpoModel, vars_map: dict, solver_options: dict = None) -> None:
+        super().__init__(model)
+
+        # Attributes required by SolverBase
+        self.model = model
+        self.status = CST.UNSOLVED
+
+        # Private attributes
+        self._original_model = model
+        self._vars_map = vars_map
+        self._solver_options = solver_options or {}
+        self._solution: CpoSolveResult | None = None
+        self._is_sat = not self.model.is_minimization() and not self.model.is_maximization()
+
+        self._sense = CST.MIN
+        self._all_vars = [v.name for v in self._vars_map.values()]
+        self._constr_num = self.model.get_statistics().get_number_of_constraints()
+
+        self.__standardize()
+
+    def __standardize(self):
+        self.__sense_to_minimize()
+
+    def __sense_to_minimize(self):
+        if not self._is_sat and self.model.is_maximization():
+            raise NotImplementedError("BendersLib currently only supports minimization problems.")
+
+    def __copy_model(self):
+        self.model = self._original_model.clone()
+
+    def fix_vars(self, var_values: dict[str, float]) -> None:
+        self.__copy_model()
+        var_values = {n: int(v) for n, v in var_values.items()}
+
+        for var_name, value in var_values.items():
+            var = self._vars_map[var_name]
+            self.model.add(var == value)
+
+    def unfix_vars(self, vars: list[str]) -> None:
+        self.__copy_model()
+
+    def get_var_values(self, vars: list[str] | None = None) -> dict[str, float]:
+        if not self._solution:
+            return {}
+        vars_to_get = vars or self._all_vars
+        res = {var_name: self._solution.get_value(self._vars_map[var_name]) for var_name in vars_to_get}
+        return res
+
+    def get_obj(self) -> float:
+        obj_val = self._solution.get_objective_value()
+        if obj_val is None and self._is_sat:
+            return 0.0
+        return obj_val
+
+    def solve(self) -> None:
+        # Hide all output
+        if 'log_output' not in self._solver_options:
+            self._solver_options['log_output'] = None
+
+        self._solution = self.model.solve(**self._solver_options)
+
+        _cplex_status_map = {
+            'optimal': CST.OPTIMAL,
+            'infeasible': CST.INFEASIBLE,
+
+            # Feasibility checking problem without objective function
+            'feasible': CST.OPTIMAL,
+        }
+
+        status_str = self._solution.get_solve_status().lower()
+        self.status = _cplex_status_map.get(status_str, CST.UNKNOWN)
+
+
+if __name__ == "__main__":
+    pass

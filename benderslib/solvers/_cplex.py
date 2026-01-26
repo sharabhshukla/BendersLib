@@ -7,17 +7,16 @@ from ._base import SolverBase
 
 
 class Cplex(SolverBase):
-    """Cplex solver interface for BendersLib.
+    """CPLEX solver interface for BendersLib.
 
-    This class provides an interface to the Cplex solver for use with BendersLib.
-    It implements the methods defined in the :class:`~benderslib.SolverBase` class.
+    This class provides an interface to the CPLEX solver for use with BendersLib.
     Refer to :ref:`solver-table` for the supported features of this solver interface
     and the link to the backend solver's official documentation.
 
     Parameters
     ---------------
     model: cplex.Cplex
-        An instance of Cplex's ``cplex.Cplex``.
+        An instance of CPLEX's ``cplex.Cplex``.
     solver_options: dict, optional
         A dictionary of solver-specific options.
     """
@@ -25,7 +24,7 @@ class Cplex(SolverBase):
     def __init__(self, model: CplexModel, solver_options: dict = None) -> None:
         super().__init__(model)
 
-        # Attributes in Cplex Model
+        # Attributes in CPLEX Model
         sense = self.model.objective.get_sense()
         vars = self.model.variables.get_names()
         vtypes = self.model.variables.get_types(vars)

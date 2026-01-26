@@ -53,11 +53,18 @@ Guide on building solver models can be found in the official documentation of ea
       - ✅
       - Commercial
     * - **CPLEX**
-      - :class:`~.solvers.Cplex`
-      - `Doc <https://www.ibm.com/docs/en/icos/22.1.2?topic=optimizers-users-manual-cplex>`__
+      - :class:`~.solvers.Cplex` (Mathematical Programming)
+      - `Doc <https://www.ibm.com/docs/en/icos/22.1.2?topic=optimizers-cplex-python-api-reference-manual>`__
       - ✅
       - ✅
       - ✅
+      - Commercial
+    * - **CPLEX**
+      - :class:`~.solvers.CplexCP` (Constraint Programming)
+      - `Doc <https://ibmdecisionoptimization.github.io/docplex-doc/cp/docplex.cp.model.py.html>`__
+      - ❌
+      - ❌
+      - ❌
       - Commercial
     * - **Gurobi**
       - :class:`~.solvers.Gurobi`
@@ -66,8 +73,8 @@ Guide on building solver models can be found in the official documentation of ea
       - ✅
       - ✅
       - Commercial
-    * - **OR-Tools**
-      - :class:`~.solvers.Ortools` [6]_
+    * - **OR-Tools** [6]_
+      - :class:`~.solvers.Ortools` (Constraint Programming)
       - `Doc <https://developers.google.com/optimization/cp>`__
       - ❌
       - ❌
@@ -320,4 +327,4 @@ See :class:`SolverBase` for the comprehensive API reference, and :doc:`built-in 
     * Base Class: :class:`SolverBase`
     * Solver Interfaces:
       :class:`~.solvers.Gurobi`, :class:`~.solvers.Copt`, :class:`~.solvers.Pyomo`, :class:`~.solvers.Scip`,
-      :class:`~.solvers.Cplex`, :class:`~.solvers.Ortools`
+      :class:`~.solvers.Cplex`, :class:`~.solvers.Ortools`, :class:`~.solvers.CplexCP`

@@ -85,7 +85,7 @@ Detailed API for each component can be found in the :doc:`API reference <../api/
 
     * Abstraction: :class:`SolverBase`
     * Solvers: :class:`~.solvers.Gurobi`, :class:`~.solvers.Copt`, :class:`~.solvers.Pyomo`, :class:`~.solvers.Scip`,
-      :class:`~.solvers.Cplex`, :class:`~.solvers.Ortools`
+      :class:`~.solvers.Cplex`, :class:`~.solvers.Ortools`, :class:`~.solvers.CplexCP`
 
 * :doc:`master`:
   The master problem component represents the high-level problem in the Benders decomposition.

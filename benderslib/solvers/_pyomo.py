@@ -13,7 +13,6 @@ class Pyomo(SolverBase):
     """Pyomo solver interface for BendersLib.
 
     This class provides an interface to Pyomo for use with BendersLib.
-    It implements the methods defined in the :class:`~benderslib.SolverBase` class.
     Refer to :ref:`solver-table` for the supported features of this interface
     and the link to the backend solver's official documentation.
 

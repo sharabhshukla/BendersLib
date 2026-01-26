@@ -137,7 +137,7 @@ Please see :doc:`examples/index` for more information.
 **Built-in Solvers Interfaces:**
 
 *    :class:`~.solvers.Gurobi`, :class:`~.solvers.Copt`, :class:`~.solvers.Pyomo`, :class:`~.solvers.Scip`,
-     :class:`~.solvers.Cplex`, :class:`~.solvers.Ortools`
+     :class:`~.solvers.Cplex`, :class:`~.solvers.Ortools`, :class:`~.solvers.CplexCP`
 
 Structure
 -----------------------------------

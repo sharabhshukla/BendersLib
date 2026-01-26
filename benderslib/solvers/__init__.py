@@ -70,19 +70,26 @@ except ImportError:
 try:
     from ._cplex import Cplex
 except ImportError:
-    Cplex = _create_placeholder_solver("Cplex", "Install it via 'pip install cplex'.")
+    CPLEX = _create_placeholder_solver("CPLEX", "Install it via 'pip install cplex'.")
 
 try:
     from ._ortools import Ortools
 except ImportError:
     Ortools = _create_placeholder_solver("Ortools", "Install it via 'pip install ortools'.")
 
+try:
+    from ._cplexcp import CplexCP
+except ImportError:
+    CplexCP = _create_placeholder_solver("CPLEX (CP)", "Install it via 'pip install docplex'.")
+
 __all__ = [
     "SolverBase",
+    "SolverCPBase",
     "Gurobi",
     "Copt",
     "Pyomo",
     "Scip",
     "Cplex",
     "Ortools",
+    "CplexCP",
 ]

@@ -12,7 +12,6 @@ class Ortools(SolverCPBase):
     """OR-Tools solver interface for BendersLib.
 
     This class provides an interface to the OR-Tools CP-SAT solver for use with BendersLib.
-    It implements the methods defined in the :class:`~benderslib.SolverBase` class.
     Refer to :ref:`solver-table` for the supported features of this solver interface
     and the link to the backend solver's official documentation.
 
@@ -103,8 +102,8 @@ class Ortools(SolverCPBase):
             cp_model.OPTIMAL: CST.OPTIMAL,
             cp_model.INFEASIBLE: CST.INFEASIBLE,
 
-            # # Feasibility checking problem without objective function
-            # cp_model.FEASIBLE: CST.OPTIMAL,
+            # Feasibility checking problem without objective function
+            cp_model.FEASIBLE: CST.OPTIMAL,
         }
         self.status = _ortools_status_map.get(status, CST.UNKNOWN)
 
