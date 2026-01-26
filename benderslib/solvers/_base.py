@@ -391,5 +391,55 @@ class SolverBase(ABC):
         ...
 
 
+class SolverCPBase(SolverBase):
+    """The abstract base class for Constraint Programming (CP) solver interfaces in BendersLib.
+
+    It defines the essential methods and attributes that any CP solver interface must implement
+    to be compatible with BendersLib.
+
+    Parameters
+    ---------------
+    model :
+        An instance of the solver's model class (e.g., Gurobi's ``gurobipy.Model``).
+    solver_options: dict, optional
+        A dictionary of solver-specific options.
+    """
+
+    def __init__(self, model, solver_options: dict = None) -> None:
+        super().__init__(model, solver_options)
+
+    def add_estimators(self, estimators: list[str], prob: list[float] = None, lb: float = 0) -> None:
+        # Below are functions required when using this solver as a master problem solver.
+        # Using CP solver for master problem is not common, so these functions are left unimplemented.
+        raise NotImplementedError("BendersLib currently does not support using a CP solver for the master problem.")
+
+    def add_cut(self, cut, name=None) -> None:
+        raise NotImplementedError("BendersLib currently does not support using a CP solver for the master problem.")
+
+    def remove_cut(self, cut_name: str) -> None:
+        raise NotImplementedError("BendersLib currently does not support using a CP solver for the master problem.")
+
+    def get_var_coefs(self, vars: list[str] | None = None) -> dict[str, list]:
+        # Below are not technically available for a CP solver.
+        raise NotImplementedError("<get_var_coefs> is not supported for a CP solver.")
+
+    def get_rhs(self) -> list[float]:
+        raise NotImplementedError("<get_rhs> is not supported for a CP solver.")
+
+    def get_dual_values(self) -> list[float]:
+        raise NotImplementedError("<get_dual_values> is not supported for a CP solver.")
+
+    def get_extreme_ray(self) -> list[float]:
+        raise NotImplementedError("<get_extreme_ray> is not supported for a CP solver.")
+
+    @staticmethod
+    def make_master_problem(original_model, master_vars: list[str]):
+        raise NotImplementedError("<make_master_problem> is not yet implemented for a CP solver.")
+
+    @staticmethod
+    def make_sub_problem(original_model, master_vars: list[str]):
+        raise NotImplementedError("<make_sub_problem> is not yet implemented for a CP solver.")
+
+
 if __name__ == '__main__':
     pass

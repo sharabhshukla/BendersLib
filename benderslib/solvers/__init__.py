@@ -9,7 +9,7 @@ __copyright__ = "Copyright 2025, https://guo.ph"
 
 from abc import ABCMeta
 
-from ._base import SolverBase
+from ._base import SolverBase, SolverCPBase
 
 
 def _create_placeholder_solver(name: str, install_message: str):

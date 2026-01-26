@@ -12,7 +12,7 @@ from .consts import BendersConsts as CST
 from .params import BendersParams
 from .result import BendersResult
 
-from .solvers import SolverBase
+from .solvers import SolverBase, SolverCPBase
 
 from .core import (
     ProblemBase,
@@ -72,6 +72,7 @@ __all__ = [
 
     # Solver
     "SolverBase",
+    "SolverCPBase",
 
     # Core
     "ProblemBase",
