@@ -151,8 +151,9 @@ Guide on building solver models can be found in the official documentation of ea
       - ✅
       - Commercial
 
-.. IPOPT, Minotaur, Baron, and KNITRO nonlinear solvers (may) will be added in future releases.
-.. MiniZinc, PuLP, CVXPY, GEKKO, GAMS, and AMPL (may) will be added in future releases.
+.. Nonlinear Solvers: IPOPT, Minotaur, Baron, KNITRO
+.. CP Solvers: Xpress Kalis, python-constraint, Z3, via MiniZinc (https://docs.minizinc.dev/en/stable/solvers.html)
+.. Modeling Languages: MiniZinc, PuLP, CVXPY, GEKKO, GAMS, AMPL
 
 .. https://news.ycombinator.com/item?id=45671176
 
