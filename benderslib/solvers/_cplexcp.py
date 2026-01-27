@@ -28,11 +28,20 @@ class CplexCP(SolverCPBase):
         An instance of CPLEX's ``CpoModel``.
     vars_map: dict[str, object]
         A dictionary mapping **all** (not only complicating) variable names to CPLEX variable objects.
+    cons_vars: dict[str, list[str]], optional
+        A dictionary mapping CPLEX constraint name to the list of decision variable names involved in
+        the corresponding constraints. This parameter is required when computing conflicting variables
+        in the IIS, using :meth:`compute_iis`.
     solver_options: dict, optional
         A dictionary of solver-specific options.
     """
 
-    def __init__(self, model: CpoModel, vars_map: dict, solver_options: dict = None) -> None:
+    def __init__(
+            self, model: CpoModel,
+            vars_map: dict,
+            cons_vars: dict = None,
+            solver_options: dict = None
+    ) -> None:
         super().__init__(model)
 
         # Attributes required by SolverBase
@@ -45,10 +54,15 @@ class CplexCP(SolverCPBase):
         self._solver_options = solver_options or {}
         self._solution: CpoSolveResult | None = None
         self._is_sat = not self.model.is_minimization() and not self.model.is_maximization()
+        self._cons_vars = cons_vars
 
         self._sense = CST.MIN
         self._all_vars = [v.name for v in self._vars_map.values()]
         self._constr_num = self.model.get_statistics().get_number_of_constraints()
+
+        # Hide all output
+        if 'log_output' not in self._solver_options:
+            self._solver_options['log_output'] = None
 
         self.__standardize()
 
@@ -87,10 +101,6 @@ class CplexCP(SolverCPBase):
         return obj_val
 
     def solve(self) -> None:
-        # Hide all output
-        if 'log_output' not in self._solver_options:
-            self._solver_options['log_output'] = None
-
         self._solution = self.model.solve(**self._solver_options)
 
         _cplex_status_map = {
@@ -103,6 +113,61 @@ class CplexCP(SolverCPBase):
 
         status_str = self._solution.get_solve_status().lower()
         self.status = _cplex_status_map.get(status_str, CST.UNKNOWN)
+
+    def compute_iis(self):
+        """Compute the Irreducible Infeasible Subsystem (IIS) of the model if it is infeasible.
+
+        This method can be useful for :doc:`../tutorials/cbd` to identify a set of conflicting
+        (binary) variables that causing subproblem infeasibility.
+        This set of variables can be smaller than the full set of complicating variables,
+        thus potentially leading to stronger :class:`~benderslib.NoGoodFC`.
+
+        This method requires the ``cons_vars`` parameter to be provided during initialization.
+
+        .. caution::
+
+            IIS is not guaranteed to be unique.
+
+        Returns
+        ---------------
+        list[str]
+            A list of variable names involved in the IIS.
+
+        Example
+        ---------------
+        .. code-block:: python
+
+                iis_vars = solver.compute_iis()
+
+        """
+
+        # https://ibmdecisionoptimization.github.io/docplex-doc/cp/docplex.cp.model.py.html#docplex.cp.model.CpoModel.refine_conflict
+        # https://ibmdecisionoptimization.github.io/docplex-doc/cp/docplex.cp.solution.py.html#docplex.cp.solution.CpoRefineConflictResult
+
+        conflict = self.model.refine_conflict(**self._solver_options)
+
+        # if conflict:
+        #     print("\nConflict found! The following constraints are contradictory:")
+        #     for c in conflict.get_member_constraints():
+        #         # The .get_name() method retrieves the name you assigned
+        #         print(f" - Constraint Name: '{c.get_name()}'")
+        #         print(type(c))
+        #         # You can also print the constraint expression itself
+        #         # print(f"   Expression: {c.get_expression()}")
+
+        var_set = set()
+
+        # Variables
+        for var in conflict.get_member_variables():
+            var_name = var.get_name()
+            var_set.add(var_name)
+
+        # Constraints
+        for cons in conflict.get_member_constraints():
+            cons_name = cons.get_name()
+            var_set.update(self._cons_vars[cons_name])
+
+        return var_set
 
 
 if __name__ == "__main__":

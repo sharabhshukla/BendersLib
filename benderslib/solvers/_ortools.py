@@ -126,7 +126,7 @@ class Ortools(SolverCPBase):
         This set of variables can be smaller than the full set of complicating variables,
         thus potentially leading to stronger :class:`~benderslib.NoGoodFC`.
 
-        Using this method requires that the ``cons_vars`` parameter is provided when initializing.
+        This method requires the ``cons_vars`` parameter to be provided during initialization.
 
         .. caution::
 

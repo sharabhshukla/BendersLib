@@ -64,7 +64,7 @@ Guide on building solver models can be found in the official documentation of ea
       - `Doc <https://ibmdecisionoptimization.github.io/docplex-doc/cp/docplex.cp.model.py.html>`__
       - ❌
       - ❌
-      - ❌
+      - ✅
       - Commercial
     * - **Gurobi**
       - :class:`~.solvers.Gurobi`
