@@ -203,6 +203,22 @@ class Gurobi(SolverBase):
         }
         self.status = _grb_status_map.get(self.model.Status, CST.UNKNOWN)
 
+    def compute_iis(self) -> set[str]:
+        self.model.computeIIS()
+
+        # Variables
+        iis_vars = set(v.VarName for v in self.model.getVars() if v.IISLB or v.IISUB)
+
+        # Constraints
+        for cons in self.model.getConstrs():
+            if cons.IISConstr:
+                row = self.model.getRow(cons)
+                for j in range(row.size()):
+                    var = row.getVar(j)
+                    iis_vars.add(var.VarName)
+
+        return iis_vars
+
     @staticmethod
     def make_master_problem(original_model: Model, master_vars: list[str]) -> Model:
         master = original_model.copy()
