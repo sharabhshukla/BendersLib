@@ -114,7 +114,7 @@ class CplexCP(SolverCPBase):
         status_str = self._solution.get_solve_status().lower()
         self.status = _cplex_status_map.get(status_str, CST.UNKNOWN)
 
-    def compute_iis(self):
+    def compute_iis(self) -> set[str]:
         """Compute the Irreducible Infeasible Subsystem (IIS) of the model if it is infeasible.
 
         This method can be useful for :doc:`../tutorials/cbd` to identify a set of conflicting

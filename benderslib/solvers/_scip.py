@@ -203,6 +203,24 @@ class Scip(SolverBase):
         }
         self.status = _scip_status_map.get(self.model.getStatus(), CST.UNKNOWN)
 
+    def compute_iis(self) -> set[str]:
+        self.model.hideOutput()
+        iis = self.model.generateIIS()
+        iis_scip = iis.getSubscip()
+
+        vars = set()
+
+        # Constraints
+        for cons in iis_scip.getConss():
+            for var in self.model.getConsVars(cons):
+                vars.add(var.name)
+
+        # Variables
+        for var in iis_scip.getVars():
+            vars.add(var.name)
+
+        return vars
+
     @staticmethod
     def make_master_problem(original_model: Model, master_vars: list[str]) -> Model:
         master = Model(sourceModel=original_model)

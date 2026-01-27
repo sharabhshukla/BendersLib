@@ -305,6 +305,32 @@ class SolverBase(ABC):
         """
         ...
 
+    def compute_iis(self) -> set[str]:
+        """Compute the Irreducible Infeasible Subsystem (IIS) of the model if it is infeasible.
+
+        This method can be useful for :doc:`../tutorials/cbd` to identify a set of conflicting
+        (binary) variables that causing subproblem infeasibility.
+        This set of variables can be smaller than the full set of complicating variables,
+        thus potentially leading to stronger :class:`~benderslib.NoGoodFC`.
+
+        .. caution::
+
+            IIS is not guaranteed to be unique.
+
+        Returns
+        ---------------
+        list[str]
+            A list of variable names involved in the IIS.
+
+        Example
+        ---------------
+        .. code-block:: python
+
+                iis_vars = solver.compute_iis()
+
+        """
+        ...
+
     @staticmethod
     def make_master_problem(original_model, master_vars: list[str]) -> object:
         """Build the master problem from the original problem.

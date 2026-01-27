@@ -34,7 +34,8 @@ Mathematical Programming Solver Interfaces
 .. autoclass:: benderslib.solvers.Pyomo
    :inherited-members:
    :show-inheritance:
-   :exclude-members: _sense, _all_vars, _bin_vars, _int_vars, _var_bounds, _rhs, _constr_num
+   :exclude-members: _sense, _all_vars, _bin_vars, _int_vars, _var_bounds, _rhs, _constr_num,
+                     compute_iis
 
 .. autoclass:: benderslib.solvers.Scip
    :inherited-members:
