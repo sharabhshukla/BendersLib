@@ -200,6 +200,24 @@ class Cplex(SolverBase):
         }
         self.status = _cplex_status_map.get(status, CST.UNKNOWN)
 
+    def compute_iis(self) -> set[str]:
+        self.model.conflict.refine()
+
+        vars = set()
+
+        for i, row in enumerate(self.model.linear_constraints.get_rows()):
+
+            # 3: the constraint is in the IIS; -1: the constraint is not in the IIS
+            is_in_iis = self.model.conflict.get(i) == 3
+            # print(i, row, self.model.conflict.get(i))
+
+            if is_in_iis:
+                for var_idx in row.ind:
+                    var_name = self.model.variables.get_names(var_idx)
+                    vars.add(var_name)
+
+        return vars
+
     @staticmethod
     def make_master_problem(original_model: CplexModel, master_vars: list[str]) -> CplexModel:
         master = CplexModel(original_model)
