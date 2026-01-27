@@ -106,7 +106,7 @@ Guide on building solver models can be found in the official documentation of ea
       - `Doc <https://www.ibm.com/docs/en/icos/22.1.2?topic=optimizers-users-manual-cplex>`__
       - ✅
       - ❌
-      - ✅
+      - 🟥 [8]_
       - Commercial
     * - GLPK
       - :class:`~.solvers.Pyomo` (``'glpk'``)
@@ -120,7 +120,7 @@ Guide on building solver models can be found in the official documentation of ea
       - `Doc <https://docs.gurobi.com>`__
       - ✅
       - ❌
-      - ✅
+      - 🟥 [8]_
       - Commercial
     * - HiGHS
       - :class:`~.solvers.Pyomo` (``'highs'``)
@@ -139,7 +139,7 @@ Guide on building solver models can be found in the official documentation of ea
     * - SCIP
       - :class:`~.solvers.Pyomo` (``'scip'``)
       - `Doc <https://www.scipopt.org>`__
-      - ❌ [5]_
+      - 🟥 [5]_
       - ❌
       - ❌
       - Open-source
@@ -148,7 +148,7 @@ Guide on building solver models can be found in the official documentation of ea
       - `Doc <https://www.fico.com/en/products/fico-xpress-optimization>`__
       - ✅
       - ❌
-      - ✅
+      - 🟥 [8]_
       - Commercial
 
 .. Nonlinear Solvers: IPOPT, Minotaur, Baron, KNITRO
@@ -179,9 +179,10 @@ Guide on building solver models can be found in the official documentation of ea
 .. [4] *"(Pyomo) Direct solver interfaces do not use any file io.*
        *Rather, they interface directly with the python bindings for the specific solver."*
        -- `Pyomo source code <https://github.com/Pyomo/pyomo/blob/e0fcc8183406aa5afa1977c2368bcbe9bbbbe9ba/pyomo/solvers/plugins/solvers/direct_or_persistent_solver.py#L26>`_.
-.. [5] *Pyomo returns all-zero dual values when using SCIP as a solver.*
+.. [5] *All-zero dual values are returned when using SCIP as a solver.*
 .. [6] *Here we only use the CP-SAT solver provided by OR-Tools for Constraint Programming (CP).*
 .. [7] *May not be irreducible, but always be sufficient.*
+.. [8] *Pyomo supports IIS through a third-party module that requires file I/O. We do not provide this feature in BendersLib.*
 
 .. admonition:: Mathematical Programming vs. Constraint Programming
     :class: note

@@ -4,6 +4,7 @@ import pyomo.environ as pyo
 from pyomo.core import Var, Objective, Constraint, Suffix
 from pyomo.core.expr.visitor import identify_variables
 from pyomo.repn import generate_standard_repn
+from pyomo.contrib.iis import write_iis
 
 from ..consts import BendersConsts as CST
 from ._base import SolverBase
@@ -204,6 +205,21 @@ class Pyomo(SolverBase):
         if self.status == CST.OPTIMAL:
             # Load solution back to the model
             self.model.solutions.load_from(results)
+
+    def compute_iis(self):
+        raise NotImplementedError("IIS computation is not supported in the Pyomo interface.")
+
+        _temp_ilp_file = "_temp_iis.ilp"
+        _solver_name = self.__solver_name
+        _solver_name.replace('_direct', '')
+
+        assert _solver_name in ['cplex', 'gurobi', 'xpress'], \
+            "Pyomo IIS computation is only supported for 'cplex', 'gurobi', and 'xpress'."
+
+        _temp_ilp_file = write_iis(self.model, _temp_ilp_file, _solver_name)
+        var_names = read_lp(_temp_ilp_file)
+
+        return var_names
 
     @staticmethod
     def make_master_problem(original_model: pyo.ConcreteModel, master_vars: list[str]) -> pyo.ConcreteModel:
