@@ -83,12 +83,14 @@ sphinx_gallery_conf = {
     'examples_dirs': [
         '../../examples',
         '../../examples/solvers',
-        '../../examples/api'
+        '../../examples/api',
+        '../../examples/iis',
     ],
     'gallery_dirs': [
         'examples',
         'examples/solvers',
-        'examples/api'
+        'examples/api',
+        'examples/iis',
     ],
     # 'download_all_examples': False,
     'capture_repr': ('__repr__', '__str__', '_repr_html_'),

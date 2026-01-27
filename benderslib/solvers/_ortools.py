@@ -30,11 +30,21 @@ class Ortools(SolverCPBase):
     vars_map: dict[str, object]
         A dictionary mapping **all** (not only complicating) variable names to OR-Tools variable objects.
         This is necessary because OR-Tools does not provide a direct way to access variables by name.
+    cons_vars: dict[int, list[str]], optional
+        A dictionary mapping boolean indicator variable indices internally used by OR-Tools
+        to the list of decision variable names involved in the corresponding constraints.
+        This parameter is required when computing conflicting variables in the IIS, using :meth:`compute_iis`.
     solver_options: dict, optional
         A dictionary of solver-specific options.
     """
 
-    def __init__(self, model: cp_model.CpModel, vars_map: dict, solver_options: dict = None) -> None:
+    def __init__(
+            self,
+            model: cp_model.CpModel,
+            vars_map: dict,
+            cons_vars: dict = None,
+            solver_options: dict = None
+    ) -> None:
         super().__init__(model)
 
         # Attributes required by SolverBase
@@ -46,6 +56,7 @@ class Ortools(SolverCPBase):
         self._original_model = model
         self._original_vars_map = vars_map
         self._vars_map = vars_map
+        self._cons_vars = cons_vars
 
         self._sense = CST.MIN
         self._all_vars = [v.name for v in self.model.Proto().variables]
@@ -106,6 +117,43 @@ class Ortools(SolverCPBase):
             cp_model.FEASIBLE: CST.OPTIMAL,
         }
         self.status = _ortools_status_map.get(status, CST.UNKNOWN)
+
+    def compute_iis(self) -> set[str]:
+        """Compute the Irreducible Infeasible Subsystem (IIS) of the model if it is infeasible.
+
+        This method can be useful for :doc:`../tutorials/cbd` to identify a set of conflicting
+        (binary) variables that causing subproblem infeasibility.
+        This set of variables can be smaller than the full set of complicating variables,
+        thus potentially leading to stronger :class:`~benderslib.NoGoodFC`.
+
+        Using this method requires that the ``cons_vars`` parameter is provided when initializing.
+
+        .. caution::
+
+            - IIS is not guaranteed to be unique.
+            - Here we use OR-Tools' ``SufficientAssumptionsForInfeasibility`` method, which
+              `may not return a minimal (irreducible) infeasible subsystem <https://groups.google.com/g/or-tools-discuss/c/qlVv2uSq1uo>`__,
+              but it is always sufficient to prove infeasibility.
+
+        Returns
+        ---------------
+        list[str]
+            A list of variable names involved in the IIS.
+
+        Example
+        ---------------
+        .. code-block:: python
+
+                iis_vars = solver.compute_iis()
+
+        """
+        assumptions_core = self._solver.SufficientAssumptionsForInfeasibility()
+
+        var_set = set()
+        for cons in assumptions_core:
+            var_set.update(self._cons_vars[cons])
+
+        return var_set
 
 
 if __name__ == "__main__":

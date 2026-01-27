@@ -78,7 +78,7 @@ Guide on building solver models can be found in the official documentation of ea
       - `Doc <https://developers.google.com/optimization/cp>`__
       - ❌
       - ❌
-      - ❌
+      - ✅ [7]_
       - Open-source
     * - **SCIP**
       - :class:`~.solvers.Scip`
@@ -181,6 +181,7 @@ Guide on building solver models can be found in the official documentation of ea
        -- `Pyomo source code <https://github.com/Pyomo/pyomo/blob/e0fcc8183406aa5afa1977c2368bcbe9bbbbe9ba/pyomo/solvers/plugins/solvers/direct_or_persistent_solver.py#L26>`_.
 .. [5] *Pyomo returns all-zero dual values when using SCIP as a solver.*
 .. [6] *Here we only use the CP-SAT solver provided by OR-Tools for Constraint Programming (CP).*
+.. [7] *May not be irreducible, but always be sufficient.*
 
 .. admonition:: Mathematical Programming vs. Constraint Programming
     :class: note
