@@ -192,6 +192,26 @@ class Copt(SolverBase):
         }
         self.status = _copt_status_map.get(self.model.status, CST.UNKNOWN)
 
+    def compute_iis(self) -> set[str]:
+        self.model.computeIIS()
+
+        # Variables
+        iis_vars = set(
+            v.getName() for v in self.model.getVars()
+            if self.model.getVarLowerIIS(v) or self.model.getVarUpperIIS(v)
+        )
+
+        # Constraints
+        for cons in self.model.getConstrs():
+            is_in_iis = self.model.getConstrLowerIIS(cons) or self.model.getConstrUpperIIS(cons)
+            if is_in_iis:
+                expr = self.model.getRow(cons)
+                for j in range(expr.getSize()):
+                    var = expr.getVar(j)
+                    iis_vars.add(var.getName())
+
+        return iis_vars
+
     @staticmethod
     def make_master_problem(original_model: Model, master_vars: list[str]) -> Model:
         master = original_model.clone()
