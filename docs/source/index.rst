@@ -124,7 +124,7 @@ with interfaces to popular solvers.
 *   Combinatorial Benders Decomposition: :doc:`Tutorial <tutorials/cbd>`, :class:`~benderslib.CombinatorialBenders`, :doc:`Example <examples/cbd>`
 *   L-shaped Method: :doc:`Tutorial <tutorials/lshape>`, :class:`~benderslib.LShaped`, :doc:`Example <examples/lshape>`
 *   Integer L-shaped Method: :doc:`Tutorial <tutorials/ilshape>`, :class:`~benderslib.IntegerLShaped`, :doc:`Example <examples/ilshape>`
-*   **Customizing your own Benders Decomposition**: :doc:`Example <examples/custom_template>`
+*   **Customizing your own Benders Decomposition**: :doc:`Example <examples/api/custom_template>`
 
 The variants supported are not limited to the above.
 Since BendersLib is designed to be extensible, allowing users to implement their own Benders cuts.

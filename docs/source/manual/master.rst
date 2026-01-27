@@ -98,7 +98,7 @@ Here is an example of how to create a master/sub problem from an annotated model
 .. seealso::
 
     - :ref:`manual_decompose_solve`
-    - **Executable Examples**: :doc:`../examples/annotation_benders`, :doc:`../examples/decompose`
+    - **Executable Examples**: :doc:`../examples/annotation_benders`, :doc:`../examples/api/decompose`
 
 .. _manual_master_add_cut:
 

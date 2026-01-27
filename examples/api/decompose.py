@@ -65,4 +65,4 @@ print(master)
 #
 # .. seealso::
 #
-#     * Automated decomposition based on master problem variables: :doc:`annotation_benders`
+#     * Automated decomposition based on master problem variables: :doc:`../../examples/annotation_benders`
