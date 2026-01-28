@@ -280,12 +280,26 @@ See :class:`SolverBase` for the comprehensive API reference, and :doc:`built-in 
     :align: center
 
     flowchart TB
+        subgraph "Mathematical Programming"
+            Gurobi
+            Copt
+            Pyomo
+            Scip
+            Cplex
+        end
+
+        subgraph "Constraint Programming"
+            Ortools
+            CplexCP
+        end
+
         Gurobi -- inherits --> SolverBase
-        COPT -- inherits --> SolverBase
+        Copt -- inherits --> SolverBase
         Pyomo -- inherits --> SolverBase
         Scip -- inherits --> SolverBase
         Cplex -- inherits --> SolverBase
         Ortools -- inherits --> SolverBase
+        CplexCP -- inherits --> SolverBase
 
 .. attention::
 

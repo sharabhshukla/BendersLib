@@ -26,7 +26,7 @@ Gurobi
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: python
-    :emphasize-lines: 12-
+    :emphasize-lines: 13-
 
     from gurobipy import Model, GRB
     from benderslib import SubProblem
@@ -64,7 +64,7 @@ For stochastic programming problems with multiple scenarios, you can create a :c
 This class takes an iterable of :class:`SubProblem` instances and their corresponding probabilities (if not provided, equal probabilities are assumed).
 
 .. code-block:: python
-    :emphasize-lines: 19-
+    :emphasize-lines: 20-
 
     from gurobipy import Model, GRB
     from benderslib import SubProblem, SubProblems

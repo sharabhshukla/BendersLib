@@ -27,7 +27,7 @@ Gurobi
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: python
-    :emphasize-lines: 12-
+    :emphasize-lines: 13-
 
     from gurobipy import Model, GRB
     from benderslib import MasterProblem
