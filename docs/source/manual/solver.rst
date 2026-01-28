@@ -298,8 +298,8 @@ See :class:`SolverBase` for the comprehensive API reference, and :doc:`built-in 
         Pyomo -- inherits --> SolverBase
         Scip -- inherits --> SolverBase
         Cplex -- inherits --> SolverBase
-        Ortools -- inherits --> SolverBase
-        CplexCP -- inherits --> SolverBase
+        Ortools -- inherits --> SolverCPBase
+        CplexCP -- inherits --> SolverCPBase
 
 .. attention::
 
@@ -341,7 +341,7 @@ See :class:`SolverBase` for the comprehensive API reference, and :doc:`built-in 
 
 .. seealso::
 
-    * Base Class: :class:`SolverBase`
+    * Base Class: :class:`SolverBase`, :class:`SolverCPBase`
     * Solver Interfaces:
       :class:`~.solvers.Gurobi`, :class:`~.solvers.Copt`, :class:`~.solvers.Pyomo`, :class:`~.solvers.Scip`,
       :class:`~.solvers.Cplex`, :class:`~.solvers.Ortools`, :class:`~.solvers.CplexCP`
