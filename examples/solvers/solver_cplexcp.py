@@ -44,17 +44,22 @@ def make_sub_problem(n_vars):
     y = [model.binary_var(name=f"y[{i}]") for i in range(n_vars)]
     x = [model.binary_var(name=f"x[{i}]") for i in range(n_vars)]
 
+    cons_vars = {}
+
     for i in range(n_vars):
-        model.add(y[i] == 1)
+        model.add((y[i] == 1).set_name(f"cy_{i}"))
+        cons_vars[f"cy_{i}"] = [f"y[{i}]"]
+
         # Ensure optimality cuts are generated
         if i <= int(n_vars / 2):
-            model.add(y[i] <= x[i])
+            model.add((y[i] <= x[i]).set_name(f"cxy_{i}"))
+            cons_vars[f"cxy_{i}"] = [f"x[{i}]", f"y[{i}]"]
 
     model.minimize(model.sum(y))
 
     vars_map = {f"x[{i}]": x[i] for i in range(n_vars)}
     vars_map.update({f"y[{i}]": y[i] for i in range(n_vars)})
-    return model, vars_map
+    return model, vars_map, cons_vars
 
 
 if __name__ == '__main__':
@@ -69,14 +74,17 @@ if __name__ == '__main__':
 
     # Benders Decomposition
     master_model, master_vars = make_master_problem(n_vars)
-    sub_model, vars_map = make_sub_problem(n_vars)
+    sub_model, vars_map, cons_vars = make_sub_problem(n_vars)
     master_problem = MasterProblem(Gurobi(master_model))
-    sub_problem = SubProblem(CplexCP(sub_model, vars_map))
+    sub_problem = SubProblem(CplexCP(sub_model, vars_map, cons_vars))
+
     BD = CombinatorialBenders(
         master_problem=master_problem,
         sub_problem=sub_problem,
         complicating_vars=master_vars,
     )
+    # Turn on IIS-based cuts
+    BD.params.use_iis_cut = True
     BD.solve()
 
     draw_curve(BD.result)

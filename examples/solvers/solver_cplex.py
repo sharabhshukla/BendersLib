@@ -36,8 +36,10 @@ def make_model():
     y_names = [f"y_{i}" for i in range(n_vars)]
     z_names = [f"z_{i}" for i in range(n_vars)]
 
-    model.variables.add(names=y_names, types=[model.variables.type.integer] * n_vars, lb=[1] * n_vars, ub=[40] * n_vars)
-    model.variables.add(names=z_names, types=[model.variables.type.continuous] * n_vars, lb=[1] * n_vars, ub=[40] * n_vars)
+    model.variables.add(
+        names=y_names, types=[model.variables.type.integer] * n_vars, lb=[1] * n_vars, ub=[40] * n_vars)
+    model.variables.add(
+        names=z_names, types=[model.variables.type.continuous] * n_vars, lb=[1] * n_vars, ub=[40] * n_vars)
 
     # Set objective
     model.objective.set_sense(model.objective.sense.minimize)

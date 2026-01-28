@@ -13,7 +13,6 @@ from benderslib import AnnotationBenders, ClassicalBenders
 from benderslib.solvers import Gurobi
 from benderslib.utils import draw_curve
 
-
 from gurobipy import GRB
 import gurobipy as gp
 

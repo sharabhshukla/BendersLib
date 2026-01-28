@@ -82,7 +82,9 @@ class CplexCP(SolverCPBase):
 
         for var_name, value in var_values.items():
             var = self._vars_map[var_name]
-            self.model.add(var == value)
+            self.model.add((var == value).set_name(f'__fix_{var_name}'))
+
+            self._cons_vars[f'__fix_{var_name}'] = [var_name]
 
     def unfix_vars(self, vars: list[str]) -> None:
         self.__copy_model()
@@ -145,15 +147,6 @@ class CplexCP(SolverCPBase):
         # https://ibmdecisionoptimization.github.io/docplex-doc/cp/docplex.cp.solution.py.html#docplex.cp.solution.CpoRefineConflictResult
 
         conflict = self.model.refine_conflict(**self._solver_options)
-
-        # if conflict:
-        #     print("\nConflict found! The following constraints are contradictory:")
-        #     for c in conflict.get_member_constraints():
-        #         # The .get_name() method retrieves the name you assigned
-        #         print(f" - Constraint Name: '{c.get_name()}'")
-        #         print(type(c))
-        #         # You can also print the constraint expression itself
-        #         # print(f"   Expression: {c.get_expression()}")
 
         var_set = set()
 
