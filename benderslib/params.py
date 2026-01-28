@@ -69,6 +69,20 @@ class BendersParams:
     If ``True``, all extreme rays are used to generate multiple feasibility cuts.
     """
 
+    # Combinatorial Benders
+    use_iis_cut: bool = False
+    """**[Combinatorial Benders]** Whether to use IIS-based feasibility cuts.
+    
+    If ``True``, before generating feasibility cuts, the IIS of the infeasible subproblem is computed,
+    and only the variables in the IIS are used to generate the feasibility cuts.
+    If ``False``, all complicating variables are used to generate the feasibility cuts.
+    
+    IIS-based cuts require additional computational time to compute the IIS,
+    but may lead to faster convergence in some problems.
+    
+    You should ensure that the solver used for the subproblem supports IIS computation, see :ref:`solver-table`.
+    """
+
     # Logging
     log_freq_sec: float = 0.5
     """Frequency (in seconds) to log messages to the console/file."""

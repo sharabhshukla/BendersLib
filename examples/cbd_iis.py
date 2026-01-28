@@ -97,6 +97,8 @@ if __name__ == '__main__':
         complicating_vars=complicating_vars,
         benders=CombinatorialBenders,
     )
+    # Turn of IIS cuts
+    AB_copy.params.use_iis_cut = False
     AB_copy.solve()
 
     print()

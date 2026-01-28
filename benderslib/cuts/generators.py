@@ -65,7 +65,12 @@ class CombinatorialFCGen(CutGenerator):
         This method generates :class:`NoGoodFC` feasibility cuts based on the current solution
         of the master problem.
         """
-        var_values = self._master_problem.get_var_values(self._complicating_vars)
+        var_names = self._complicating_vars
+        if self.params.use_iis_cut:
+            var_names = self._sub_problem.compute_iis()
+
+        var_names = list(set(var_names) & set(self._complicating_vars))
+        var_values = self._master_problem.get_var_values(var_names)
 
         cut = NoGoodFC(var_values)
         return [cut]
