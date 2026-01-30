@@ -7,6 +7,7 @@ from pyomo.repn import generate_standard_repn
 from pyomo.contrib.iis import write_iis
 
 from ..consts import BendersConsts as CST
+from ..utils import load_config
 from ._base import SolverBase
 
 
@@ -66,16 +67,9 @@ class Pyomo(SolverBase):
         if '_persistent' in self.__solver_name:
             raise NotImplementedError("BendersLib currently does not support Pyomo persistent solvers.")
 
-        _solver_options = {
-            # Hide solver output
-            'gurobi': {'OutputFlag': 0, 'LogToConsole': 0, 'InfUnbdInfo': 1, 'QCPDual': 1},
-            'gurobi_direct': {'OutputFlag': 0, 'LogToConsole': 0, 'InfUnbdInfo': 1, 'QCPDual': 1},
-            'scip': {
-                'presolving/maxrounds': 0, 'separating/maxrounds': 0, 'propagating/maxrounds': 0,
-                'lp/alwaysgetduals': True
-            },
-        }
-        _options = _solver_options.get(self.__solver_name, {})
+        _options = load_config('PYOMO_SOLVER_OPTIONS').get(self.__solver_name, {})
+
+        # Prioritize user-defined options
         _options.update(self.__solver_options)
 
         solver_factory = pyo.SolverFactory(self.__solver_name, options=_options)

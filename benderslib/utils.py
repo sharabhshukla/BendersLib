@@ -1,5 +1,7 @@
 # coding:utf-8
 
+import os
+import yaml
 import functools
 
 from benderslib import BendersResult
@@ -93,3 +95,18 @@ def draw_curve(result: BendersResult):
     ax2.legend(lines + lines2, labels + labels2, loc='best')
 
     plt.show()
+
+
+def load_config(section: str = None, file='config.yaml') -> dict:
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    config_path = os.path.join(current_dir, file)
+    with open(config_path, 'r', encoding='utf-8') as f:
+        config = yaml.safe_load(f)
+
+    if section:
+        return config.get(section, {})
+    return config
+
+
+if __name__ == '__main__':
+    print(load_config('PYOMO_SOLVER_OPTIONS'))
