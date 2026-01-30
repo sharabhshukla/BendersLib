@@ -366,7 +366,3 @@ class GeneLShapedOCGen(CutGenerator):
         :class:`GeneLShapedOC` for all scenarios.
         """
         return self._multi_cuts() if self.params.multi_opti_cut else self._single_cut()
-
-
-if __name__ == '__main__':
-    pass

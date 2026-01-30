@@ -79,7 +79,3 @@ class BendersConsts:
     # Ensure immutability
     def __setattr__(self, key, value):
         raise AttributeError(f"Cannot modify constant class attributes: {key}")
-
-
-if __name__ == '__main__':
-    pass

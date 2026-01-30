@@ -111,7 +111,3 @@ class BendersLogger:
     @staticmethod
     def warning(msg: str):
         logging.warning(msg)
-
-
-if __name__ == "__main__":
-    pass

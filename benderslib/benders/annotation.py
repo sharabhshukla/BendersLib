@@ -176,7 +176,3 @@ class AnnotationBenders:
         See :meth:`~benderslib.BendersSolver.solve` for details.
         """
         self.benders_instance.solve(callback)
-
-
-if __name__ == '__main__':
-    pass

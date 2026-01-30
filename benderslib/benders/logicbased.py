@@ -102,7 +102,3 @@ class LogicBasedBenders(BendersSolver):
             feasibility_cut,
             params
         )
-
-
-if __name__ == "__main__":
-    pass

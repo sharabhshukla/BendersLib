@@ -608,7 +608,3 @@ class GeneLShapedOC(OptimalityCut):
         final_coefs = final_aggregated_x_coefs + [1.0]
 
         super().__init__(vars=final_vars, coefs=final_coefs, rhs=aggregated_rhs, sense='>=', name="GeneLShapedOC")
-
-
-if __name__ == '__main__':
-    pass

@@ -123,7 +123,3 @@ def load_config(section: str = None, file='config.yaml') -> dict:
     if section:
         return config.get(section, {}) or {}
     return config
-
-
-if __name__ == '__main__':
-    pass

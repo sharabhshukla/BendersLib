@@ -105,7 +105,3 @@ class GeneralizedBenders(BendersSolver):
             feasibility_cut,
             prob
         )
-
-
-if __name__ == "__main__":
-    pass

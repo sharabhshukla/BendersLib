@@ -1467,7 +1467,3 @@ class BendersSolver:
         self.result.n_feas_cuts = len(self.master_problem.feasibility_cuts)
         self.result.n_cuts = self.result.n_opt_cuts + self.result.n_feas_cuts
         self.__logger.log_end()
-
-
-if __name__ == '__main__':
-    pass

@@ -72,7 +72,3 @@ class BendersResult:
             f" [Master: {self.runtime_master:.2f}, Sub: {self.runtime_sub:.2f}]"
         )
         return summary
-
-
-if __name__ == '__main__':
-    pass
