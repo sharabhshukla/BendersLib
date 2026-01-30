@@ -222,6 +222,9 @@ html_theme_options = {
 #     "source_repo": "BendersLib",
 # }
 
+# html_permalinks_icon = '<span>#</span>'
+# html_theme = 'sphinxawesome_theme'
+
 # html_theme = 'insipid'
 
 # html_theme = 'sphinx_book_theme'
