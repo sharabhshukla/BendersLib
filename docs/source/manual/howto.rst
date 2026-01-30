@@ -55,7 +55,7 @@ How to build master/sub problems from a monolithic model?
 --------------------------------------------------------------
 
 BendersLib offers two ways to decompose a monolithic optimization model into master and sub problems.
-You can either use the :meth:`AnnotationBenders._decompose` method,
+You can either use the :meth:`AnnotationBenders.decompose` method,
 or the solver-specific methods like :meth:`~.SolverBase.make_master_problem` and :meth:`~.SolverBase.make_sub_problem`.
 The following example demonstrates both approaches.
 
@@ -81,7 +81,7 @@ The following example demonstrates both approaches.
     master_vars = ["x"]
 
     # Approach 1:
-    master_problem, sub_problem = AnnotationBenders._decompose(
+    master_problem, sub_problem = AnnotationBenders.decompose(
         original_problem=model,
         solver=Gurobi,
         master_vars=master_vars,

@@ -44,7 +44,7 @@ def make_original_problem():
 # %%
 # Obtain the master and sub problems:
 model, complicating_vars = make_original_problem()
-master, sub = AnnotationBenders._decompose(
+master, sub = AnnotationBenders.decompose(
     original_problem=model,
     solver=Gurobi,
     master_vars=complicating_vars,

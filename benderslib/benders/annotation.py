@@ -85,7 +85,7 @@ class AnnotationBenders:
             params: BendersParams = BendersParams(),
     ):
         master_vars = master_vars if master_vars is not None else complicating_vars
-        master_problem, sub_problem = self._decompose(original_problem, solver, master_vars)
+        master_problem, sub_problem = self.decompose(original_problem, solver, master_vars)
 
         # Attributes
         self.params = params
@@ -108,7 +108,7 @@ class AnnotationBenders:
         """An instance of :class:`BendersResult` that stores the results and statistics."""
 
     @staticmethod
-    def _decompose(
+    def decompose(
             original_problem,
             solver: Type[SolverBase],
             master_vars: list[str],
@@ -155,7 +155,7 @@ class AnnotationBenders:
             original_problem = ...  # Define or load your original problem here
             master_vars = [...]  # List of master variable names (usually a superset of complicating_vars)
 
-            master, sub = AnnotationBenders._decompose(
+            master, sub = AnnotationBenders.decompose(
                 original_problem=original_problem,
                 solver=Gurobi,
                 master_vars=master_vars,

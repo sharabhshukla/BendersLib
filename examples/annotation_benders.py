@@ -61,7 +61,7 @@ if __name__ == '__main__':
     AB.solve()
 
     # # Another way: Manually decompose the model and create ClassicalBenders instance
-    # master_model, sub_model = AnnotationBenders._decompose(model, Gurobi, complicating_vars, solver_model=True)
+    # master_model, sub_model = AnnotationBenders.decompose(model, Gurobi, complicating_vars, solver_model=True)
     # AB = ClassicalBenders.from_models(master_model, Gurobi, sub_model, Gurobi, complicating_vars=complicating_vars)
     # AB.solve()
 
