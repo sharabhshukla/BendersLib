@@ -28,22 +28,22 @@ class Scip(SolverBase):
         super().__init__(model)
 
         # Supporting method like getVarByName and getConsByName
-        _vars_dict = {v.name: v for v in self.model.getVars(transformed=False)}
-        _cons_dict = {c.name: c for c in self.model.getConss(transformed=False)}
+        self._vars_map = {v.name: v for v in self.model.getVars(transformed=False)}
+        self._cons_map = {c.name: c for c in self.model.getConss(transformed=False)}
 
         # Attributes required by SolverBase
         self.model = model
         self.status = CST.UNSOLVED
 
         self._sense = CST.MIN if self.model.getObjectiveSense() == 'minimize' else CST.MAX
-        self._all_vars = list(_vars_dict.keys())
-        self._bin_vars = [var_name for var_name, var in _vars_dict.items() if var.vtype() == 'BINARY']
-        self._int_vars = [var_name for var_name, var in _vars_dict.items() if var.vtype() == 'INTEGER']
+        self._all_vars = list(self._vars_map.keys())
+        self._bin_vars = [var_name for var_name, var in self._vars_map.items() if var.vtype() == 'BINARY']
+        self._int_vars = [var_name for var_name, var in self._vars_map.items() if var.vtype() == 'INTEGER']
 
         # Record only non-trivial bounds, i.e., lb != 0 or ub != +inf
         self._var_bounds = {
             var_name: (var.getLbGlobal(), var.getUbGlobal())
-            for var_name, var in _vars_dict.items()
+            for var_name, var in self._vars_map.items()
             if var.getLbGlobal() != 0 or var.getUbGlobal() < self.__SCIP_VAR_UB}
 
         self.__standardize()
@@ -71,12 +71,18 @@ class Scip(SolverBase):
         #         "BendersLib currently does not support variable bounds in SCIP, due to a SCIP limitation.")
 
         # If there are bound constraints
-        for cons in self.model.getConss(transformed=False):
-            if len(self.model.getConsVars(cons)) == 1:
-                raise NotImplementedError(
-                    "BendersLib currently does not support bound constraints in SCIP, due to a SCIP limitation.")
+        # for cons in self.model.getConss(transformed=False):
+        #     if len(self.model.getConsVars(cons)) == 1:
+        #         raise NotImplementedError(
+        #             "BendersLib currently does not support bound constraints in SCIP, due to a SCIP limitation.")
 
-        ...
+        # Define variable bounds as constraints
+        for var_name, (lb, ub) in self._var_bounds.items():
+            var = self._vars_map[var_name]
+            if lb > 0:
+                self._cons_map[f"__{var_name}_lb"] = self.model.addCons(var >= lb, name=f"__{var_name}_lb")
+            if ub < self.__SCIP_VAR_UB:
+                self._cons_map[f"__{var_name}_ub"] = self.model.addCons(var <= ub, name=f"__{var_name}_ub")
 
     def __setup_model(self, solver_options: dict = None):
         # Hide output
@@ -105,22 +111,20 @@ class Scip(SolverBase):
                 raise ValueError("Length of 'prob' must match length of 'estimators'.")
 
         for name, obj in zip(estimators, prob):
-            self.model.addVar(name=name, vtype='C', lb=lb, obj=obj)
+            self._vars_map[name] = self.model.addVar(name=name, vtype='C', lb=lb, obj=obj)
 
     def fix_vars(self, var_values: dict[str, float]) -> None:
         self.model.freeTransform()
-        _vars_dict = {v.name: v for v in self.model.getVars(transformed=False)}
         for var_name, value in var_values.items():
-            var = _vars_dict[var_name]
+            var = self._vars_map[var_name]
             self.model.chgVarLb(var, value)
             self.model.chgVarUb(var, value)
             # self.model.fixVar(var, value)
 
     def unfix_vars(self, vars: list[str]) -> None:
         self.model.freeTransform()
-        _vars_dict = {v.name: v for v in self.model.getVars(transformed=False)}
         for var_name in vars:
-            var = _vars_dict[var_name]
+            var = self._vars_map[var_name]
             lb, ub = self._var_bounds.get(var_name, (0, self.__SCIP_VAR_UB))
             self.model.chgVarLb(var, lb)
             self.model.chgVarUb(var, ub)
@@ -134,8 +138,7 @@ class Scip(SolverBase):
     def get_var_coefs(self, vars: list[str] | None = None) -> dict[str, list]:
         result = {vars: [] for vars in (vars or self._all_vars)}
 
-        _cons_dict = {c.name: c for c in self.model.getConss(transformed=False)}
-        for cons in _cons_dict.values():
+        for cons in self._cons_map.values():
             var_coefs = self.model.getValsLinear(cons)
             for var_name in result.keys():
                 coef = var_coefs.get(var_name, 0.0)
@@ -177,21 +180,25 @@ class Scip(SolverBase):
         return self.model.getObjVal()
 
     def add_cut(self, cut, name=None) -> None:
-        _vars_dict = {v.name: v for v in self.model.getVars(transformed=False)}
-        lhs = sum(coef * _vars_dict[var] for var, coef in zip(cut.vars, cut.coefs))
+        lhs = sum(coef * self._vars_map[var] for var, coef in zip(cut.vars, cut.coefs))
 
         # Cut cannot be added in the "problem solved stage"
         self.model.freeTransform()
 
         if cut.sense == CST.EQ:
-            self.model.addCons(lhs == cut.rhs, name=name)
+            self._cons_map[name] = self.model.addCons(lhs == cut.rhs, name=name)
         elif cut.sense == CST.LE:
-            self.model.addCons(lhs <= cut.rhs, name=name)
+            self._cons_map[name] = self.model.addCons(lhs <= cut.rhs, name=name)
         elif cut.sense == CST.GE:
-            self.model.addCons(lhs >= cut.rhs, name=name)
+            self._cons_map[name] = self.model.addCons(lhs >= cut.rhs, name=name)
 
     def remove_cut(self, cut_name: str) -> None:
-        raise NotImplementedError("Removing cuts is not supported by the SCIP interface yet.")
+        # raise NotImplementedError("Removing cuts is not supported by the SCIP interface yet.")
+        self.model.freeTransform()
+
+        cons = self._cons_map[cut_name]
+        self.model.delCons(cons)
+        self._cons_map.pop(cut_name)
 
     def solve(self) -> None:
         # self.model.freeTransform()

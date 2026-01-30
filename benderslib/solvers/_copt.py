@@ -115,7 +115,9 @@ class Copt(SolverBase):
 
     def get_var_coefs(self, vars: list[str] | None = None) -> dict[str, list]:
         res = {}
-        for v in vars:
+        _vars = vars or self._all_vars
+
+        for v in _vars:
             var = self.model.getVarByName(v)
             coefs = [self.model.getCoeff(cons, var) for cons in self.model.getConstrs()]
             res[v] = coefs

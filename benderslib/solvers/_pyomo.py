@@ -126,7 +126,7 @@ class Pyomo(SolverBase):
     def unfix_vars(self, vars: list[str]) -> None:
         for var_name in vars:
             var = self.model.find_component(var_name)
-            var.set_value(None)
+            # var.set_value(None)
             var.unfix()
 
     def get_var_values(self, vars: list[str] | None = None) -> dict[str, float]:

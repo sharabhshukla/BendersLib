@@ -27,7 +27,14 @@ class Cplex(SolverBase):
         # Attributes in CPLEX Model
         sense = self.model.objective.get_sense()
         vars = self.model.variables.get_names()
-        vtypes = self.model.variables.get_types(vars)
+
+        if self.model.get_problem_type() == 0:
+            # 0: LP
+            vtypes = ['C'] * len(vars)
+        else:
+            # MIP
+            vtypes = self.model.variables.get_types(vars)
+
         lbs = self.model.variables.get_lower_bounds(vars)
         ubs = self.model.variables.get_upper_bounds(vars)
 
@@ -152,7 +159,6 @@ class Cplex(SolverBase):
 
     def get_dual_values(self) -> list[float]:
         dual = self.model.solution.get_dual_values()
-        # dual = [-d for d in dual]
         return dual
 
     def get_extreme_ray(self) -> list[float]:
