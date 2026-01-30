@@ -14,6 +14,7 @@ from benderslib.solvers import Gurobi
 from benderslib.utils import draw_curve
 
 from pathlib import Path
+import inspect
 
 from gurobipy import GRB
 import gurobipy as gp
@@ -24,7 +25,10 @@ def make_original_problem():
     # env.setParam("OutputFlag", 0)
     # model = gp.read("m.lp",env=env)
 
-    model = gp.read(str(Path(__file__).parent / "m.lp"))
+    # Get the directory of the current file
+    current_file_path = inspect.getfile(inspect.currentframe())
+    lp_file_path = Path(current_file_path).parent / "m.lp"
+    model = gp.read(str(lp_file_path))
 
     complicating_vars = [v.VarName for v in model.getVars() if v.VType != GRB.CONTINUOUS]
     return model, complicating_vars
