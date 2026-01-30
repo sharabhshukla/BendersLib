@@ -2,6 +2,7 @@
 
 from ..consts import BendersConsts as CST
 from ._base import SolverCPBase
+from ..utils import load_config
 
 from docplex.cp.model import CpoModel
 from docplex.cp.solution import CpoSolveResult
@@ -60,9 +61,10 @@ class CplexCP(SolverCPBase):
         self._all_vars = [v.name for v in self._vars_map.values()]
         self._constr_num = self.model.get_statistics().get_number_of_constraints()
 
-        # Hide all output
-        if 'log_output' not in self._solver_options:
-            self._solver_options['log_output'] = None
+        _options = load_config('CPLEXCP_OPTIONS')
+        # Prioritize user options
+        _options.update(self._solver_options)
+        self._solver_options = _options
 
         self.__standardize()
 

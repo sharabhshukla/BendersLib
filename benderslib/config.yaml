@@ -1,4 +1,4 @@
-PYOMO_SOLVER_OPTIONS:
+PYOMO_OPTIONS:
   gurobi:
     'OutputFlag': 0
     'LogToConsole': 0
@@ -14,3 +14,34 @@ PYOMO_SOLVER_OPTIONS:
     'separating/maxrounds': 0
     'propagating/maxrounds': 0
     'lp/alwaysgetduals': True
+
+GUROBI_OPTIONS:
+  # Hide solver output
+  'OutputFlag': 0
+  'LogToConsole': 0
+  # Get Model.FarkasDual requires InfUnbdInfo = 1
+  'InfUnbdInfo': 1
+  # QCPi requires QCPDual = 1
+  'QCPDual': 1
+  # Gurobi model status code 4 (INF_OR_UNBD)
+  'DualReductions': 0
+
+SCIP_OPTIONS:
+  # Get Farkas duals for infeasible problems
+  'lp/alwaysgetduals': True
+
+CPLEXCP_OPTIONS:
+  # Hide solver output
+  'log_output': None
+
+COPT_OPTIONS:
+  # Hide solver output
+  'Logging': 0
+  'LogToConsole': 0
+  # Request Farkas dual for infeasible problems
+  'ReqFarkasRay': 1
+
+CPLEX_OPTIONS:
+  # Parameters for obtaining Farkas certificate
+  'preprocessing.presolve': 0
+  'lpmethod': 2

@@ -4,6 +4,7 @@ from gurobipy import Model, GRB
 
 from ..consts import BendersConsts as CST
 from ._base import SolverBase
+from ..utils import load_config
 
 
 class Gurobi(SolverBase):
@@ -76,23 +77,13 @@ class Gurobi(SolverBase):
         self.model.update()
 
     def __setup_model(self, solver_options: dict = None):
-        # Hide solver output
-        self.model.Params.OutputFlag = 0
-        self.model.Params.LogToConsole = 0
+        _options = load_config('GUROBI_OPTIONS')
+        # Prioritize user options
+        solver_options = solver_options or {}
+        _options.update(solver_options)
 
-        # Get Model.FarkasDual requires InfUnbdInfo = 1
-        self.model.Params.InfUnbdInfo = 1
-
-        # Gurobi model status code 4 (INF_OR_UNBD)
-        self.model.Params.DualReductions = 0
-
-        # QCPi requires QCPDual = 1
-        self.model.Params.QCPDual = 1
-
-        # Setup solver options
-        if solver_options:
-            for option, value in solver_options.items():
-                setattr(self.model.Params, option, value)
+        for option, value in _options.items():
+            setattr(self.model.Params, option, value)
 
     def add_estimators(self, estimators: list[str], prob: list[float] = None, lb: float = 0) -> None:
         if prob is None:

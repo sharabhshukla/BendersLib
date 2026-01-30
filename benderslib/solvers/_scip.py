@@ -4,6 +4,7 @@ from pyscipopt import Model, Expr, SCIP_PARAMSETTING
 
 from ..consts import BendersConsts as CST
 from ._base import SolverBase
+from ..utils import load_config
 
 
 class Scip(SolverBase):
@@ -87,18 +88,17 @@ class Scip(SolverBase):
     def __setup_model(self, solver_options: dict = None):
         # Hide output
         self.model.hideOutput()
-
         # Turn off presolve to get correct dual values
         self.model.setPresolve(SCIP_PARAMSETTING.OFF)
         self.model.setHeuristics(SCIP_PARAMSETTING.OFF)
         self.model.disablePropagation()
 
-        # Get Farkas duals for infeasible problems
-        self.model.setBoolParam("lp/alwaysgetduals", True)
+        _options = load_config('SCIP_OPTIONS')
+        # Prioritize user options
+        solver_options = solver_options or {}
+        _options.update(solver_options)
 
-        # Setup solver options
-        if solver_options:
-            self.model.setParams(solver_options)
+        self.model.setParams(_options)
 
     def add_estimators(self, estimators: list[str], prob: list[float] = None, lb: float = 0) -> None:
         if prob is None:

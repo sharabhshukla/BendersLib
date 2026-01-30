@@ -4,6 +4,7 @@ from coptpy import Model, LinExpr, COPT
 
 from ..consts import BendersConsts as CST
 from ._base import SolverBase
+from ..utils import load_config
 
 
 class Copt(SolverBase):
@@ -73,17 +74,14 @@ class Copt(SolverBase):
                 var.ub = COPT.INFINITY
 
     def __setup_model(self, solver_options: dict = None):
-        # Hide solver output
-        self.model.setParam(COPT.Param.Logging, 0)
-        self.model.setParam(COPT.Param.LogToConsole, 0)
+        _options = load_config('COPT_OPTIONS')
 
-        # Request Farkas dual for infeasible problems
-        self.model.setParam(COPT.Param.ReqFarkasRay, 1)
+        # Prioritize user options
+        solver_options = solver_options or {}
+        _options.update(solver_options)
 
-        # Setup solver options
-        if solver_options:
-            for option, value in solver_options.items():
-                self.model.setParam(option, value)
+        for option, value in _options.items():
+            self.model.setParam(option, value)
 
     def add_estimators(self, estimators: list[str], prob: list[float] = None, lb: float = 0) -> None:
         if prob is None:

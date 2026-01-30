@@ -4,6 +4,7 @@ from cplex import Cplex as CplexModel, infinity as CPLEX_INFINITY
 
 from ..consts import BendersConsts as CST
 from ._base import SolverBase
+from ..utils import load_config
 
 
 class Cplex(SolverBase):
@@ -92,21 +93,21 @@ class Cplex(SolverBase):
         self.model.set_warning_stream(None)
         self.model.set_results_stream(None)
 
-        # Parameter for obtaining Farkas certificate
-        self.model.parameters.preprocessing.presolve.set(0)
-        self.model.parameters.lpmethod.set(2)
+        # # Parameters for obtaining Farkas certificate
+        # self.model.parameters.preprocessing.presolve.set(0)
+        # self.model.parameters.lpmethod.set(2)
 
-        # Setup solver options
-        if solver_options:
-            for option, value in solver_options.items():
-                # This is a bit tricky as cplex parameters are nested
-                # e.g. model.parameters.mip.tolerances.mipgap.set(0.01)
-                # We assume solver_options is a dict like {'mip.tolerances.mipgap': 0.01}
-                keys = option.split('.')
-                param = self.model.parameters
-                for key in keys[:-1]:
-                    param = getattr(param, key)
-                getattr(param, keys[-1]).set(value)
+        _options = load_config('CPLEX_OPTIONS')
+        # Prioritize user options
+        solver_options = solver_options or {}
+        _options.update(solver_options)
+
+        for option, value in _options.items():
+            keys = option.split('.')
+            param = self.model.parameters
+            for key in keys[:-1]:
+                param = getattr(param, key)
+            getattr(param, keys[-1]).set(value)
 
     def add_estimators(self, estimators: list[str], prob: list[float] = None, lb: float = 0) -> None:
         if prob is None:
