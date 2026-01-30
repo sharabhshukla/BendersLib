@@ -13,6 +13,8 @@ from benderslib import AnnotationBenders, ClassicalBenders
 from benderslib.solvers import Gurobi
 from benderslib.utils import draw_curve
 
+from pathlib import Path
+
 from gurobipy import GRB
 import gurobipy as gp
 
@@ -22,7 +24,7 @@ def make_original_problem():
     # env.setParam("OutputFlag", 0)
     # model = gp.read("m.lp",env=env)
 
-    model = gp.read("m.lp")
+    model = gp.read(str(Path(__file__).parent / "m.lp"))
 
     complicating_vars = [v.VarName for v in model.getVars() if v.VType != GRB.CONTINUOUS]
     return model, complicating_vars

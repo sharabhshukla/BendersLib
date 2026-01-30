@@ -13,6 +13,8 @@ from benderslib import AnnotationBenders, ClassicalBenders
 from benderslib.solvers import Copt
 from benderslib.utils import draw_curve
 
+from pathlib import Path
+
 from coptpy import COPT
 import coptpy
 
@@ -20,7 +22,7 @@ import coptpy
 def make_original_problem():
     env = coptpy.Envr()
     model = env.createModel()
-    model.readLp("m.lp")
+    model.readLp(str(Path(__file__).parent / "m.lp"))
 
     complicating_vars = [v.name for v in model.getVars() if v.vtype != COPT.CONTINUOUS]
     return model, complicating_vars

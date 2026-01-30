@@ -1,0 +1,20 @@
+# coding:utf-8
+
+import runpy
+from pathlib import Path
+import pytest
+
+EXAMPLES_DIR = Path(__file__).parent.parent.parent / "examples"
+example_files = [f for f in EXAMPLES_DIR.glob("**/*.py") if f.name != "__init__.py"]
+
+
+@pytest.mark.parametrize(
+    "example_file",
+    example_files,
+    ids=[f.name for f in example_files]
+)
+def test_example(example_file):
+    try:
+        runpy.run_path(str(example_file), run_name="__main__")
+    except Exception as e:
+        pytest.fail(f"Running {example_file.name} failed with {e}")
