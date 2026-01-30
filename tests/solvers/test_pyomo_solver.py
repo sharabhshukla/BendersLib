@@ -48,7 +48,7 @@ def create_pyomo_model():
 
 @pytest.mark.parametrize("solver", solvers)
 @pytest.mark.skipif(not pyomo_available, reason="Pyomo is not installed")
-class TestPyomoSolver(BaseTestSolver):
+class TestPyomo(BaseTestSolver):
 
     @pytest.fixture(autouse=True)
     def skip_if_solver_not_available(self, solver):

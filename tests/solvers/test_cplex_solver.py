@@ -17,7 +17,7 @@ print(LP_FILE)
 
 
 @pytest.mark.skipif(not cplex_available, reason="CPLEX is not installed")
-class TestCplexSolver(BaseTestSolver):
+class TestCplex(BaseTestSolver):
 
     @pytest.fixture
     def solver_instance(self):

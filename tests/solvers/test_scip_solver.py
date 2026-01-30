@@ -16,7 +16,7 @@ LP_FILE = os.path.join(os.path.dirname(__file__), "lp.lp")
 
 
 @pytest.mark.skipif(not scip_available, reason="SCIP is not installed")
-class TestScipSolver(BaseTestSolver):
+class TestScip(BaseTestSolver):
 
     @pytest.fixture
     def solver_instance(self):

@@ -7,6 +7,11 @@ from benderslib import BendersConsts as CST
 
 
 class BaseTestSolver:
+    """Base test class for solver interfaces.
+
+    Since assertions are consistent across different solver interfaces,
+    it can be ensured that all solvers have consistent behavior.
+    """
 
     @pytest.fixture
     def solver_instance(self, *args):
@@ -129,6 +134,11 @@ class BaseTestSolver:
 
 
 class BaseTestCPSolver(BaseTestSolver):
+    """Base test class for Constraint Programming (CP) solver interfaces.
+
+    The tests that are not applicable to CP solvers are skipped.
+    """
+
     @pytest.mark.skip(reason="CP solvers do not support estimators.")
     def test_add_estimators(self, solver_instance):
         pass
@@ -160,4 +170,3 @@ class BaseTestCPSolver(BaseTestSolver):
     @pytest.mark.skip(reason="make_sub_problem is not applicable to CP solvers in this context.")
     def test_make_sub_problem(self, solver_instance):
         pass
-
