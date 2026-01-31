@@ -302,7 +302,3 @@ class Pyomo(SolverBase):
             del cons.parent_component()[cons.index()]
 
         return sub
-
-
-if __name__ == "__main__":
-    pass

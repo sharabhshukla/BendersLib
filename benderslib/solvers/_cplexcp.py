@@ -163,7 +163,3 @@ class CplexCP(SolverCPBase):
             var_set.update(self._cons_vars[cons_name])
 
         return var_set
-
-
-if __name__ == "__main__":
-    pass

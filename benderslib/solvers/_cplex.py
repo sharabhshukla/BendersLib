@@ -278,7 +278,3 @@ class Cplex(SolverBase):
         sub.linear_constraints.delete(_cons_to_remove_name)
 
         return sub
-
-
-if __name__ == '__main__':
-    pass

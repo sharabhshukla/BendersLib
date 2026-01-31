@@ -270,7 +270,3 @@ class Copt(SolverBase):
             sub.remove(constrs[idx])
 
         return sub
-
-
-if __name__ == '__main__':
-    pass

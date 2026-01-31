@@ -291,7 +291,3 @@ class Scip(SolverBase):
             sub.delCons(constrs[i])
 
         return sub
-
-
-if __name__ == '__main__':
-    pass

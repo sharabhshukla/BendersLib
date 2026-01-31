@@ -154,7 +154,3 @@ class Ortools(SolverCPBase):
             var_set.update(self._cons_vars[cons])
 
         return var_set
-
-
-if __name__ == "__main__":
-    pass

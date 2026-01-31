@@ -270,7 +270,3 @@ class Gurobi(SolverBase):
 
         sub.update()
         return sub
-
-
-if __name__ == '__main__':
-    pass

@@ -465,7 +465,3 @@ class SolverCPBase(SolverBase):
     @staticmethod
     def make_sub_problem(original_model, master_vars: list[str]):
         raise NotImplementedError("<make_sub_problem> is not yet implemented for a CP solver.")
-
-
-if __name__ == '__main__':
-    pass

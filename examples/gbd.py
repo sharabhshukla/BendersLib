@@ -108,7 +108,7 @@ def create_complete_model(warehouse_num, price, budget, demand, max_shortage_rat
 
 # %%
 # Solve with Generalized Benders Decomposition:
-if __name__ == "__main__":
+if __name__ == '__main__':
     # Data
     warehouse_num = 8
     random.seed(1)
