@@ -2,69 +2,10 @@
 
 import os
 import yaml
-import functools
 
 from benderslib import BendersResult
 
 import matplotlib.pyplot as plt
-
-
-def numerical_cleanup(tol: float = 1e-9):
-    """A decorator to clean up numerical noise from the return value of a function.
-
-    This decorator inspects the decorated function's return value and sets any
-    floating-point numbers with an absolute value smaller than the tolerance `tol`
-    to exactly `0.0`. This is useful for handling numerical inaccuracies that can
-    arise from optimization solvers, where coefficients that should be zero appear
-    as very small numbers (e.g., 1e-12).
-
-    The cleanup is applied recursively to lists, tuples, and dictionary values.
-
-    Parameters
-    ---------------
-    tol : float
-        The tolerance used to identify and zero out small numbers.
-        Defaults to 1e-9.
-
-    Returns
-    ---------------
-    A wrapper function that cleans its result before returning it.
-
-    Example
-    ---------------
-    .. code-block:: python
-
-        @numerical_cleanup(tol=1e-8)
-        def get_dual_values() -> list[float]:
-            # Returns a list like [1.0, 1e-9, -5.0]
-            ...
-        # The decorated function will return [1.0, 0.0, -5.0]
-    """
-
-    def decorator(func):
-        @functools.wraps(func)
-        def wrapper(*args, **kwargs):
-            result = func(*args, **kwargs)
-
-            def clean(value):
-                if isinstance(value, float):
-                    if 0.0 < abs(value) < tol:
-                        print('Cleaning value:', value)
-                    return 0.0 if abs(value) < tol else value
-                elif isinstance(value, list):
-                    return [clean(v) for v in value]
-                elif isinstance(value, tuple):
-                    return tuple(clean(v) for v in value)
-                elif isinstance(value, dict):
-                    return {k: clean(v) for k, v in value.items()}
-                else:
-                    return value
-
-            return clean(result)
-
-        return wrapper
-
-    return decorator
 
 
 def draw_curve(result: BendersResult):
