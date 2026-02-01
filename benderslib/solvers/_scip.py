@@ -93,7 +93,7 @@ class Scip(SolverBase):
         self.model.setHeuristics(SCIP_PARAMSETTING.OFF)
         self.model.disablePropagation()
 
-        _options = load_config('SCIP_OPTIONS')
+        _options = self._options['SCIP_OPTIONS']
         # Prioritize user options
         solver_options = solver_options or {}
         _options.update(solver_options)

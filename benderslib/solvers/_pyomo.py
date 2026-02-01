@@ -67,7 +67,7 @@ class Pyomo(SolverBase):
         if '_persistent' in self.__solver_name:
             raise NotImplementedError("BendersLib currently does not support Pyomo persistent solvers.")
 
-        _options = load_config('PYOMO_OPTIONS').get(self.__solver_name, {})
+        _options = self._options['PYOMO_OPTIONS'].get(self.__solver_name, {})
 
         # Prioritize user options
         _options.update(self.__solver_options)

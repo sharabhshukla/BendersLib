@@ -61,7 +61,7 @@ class CplexCP(SolverCPBase):
         self._all_vars = [v.name for v in self._vars_map.values()]
         self._constr_num = self.model.get_statistics().get_number_of_constraints()
 
-        _options = load_config('CPLEXCP_OPTIONS')
+        _options = self._options['CPLEXCP_OPTIONS']
         # Prioritize user options
         _options.update(self._solver_options)
         self._solver_options = _options

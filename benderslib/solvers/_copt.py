@@ -74,7 +74,7 @@ class Copt(SolverBase):
                 var.ub = COPT.INFINITY
 
     def __setup_model(self, solver_options: dict = None):
-        _options = load_config('COPT_OPTIONS')
+        _options = self._options['COPT_OPTIONS']
 
         # Prioritize user options
         solver_options = solver_options or {}

@@ -77,7 +77,7 @@ class Gurobi(SolverBase):
         self.model.update()
 
     def __setup_model(self, solver_options: dict = None):
-        _options = load_config('GUROBI_OPTIONS')
+        _options = self._options['GUROBI_OPTIONS']
         # Prioritize user options
         solver_options = solver_options or {}
         _options.update(solver_options)

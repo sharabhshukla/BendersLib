@@ -97,7 +97,7 @@ class Cplex(SolverBase):
         # self.model.parameters.preprocessing.presolve.set(0)
         # self.model.parameters.lpmethod.set(2)
 
-        _options = load_config('CPLEX_OPTIONS')
+        _options = self._options['CPLEX_OPTIONS']
         # Prioritize user options
         solver_options = solver_options or {}
         _options.update(solver_options)
