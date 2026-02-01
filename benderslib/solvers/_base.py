@@ -44,8 +44,10 @@ class SolverBase(ABC):
         """
 
         self._options = load_config()
+        """A dictionary of solver-specific options loaded from the configuration file."""
 
         # Attributes to be set in the subclass
+        # Below are for printing and reporting purposes
         self._sense = CST.MIN
         """An indicator of the objective sense of the model."""
         self._all_vars: list[str] = []

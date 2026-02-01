@@ -122,11 +122,26 @@ if __name__ == '__main__':
         prob=probs,
     )
 
-    # L.params.multi_opti_cut = True
-    # L.params.multi_feas_cut = True
     L.params.log_freq_sec = 0.0
-
     L.solve()
+
+    # Multi-cut L-shaped solution
+    # Master and Sub models are required to be re-defined,
+    # since they have been modified (by adding cuts) in the previous solve.
+    master_model, complicating_vars = first_stage_model(n_plants)
+    sub_models = second_stage_model(n_plants, scenarios, total_capacity)
+    LM = LShaped.from_models(
+        master_model=master_model,
+        master_solver=Gurobi,
+        sub_model=sub_models,
+        sub_solver=Gurobi,
+        complicating_vars=complicating_vars,
+        prob=probs,
+    )
+    LM.params.multi_opti_cut = True
+    LM.params.multi_feas_cut = True
+    LM.params.log_freq_sec = 0.0
+    LM.solve()
 
     # Draw convergence curve
     plt.plot(L.result.lb_list, label='Lower Bound')
