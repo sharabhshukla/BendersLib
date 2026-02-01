@@ -20,7 +20,7 @@ class ClassicalOCGen(CutGenerator):
     def __init__(self, master_problem, sub_problem, params):
         super().__init__(master_problem, sub_problem, params)
 
-        self.var_coefs = sub_problem.get_var_coefs(self._complicating_vars)
+        self.var_coefs = sub_problem.get_var_coefs(self.complicating_vars)
         self.rhs = sub_problem.get_rhs()
 
     def generate(self) -> list[ClassicalOC]:
@@ -30,7 +30,7 @@ class ClassicalOCGen(CutGenerator):
         """
         dual_values = self.sub_problem.get_dual_values()
 
-        cut = ClassicalOC(self._complicating_vars, self.var_coefs, dual_values, self.rhs)
+        cut = ClassicalOC(self.complicating_vars, self.var_coefs, dual_values, self.rhs)
         return [cut]
 
 
@@ -40,7 +40,7 @@ class ClassicalFCGen(CutGenerator):
     def __init__(self, master_problem, sub_problem, params):
         super().__init__(master_problem, sub_problem, params)
 
-        self.var_coefs = sub_problem.get_var_coefs(self._complicating_vars)
+        self.var_coefs = sub_problem.get_var_coefs(self.complicating_vars)
         self.rhs = sub_problem.get_rhs()
 
     def generate(self) -> list[ClassicalFC]:
@@ -50,7 +50,7 @@ class ClassicalFCGen(CutGenerator):
         """
         extreme_ray = self.sub_problem.get_extreme_ray()
 
-        cut = ClassicalFC(self._complicating_vars, self.var_coefs, extreme_ray, self.rhs)
+        cut = ClassicalFC(self.complicating_vars, self.var_coefs, extreme_ray, self.rhs)
         return [cut]
 
 
@@ -65,11 +65,11 @@ class CombinatorialFCGen(CutGenerator):
         This method generates :class:`NoGoodFC` feasibility cuts based on the current solution
         of the master problem.
         """
-        var_names = self._complicating_vars
+        var_names = self.complicating_vars
         if self.params.use_iis_cut:
             var_names = self.sub_problem.compute_iis()
 
-        var_names = list(set(var_names) & set(self._complicating_vars))
+        var_names = list(set(var_names) & set(self.complicating_vars))
         var_values = self.master_problem.get_var_values(var_names)
 
         cut = NoGoodFC(var_values)
@@ -87,7 +87,7 @@ class CombinatorialOCGen(CutGenerator):
         This method generates :class:`CombinatorialOC` optimality cuts based on the current solution
         of the master problem and the objective value obtained from the subproblem.
         """
-        var_values = self.master_problem.get_var_values(self._complicating_vars)
+        var_values = self.master_problem.get_var_values(self.complicating_vars)
         sub_obj = self.sub_problem.get_obj()
         estimator = self.master_problem.estimators[0]
         theta_lb = self.master_problem.get_estimator_values()[estimator]
@@ -106,14 +106,14 @@ class LShapedOCGen(CutGenerator):
         self.rhs = dict()
 
         for i, sub in enumerate(self.sub_problem):
-            self.var_coefs[i] = sub.get_var_coefs(self._complicating_vars)
+            self.var_coefs[i] = sub.get_var_coefs(self.complicating_vars)
             self.rhs[i] = sub.get_rhs()
 
     def _single_cut(self) -> list[LShapedOC]:
         """
         This method generates a single :class:`LShapedOC` optimality cut aggregating all subproblems (scenarios).
         """
-        complicating_vars = self._complicating_vars
+        complicating_vars = self.complicating_vars
 
         all_probs = []
         all_duals = []
@@ -138,7 +138,7 @@ class LShapedOCGen(CutGenerator):
             _rhs = self.rhs[i]
             _dual = sub.get_dual_values()
 
-            vars = self._complicating_vars
+            vars = self.complicating_vars
             estimator = self.master_problem.estimators[i]
 
             # Add the cut only if it is violated
@@ -168,7 +168,7 @@ class LShapedFCGen(CutGenerator):
         self.rhs = dict()
 
         for i, sub in enumerate(self.sub_problem):
-            self.var_coefs[i] = sub.get_var_coefs(self._complicating_vars)
+            self.var_coefs[i] = sub.get_var_coefs(self.complicating_vars)
             self.rhs[i] = sub.get_rhs()
 
     def generate(self) -> list[ClassicalFC]:
@@ -184,7 +184,7 @@ class LShapedFCGen(CutGenerator):
                 _rhs = self.rhs[i]
                 _extreme_ray = sub.get_extreme_ray()
 
-                cut = ClassicalFC(self._complicating_vars, _var_coefs, _extreme_ray, _rhs)
+                cut = ClassicalFC(self.complicating_vars, _var_coefs, _extreme_ray, _rhs)
                 cuts.append(cut)
                 if not self.params.multi_feas_cut:
                     break
@@ -202,7 +202,7 @@ class IntegerLShapedOCGen(CutGenerator):
         """
         This method generates a single :class:`CombinatorialOC` optimality cut aggregating all subproblems (scenarios).
         """
-        bin_var_values = self.master_problem.get_var_values(self._complicating_vars)
+        bin_var_values = self.master_problem.get_var_values(self.complicating_vars)
         sub_obj = self.sub_problem.get_obj()
         estimator = self.master_problem.estimators[0]
         theta_lb = self.master_problem.get_estimator_values()[estimator]
@@ -217,7 +217,7 @@ class IntegerLShapedOCGen(CutGenerator):
         cuts = []
 
         for i, sub in enumerate(self.sub_problem):
-            bin_var_values = self.master_problem.get_var_values(self._complicating_vars)
+            bin_var_values = self.master_problem.get_var_values(self.complicating_vars)
             sub_obj = sub.get_obj()
             estimator = self.master_problem.estimators[i]
             theta = self.master_problem.get_estimator_values()[estimator]
@@ -250,7 +250,7 @@ class IntegerLShapedFCGen(CutGenerator):
         This method generates :class:`NoGoodFC` feasibility cuts based on the current values of binary
         complicating variables in the master problem.
         """
-        bin_var_values = self.master_problem.get_var_values(self._complicating_vars)
+        bin_var_values = self.master_problem.get_var_values(self.complicating_vars)
         cut = NoGoodFC(bin_var_values)
 
         return [cut]
@@ -262,16 +262,16 @@ class GeneralizedOCGen(CutGenerator):
     def __init__(self, master_problem, sub_problem, params):
         super().__init__(master_problem, sub_problem, params)
 
-        self.var_coefs = sub_problem.get_var_coefs(self._complicating_vars)
+        self.var_coefs = sub_problem.get_var_coefs(self.complicating_vars)
 
     def generate(self) -> list[GeneralizedOC]:
         """This method generates :class:`GeneralizedOC` optimality cuts."""
         sub_obj = self.sub_problem.get_obj()
         lagrange_multipliers = self.sub_problem.get_dual_values()
-        master_vars_values = self.master_problem.get_var_values(self._complicating_vars)
+        master_vars_values = self.master_problem.get_var_values(self.complicating_vars)
 
         cut = GeneralizedOC(
-            self._complicating_vars,
+            self.complicating_vars,
             master_vars_values,
             self.var_coefs,
             sub_obj,
@@ -286,14 +286,14 @@ class GeneralizedFCGen(CutGenerator):
     def __init__(self, master_problem, sub_problem, params):
         super().__init__(master_problem, sub_problem, params)
 
-        self.var_coefs = sub_problem.get_var_coefs(self._complicating_vars)
+        self.var_coefs = sub_problem.get_var_coefs(self.complicating_vars)
         self.rhs = sub_problem.get_rhs()
 
     def generate(self) -> list[ClassicalFC]:
         """This method generates :class:`GeneralizedFC` feasibility cuts."""
         extreme_ray = self.sub_problem.get_extreme_ray()
 
-        cut = GeneralizedFC(self._complicating_vars, self.var_coefs, extreme_ray, self.rhs)
+        cut = GeneralizedFC(self.complicating_vars, self.var_coefs, extreme_ray, self.rhs)
         return [cut]
 
 
@@ -305,11 +305,11 @@ class GeneLShapedOCGen(CutGenerator):
 
         self.var_coefs = dict()
         for i, sub in enumerate(self.sub_problem):
-            self.var_coefs[i] = sub.get_var_coefs(self._complicating_vars)
+            self.var_coefs[i] = sub.get_var_coefs(self.complicating_vars)
 
     def _single_cut(self) -> list[GeneLShapedOC]:
         """Generates a single aggregated :class:`GeneLShapedOC` from all scenarios."""
-        complicating_vars = self._complicating_vars
+        complicating_vars = self.complicating_vars
         var_values = self.master_problem.get_var_values(complicating_vars)
 
         all_probs = []
@@ -336,7 +336,7 @@ class GeneLShapedOCGen(CutGenerator):
     def _multi_cuts(self) -> list[GeneralizedOC]:
         """Generates multiple :class:`GeneralizedOC` cuts, one for each subproblem (scenario)."""
         cuts = []
-        var_values = self.master_problem.get_var_values(self._complicating_vars)
+        var_values = self.master_problem.get_var_values(self.complicating_vars)
 
         for i, sub in enumerate(self.sub_problem):
             estimator = self.master_problem.estimators[i]
@@ -346,7 +346,7 @@ class GeneLShapedOCGen(CutGenerator):
             # Add the cut only if it is violated
             if sub_obj - theta > self.params.tol_obj_diff:
                 cut = GeneralizedOC(
-                    vars=self._complicating_vars,
+                    vars=self.complicating_vars,
                     var_values=var_values,
                     var_coefs=self.var_coefs[i],
                     sub_obj=sub_obj,

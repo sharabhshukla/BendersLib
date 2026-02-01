@@ -1054,12 +1054,12 @@ class CutGenerator(ABC):
         """The master problem instance."""
         self.sub_problem = sub_problem
         """The subproblem instance."""
-        self._complicating_vars = master_problem.complicating_vars
+        self.complicating_vars = master_problem.complicating_vars
         """A list of names of the complicating variables."""
         self.params = params
         """The parameters that can be set by the user (see :class:`BendersParams`)."""
 
-        assert set(self._complicating_vars) == set(sub_problem.complicating_vars), \
+        assert set(self.complicating_vars) == set(sub_problem.complicating_vars), \
             "Complicating variables in master and subproblem must match."
 
     @abstractmethod

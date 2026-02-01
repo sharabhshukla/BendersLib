@@ -38,7 +38,7 @@ extensions = [
 autodoc_default_options = {
     'members': True,  # Document members (methods, attributes, etc.)
     'undoc-members': False,  # Document members that don't have a docstring
-    'private-members': True,  # Document private members (like _member)
+    'private-members': False,  # Document private members (like _member)
 }
 
 autosummary_generate = True

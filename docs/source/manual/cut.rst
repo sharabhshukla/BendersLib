@@ -149,10 +149,10 @@ Here are a couple of examples to illustrate how they work.
        def generate(self) -> list[ClassicalOC]:
            dual_values = self.sub_problem.get_dual_values()
 
-           cut = ClassicalOC(self._complicating_vars, self.var_coefs, dual_values, self.rhs)
+           cut = ClassicalOC(self.complicating_vars, self.var_coefs, dual_values, self.rhs)
            return [cut]
 
-   - ``self._complicating_vars``, ``self.var_coefs``, and ``self.rhs`` are attributes cached at initialization for efficiency.
+   - ``self.complicating_vars``, ``self.var_coefs``, and ``self.rhs`` are attributes cached at initialization for efficiency.
    - The ``dual_values`` are retrieved from the subproblem at each iteration, as they depend on the master problem's solution.
 
 .. admonition:: Example: CombinatorialFCGen
@@ -163,7 +163,7 @@ Here are a couple of examples to illustrate how they work.
 
        # Inside CombinatorialFCGen
        def generate(self) -> list[NoGoodFC]:
-           var_values = self.master_problem.get_var_values(self._complicating_vars)
+           var_values = self.master_problem.get_var_values(self.complicating_vars)
 
            cut = NoGoodFC(var_values)
            return [cut]
@@ -281,7 +281,7 @@ To create and use one class-based cut generator, follow these steps.
                # Step 3: Generate the cuts
                # Retrieve the values of the complicating variables from the master problem.
                # Create the custom cut
-               infeasible_solution = self.master_problem.get_var_values(self._complicating_vars)
+               infeasible_solution = self.master_problem.get_var_values(self.complicating_vars)
                cut = NoGoodFC(infeasible_solution)
                # cut = Cut(...)  # Alternatively, create a Cut instance directly.
                return [cut]  # Return a list of cuts, even if it's just one.
@@ -406,7 +406,7 @@ There is no public method.
 
    ~CutGenerator.master_problem
    ~CutGenerator.sub_problem
-   ~CutGenerator._complicating_vars
+   ~CutGenerator.complicating_vars
    ~CutGenerator.params
 
 .. rubric:: :class:`CutGenerator` - Methods
