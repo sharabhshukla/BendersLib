@@ -1050,9 +1050,9 @@ class CutGenerator(ABC):
             sub_problem: SubProblem | SubProblems,
             params: BendersParams = BendersParams()
     ):
-        self._master_problem = master_problem
+        self.master_problem = master_problem
         """The master problem instance."""
-        self._sub_problem = sub_problem
+        self.sub_problem = sub_problem
         """The subproblem instance."""
         self._complicating_vars = master_problem.complicating_vars
         """A list of names of the complicating variables."""
@@ -1107,7 +1107,7 @@ class _FuncWrapperCut(CutGenerator):
         super().__init__(master_problem, sub_problem, params)
 
     def generate(self):
-        return self._func(self._master_problem, self._sub_problem)
+        return self._func(self.master_problem, self.sub_problem)
 
 
 class BendersSolver:
