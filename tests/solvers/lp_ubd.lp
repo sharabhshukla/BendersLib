@@ -1,4 +1,4 @@
-\ An unbounded linear Programming problem
+\ An unbounded Linear Programming problem
 \ with minimization objective and non-negativity variables
 
 Minimize
