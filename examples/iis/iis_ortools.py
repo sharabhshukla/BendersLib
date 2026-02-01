@@ -21,9 +21,9 @@ def make_sub_problem():
     y = model.NewIntVar(0, 5, "y")
 
     # We need to make the following auxiliary steps to track constraints causing infeasibility:
-    # - Define boolean variables for each constraint.
+    # - Define a boolean variable for each constraint.
     # - Use OnlyEnforceIf to link constraints to these boolean variables.
-    # - Map boolean variable indices to decision variable names in the corresponding constraints.
+    # - Map boolean variable objects to decision variable names in the corresponding constraints.
 
     # See also this OR-Tools official example:
     # https://github.com/google/or-tools/blob/stable/ortools/sat/samples/assumptions_sample_sat.py
@@ -49,13 +49,12 @@ def make_sub_problem():
         "c3_active": c3_active
     }
 
-    # The "SufficientAssumptionsForInfeasibility" method provided by OR-Tools
-    # returns its internal indices of the boolean variables causing infeasibility.
-    # We need to map these back to our variable names in each corresponding constraint.
+    # You are required to provide a mapping from boolean variable objects associated with constraints
+    # to the variable names involved in each constraint for IIS computation.
     cons_vars = {
-        c1_active.Index(): ['x'],
-        c2_active.Index(): ['y'],
-        c3_active.Index(): ['x', 'y']
+        c1_active: ['x'],
+        c2_active: ['y'],
+        c3_active: ['x', 'y']
     }
 
     return model, vars_map, cons_vars

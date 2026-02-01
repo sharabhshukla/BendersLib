@@ -30,9 +30,9 @@ class Ortools(SolverCPBase):
     vars_map: dict[str, object]
         A dictionary mapping **all** (not only complicating) variable names to OR-Tools variable objects.
         This is necessary because OR-Tools does not provide a direct way to access variables by name.
-    cons_vars: dict[int, list[str]], optional
-        A dictionary mapping boolean indicator variable indices internally used by OR-Tools
-        to the list of decision variable names involved in the corresponding constraints.
+    cons_vars: dict[object, list[str]], optional
+        A dictionary mapping boolean indicator variable object associated with each constraint
+        to the list of decision variable names involved in that constraint.
         This parameter is required when computing conflicting variables in the IIS, using :meth:`compute_iis`.
     solver_options: dict, optional
         A dictionary of solver-specific options.
@@ -57,6 +57,8 @@ class Ortools(SolverCPBase):
         self._original_vars_map = vars_map
         self._vars_map = vars_map
         self._cons_vars = cons_vars
+        if cons_vars:
+            self._cons_vars = {self.model.get_or_make_boolean_index(b): vars for b, vars in cons_vars.items()}
 
         self._sense = CST.MIN
         self._all_vars = [v.name for v in self.model.Proto().variables]

@@ -1,6 +1,5 @@
 # coding:utf-8
 import pytest
-import os
 from .test_solver_base import BaseTestCPSolver
 
 try:
@@ -41,8 +40,8 @@ class TestOrtools(BaseTestCPSolver):
         }
 
         cons_vars = {
-            c1_active.Index(): ['x1', 'x2'],
-            c2_active.Index(): ['x1', 'x2']
+            c1_active: ['x1', 'x2'],
+            c2_active: ['x1', 'x2']
         }
 
         return Ortools(model, vars_map, cons_vars)
@@ -77,9 +76,9 @@ class TestOrtools(BaseTestCPSolver):
         }
 
         cons_vars = {
-            c1_active.Index(): ['x1', 'x2'],
-            c2_active.Index(): ['x1', 'x2'],
-            c3_active.Index(): ['x1', 'x2']
+            c1_active: ['x1', 'x2'],
+            c2_active: ['x1', 'x2'],
+            c3_active: ['x1', 'x2']
         }
 
         return Ortools(model, vars_map, cons_vars)
