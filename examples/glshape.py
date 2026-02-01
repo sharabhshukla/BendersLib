@@ -101,8 +101,18 @@ if __name__ == '__main__':
 
     # Initialize and run the Benders solver
     BD = GeneLShaped(master_problem, sub_problems, complicating_vars)
-    BD.params.multi_opti_cut = True
     BD.solve()
+
+    # Multi-cut version
+    # Master and Sub models are required to be re-defined,
+    # since they have been modified (by adding cuts) in the previous solve.
+    fs_model, complicating_vars = first_stage_model(n_plants)
+    ss_models = list(second_stage_model(n_plants, scenarios))
+    master_problem = MasterProblem(Gurobi(fs_model))
+    sub_problems = SubProblems([Gurobi(m) for m in ss_models], prob=probs)
+    BD_multi = GeneLShaped(master_problem, sub_problems, complicating_vars)
+    BD_multi.params.multi_opti_cut = True
+    BD_multi.solve()
 
     # Plot convergence
     plt.plot(BD.result.lb_list, label='Lower Bound')
