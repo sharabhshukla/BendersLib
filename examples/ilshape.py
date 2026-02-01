@@ -113,10 +113,24 @@ if __name__ == '__main__':
         complicating_vars=complicating_vars,
         prob=probs,
     )
-
-    # L.params.multi_opti_cut = True
     L.params.log_freq_sec = 0.1
+    L.solve()
 
+    # Multi-cut Integer L-shaped solver
+    # Master and Sub models are required to be re-defined,
+    # since they have been modified (by adding cuts) in the previous solve.
+    master_model, complicating_vars = first_stage_model(n_plants)
+    sub_models = second_stage_model(n_plants, scenarios, penalty)
+    L = IntegerLShaped.from_models(
+        master_model=master_model,
+        master_solver=Gurobi,
+        sub_model=sub_models,
+        sub_solver=Gurobi,
+        complicating_vars=complicating_vars,
+        prob=probs,
+    )
+    L.params.multi_opti_cut = True
+    L.params.log_freq_sec = 0.1
     L.solve()
 
     # Draw convergence curve
