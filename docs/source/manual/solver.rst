@@ -31,8 +31,6 @@ A Benders decomposition variant usually require one or two features to work prop
   with :class:`CombinatorialBenders` and :class:`LogicBasedBenders`, respectively, if the user wants to add no-good
   feasibility cuts.
 
-Guide on building solver models can be found in the official documentation of each solver.
-
 .. list-table:: Supported Solvers' Features
     :widths: auto
     :header-rows: 1
@@ -184,40 +182,38 @@ Guide on building solver models can be found in the official documentation of ea
 .. [7] *May not be irreducible, but always be sufficient.*
 .. [8] *Pyomo supports IIS through a third-party module that requires file I/O. We do not provide this feature in BendersLib.*
 
-.. admonition:: Mathematical Programming vs. Constraint Programming
-    :class: note
+These solvers can be categorized into two groups: Mathematical Programming solvers (most of the solvers supported)
+and Constraint Programming solvers (:class:`~.solvers.CplexCP` and :class:`~.solvers.Ortools`),
+which are two different paradigms for solving optimization problems.
+They have distinct approaches and are suited for different types of problems.
+A wise choice between the two can lead to more efficient problem-solving.
 
-    Mathematical Programming and Constraint Programming are two different paradigms for solving optimization problems.
-    They have distinct approaches and are suited for different types of problems.
-    A wise choice between the two can lead to more efficient problem-solving.
+.. list-table::
+   :widths: 25 37 38
+   :header-rows: 1
 
-    .. list-table::
-       :widths: 25 37 38
-       :header-rows: 1
+   * - Feature
+     - Mathematical Programming
+     - Constraint Programming
+   * - **Origin**
+     - Operations Research (OR)
+     - Artificial Intelligence (AI)
+   * - **Core Idea**
+     - Optimize a specific objective function subject to a set of constraints.
+     - Find a feasible solution that satisfies all constraints, without necessarily having an objective function.
+   * - **Typical Techniques**
+     - Simplex method, interior-point methods.
+     - Backtracking, constraint propagation, and local search.
+   * - **Best Suited For**
+     - Problems with quantitative variables and linear/nonlinear relationships.
+     - Problems with combinatorial structures and discrete variables.
 
-       * - Feature
-         - Mathematical Programming
-         - Constraint Programming
-       * - **Origin**
-         - Operations Research (OR)
-         - Artificial Intelligence (AI)
-       * - **Core Idea**
-         - Optimize a specific objective function subject to a set of constraints.
-         - Find a feasible solution that satisfies all constraints, without necessarily having an objective function.
-       * - **Typical Techniques**
-         - Simplex method, interior-point methods.
-         - Backtracking, constraint propagation, and local search.
-       * - **Best Suited For**
-         - Problems with quantitative variables and linear/nonlinear relationships.
-         - Problems with combinatorial structures and discrete variables.
-
-    There are many successful attempts that **combing both paradigms**.
-    Specifically in the :doc:`../tutorials/lbbd` famework,
-    master problems are often modeled using Mathematical Programming,
-    while subproblems can be modeled using Constraint Programming to leverage its strengths in handling combinatorial constraints.
+There are many successful attempts that **combing both paradigms**.
+Specifically in :doc:`../tutorials/cbd` and :doc:`../tutorials/lbbd`,
+master problems are often modeled using Mathematical Programming,
+while subproblems can be modeled using Constraint Programming to leverage its strengths in handling combinatorial constraints.
 
 **Using a solver not listed here? No worries!**
-
 See the next section on how to create a custom solver interface,
 and see :ref:`Custom Subproblem <manual_custom_sub>` for even simpler ways to use custom solvers for subproblems.
 
@@ -231,7 +227,8 @@ Customization
 BendersLib is designed to be extensible, allowing you to integrate solvers that are not natively supported.
 This is achieved by creating a custom solver interface.
 
-To add a new solver, you need to create a class that inherits from :class:`SolverBase`.
+To add a new solver, you need to create a class that inherits from :class:`SolverBase`
+(for Mathematical Programming, or :class:`SolverCPBase` for Constraint Programming).
 This base class serves as a template for all solver interfaces in BendersLib.
 The :class:`SolverBase` is an `Abstract Base Class (ABC) <https://docs.python.org/3/library/abc.html>`_,
 a feature from Python.
@@ -258,22 +255,24 @@ such as :class:`~.solvers.Gurobi`.
 Examining how it inherits from :class:`SolverBase` and implements the required methods will provide a clear
 and effective template for creating your own custom solver.
 
-.. note::
-
-   *Contributing solver interfaces to BendersLib is welcome!*
-   See :doc:`contribution` for guidelines.
+**Contributing solver interfaces to BendersLib is welcome!**
+See :doc:`contribution` for how to contribute your custom solver interface to the official repository.
 
 ====
 
 Attributes & Methods
 -------------------------------------------
 
-Below are the attributes and methods of the base solver interface :class:`SolverBase`.
-Any built-in solver interface (e.g., :class:`~.solvers.Gurobi`) is inherited from this base class,
-meaning they have these attributes and methods.
+Below are the attributes and methods of the base solver interfaces :class:`SolverBase` (Mathematical Programming)
+and :class:`SolverCPBase` (Constraint Programming).
+Any built-in solver interface is inherited from one of them, with the attributes and methods properly implemented.
 Adding a new solver interface requires implementing these attributes and methods,
 especially the `abstract methods <https://docs.python.org/3/library/abc.html#abc.abstractmethod>`_.
-See :class:`SolverBase` for the comprehensive API reference, and :doc:`built-in solver interfaces <../api/solver>` for examples.
+See :class:`SolverBase`  nd :class:`SolverCPBase` for the comprehensive API reference,
+and :doc:`built-in solver interfaces <../api/solver>` for examples.
+Note that the solver interfaces are not designed to be used directly by end-users.
+Use :class:`MasterProblem` and :class:`SubProblem` instead,
+which internally utilize the solver interfaces to interact with the optimization solvers.
 
 .. mermaid::
     :caption: Solver Interface Inheritance Diagram
@@ -301,12 +300,6 @@ See :class:`SolverBase` for the comprehensive API reference, and :doc:`built-in 
         Ortools -- inherits --> SolverCPBase
         CplexCP -- inherits --> SolverCPBase
 
-.. attention::
-
-    The solver interfaces are not designed to be used directly by end-users.
-    Use :class:`MasterProblem` and :class:`SubProblem` instead,
-    which internally utilize the solver interfaces to interact with the optimization solvers.
-
 .. rubric:: :class:`SolverBase` - Attributes
 
 .. autosummary::
@@ -317,7 +310,7 @@ See :class:`SolverBase` for the comprehensive API reference, and :doc:`built-in 
 
 .. tip::
 
-    Use :attr:`SolverBase.model` to access to more attributes.
+    More attributes can be accessed via :attr:`~SolverBase.model`, which is the underlying solver model instance.
 
 .. rubric:: :class:`SolverBase` - Methods
 
@@ -336,12 +329,26 @@ See :class:`SolverBase` for the comprehensive API reference, and :doc:`built-in 
    ~SolverBase.add_cut
    ~SolverBase.remove_cut
    ~SolverBase.solve
+   ~SolverBase.compute_iis
    ~SolverBase.make_master_problem
    ~SolverBase.make_sub_problem
 
-.. seealso::
+.. rubric:: :class:`SolverCPBase` - Attributes
 
-    * Base Class: :class:`SolverBase`, :class:`SolverCPBase`
-    * Solver Interfaces:
-      :class:`~.solvers.Gurobi`, :class:`~.solvers.Copt`, :class:`~.solvers.Pyomo`, :class:`~.solvers.Scip`,
-      :class:`~.solvers.Cplex`, :class:`~.solvers.Ortools`, :class:`~.solvers.CplexCP`
+.. autosummary::
+   :nosignatures:
+
+   ~SolverCPBase.model
+   ~SolverCPBase.status
+
+.. rubric:: :class:`SolverCPBase` - Methods
+
+.. autosummary::
+   :nosignatures:
+
+   ~SolverCPBase.fix_vars
+   ~SolverCPBase.unfix_vars
+   ~SolverCPBase.get_var_values
+   ~SolverCPBase.get_obj
+   ~SolverCPBase.compute_iis
+   ~SolverCPBase.solve
