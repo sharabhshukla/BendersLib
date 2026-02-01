@@ -185,16 +185,8 @@ class Pyomo(SolverBase):
         self.model.del_component(cut_name)
 
     def solve(self) -> None:
-        # Solve the model
         results = self.solver_factory.solve(self.model, tee=False, load_solutions=False)
-        term_cond = results.solver.termination_condition
-
-        # Update status
-        _pyomo_status_map = {
-            pyo.TerminationCondition.optimal: CST.OPTIMAL,
-            pyo.TerminationCondition.infeasible: CST.INFEASIBLE,
-        }
-        self.status = _pyomo_status_map.get(term_cond, CST.UNKNOWN)
+        self._update_status('PYOMO', results.solver.termination_condition.lower())
 
         if self.status == CST.OPTIMAL:
             # Load solution back to the model

@@ -187,12 +187,7 @@ class Gurobi(SolverBase):
 
     def solve(self) -> None:
         self.model.optimize()
-
-        _grb_status_map = {
-            GRB.OPTIMAL: CST.OPTIMAL,
-            GRB.INFEASIBLE: CST.INFEASIBLE,
-        }
-        self.status = _grb_status_map.get(self.model.Status, CST.UNKNOWN)
+        self._update_status('GUROBI', self.model.Status)
 
     def compute_iis(self) -> set[str]:
         self.model.computeIIS()

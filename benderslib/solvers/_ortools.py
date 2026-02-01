@@ -108,15 +108,7 @@ class Ortools(SolverCPBase):
 
     def solve(self) -> None:
         status = self._solver.Solve(self.model)
-
-        _ortools_status_map = {
-            cp_model.OPTIMAL: CST.OPTIMAL,
-            cp_model.INFEASIBLE: CST.INFEASIBLE,
-
-            # Feasibility checking problem without objective function
-            cp_model.FEASIBLE: CST.OPTIMAL,
-        }
-        self.status = _ortools_status_map.get(status, CST.UNKNOWN)
+        self._update_status('ORTOOLS', status.value)
 
     def compute_iis(self) -> set[str]:
         """Compute the Irreducible Infeasible Subsystem (IIS) of the model if it is infeasible.

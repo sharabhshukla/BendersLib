@@ -194,18 +194,7 @@ class Cplex(SolverBase):
                 self.model.set_problem_type(self.model.problem_type.LP)
 
         self.model.solve()
-
-        status = self.model.solution.get_status()
-        sol_status = self.model.solution.status
-
-        _cplex_status_map = {
-            sol_status.optimal: CST.OPTIMAL,
-            sol_status.MIP_optimal: CST.OPTIMAL,
-            sol_status.infeasible: CST.INFEASIBLE,
-            sol_status.MIP_infeasible: CST.INFEASIBLE,
-            102: CST.OPTIMAL
-        }
-        self.status = _cplex_status_map.get(status, CST.UNKNOWN)
+        self._update_status('CPLEX', self.model.solution.get_status())
 
     def compute_iis(self) -> set[str]:
         self.model.conflict.refine()

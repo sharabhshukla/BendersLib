@@ -3,6 +3,7 @@
 from abc import ABC, abstractmethod
 
 from ..consts import BendersConsts as CST
+from ..utils import load_config
 
 
 class SolverBase(ABC):
@@ -41,6 +42,8 @@ class SolverBase(ABC):
             since it is not clear how other statuses (e.g., feasible but not optimal)
             would impact convergence of Benders decomposition.
         """
+
+        self._options = load_config()
 
         # Attributes to be set in the subclass
         self._sense = CST.MIN
@@ -304,6 +307,20 @@ class SolverBase(ABC):
             would impact convergence of Benders decomposition.
         """
         ...
+
+    def _update_status(self, solver_name: str, raw_status: int | str) -> None:
+        """Update the status attribute based on the backer solver's raw status code.
+
+        Parameters
+        ---------------
+        solver_name:
+            The name of the solver (e.g., 'GUROBI', 'CPLEX', 'PYOMO', etc.).
+        raw_status:
+            The raw status code returned by the solver after solving.
+        """
+        solver_status_map = self._options['STATUS_CODES'][solver_name.upper()]
+        status_str = solver_status_map.get(raw_status, 'UNKNOWN')
+        self.status = getattr(CST, status_str, CST.UNKNOWN)
 
     def compute_iis(self) -> set[str]:
         """Compute the Irreducible Infeasible Subsystem (IIS) of the model if it is infeasible.

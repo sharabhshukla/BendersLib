@@ -106,17 +106,7 @@ class CplexCP(SolverCPBase):
 
     def solve(self) -> None:
         self._solution = self.model.solve(**self._solver_options)
-
-        _cplex_status_map = {
-            'optimal': CST.OPTIMAL,
-            'infeasible': CST.INFEASIBLE,
-
-            # Feasibility checking problem without objective function
-            'feasible': CST.OPTIMAL,
-        }
-
-        status_str = self._solution.get_solve_status().lower()
-        self.status = _cplex_status_map.get(status_str, CST.UNKNOWN)
+        self._update_status('CPLEXCP', self._solution.get_solve_status().lower())
 
     def compute_iis(self) -> set[str]:
         """Compute the Irreducible Infeasible Subsystem (IIS) of the model if it is infeasible.

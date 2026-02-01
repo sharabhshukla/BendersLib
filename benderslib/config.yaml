@@ -45,3 +45,43 @@ CPLEX_OPTIONS:
   # Parameters for obtaining Farkas certificate
   'preprocessing.presolve': 0
   'lpmethod': 2
+
+STATUS_CODES:
+  'COPT':
+    1: 'OPTIMAL'
+    2: 'INFEASIBLE'
+    3: 'UNBOUNDED'
+
+  'CPLEX':
+    1: 'OPTIMAL'
+    101: 'OPTIMAL'
+    3: 'INFEASIBLE'
+    103: 'INFEASIBLE'
+    2: 'UNBOUNDED'
+    118: 'UNBOUNDED'
+    102: 'OPTIMAL'  # OPTIMAL_TOL
+
+  'CPLEXCP':
+    'optimal': 'OPTIMAL'
+    'infeasible': 'INFEASIBLE'
+    'feasible': 'OPTIMAL'  # FEASIBLE
+
+  'GUROBI':
+    2: 'OPTIMAL'
+    3: 'INFEASIBLE'
+    5: 'UNBOUNDED'
+
+  'ORTOOLS':
+    4: 'OPTIMAL'
+    3: 'INFEASIBLE'
+    2: ‘OPTIMAL'  # FEASIBLE
+
+  'SCIP':
+    'optimal': 'OPTIMAL'
+    'infeasible': 'INFEASIBLE'
+    'unbounded': 'UNBOUNDED'
+
+  'PYOMO':
+    'optimal': 'OPTIMAL'
+    'infeasible': 'INFEASIBLE'
+    'unbounded': 'UNBOUNDED'

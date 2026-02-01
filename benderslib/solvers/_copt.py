@@ -185,12 +185,7 @@ class Copt(SolverBase):
 
     def solve(self) -> None:
         self.model.solve()
-
-        _copt_status_map = {
-            COPT.OPTIMAL: CST.OPTIMAL,
-            COPT.INFEASIBLE: CST.INFEASIBLE,
-        }
-        self.status = _copt_status_map.get(self.model.status, CST.UNKNOWN)
+        self._update_status('COPT', self.model.status)
 
     def compute_iis(self) -> set[str]:
         self.model.computeIIS()

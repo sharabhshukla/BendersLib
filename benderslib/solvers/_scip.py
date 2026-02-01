@@ -203,12 +203,7 @@ class Scip(SolverBase):
     def solve(self) -> None:
         # self.model.freeTransform()
         self.model.optimize()
-
-        _scip_status_map = {
-            'optimal': CST.OPTIMAL,
-            'infeasible': CST.INFEASIBLE,
-        }
-        self.status = _scip_status_map.get(self.model.getStatus(), CST.UNKNOWN)
+        self._update_status('SCIP', self.model.getStatus().lower())
 
     def compute_iis(self) -> set[str]:
         self.model.hideOutput()
