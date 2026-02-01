@@ -128,10 +128,17 @@ if __name__ == '__main__':
     sub_problem = SubProblem(Gurobi(sub_problem_model))
 
     # Create Benders decomposition instance
-    benders = GeneralizedBenders(
-        master_problem=master_problem,
-        sub_problem=sub_problem,
-        complicating_vars=complicating_vars
+    # benders = GeneralizedBenders(
+    #     master_problem=master_problem,
+    #     sub_problem=sub_problem,
+    #     complicating_vars=complicating_vars
+    # )
+    benders = GeneralizedBenders.from_models(
+        master_model=master_problem_model,
+        sub_model=sub_problem_model,
+        master_solver=Gurobi,
+        sub_solver=Gurobi,
+        complicating_vars=complicating_vars,
     )
     benders.solve()
 

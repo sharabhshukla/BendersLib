@@ -15,7 +15,7 @@ problem is a convex program (e.g., a Quadratic Programming problem).
 
 import random
 
-from benderslib import MasterProblem, SubProblems, GeneLShaped, CST
+from benderslib import MasterProblem, SubProblems, GeneLShaped, CST, BendersParams
 from benderslib.solvers import Gurobi
 from gurobipy import Model, GRB, QuadExpr, quicksum
 from matplotlib import pyplot as plt
@@ -108,11 +108,16 @@ if __name__ == '__main__':
     # since they have been modified (by adding cuts) in the previous solve.
     fs_model, complicating_vars = first_stage_model(n_plants)
     ss_models = list(second_stage_model(n_plants, scenarios))
-    master_problem = MasterProblem(Gurobi(fs_model))
-    sub_problems = SubProblems([Gurobi(m) for m in ss_models], prob=probs)
-    BD_multi = GeneLShaped(master_problem, sub_problems, complicating_vars)
-    BD_multi.params.multi_opti_cut = True
-    BD_multi.solve()
+    BD = GeneLShaped.from_models(
+        master_model=fs_model,
+        master_solver=Gurobi,
+        sub_model=ss_models,
+        sub_solver=Gurobi,
+        complicating_vars=complicating_vars,
+        prob=probs,
+        params=BendersParams(multi_opti_cut =True)
+    )
+    BD.solve()
 
     # Plot convergence
     plt.plot(BD.result.lb_list, label='Lower Bound')

@@ -72,14 +72,16 @@ class GeneralizedBenders(BendersSolver):
             sub_problem: SubProblem,
             complicating_vars: list[str],
             optimality_cut=GeneralizedOCGen,
-            feasibility_cut=GeneralizedFCGen
+            feasibility_cut=GeneralizedFCGen,
+            params: BendersParams = BendersParams()
     ):
         super().__init__(
             master_problem,
             sub_problem,
             complicating_vars,
             optimality_cut,
-            feasibility_cut
+            feasibility_cut,
+            params
         )
 
     @classmethod
@@ -103,5 +105,6 @@ class GeneralizedBenders(BendersSolver):
             complicating_vars,
             optimality_cut,
             feasibility_cut,
-            prob
+            prob,
+            params
         )

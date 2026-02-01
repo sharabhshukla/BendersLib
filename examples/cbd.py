@@ -74,12 +74,37 @@ if __name__ == '__main__':
     else:
         print("Original Problem Solution: Infeasible or Unbounded\n")
 
-    # Solve with Benders Decomposition
-    AB = AnnotationBenders(model, solver=Gurobi, complicating_vars=complicating_vars, benders=CombinatorialBenders)
+    # Using .from_models() method
+    # Decompose the original problem into master and subproblem
+    master_model, sub_model = AnnotationBenders.decompose(
+        original_problem=model,
+        solver=Gurobi,
+        master_vars=complicating_vars,
+        solver_model=True
+    )
+    AB = CombinatorialBenders.from_models(
+        master_model=master_model,
+        master_solver=Gurobi,
+        sub_model=sub_model,
+        sub_solver=Gurobi,
+        complicating_vars=complicating_vars,
+    )
     AB.solve()
     print("\nBenders Decomposition Solution:")
     # print(AB.result.solution)
     print(f"Obj: {AB.result.obj}")
+
+    # Simpler way
+    # Master and Sub models are required to be re-defined,
+    # since they have been modified (by adding cuts) in the previous solve.
+    # model, complicating_vars = make_original_problem(has_sub_objective=True)
+    # AB = AnnotationBenders(
+    #     original_problem=model,
+    #     solver=Gurobi,
+    #     complicating_vars=complicating_vars,
+    #     benders=CombinatorialBenders
+    # )
+    # AB.solve()
 
     # Draw convergence curve
     plt.plot(AB.result.lb_list, label='Lower Bound')
