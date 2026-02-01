@@ -13,6 +13,7 @@ except ImportError:
     gurobi_available = False
 
 LP_FILE = os.path.join(os.path.dirname(__file__), "lp.lp")
+UBD_LP_FILE = os.path.join(os.path.dirname(__file__), "lp_ubd.lp")
 
 
 @pytest.mark.skipif(not gurobi_available, reason="Gurobi is not installed")
@@ -29,4 +30,9 @@ class TestGurobi(BaseTestSolver):
         x1 = model.getVarByName("x1")
         x2 = model.getVarByName("x2")
         model.addConstr(x1 + x2 <= 3)
+        return Gurobi(model)
+
+    @pytest.fixture
+    def unbounded_solver_instance(self):
+        model = gp.read(UBD_LP_FILE)
         return Gurobi(model)

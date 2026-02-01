@@ -29,10 +29,12 @@ class BendersConsts:
     """Status indicating an optimal solution has been found."""
     INFEASIBLE = 'INFEASIBLE'
     """Status indicating the problem is infeasible."""
+    UNBOUNDED = 'UNBOUNDED'
+    """Status indicating the problem is unbounded."""
     TIMEOUT = 'TIMEOUT'
     """Status indicating the solver reached the time limit."""
     UNKNOWN = 'UNKNOWN'
-    """Status indicating neither feasibility nor optimality could be determined."""
+    """Status indicating an unknown solver backend status."""
     ERROR = 'ERROR'
     """Status indicating an error occurred during solving."""
 

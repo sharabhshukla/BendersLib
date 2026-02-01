@@ -46,6 +46,17 @@ def create_pyomo_model():
     return model
 
 
+def create_ubd_pyomo_model():
+    # Below is an equivalent formulation of "lp_ubd.lp"
+    model = pyo.ConcreteModel()
+    model.x = pyo.Var(bounds=(0, None))
+    model.y = pyo.Var(bounds=(0, None))
+    model.obj = pyo.Objective(expr=-model.x - model.y, sense=pyo.minimize)
+    model.c1 = pyo.Constraint(expr=model.x - model.y <= 1)
+    model.c2 = pyo.Constraint(expr=-model.x + model.y <= 1)
+    return model
+
+
 @pytest.mark.parametrize("solver", solvers)
 @pytest.mark.skipif(not pyomo_available, reason="Pyomo is not installed")
 class TestPyomo(BaseTestSolver):
@@ -78,3 +89,12 @@ class TestPyomo(BaseTestSolver):
         if solver_instance._Pyomo__solver_name == 'scip':
             pytest.skip("Pyomo(m, solver='scip') is unable to obtain correct dual values as documented.")
         super().test_get_dual_values(solver_instance)
+
+    @pytest.fixture
+    def unbounded_solver_instance(self, solver):
+        model = create_ubd_pyomo_model()
+        return Pyomo(model, solver=solver)
+
+    def test_unbounded_solution(self, unbounded_solver_instance):
+        if unbounded_solver_instance._Pyomo__solver_name == 'glpk':
+            pytest.skip("GLPK returns unexpected status 'other'.")

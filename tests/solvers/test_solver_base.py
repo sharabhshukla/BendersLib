@@ -122,15 +122,16 @@ class BaseTestSolver:
     @pytest.mark.skipif_cp_solver
     def test_make_master_problem(self, solver_instance):
         master_problem = solver_instance.make_master_problem(solver_instance.model, ["x1"])
-        # TODO: Placeholder assertion; implement specific checks as needed
         assert type(master_problem) == type(solver_instance.model)
 
     @pytest.mark.skipif_cp_solver
     def test_make_sub_problem(self, solver_instance):
-        # Placeholder assertion; implement specific checks as needed
         sub_problem = solver_instance.make_sub_problem(solver_instance.model, ["x1"])
-        # TODO: Placeholder assertion; implement specific checks as needed
         assert type(sub_problem) == type(solver_instance.model)
+
+    def test_unbounded_solution(self, unbounded_solver_instance):
+        unbounded_solver_instance.solve()
+        assert unbounded_solver_instance.status == CST.UNBOUNDED
 
 
 class BaseTestCPSolver(BaseTestSolver):
@@ -169,4 +170,8 @@ class BaseTestCPSolver(BaseTestSolver):
 
     @pytest.mark.skip(reason="make_sub_problem is not applicable to CP solvers in this context.")
     def test_make_sub_problem(self, solver_instance):
+        pass
+
+    @pytest.mark.skip(reason="CP solvers cannot determine unboundedness.")
+    def test_unbounded_solution(self, unbounded_solver_instance):
         pass

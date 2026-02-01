@@ -186,7 +186,7 @@ class Pyomo(SolverBase):
 
     def solve(self) -> None:
         results = self.solver_factory.solve(self.model, tee=False, load_solutions=False)
-        self._update_status('PYOMO', results.solver.termination_condition.lower())
+        self._update_status('PYOMO', results.solver.termination_condition)
 
         if self.status == CST.OPTIMAL:
             # Load solution back to the model

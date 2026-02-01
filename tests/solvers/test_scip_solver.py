@@ -13,6 +13,7 @@ except ImportError:
     scip_available = False
 
 LP_FILE = os.path.join(os.path.dirname(__file__), "lp.lp")
+UBD_LP_FILE = os.path.join(os.path.dirname(__file__), "lp_ubd.lp")
 
 
 @pytest.mark.skipif(not scip_available, reason="SCIP is not installed")
@@ -32,4 +33,10 @@ class TestScip(BaseTestSolver):
         x1 = vars_map["x1"]
         x2 = vars_map["x2"]
         model.addCons(x1 + x2 <= 3)
+        return Scip(model)
+
+    @pytest.fixture
+    def unbounded_solver_instance(self):
+        model = Model()
+        model.readProblem(UBD_LP_FILE)
         return Scip(model)

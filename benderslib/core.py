@@ -1456,6 +1456,11 @@ class BendersSolver:
                 self.result.status = CST.INFEASIBLE
                 break
 
+            # Master problem is unbounded -> original problem is unbounded
+            elif self.master_problem.status == CST.UNBOUNDED:
+                self.result.status = CST.UNBOUNDED
+                break
+
             # Master problem is neither infeasible nor optimal -> error
             else:
                 self.result.status = CST.UNKNOWN

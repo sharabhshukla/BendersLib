@@ -76,3 +76,4 @@ STATUS_CODES:
     'optimal': 'OPTIMAL'
     'infeasible': 'INFEASIBLE'
     'unbounded': 'UNBOUNDED'
+    'infeasibleOrUnbounded': 'UNBOUNDED'  # Treat 'infeasibleOrUnbounded as 'UNBOUNDED'

@@ -13,7 +13,7 @@ except ImportError:
     cplex_available = False
 
 LP_FILE = os.path.join(os.path.dirname(__file__), "lp.lp")
-print(LP_FILE)
+UBD_LP_FILE = os.path.join(os.path.dirname(__file__), "lp_ubd.lp")
 
 
 @pytest.mark.skipif(not cplex_available, reason="CPLEX is not installed")
@@ -38,4 +38,10 @@ class TestCplex(BaseTestSolver):
             names=['c3']
         )
 
+        return Cplex(model)
+
+    @pytest.fixture
+    def unbounded_solver_instance(self):
+        model = cplex.Cplex()
+        model.read(UBD_LP_FILE)
         return Cplex(model)
