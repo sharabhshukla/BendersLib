@@ -24,7 +24,7 @@ indicating that the optimal solution to the original problem has been found.
 
 .. note::
 
-    All Benders Decomposition variants (:doc:`../tutorials/index`) share the same key components:
+    All :doc:`Benders decomposition variants <../tutorials/index>` share the same key components:
     **master problem**, **subproblem**, **Benders cuts**, and the **iterative solving process**.
 
 The BendersLib is structured around these fundamental components,
@@ -81,10 +81,10 @@ Detailed API for each component can be found in the :doc:`API reference <../api/
   This abstraction allows the main Benders algorithm to remain independent of the specific solver used.
 
 .. admonition:: Related classes
-    :class: seealso
+    :class: note
 
-    * Abstraction: :class:`SolverBase`
-    * Solvers: :class:`~.solvers.Gurobi`, :class:`~.solvers.Copt`, :class:`~.solvers.Pyomo`, :class:`~.solvers.Scip`,
+    * Abstraction: :class:`SolverBase`, :class:`SolverCPBase`
+    * Solver interfaces: :class:`~.solvers.Gurobi`, :class:`~.solvers.Copt`, :class:`~.solvers.Pyomo`, :class:`~.solvers.Scip`,
       :class:`~.solvers.Cplex`, :class:`~.solvers.Ortools`, :class:`~.solvers.CplexCP`
 
 * :doc:`master`:
@@ -95,7 +95,7 @@ Detailed API for each component can be found in the :doc:`API reference <../api/
   and establish a lower bound on the optimal objective.
 
 .. admonition:: Related classes
-    :class: seealso
+    :class: note
 
     * :class:`ProblemBase`, :class:`MasterProblem`
 
@@ -107,7 +107,7 @@ Detailed API for each component can be found in the :doc:`API reference <../api/
   For stochastic problems, this component can manage multiple subproblems representing different scenarios.
 
 .. admonition:: Related classes
-    :class: seealso
+    :class: note
 
     * :class:`ProblemBase`, :class:`SubProblem`, :class:`LogicBasedSubProblem`, :class:`SubProblems`
 
@@ -118,14 +118,14 @@ Detailed API for each component can be found in the :doc:`API reference <../api/
   This abstracts the logic of cut generation, allowing maintaining global attributes for cut management.
 
 .. admonition:: Related classes
-    :class: seealso
+    :class: note
 
     * Abstraction:
       :class:`CutGenerator`, :class:`Cut`, :class:`OptimalityCut`, :class:`FeasibilityCut`
-    * Benders cut:
+    * Benders cuts:
       :class:`ClassicalOC`, :class:`ClassicalFC`, :class:`CombinatorialOC`, :class:`NoGoodFC`, :class:`LShapedOC`,
       :class:`GeneralizedOC`, :class:`GeneralizedFC`, :class:`GeneLShapedOC`
-    * Cut generator:
+    * Cut generators:
       :class:`ClassicalOCGen`, :class:`ClassicalFCGen`,
       :class:`CombinatorialOCGen`, :class:`CombinatorialFCGen`,
       :class:`LShapedOCGen`, :class:`LShapedFCGen`,
@@ -142,7 +142,7 @@ Detailed API for each component can be found in the :doc:`API reference <../api/
   and other custom variants by users.
 
 .. admonition:: Related classes
-    :class: seealso
+    :class: note
 
     * Abstraction: :class:`BendersSolver`,
     * Benders methods: :class:`ClassicalBenders`, :class:`CombinatorialBenders`,

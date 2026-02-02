@@ -40,6 +40,8 @@ Benders Methods
     :show-inheritance:
     :exclude-members: master_problem, sub_problem, complicating_vars, optimality_cut, feasibility_cut, params, result
 
+.. _cut_generators:
+
 Cut Generators
 --------------------------------------
 

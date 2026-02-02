@@ -65,20 +65,6 @@ To verify that BendersLib has been installed correctly, you can run the followin
 
 If you see the version number printed without any errors, the installation was successful.
 
-Dependencies
-------------------------------------
-
-BendersLib requires ``Python>=3.9`` and the following dependencies to run.
-
-* `NumPy <https://numpy.org/>`_ (>=1.20): Package for vectorized numerical computations.
-
-A full list of dependencies can be found in the ``pyproject.toml`` file of the source code.
-During the installation, these dependencies will be installed automatically if they are not already present
-in your environment.
-Mathematical optimization solvers are **NOT** included in the dependencies,
-and will not be installed automatically.
-You need to install the solvers separately based on your needs.
-
 .. _manual_installing_solver:
 
 Installing Solvers
@@ -170,17 +156,6 @@ Please refer to :ref:`solver-table` for solver features and license requirements
         `installation instruction <https://pyomo.readthedocs.io/en/stable/getting_started/solvers.html>`_ *(by Pyomo)*
         *and* `supported solvers <https://github.com/Pyomo/pyomo/tree/main/pyomo/solvers/plugins/solvers>`_.
         *The above list of solvers is not exhaustive. BendersLib's Pyomo interface can also utilize other solvers supported by Pyomo.*
-
-Verifying the Installation
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-To verify that a specific solver is correctly installed and accessible, you can run the following code (for Gurobi as an example):
-
-.. code-block:: python
-
-    from benderslib.solvers import Gurobi
-
-An error will be raised if ``gurobipy`` is not installed.
 
 Troubleshooting
 ------------------------------------

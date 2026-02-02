@@ -83,15 +83,16 @@ The following steps take :doc:`../tutorials/classical` as an example to demonstr
 to model and solve an optimization problem.
 Other variants of Benders Decomposition follow a similar workflow, please refer to :doc:`benders` for more details.
 
-.. seealso::
+.. admonition:: Example
+    :class: note
 
-    An **executable** example is available at :doc:`../examples/classical_benders`.
+    The executable code is available at :doc:`../examples/classical_benders`.
 
 Step 1: Building the Master Problem
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Build a master problem using the API of an off-the-shelf solver supported by BendersLib,
-such as Gurobi (see :doc:`solver` for other supported solvers).
+Build a master problem using the API of an off-the-shelf solver :doc:`supported by BendersLib <solver>`,
+such as Gurobi.
 
 .. code-block:: python
 
@@ -127,8 +128,8 @@ Wrap the solver model with BendersLib's :class:`~.solvers.Gurobi` interface and 
 Step 2: Building the Subproblem
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Build a subproblem using the API of an off-the-shelf solver supported by BendersLib,
-such as Gurobi (see :doc:`solver` for other supported solvers).
+Build a subproblem using the API of an off-the-shelf solver :doc:`supported by BendersLib <solver>`,
+such as Gurobi.
 The subproblem can use a different solver from the master problem.
 
 .. code-block:: python
@@ -148,8 +149,8 @@ The subproblem can use a different solver from the master problem.
 
     The complicating variables defined in the master problem should also appear in the subproblem,
     with exactly the **same** names.
-    Internally, BendersLib treats them as parameters in the subproblem by setting their lower and upper bounds
-    to the values given by the master problem at each iteration.
+    Internally, BendersLib treats them as parameters in the subproblem by fixing their
+    values to the values given by the master problem at each iteration.
 
 Wrap the solver model with BendersLib's :class:`~.solvers.Gurobi` interface and the :class:`SubProblem` class.
 
@@ -200,7 +201,7 @@ Step 4: Solving the Instance
 
 Solve the Benders Decomposition instance by simply using its :meth:`ClassicalBenders.solve` method.
 Before calling this method, you can customize various parameters of the Benders algorithm
-by modifying the attributes of the :attr:`ClassicalBenders.params` object (a :class:`BendersParams` object).
+by modifying the attributes of the :attr:`ClassicalBenders.params` (a :class:`BendersParams` object).
 
 .. code-block:: python
 

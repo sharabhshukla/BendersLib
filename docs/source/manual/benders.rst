@@ -11,7 +11,6 @@ To create a Benders decomposition instance, you need to provide :ref:`a master p
 BendersLib will then build a Benders decomposition framework to your problem.
 
 .. code-block:: python
-    :emphasize-lines: 9-
 
     from benderslib import ClassicalBenders, MasterProblem, SubProblem
 
@@ -34,7 +33,6 @@ This method is a convenient way to instantiate a Benders solver without manually
 creating :class:`MasterProblem` and :class:`SubProblem` objects.
 
 .. code-block:: python
-    :emphasize-lines: 9-
 
     from benderslib import ClassicalBenders
     from benderslib.solvers import Gurobi
@@ -73,22 +71,15 @@ is a ready-to-use implementation of a Benders decomposition variant.
    ~GeneralizedBenders
    ~GeneLShaped
 
-.. seealso::
-
-    For more details on the specific arguments and implementations,
-    please refer to the :doc:`API Reference <../api/benders>`.
-
 Options for Benders Decomposition
 -------------------------------------------
 
+These options are set after creating a Benders Decomposition instance,
+but before calling the :meth:`BendersSolver.solve` method.
 Please refer to :class:`BendersParams` for the available options to customize
 the behavior of BendersLib's Benders Decomposition methods.
 
-These options are set after creating a Benders Decomposition instance,
-but before calling the :meth:`BendersSolver.solve` method.
-
 .. code-block:: python
-    :emphasize-lines: 7
 
     from benderslib import ClassicalBenders, BendersParams
 
@@ -98,10 +89,9 @@ but before calling the :meth:`BendersSolver.solve` method.
     # Customize Benders parameters
     benders_solver.params.time_limit = 600  # Set time limit to 600 seconds
 
-Alternatively, you can pass a BendersParams instance as an argument when creating the Benders Decomposition instance.
+Alternatively, you can pass a :class:`BendersParams` instance as an argument when creating the Benders Decomposition instance.
 
 .. code-block:: python
-    :emphasize-lines: 4-5
 
     from benderslib import ClassicalBenders, BendersParams
 
@@ -114,10 +104,6 @@ Alternatively, you can pass a BendersParams instance as an argument when creatin
         master_problem, sub_problem, complicating_vars,
         params=params
     )
-
-.. seealso::
-
-    See :class:`BendersParams` for all available options.
 
 Solve the Benders Decomposition Instance
 -------------------------------------------
@@ -197,10 +183,6 @@ This attribute is an instance of the :class:`BendersResult` class.
     print(f"Solve Time (sec.): {benders_solver.result.runtime}")
     print(f"Solution: {benders_solver.result.solution}")
 
-.. seealso::
-
-    See :class:`BendersResult` for all available statistics.
-
 .. _manual_decompose_solve:
 
 Automated Decomposition
@@ -257,11 +239,11 @@ Finally, it uses the specified Benders method (:class:`ClassicalBenders` in this
     For example, if your subproblem contains integer variables, and you choose :class:`ClassicalBenders`,
     the algorithm will not function correctly since :class:`ClassicalBenders` assumes a Linear Programming subproblem.
 
-.. seealso::
+.. admonition:: Example
+    :class: note
 
-    - :ref:`manual_decompose`.
-    - For more details on the class, see :class:`AnnotationBenders`.
-    - **Executable Example**: :doc:`../examples/annotation_benders`
+    :ref:`manual_decompose_solve`, :doc:`../examples/annotation_benders`, :doc:`../examples/api/decompose`,
+    :doc:`../examples/cbd`
 
 Customization
 -------------------------------------------
@@ -307,10 +289,6 @@ Here is a code snippet showing how to set up a :class:`LogicBasedBenders` instan
     BD = LogicBasedBenders(mp, sp, complicating_vars, optimality_cut=MyOptimalityCutGenerator)
     BD.solve()
 
-.. hint::
-
-    Use only custom cut generator or custom subproblem if needed.
-
 .. seealso::
 
     - Abstract base classes for customization:
@@ -354,7 +332,7 @@ and :class:`CutGenerator` instances to handle their respective functionalities.
         style Cut fill:#f2f2f2,stroke:#333,stroke-width:1px
 
 Below are the attributes and methods of the :class:`BendersSolver` class.
-Please refer to :doc:`API Reference <../api/benders>` for the attributes and methods of specific implementations.
+Please refer to :doc:`../api/benders` for the attributes and methods of specific implementations.
 
 .. rubric:: :class:`BendersSolver` - Attributes
 
