@@ -4,7 +4,6 @@ from pyscipopt import Model, Expr, SCIP_PARAMSETTING
 
 from ..consts import BendersConsts as CST
 from ._base import SolverBase
-from ..utils import load_config
 
 
 class Scip(SolverBase):

@@ -4,7 +4,6 @@ from gurobipy import Model, GRB
 
 from ..consts import BendersConsts as CST
 from ._base import SolverBase
-from ..utils import load_config
 
 
 class Gurobi(SolverBase):

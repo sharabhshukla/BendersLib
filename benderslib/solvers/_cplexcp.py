@@ -2,7 +2,6 @@
 
 from ..consts import BendersConsts as CST
 from ._base import SolverCPBase
-from ..utils import load_config
 
 from docplex.cp.model import CpoModel
 from docplex.cp.solution import CpoSolveResult

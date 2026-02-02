@@ -4,7 +4,6 @@ from cplex import Cplex as CplexModel, infinity as CPLEX_INFINITY
 
 from ..consts import BendersConsts as CST
 from ._base import SolverBase
-from ..utils import load_config
 
 
 class Cplex(SolverBase):

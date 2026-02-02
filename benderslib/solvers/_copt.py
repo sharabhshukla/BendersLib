@@ -4,7 +4,6 @@ from coptpy import Model, LinExpr, COPT
 
 from ..consts import BendersConsts as CST
 from ._base import SolverBase
-from ..utils import load_config
 
 
 class Copt(SolverBase):

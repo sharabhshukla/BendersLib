@@ -7,7 +7,6 @@ from pyomo.repn import generate_standard_repn
 from pyomo.contrib.iis import write_iis
 
 from ..consts import BendersConsts as CST
-from ..utils import load_config
 from ._base import SolverBase
 
 
