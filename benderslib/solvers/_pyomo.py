@@ -4,7 +4,7 @@ import pyomo.environ as pyo
 from pyomo.core import Var, Objective, Constraint, Suffix
 from pyomo.core.expr.visitor import identify_variables
 from pyomo.repn import generate_standard_repn
-from pyomo.contrib.iis import write_iis
+# from pyomo.contrib.iis import write_iis
 
 from ..consts import BendersConsts as CST
 from ._base import SolverBase
