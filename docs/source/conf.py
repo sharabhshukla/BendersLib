@@ -16,7 +16,7 @@ sys.path.insert(0, pathlib.Path(__file__).parents[2].resolve().as_posix())
 today_date = __import__('datetime').datetime.now().strftime('%Y-%m-%d')
 
 project = 'BendersLib'
-copyright = f'Copyright © 2025, Peng-Hui Guo (Latest update: {today_date})'
+copyright = f'Peng-Hui Guo (Latest update: {today_date})'
 author = 'Peng-Hui Guo'
 release = '0.0.1'
 
@@ -132,7 +132,7 @@ sphinx_gallery_conf = {
 #         'searchbox.html',
 #     ]
 # }
-#
+
 # html_theme = 'sphinx_rtd_theme'
 # html_theme_options = {
 #     'collapse_navigation': True,
@@ -174,48 +174,46 @@ sphinx_gallery_conf = {
 #
 # }
 
-# html_theme = "furo"
-# html_title = "BendersLib"
-# html_favicon = '_static/icon.png'
-# blue = "#0066CC"
-# # blue = "#0064a2"
-# html_theme_options = {
-#     "light_css_variables": {
-#         "color-sidebar-link-text--top-level": blue,
-#         "color-toc-item-text--active": blue,
-#         "color-link": blue,
-#         "color-link--visited": "var(--color-link)",
-#         "color-link--hover": "var(--color-link)",
-#     },
-#     "dark_css_variables": {
-#         "color-sidebar-link-text--top-level": blue,
-#         "color-toc-item-text--active": blue,
-#         "color-link": blue,
-#         "color-link--visited": "var(--color-link)",
-#         "color-link--hover": "var(--color-link)",
-#     },
-#     # "announcement": "This is an Alpha release, the API may change in future and there might be bugs."
-# }
-
-html_theme = "shibuya"
-html_baseurl = "https://benders.dev/en/latest/"
-# html_logo = '_static/benderslib.svg'
+html_theme = "furo"
+html_title = "BendersLib"
 html_favicon = '_static/icon.ico'
-html_copy_source = True
+blue = "#0066CC"
+# blue = "#0064a2"
 html_theme_options = {
-    # "accent_color": "indigo",
-    "accent_color": "blue",
-    # "announcement": "This is a Beta release, the API may change in future and there might be bugs.",
-    "github_url": "https://github.com/phguo/BendersLib",
-    # "discussion_url": "https://github.com/phguo/BendersLib/discussions",
-
-    "show_ai_links": True,
-    "open_in_chatgpt": True,
-    "open_in_claude": True,
-    "open_in_perplexity": True,
+    "light_css_variables": {
+        "color-sidebar-link-text--top-level": blue,
+        "color-toc-item-text--active": blue,
+        "color-link": blue,
+        "color-link--visited": "var(--color-link)",
+        "color-link--hover": "var(--color-link)",
+    },
+    "dark_css_variables": {
+        "color-sidebar-link-text--top-level": blue,
+        "color-toc-item-text--active": blue,
+        "color-link": blue,
+        "color-link--visited": "var(--color-link)",
+        "color-link--hover": "var(--color-link)",
+    },
+    # "announcement": "This is an Alpha release, the API may change in future and there might be bugs."
 }
 
-
+# html_theme = "shibuya"
+# html_baseurl = "https://benders.dev/en/latest/"
+# # html_logo = '_static/benderslib.svg'
+# html_favicon = '_static/icon.ico'
+# html_copy_source = True
+# html_theme_options = {
+#     "accent_color": "indigo",
+#     # "accent_color": "blue",
+#     # "announcement": "This is a Beta release, the API may change in future and there might be bugs.",
+#     "github_url": "https://github.com/phguo/BendersLib",
+#     # "discussion_url": "https://github.com/phguo/BendersLib/discussions",
+#
+#     "show_ai_links": True,
+#     "open_in_chatgpt": True,
+#     "open_in_claude": True,
+#     "open_in_perplexity": True,
+# }
 # html_context = {
 #     "source_type": "github",
 #     "source_user": "phguo",
@@ -230,7 +228,7 @@ html_theme_options = {
 # html_theme = 'sphinx_book_theme'
 # html_title = 'BendersLib'
 # html_logo = '_static/benderslib.svg'
-# html_favicon = '_static/icon.png'
+# html_favicon = '_static/icon.ico'
 # html_theme_options = {
 #     # "github_url": "https://github.com/phguo/BendersLib",
 #     # "repository_url": "https://github.com/phguo/BendersLib",

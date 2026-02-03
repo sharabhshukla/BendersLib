@@ -63,6 +63,11 @@ from .benders import (
     GeneLShaped
 )
 
+from .callback import (
+    BendersContext,
+    BendersCallback
+)
+
 __all__ = [
     # Data
     "BendersConsts",
@@ -118,4 +123,8 @@ __all__ = [
     "LogicBasedBenders",
     "GeneralizedBenders",
     "GeneLShaped",
+
+    # Callbacks
+    "BendersContext",
+    "BendersCallback",
 ]

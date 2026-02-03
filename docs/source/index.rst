@@ -218,8 +218,8 @@ Contents
    :maxdepth: 1
    :hidden:
 
-   Benders.dev <https://benders.dev>
    Getting Help <https://github.com/phguo/BendersLib/issues?q=is%3Aissue>
    @GitHub <https://github.com/phguo/BendersLib>
    @PyPI <https://pypi.org/project/BendersLib/>
    Author <https://guo.ph>
+   Benders.dev <https://benders.dev>

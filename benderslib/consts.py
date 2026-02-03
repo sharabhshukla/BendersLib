@@ -38,6 +38,12 @@ class BendersConsts:
     ERROR = 'ERROR'
     """Status indicating an error occurred during solving."""
 
+    # Callback actions
+    PROCEED = 'PROCEED'
+    """Action in a callback function to continue the Benders algorithm."""
+    TERMINATE = 'TERMINATE'
+    """Action in a callback function to terminate the Benders algorithm."""
+
     # Estimator
     ESTIMATOR_NAME = 'theta'
     """Name of the estimator variable in the master problem."""

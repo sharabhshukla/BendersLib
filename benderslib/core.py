@@ -11,6 +11,7 @@ from .params import BendersParams
 from .result import BendersResult
 from .solvers import SolverBase
 from .logger import BendersLogger
+from .callback import BendersContext, BendersCallback, _CallbackEvents as EVENTS, _CallbackManager
 
 
 class ProblemBase:
@@ -1193,6 +1194,10 @@ class BendersSolver:
         """An instance of :class:`BendersLogger` for handling logging."""
         self.__prob = self.sub_problem.prob if isinstance(self.sub_problem, SubProblems) else None
 
+        # Callbacks
+        self._context = BendersContext(self.master_problem, self.sub_problem, self.result, self)
+        self._callback_manager = _CallbackManager()
+
         # Ensure at least one cut generator is provided
         assert self.optimality_cut or self.feasibility_cut, "Provide at least <optimality_cut> or <feasibility_cut>."
 
@@ -1408,6 +1413,7 @@ class BendersSolver:
 
         # Initialize
         self.__preprocess()
+        self._trigger_callbacks(EVENTS.ON_BENDERS_START)
 
         self.result.status = CST.UNSOLVED
         self.result.n_iter = 0
@@ -1472,3 +1478,64 @@ class BendersSolver:
         self.result.n_feas_cuts = len(self.master_problem.feasibility_cuts)
         self.result.n_cuts = self.result.n_opt_cuts + self.result.n_feas_cuts
         self.__logger.log_end()
+
+        self._trigger_callbacks(EVENTS.ON_BENDERS_END)
+
+    def register_callback(self, callback: BendersCallback | Callable) -> None:
+        """Register a user-defined callback to be called during the Benders solving process.
+
+        Users can define custom callbacks by inheriting from :class:`BendersCallback` and
+        overriding the desired event methods. Each method receives a
+        :class:`BendersContext` object containing information about the current
+        state of the Benders decomposition process.
+        Alternatively, users can define standalone functions with names matching
+        the methods in :class:`BendersCallback` to serve as lightweight callbacks.
+
+        Parameters
+        ---------------
+
+        callback : BendersCallback | Callable
+            A callback instance inherited from :class:`BendersCallback` or
+            a function with signature ``func(context: BendersContext)``.
+
+        Example
+        ---------------
+
+        .. code-block:: python
+
+            from benderslib.callback import BendersCallback, BendersContext
+
+            # Class-based callback
+            class MyCallback(BendersCallback):
+
+                def on_benders_start(self, context: BendersContext):
+                    print("Benders process started!")
+
+            # Function-based callback
+            def on_benders_end(self, context: BendersContext):
+                print("Benders process finished!")
+
+            BD = BendersSolver(...)
+            BD.register_callback(MyCallback())
+            BD.register_callback(on_benders_end)
+        """
+
+        self._callback_manager.register(callback)
+
+    def _trigger_callbacks(self, event: str) -> str:
+        """Trigger all registered callbacks for a specific event.
+
+        Parameters
+        ---------------
+
+        event : str
+            The event name to trigger callbacks for, which should be within :class:`_CallbackEvents`.
+
+        Returns
+        ---------------
+
+        str
+            The action returned by the last callback function.
+        """
+
+        return self._callback_manager.trigger(event, self._context)
