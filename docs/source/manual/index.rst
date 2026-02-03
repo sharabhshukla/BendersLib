@@ -148,7 +148,7 @@ For complete, runnable code, please see the :doc:`../examples/index`.
    sub.rst
    cut.rst
    benders.rst
-   callback.rst
+   callbacks.rst
    enhance.rst
    logging.rst
    numerical.rst

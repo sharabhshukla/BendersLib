@@ -117,5 +117,5 @@ Expert Usage
 ------------
 
 This section covers expert-level features for fine-tuning the Benders decomposition algorithm,
-including the use of :doc:`callbacks <callback>` for implementing custom acceleration strategies,
+including the use of :doc:`callbacks <callbacks>` for implementing custom acceleration strategies,
 such as warm starts, cut management, and dynamic algorithm configuration.

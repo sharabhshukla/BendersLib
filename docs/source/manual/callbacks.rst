@@ -1,4 +1,4 @@
-Callback
+Callbacks
 ====================================
 
 .. currentmodule:: benderslib
@@ -6,7 +6,8 @@ Callback
 What are Callbacks?
 ------------------------------------
 
-This section provides an overview of the callback system in BendersLib.
+This section provides an overview of the `callback <https://en.wikipedia.org/wiki/Callback_(computer_programming)>`_
+system in BendersLib.
 Callbacks are functions executed at specific events during the Benders decomposition,
 allowing for monitoring and intervention.
 
