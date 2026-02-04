@@ -14,9 +14,10 @@ sys.path.insert(0, pathlib.Path(__file__).parents[2].resolve().as_posix())
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 today_date = __import__('datetime').datetime.now().strftime('%Y-%m-%d')
+today_year = __import__('datetime').datetime.now().year
 
 project = 'BendersLib'
-copyright = f'Peng-Hui Guo (Latest update: {today_date})'
+copyright = f'2025-{today_year} Peng-Hui Guo (latest update: {today_date})'
 author = 'Peng-Hui Guo'
 release = '0.0.1'
 

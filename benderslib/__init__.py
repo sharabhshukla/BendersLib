@@ -5,7 +5,7 @@ __author__ = "Peng-Hui Guo"
 __email__ = "m@guo.ph"
 __license__ = "GPL-3.0"
 __url__ = "https://benders.dev"
-__copyright__ = "Copyright 2025"
+__copyright__ = "2025-2026 Peng-Hui Guo"
 
 from .consts import BendersConsts
 from .consts import BendersConsts as CST
