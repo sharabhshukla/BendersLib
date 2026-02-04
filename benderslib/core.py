@@ -1338,7 +1338,9 @@ class BendersSolver:
         self.result.n_sol += 1
         self.result.status = CST.FEASIBLE
 
-        self.result.lb = self.master_problem.get_obj()
+        _new_lb_found = self.master_problem.get_obj() > self.result.lb
+        if _new_lb_found:
+            self.result.lb = self.master_problem.get_obj()
         estimator_vals = self.master_problem.get_estimator_values()
 
         if isinstance(self.sub_problem, SubProblem) or not self.params.multi_opti_cut:
@@ -1353,8 +1355,8 @@ class BendersSolver:
             )
 
         self.result.ub = self.result.lb - theta + self.sub_problem.get_obj()
-
-        if self.result.ub < self.result.obj:
+        _new_ub_found = self.result.ub < self.result.obj
+        if _new_ub_found:
             self.result.obj = self.result.ub
             self.result.solution = self.sub_problem.get_var_values()
 
@@ -1365,9 +1367,16 @@ class BendersSolver:
         else:
             # Zero ub
             self.result.gap = 0 if self.result.lb == 0 else float('Inf')
+
         self.result.lb_list.append(self.result.lb)
         self.result.ub_list.append(self.result.ub)
         self.result.runtime = time.perf_counter() - time_start
+
+        # Callbacks for new bounds
+        if _new_lb_found:
+            self._trigger_callbacks(EVENTS.ON_NEW_LOWER_BOUND)
+        if _new_ub_found:
+            self._trigger_callbacks(EVENTS.ON_NEW_UPPER_BOUND)
 
     def __terminate(self, time_start):
         # Iteration limit
