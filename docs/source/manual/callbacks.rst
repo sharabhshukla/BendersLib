@@ -55,6 +55,7 @@ The following pseudocode illustrates the main stages of the Benders decompositio
     trigger :meth:`~BendersCallback.on_sub_build`
     trigger :meth:`~BendersCallback.on_benders_start`
 
+    iteration counter = 0
     while not converged:
         increment iteration counter
         trigger :meth:`~BendersCallback.on_iteration_start`

@@ -2,7 +2,7 @@
 
 from abc import ABC
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING, Callable, Type
 
 from .consts import BendersConsts as CST
 
@@ -29,7 +29,7 @@ class BendersContext:
     state: "BendersResult"
     """The current state of the Benders decomposition process."""
     cuts_generated: list["Cut"] = None
-    """List of cuts generated but not yet added to the master problem."""
+    """A list of cuts generated but not yet added to the master problem."""
 
     def __str__(self):
         master_str = str(self.master_problem).replace('\n', '\n' + ' ' * 4)
@@ -142,18 +142,6 @@ class _CallbackEvents:
 
     The event names correspond to the method names in :class:`BendersCallback`,
     but are represented as uppercase strings.
-    When define a function-based callback, the function takes the name of the event
-    to be triggered.
-
-    Example
-    ---------------
-
-    .. code-block:: python
-
-        from benderslib import _CallbackEvents as EVENTS, BendersContext
-
-        def example_callback_function(EVENTS.ON_BENDERS_START, context: BendersContext):
-            print("Benders process started!")
     """
 
     ON_BENDERS_START = "ON_BENDERS_START"
@@ -197,10 +185,15 @@ class _CallbackManager:
     def __init__(self):
         self.callbacks: list[BendersCallback] = []
 
-    def register(self, callback: BendersCallback | Callable):
-        # Handle functions as callbacks
+    def register(self, callback: BendersCallback | Callable | Type[BendersCallback]):
+        if isinstance(callback, type) and issubclass(callback, BendersCallback):
+            # Handle class-based callbacks by instantiating them
+            callback = callback()
+
         if not isinstance(callback, BendersCallback):
+            # Handle functions as callbacks
             callback = _FuncWrapperCallback(callback)
+
         self.callbacks.append(callback)
 
     def trigger(self, event: str, context: BendersContext):

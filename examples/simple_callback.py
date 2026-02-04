@@ -46,9 +46,10 @@ class MyCallback(BendersCallback):
 
 # %%
 # # Define a lightweight function as a callback.
-def on_iteration_start(context: BendersContext):
+def on_iteration_end(context: BendersContext):
     print(f"Starting iteration: {context.state.n_iter} ...")
-    if context.state.n_iter == 2:
+
+    if context.state.n_iter == 1:
         print("Reached maximum iterations, terminating...")
         return CST.TERMINATE
 
@@ -67,8 +68,8 @@ benders = ClassicalBenders.from_models(
 benders.params.log_to_console = False
 
 # Register the callback
-benders.register_callback(MyCallback())
-benders.register_callback(on_iteration_start)
+benders.register_callback(MyCallback)
+benders.register_callback(on_iteration_end)
 
 # Solve the problem
 benders.solve()
