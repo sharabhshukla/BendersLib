@@ -170,9 +170,9 @@ class AnnotationBenders:
         else:
             return MasterProblem(solver(master)), SubProblem(solver(sub))
 
-    def solve(self, callback=None):
+    def solve(self):
         """A wrapper method to solve the Benders decomposition instance.
 
         See :meth:`~benderslib.BendersSolver.solve` for details.
         """
-        self.benders_instance.solve(callback)
+        self.benders_instance.solve()

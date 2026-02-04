@@ -1197,7 +1197,7 @@ class BendersSolver:
         # Callbacks
         self._context = BendersContext(self, self.master_problem, self.sub_problem, self.result, [])
         self._callback_manager = _CallbackManager()
-        self.__callback_terminate = False
+        self.__callback_action = CST.PROCEED
 
         # Ensure at least one cut generator is provided
         assert self.optimality_cut or self.feasibility_cut, "Provide at least <optimality_cut> or <feasibility_cut>."
@@ -1318,7 +1318,7 @@ class BendersSolver:
         """
         cuts = self.optimality_cut._generate()
         self._context.cuts_generated = cuts
-        self._trigger_callbacks(EVENTS.ON_OPTI_CUT_GENERATED)
+        self.__callback_action = self._trigger_callbacks(EVENTS.ON_OPTI_CUT_GENERATED)
 
         for cut in cuts:
             self.master_problem.add_cut(cut)
@@ -1329,7 +1329,7 @@ class BendersSolver:
         """
         cuts = self.feasibility_cut._generate()
         self._context.cuts_generated = cuts
-        self._trigger_callbacks(EVENTS.ON_FEAS_CUT_GENERATED)
+        self.__callback_action = self._trigger_callbacks(EVENTS.ON_FEAS_CUT_GENERATED)
 
         for cut in cuts:
             self.master_problem.add_cut(cut)
@@ -1374,9 +1374,9 @@ class BendersSolver:
 
         # Callbacks for new bounds
         if _new_lb_found:
-            self._trigger_callbacks(EVENTS.ON_NEW_LOWER_BOUND)
+            self.__callback_action = self._trigger_callbacks(EVENTS.ON_NEW_LOWER_BOUND)
         if _new_ub_found:
-            self._trigger_callbacks(EVENTS.ON_NEW_UPPER_BOUND)
+            self.__callback_action = self._trigger_callbacks(EVENTS.ON_NEW_UPPER_BOUND)
 
     def __terminate(self, time_start):
         # Iteration limit
@@ -1398,7 +1398,7 @@ class BendersSolver:
             return True
 
         # User-defined callback termination
-        if self.__callback_terminate:
+        if self.__callback_action == CST.TERMINATE:
             self.result.status = CST.TERMINATED
             return True
 
@@ -1416,7 +1416,7 @@ class BendersSolver:
         # Other preprocessing steps can be added here
         ...
 
-    def solve(self, callback=None) -> None:
+    def solve(self) -> None:
         """Solve the problem using Benders decomposition.
 
         This method implements the main Benders decomposition algorithm, iteratively solving the master and
@@ -1424,19 +1424,14 @@ class BendersSolver:
 
         After calling this method, the results and statistics of the Benders decomposition process can be accessed
         through the :attr:`BendersSolver.result` attribute, which is an instance of :class:`BendersResult`.
-
-        Parameters
-        ---------------
-
-        callback : function, optional
-            A user-defined callback function that can be called at each iteration for custom processing.
         """
 
         # Initialize
+        self.__callback_action = CST.PROCEED
         self.__preprocess()
-        self._trigger_callbacks(EVENTS.ON_MASTER_BUILD)
-        self._trigger_callbacks(EVENTS.ON_SUB_BUILD)
-        self._trigger_callbacks(EVENTS.ON_BENDERS_START)
+        self.__callback_action = self._trigger_callbacks(EVENTS.ON_MASTER_BUILD)
+        self.__callback_action = self._trigger_callbacks(EVENTS.ON_SUB_BUILD)
+        self.__callback_action = self._trigger_callbacks(EVENTS.ON_BENDERS_START)
 
         self.result.status = CST.UNSOLVED
         self.result.n_iter = 0
@@ -1447,10 +1442,10 @@ class BendersSolver:
         while self.result.n_iter <= self.params.iter_limit:
             self.result.n_iter += 1
             tm = time.perf_counter()
-            self._trigger_callbacks(EVENTS.ON_ITERATION_START)
-            self._trigger_callbacks(EVENTS.ON_BEFORE_MASTER_SOLVE)
+            self.__callback_action = self._trigger_callbacks(EVENTS.ON_ITERATION_START)
+            self.__callback_action = self._trigger_callbacks(EVENTS.ON_BEFORE_MASTER_SOLVE)
             self.master_problem.solve()
-            self._trigger_callbacks(EVENTS.ON_AFTER_MASTER_SOLVE)
+            self.__callback_action = self._trigger_callbacks(EVENTS.ON_AFTER_MASTER_SOLVE)
             self.result.runtime_master += time.perf_counter() - tm
 
             if self.master_problem.status == CST.OPTIMAL:
@@ -1458,13 +1453,14 @@ class BendersSolver:
                 var_values = self.master_problem.get_var_values(self.complicating_vars)
                 self.sub_problem.fix_vars(var_values)
                 ts = time.perf_counter()
-                self._trigger_callbacks(EVENTS.ON_BEFORE_SUB_SOLVE)
+                self.__callback_action = self._trigger_callbacks(EVENTS.ON_BEFORE_SUB_SOLVE)
                 self.sub_problem.solve()
-                self._trigger_callbacks(EVENTS.ON_AFTER_SUB_SOLVE)
+                self.__callback_action = self._trigger_callbacks(EVENTS.ON_AFTER_SUB_SOLVE)
                 self.result.runtime_sub += time.perf_counter() - ts
 
                 # Sub problem is infeasible -> add feasibility cut
                 if self.sub_problem.status == CST.INFEASIBLE:
+                    # Ensure bounds are recorded for in all iterations, even when subproblem is infeasible
                     self.result.lb_list.append(self.result.lb)
                     self.result.ub_list.append(self.result.ub)
                     if self.__terminate(time_start):
@@ -1500,7 +1496,7 @@ class BendersSolver:
                 self.result.status = CST.UNKNOWN
                 raise ValueError(f"Master problem returned an unexpected status: {self.master_problem.status}.")
 
-            self._trigger_callbacks(EVENTS.ON_ITERATION_END)
+            self.__callback_action = self._trigger_callbacks(EVENTS.ON_ITERATION_END)
 
         # Finalize
         self.result.time = time.perf_counter() - time_start
@@ -1509,7 +1505,7 @@ class BendersSolver:
         self.result.n_cuts = self.result.n_opt_cuts + self.result.n_feas_cuts
         self.__logger.log_end()
 
-        self._trigger_callbacks(EVENTS.ON_BENDERS_END)
+        self.__callback_action = self._trigger_callbacks(EVENTS.ON_BENDERS_END)
 
     def register_callback(self, callback: BendersCallback | Callable) -> None:
         """Register a user-defined callback to be called during the Benders solving process.
@@ -1568,4 +1564,10 @@ class BendersSolver:
             The action returned by the last callback function.
         """
 
-        return self._callback_manager.trigger(event, self._context)
+        action = self._callback_manager.trigger(event, self._context)
+
+        # Ensure termination if any callback requests it
+        if self.__callback_action == CST.TERMINATE:
+            action = CST.TERMINATE
+
+        return action

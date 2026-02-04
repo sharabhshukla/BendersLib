@@ -74,7 +74,7 @@ The following pseudocode illustrates the main stages of the Benders decompositio
                 if new upper bound is found:
                     trigger :meth:`~BendersCallback.on_new_upper_bound`
 
-                if converged:
+                if converged or a callback signaled :attr:`~BendersConsts.TERMINATE`:
                     break
 
                 generate optimality cut
@@ -82,7 +82,7 @@ The following pseudocode illustrates the main stages of the Benders decompositio
                 add optimality cut to master problem
 
             else if subproblem is infeasible:
-                if converged:
+                if converged or a callback signaled :attr:`~BendersConsts.TERMINATE`:
                     break
 
                 generate feasibility cut
