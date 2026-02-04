@@ -56,6 +56,11 @@ class CallbackBase(ABC):
     process will be terminated immediately.  Otherwise,
     returning ``None`` (or not returning) signals normal continuation.
 
+    A callback can terminate the Benders process prematurely by returning
+    the constant :attr:`~BendersConsts.TERMINATE`;
+    If a callback returns :attr:`~BendersConsts.PROCEED` or does not return anything,
+    the Benders process continues as normal.
+
     The callbacks are passed to Benders decomposition instances via :meth:`~BendersSolver.register_callback`.
 
     Example
