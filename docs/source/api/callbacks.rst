@@ -12,8 +12,3 @@ Callbacks
    :inherited-members:
    :show-inheritance:
    :exclude-members:
-
-.. autoclass:: _CallbackEvents
-   :inherited-members:
-   :show-inheritance:
-   :exclude-members:
