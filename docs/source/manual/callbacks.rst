@@ -47,8 +47,8 @@ to that event and executes them sequentially.
 A callback can also terminate the Benders process prematurely by returning the constant :attr:`~BendersConsts.TERMINATE`;
 If a callback returns :attr:`~BendersConsts.PROCEED` or does not return anything, the Benders process continues as normal.
 
-The following pseudocode illustrates the main stages of the Benders decomposition algorithm
-and the specific points at which each callback event is triggered.
+The following pseudocode (source of :func:`~BendersSolver.solve`) illustrates the main stages of the
+Benders decomposition algorithm and the specific points at which each callback event is triggered.
 
 .. parsed-literal::
    :class: benders-pseudocode
