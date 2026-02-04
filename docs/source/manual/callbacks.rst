@@ -40,12 +40,62 @@ See :doc:`enhance` for advanced acceleration techniques implemented via callback
    ~BendersCallback.on_opti_cut_generated
    ~BendersCallback.on_new_upper_bound
 
-.. mermaid
-
 The callback system in BendersLib operates on an event-driven basis.
 The :class:`BendersSolver` emits events at various stages of the decomposition process.
 When an event is emitted, the solver checks for any registered callbacks corresponding
 to that event and executes them sequentially.
+The following pseudocode illustrates the main stages of the Benders decomposition algorithm and the specific points at which each callback event is triggered.
+
+.. parsed-literal::
+   :class: benders-pseudocode
+   :name: Timeline of Callback Triggers in Benders Decomposition
+
+    // solve() method of BendersSolver is called
+    trigger :meth:`~BendersCallback.on_master_build`
+    trigger :meth:`~BendersCallback.on_sub_build`
+    trigger :meth:`~BendersCallback.on_benders_start`
+
+    while not converged:
+        trigger :meth:`~BendersCallback.on_iteration_start`
+
+        trigger :meth:`~BendersCallback.on_before_master_solve`
+        solve master problem
+        trigger :meth:`~BendersCallback.on_after_master_solve`
+
+        if master problem is optimal:
+            trigger :meth:`~BendersCallback.on_before_sub_solve`
+            solve subproblem
+            trigger :meth:`~BendersCallback.on_after_sub_solve`
+
+            if subproblem is optimal:
+                if new lower bound is found:
+                    trigger :meth:`~BendersCallback.on_new_lower_bound`
+                if new upper bound is found:
+                    trigger :meth:`~BendersCallback.on_new_upper_bound`
+
+                if converged:
+                    break
+
+                generate optimality cut
+                trigger :meth:`~BendersCallback.on_opti_cut_generated`
+                add optimality cut to master problem
+
+            else if subproblem is infeasible:
+                if converged:
+                    break
+
+                generate feasibility cut
+                trigger :meth:`~BendersCallback.on_feas_cut_generated`
+                add feasibility cut to master problem
+
+        else:
+            // master problem is infeasible or unbounded
+            break
+
+        trigger :meth:`~BendersCallback.on_iteration_end`
+
+    trigger :meth:`~BendersCallback.on_benders_end`
+
 
 How to Use Callbacks?
 ------------------------------------
