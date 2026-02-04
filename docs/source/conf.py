@@ -32,7 +32,8 @@ extensions = [
     'sphinx_copybutton',  # Add copy button to code blocks
     'sphinx_gallery.gen_gallery',  # Generate a gallery of examples
     'sphinxcontrib.mermaid',  # Mermaid diagrams
-    'sphinx_tabs.tabs'  # Tabbed content
+    # 'sphinx_tabs.tabs',  # Tabbed content, works with Shibuya theme
+    'sphinx_inline_tabs',
 ]
 
 autodoc_default_options = {
@@ -177,25 +178,34 @@ sphinx_gallery_conf = {
 html_theme = "furo"
 html_title = "BendersLib"
 html_favicon = '_static/icon.ico'
-blue = "#0066CC"
-# blue = "#0064a2"
+navy_blue = "#0066CC"
+nuaa_blue = "#0000ff"
 html_theme_options = {
     "light_css_variables": {
-        "color-sidebar-link-text--top-level": blue,
-        "color-toc-item-text--active": blue,
-        "color-link": blue,
+        "color-sidebar-link-text--top-level": navy_blue,
+        "color-toc-item-text--active": navy_blue,
+        "color-link": navy_blue,
         "color-link--visited": "var(--color-link)",
         "color-link--hover": "var(--color-link)",
+        "color-brand-primary": navy_blue,
+        "color-brand-content": navy_blue,
+        "color-api-name": nuaa_blue,
+        "color-highlighted-background": "yellow",
     },
     "dark_css_variables": {
-        "color-sidebar-link-text--top-level": blue,
-        "color-toc-item-text--active": blue,
-        "color-link": blue,
+        "color-sidebar-link-text--top-level": navy_blue,
+        "color-toc-item-text--active": navy_blue,
+        "color-link": navy_blue,
         "color-link--visited": "var(--color-link)",
         "color-link--hover": "var(--color-link)",
+        "color-brand-primary": navy_blue,
+        "color-brand-content": navy_blue,
+        "color-api-name": navy_blue,
+        "color-highlighted-background": "yellow",
     },
     # "announcement": "This is an Alpha release, the API may change in future and there might be bugs."
 }
+
 
 # html_theme = "shibuya"
 # html_baseurl = "https://benders.dev/en/latest/"

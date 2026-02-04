@@ -32,25 +32,23 @@ for BendersLib before installing it.
 Installing BendersLib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. tabs::
+.. tab:: pip
 
-   .. tab:: pip
-
-     .. code-block:: bash
+    .. code-block:: bash
 
         pip install benderslib
 
         # Upgrade to the latest version
         # pip install benderslib --upgrade
 
-   .. tab:: conda
+.. tab:: conda
 
-      .. code-block:: bash
+    .. code-block:: bash
 
-         conda install -c conda-forge benderslib
+        conda install -c conda-forge benderslib
 
-         # Upgrade to the latest version
-         # conda update -c conda-forge benderslib
+        # Upgrade to the latest version
+        # conda update -c conda-forge benderslib
 
 Verifying the Installation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
