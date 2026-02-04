@@ -44,7 +44,11 @@ The callback system in BendersLib operates on an event-driven basis.
 The :class:`BendersSolver` emits events at various stages of the decomposition process.
 When an event is emitted, the solver checks for any registered callbacks corresponding
 to that event and executes them sequentially.
-The following pseudocode illustrates the main stages of the Benders decomposition algorithm and the specific points at which each callback event is triggered.
+A callback can also terminate the Benders process prematurely by returning the constant :attr:`~BendersConsts.TERMINATE`;
+If a callback returns :attr:`~BendersConsts.PROCEED` or does not return anything, the Benders process continues as normal.
+
+The following pseudocode illustrates the main stages of the Benders decomposition algorithm
+and the specific points at which each callback event is triggered.
 
 .. parsed-literal::
    :class: benders-pseudocode
@@ -109,7 +113,6 @@ The **class-based** callbacks are ideal for complex logic that requires maintain
 By defining a class, you can use instance attributes to store information across different callback calls.
 The **function-based** callbacks is a simpler, more direct way to respond to events when you don not  need to
 maintain state. Each callback function is independent.
-A callback can also terminate the Benders process prematurely by returning the constant :attr:`~BendersConsts.TERMINATE`.
 
 The following :doc:`example <../examples/simple_callback>` demonstrates how to define and register both types of callbacks.
 
