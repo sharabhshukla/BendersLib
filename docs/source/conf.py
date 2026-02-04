@@ -179,8 +179,10 @@ sphinx_gallery_conf = {
 html_theme = "furo"
 html_title = "BendersLib"
 html_favicon = '_static/icon.ico'
+# html_logo = "_static/benderslib_v.png"
 navy_blue = "#0066CC"
-nuaa_blue = "#0000ff"
+# nuaa_blue = "#0000ff"
+another_blue = "#0769CF"
 html_theme_options = {
     "light_css_variables": {
         "color-sidebar-link-text--top-level": navy_blue,
@@ -190,7 +192,7 @@ html_theme_options = {
         "color-link--hover": "var(--color-link)",
         "color-brand-primary": navy_blue,
         "color-brand-content": navy_blue,
-        "color-api-name": nuaa_blue,
+        "color-api-name": another_blue,
         "color-highlighted-background": "yellow",
     },
     "dark_css_variables": {
@@ -201,7 +203,7 @@ html_theme_options = {
         "color-link--hover": "var(--color-link)",
         "color-brand-primary": navy_blue,
         "color-brand-content": navy_blue,
-        "color-api-name": navy_blue,
+        "color-api-name": another_blue,
         "color-highlighted-background": "yellow",
     },
     # "announcement": "This is an Alpha release, the API may change in future and there might be bugs."
@@ -210,7 +212,7 @@ html_theme_options = {
 
 # html_theme = "shibuya"
 # html_baseurl = "https://benders.dev/en/latest/"
-# # html_logo = '_static/benderslib.svg'
+# # html_logo = '_static/benderslib.png'
 # html_favicon = '_static/icon.ico'
 # html_copy_source = True
 # html_theme_options = {
@@ -238,7 +240,7 @@ html_theme_options = {
 
 # html_theme = 'sphinx_book_theme'
 # html_title = 'BendersLib'
-# html_logo = '_static/benderslib.svg'
+# html_logo = '_static/benderslib.png'
 # html_favicon = '_static/icon.ico'
 # html_theme_options = {
 #     # "github_url": "https://github.com/phguo/BendersLib",

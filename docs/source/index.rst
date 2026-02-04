@@ -1,5 +1,4 @@
-.. image:: _static/benderslib.svg
-   :scale: 100%
+.. image:: _static/benderslib.png
    :align: center
 
 
@@ -218,8 +217,8 @@ Contents
    :maxdepth: 1
    :hidden:
 
+   GitHub <https://github.com/phguo/BendersLib>
+   PyPI <https://pypi.org/project/BendersLib/>
    Getting Help <https://github.com/phguo/BendersLib/issues?q=is%3Aissue>
-   @GitHub <https://github.com/phguo/BendersLib>
-   @PyPI <https://pypi.org/project/BendersLib/>
    Author <https://guo.ph>
    Benders.dev <https://benders.dev>
