@@ -17,7 +17,7 @@ class BendersContext:
 
     This dataclass bundles the objects that callbacks commonly need while
     observing or interacting with a running Benders decomposition. It is
-    passed as the sole argument to all callback methods in :class:`BendersCallback`.
+    passed as the sole argument to all callback methods in :class:`CallbackBase`.
     """
 
     benders: "BendersSolver"
@@ -42,15 +42,15 @@ class BendersContext:
                 f")")
 
 
-class BendersCallback(ABC):
+class CallbackBase(ABC):
     """Abstract base class for Benders decomposition callbacks.
 
-    Users can define custom callbacks by inheriting from :class:`BendersCallback` and
+    Users can define custom callbacks by inheriting from :class:`CallbackBase` and
     overriding the desired event methods. Each method receives a
     :class:`BendersContext` object containing information about the current
     state of the Benders decomposition process.
     Alternatively, users can define standalone functions with names matching
-    the methods in :class:`BendersCallback` to serve as lightweight callbacks.
+    the methods in :class:`CallbackBase` to serve as lightweight callbacks.
 
     If a callback returns the constant :attr:`~BendersConsts.TERMINATE` the Benders
     process will be terminated immediately.  Otherwise,
@@ -63,10 +63,10 @@ class BendersCallback(ABC):
 
     .. code-block:: python
 
-        from benderslib import BendersCallback, BendersContext
+        from benderslib import CallbackBase, BendersContext
 
         # Class-based callback
-        class MyCallback(BendersCallback):
+        class MyCallback(CallbackBase):
 
             def on_benders_start(self, context: BendersContext):
                 print("Benders process started!")
@@ -140,38 +140,38 @@ class BendersCallback(ABC):
 class _CallbackEvents:
     """Enumeration of callback event names.
 
-    The event names correspond to the method names in :class:`BendersCallback`,
+    The event names correspond to the method names in :class:`CallbackBase`,
     but are represented as uppercase strings.
     """
 
     ON_BENDERS_START = "ON_BENDERS_START"
-    """See :meth:`BendersCallback.on_benders_start`."""
+    """See :meth:`CallbackBase.on_benders_start`."""
     ON_BENDERS_END = "ON_BENDERS_END"
-    """See :meth:`BendersCallback.on_benders_end`."""
+    """See :meth:`CallbackBase.on_benders_end`."""
     ON_ITERATION_START = "ON_ITERATION_START"
-    """See :meth:`BendersCallback.on_iteration_start`."""
+    """See :meth:`CallbackBase.on_iteration_start`."""
     ON_ITERATION_END = "ON_ITERATION_END"
-    """See :meth:`BendersCallback.on_iteration_end`."""
+    """See :meth:`CallbackBase.on_iteration_end`."""
     ON_MASTER_BUILD = "ON_MASTER_BUILD"
-    """See :meth:`BendersCallback.on_master_build`."""
+    """See :meth:`CallbackBase.on_master_build`."""
     ON_SUB_BUILD = "ON_SUB_BUILD"
-    """See :meth:`BendersCallback.on_sub_build`."""
+    """See :meth:`CallbackBase.on_sub_build`."""
     ON_BEFORE_MASTER_SOLVE = "ON_BEFORE_MASTER_SOLVE"
-    """See :meth:`BendersCallback.on_before_master_solve`."""
+    """See :meth:`CallbackBase.on_before_master_solve`."""
     ON_AFTER_MASTER_SOLVE = "ON_AFTER_MASTER_SOLVE"
-    """See :meth:`BendersCallback.on_after_master_solve`."""
+    """See :meth:`CallbackBase.on_after_master_solve`."""
     ON_BEFORE_SUB_SOLVE = "ON_BEFORE_SUB_SOLVE"
-    """See :meth:`BendersCallback.on_before_sub_solve`."""
+    """See :meth:`CallbackBase.on_before_sub_solve`."""
     ON_AFTER_SUB_SOLVE = "ON_AFTER_SUB_SOLVE"
-    """See :meth:`BendersCallback.on_after_sub_solve`."""
+    """See :meth:`CallbackBase.on_after_sub_solve`."""
     ON_OPTI_CUT_GENERATED = "ON_OPTI_CUT_GENERATED"
-    """See :meth:`BendersCallback.on_opti_cut_generated`."""
+    """See :meth:`CallbackBase.on_opti_cut_generated`."""
     ON_FEAS_CUT_GENERATED = "ON_FEAS_CUT_GENERATED"
-    """See :meth:`BendersCallback.on_feas_cut_generated`."""
+    """See :meth:`CallbackBase.on_feas_cut_generated`."""
     ON_NEW_LOWER_BOUND = "ON_NEW_LOWER_BOUND"
-    """See :meth:`BendersCallback.on_new_lower_bound`."""
+    """See :meth:`CallbackBase.on_new_lower_bound`."""
     ON_NEW_UPPER_BOUND = "ON_NEW_UPPER_BOUND"
-    """See :meth:`BendersCallback.on_new_upper_bound`."""
+    """See :meth:`CallbackBase.on_new_upper_bound`."""
 
 
 class _CallbackManager:
@@ -183,14 +183,14 @@ class _CallbackManager:
     """
 
     def __init__(self):
-        self.callbacks: list[BendersCallback] = []
+        self.callbacks: list[CallbackBase] = []
 
-    def register(self, callback: BendersCallback | Callable | Type[BendersCallback]):
-        if isinstance(callback, type) and issubclass(callback, BendersCallback):
+    def register(self, callback: CallbackBase | Callable | Type[CallbackBase]):
+        if isinstance(callback, type) and issubclass(callback, CallbackBase):
             # Handle class-based callbacks by instantiating them
             callback = callback()
 
-        if not isinstance(callback, BendersCallback):
+        if not isinstance(callback, CallbackBase):
             # Handle functions as callbacks
             callback = _FuncWrapperCallback(callback)
 
@@ -209,12 +209,12 @@ class _CallbackManager:
         return CST.PROCEED
 
 
-class _FuncWrapperCallback(BendersCallback):
+class _FuncWrapperCallback(CallbackBase):
     """A wrapper class to allow using functions as callbacks."""
 
     valid_events = [
-        func for func in dir(BendersCallback)
-        if callable(getattr(BendersCallback, func))
+        func for func in dir(CallbackBase)
+        if callable(getattr(CallbackBase, func))
            and not func.startswith("__")
     ]
 

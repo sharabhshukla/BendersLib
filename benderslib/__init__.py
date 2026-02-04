@@ -65,7 +65,7 @@ from .benders import (
 
 from .callback import (
     BendersContext,
-    BendersCallback,
+    CallbackBase,
     _CallbackEvents,
 )
 
@@ -127,6 +127,6 @@ __all__ = [
 
     # Callbacks
     "BendersContext",
-    "BendersCallback",
+    "CallbackBase",
     "_CallbackEvents",
 ]

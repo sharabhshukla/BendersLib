@@ -8,7 +8,7 @@ Callbacks
    :show-inheritance:
    :exclude-members:
 
-.. autoclass:: BendersCallback
+.. autoclass:: CallbackBase
    :inherited-members:
    :show-inheritance:
    :exclude-members:

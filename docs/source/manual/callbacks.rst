@@ -25,20 +25,20 @@ See :doc:`enhance` for advanced acceleration techniques implemented via callback
 .. autosummary::
    :nosignatures:
 
-   ~BendersCallback.on_benders_start
-   ~BendersCallback.on_benders_end
-   ~BendersCallback.on_iteration_start
-   ~BendersCallback.on_iteration_end
-   ~BendersCallback.on_master_build
-   ~BendersCallback.on_before_master_solve
-   ~BendersCallback.on_after_master_solve
-   ~BendersCallback.on_new_lower_bound
-   ~BendersCallback.on_sub_build
-   ~BendersCallback.on_before_sub_solve
-   ~BendersCallback.on_after_sub_solve
-   ~BendersCallback.on_feas_cut_generated
-   ~BendersCallback.on_opti_cut_generated
-   ~BendersCallback.on_new_upper_bound
+   ~CallbackBase.on_benders_start
+   ~CallbackBase.on_benders_end
+   ~CallbackBase.on_iteration_start
+   ~CallbackBase.on_iteration_end
+   ~CallbackBase.on_master_build
+   ~CallbackBase.on_before_master_solve
+   ~CallbackBase.on_after_master_solve
+   ~CallbackBase.on_new_lower_bound
+   ~CallbackBase.on_sub_build
+   ~CallbackBase.on_before_sub_solve
+   ~CallbackBase.on_after_sub_solve
+   ~CallbackBase.on_feas_cut_generated
+   ~CallbackBase.on_opti_cut_generated
+   ~CallbackBase.on_new_upper_bound
 
 The callback system in BendersLib operates on an event-driven basis.
 The :class:`BendersSolver` emits events at various stages of the decomposition process.
@@ -55,35 +55,35 @@ Benders decomposition algorithm and the specific points at which each callback e
    :name: Timeline of Callback Triggers in Benders Decomposition
 
     // solve() method of BendersSolver is called
-    trigger :meth:`~BendersCallback.on_master_build`
-    trigger :meth:`~BendersCallback.on_sub_build`
-    trigger :meth:`~BendersCallback.on_benders_start`
+    trigger :meth:`~CallbackBase.on_master_build`
+    trigger :meth:`~CallbackBase.on_sub_build`
+    trigger :meth:`~CallbackBase.on_benders_start`
 
     iteration counter = 0
     while not converged:
         increment iteration counter
-        trigger :meth:`~BendersCallback.on_iteration_start`
+        trigger :meth:`~CallbackBase.on_iteration_start`
 
-        trigger :meth:`~BendersCallback.on_before_master_solve`
+        trigger :meth:`~CallbackBase.on_before_master_solve`
         solve master problem
-        trigger :meth:`~BendersCallback.on_after_master_solve`
+        trigger :meth:`~CallbackBase.on_after_master_solve`
 
         if master problem is optimal:
-            trigger :meth:`~BendersCallback.on_before_sub_solve`
+            trigger :meth:`~CallbackBase.on_before_sub_solve`
             solve subproblem
-            trigger :meth:`~BendersCallback.on_after_sub_solve`
+            trigger :meth:`~CallbackBase.on_after_sub_solve`
 
             if subproblem is optimal:
                 if new lower bound is found:
-                    trigger :meth:`~BendersCallback.on_new_lower_bound`
+                    trigger :meth:`~CallbackBase.on_new_lower_bound`
                 if new upper bound is found:
-                    trigger :meth:`~BendersCallback.on_new_upper_bound`
+                    trigger :meth:`~CallbackBase.on_new_upper_bound`
 
                 if converged or a callback signaled :attr:`~BendersConsts.TERMINATE`:
                     break
 
                 generate optimality cut
-                trigger :meth:`~BendersCallback.on_opti_cut_generated`
+                trigger :meth:`~CallbackBase.on_opti_cut_generated`
                 add optimality cut to master problem
 
             else if subproblem is infeasible:
@@ -91,22 +91,22 @@ Benders decomposition algorithm and the specific points at which each callback e
                     break
 
                 generate feasibility cut
-                trigger :meth:`~BendersCallback.on_feas_cut_generated`
+                trigger :meth:`~CallbackBase.on_feas_cut_generated`
                 add feasibility cut to master problem
 
         else:
             // master problem is infeasible or unbounded
             break
 
-        trigger :meth:`~BendersCallback.on_iteration_end`
+        trigger :meth:`~CallbackBase.on_iteration_end`
 
-    trigger :meth:`~BendersCallback.on_benders_end`
+    trigger :meth:`~CallbackBase.on_benders_end`
 
 
 How to Use Callbacks?
 ------------------------------------
 
-There are two ways to create callbacks: as a class inheriting from :class:`BendersCallback` or as a standalone function.
+There are two ways to create callbacks: as a class inheriting from :class:`CallbackBase` or as a standalone function.
 Both approaches receive a :class:`BendersContext` object, which provides access to the master problem, subproblem,
 and the current state of the decomposition.
 The **class-based** callbacks are ideal for complex logic that requires maintaining state between events.

@@ -11,7 +11,7 @@ from .params import BendersParams
 from .result import BendersResult
 from .solvers import SolverBase
 from .logger import BendersLogger
-from .callback import BendersContext, BendersCallback, _CallbackEvents as EVENTS, _CallbackManager
+from .callback import BendersContext, CallbackBase, _CallbackEvents as EVENTS, _CallbackManager
 
 
 class ProblemBase:
@@ -1507,21 +1507,21 @@ class BendersSolver:
 
         self.__callback_action = self._trigger_callbacks(EVENTS.ON_BENDERS_END)
 
-    def register_callback(self, callback: BendersCallback | Callable) -> None:
+    def register_callback(self, callback: CallbackBase | Callable) -> None:
         """Register a user-defined callback to be called during the Benders solving process.
 
-        Users can define custom callbacks by inheriting from :class:`BendersCallback` and
+        Users can define custom callbacks by inheriting from :class:`CallbackBase` and
         overriding the desired event methods. Each method receives a
         :class:`BendersContext` object containing information about the current
         state of the Benders decomposition process.
         Alternatively, users can define standalone functions with names matching
-        the methods in :class:`BendersCallback` to serve as lightweight callbacks.
+        the methods in :class:`CallbackBase` to serve as lightweight callbacks.
 
         Parameters
         ---------------
 
-        callback : BendersCallback | Callable
-            A callback instance inherited from :class:`BendersCallback` or
+        callback : CallbackBase | Callable
+            A callback instance inherited from :class:`CallbackBase` or
             a function with signature ``func(context: BendersContext)``.
 
         Example
@@ -1529,10 +1529,10 @@ class BendersSolver:
 
         .. code-block:: python
 
-            from benderslib.callback import BendersCallback, BendersContext
+            from benderslib.callback import CallbackBase, BendersContext
 
             # Class-based callback
-            class MyCallback(BendersCallback):
+            class MyCallback(CallbackBase):
 
                 def on_benders_start(self, context: BendersContext):
                     print("Benders process started!")
