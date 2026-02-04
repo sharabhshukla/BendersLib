@@ -143,35 +143,8 @@ Each one implements a specific logic for generating cuts by overriding the :meth
 .. caution::
 
    These classes are tailored for their respective Benders decomposition variants.
-   Use them with caution in your own custom Benders decomposition unless you are certain that your implementation matches one of these variants.
-
-.. admonition:: Example
-   :class: note
-
-   Here are examples of cut generators.
-   The :class:`ClassicalOCGen` generates optimality cuts using the dual values from the subproblem.
-
-   .. code-block:: python
-
-       # Inside ClassicalOCGen
-       def generate(self) -> list[ClassicalOC]:
-           dual_values = self.sub_problem.get_dual_values()
-
-           cut = ClassicalOC(self.complicating_vars, self.var_coefs, dual_values, self.rhs)
-           return [cut]
-
-   The :class:`CombinatorialFCGen` generates a no-good cut based on the values of the binary complicating variables from the master problem.
-
-   .. code-block:: python
-
-       # Inside CombinatorialFCGen
-       def generate(self) -> list[NoGoodFC]:
-           var_values = self.master_problem.get_var_values(self.complicating_vars)
-
-           cut = NoGoodFC(var_values)
-           return [cut]
-
-   More examples can be found in the source code of :ref:`cut_generators`.
+   Use them with caution in your own custom Benders decomposition unless you are certain that your
+   implementation matches one of these variants.
 
 ====
 
@@ -180,7 +153,8 @@ Each one implements a specific logic for generating cuts by overriding the :meth
 Customization
 -------------------------------------------
 
-BendersLib is designed to be highly customizable, allowing you to define your own Benders cuts and the logic for generating them.
+BendersLib is designed to be highly customizable, allowing you to define your own Benders cuts and
+the logic for generating them.
 This is particularly useful when implementing advanced non-standard Benders decomposition methods.
 
 Custom Benders Cut
@@ -240,38 +214,43 @@ To create and use one class-based cut generator, follow these steps.
 
 - **Step 4**.  Pass the custom cut generator class (not an instance) to the Benders solver when instantiating it.
 
-Here is an example of a custom cut generator that creates the :class:`NoGoodFC` instances defined earlier.
+.. admonition:: Example
+    :class: note
 
-.. code-block:: python
+    Here is an example of a custom cut generator that creates the :class:`NoGoodFC` instances.
 
-    from benderslib import CutGenerator, BendersSolver, Cut
+    .. code-block:: python
 
-    # Step 1: Define the custom cut generator class
-    class MyCutGen(CutGenerator):
+        from benderslib import CutGenerator, BendersSolver, Cut
 
-        def __init__(self, master_problem, sub_problem, params):
-            # Step 2: Initialization and caching
-            # No data needs to be cached for this simple generator.
-            # The __init__ can be left empty if no pre-processing is needed.
-            super().__init__(master_problem, sub_problem, params)
+        # Step 1: Define the custom cut generator class
+        class MyCutGen(CutGenerator):
 
-        def generate(self) -> list[NoGoodFC]:
-            # Step 3: Generate the cuts
-            # Retrieve the values of the complicating variables from the master problem.
-            # Create the custom cut
-            infeasible_solution = self.master_problem.get_var_values(self.complicating_vars)
-            cut = NoGoodFC(infeasible_solution)
-            # cut = Cut(...)  # Alternatively, create a Cut instance directly.
-            return [cut]  # Return a list of cuts, even if it's just one.
+            def __init__(self, master_problem, sub_problem, params):
+                # Step 2: Initialization and caching
+                # No data needs to be cached for this simple generator.
+                # The __init__ can be left empty if no pre-processing is needed.
+                super().__init__(master_problem, sub_problem, params)
 
-    # Step 4: Use the custom cut generator in the Benders solver
-    solver = BendersSolver(
-        master_problem,
-        sub_problem,
-        complicating_vars,
-        feasibility_cut=MyCutGen,  # Pass the custom cut generator class
-    )
-    solver.solve()
+            def generate(self) -> list[NoGoodFC]:
+                # Step 3: Generate the cuts
+                # Retrieve the values of the complicating variables from the master problem.
+                # Create the custom cut
+                infeasible_solution = self.master_problem.get_var_values(self.complicating_vars)
+                cut = NoGoodFC(infeasible_solution)
+                # cut = Cut(...)  # Alternatively, create a Cut instance directly.
+                return [cut]  # Return a list of cuts, even if it's just one.
+
+        # Step 4: Use the custom cut generator in the Benders solver
+        solver = BendersSolver(
+            master_problem,
+            sub_problem,
+            complicating_vars,
+            feasibility_cut=MyCutGen,  # Pass the custom cut generator class
+        )
+        solver.solve()
+
+    More examples can be found in the source code of :ref:`cut_generators`.
 
 Custom Cut Generator (function-based)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
