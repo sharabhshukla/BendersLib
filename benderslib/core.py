@@ -1323,6 +1323,9 @@ class BendersSolver:
         for cut in cuts:
             self.master_problem.add_cut(cut)
 
+        self._context.cuts_generated = []
+        self.__callback_action = self._trigger_callbacks(EVENTS.ON_OPTI_CUT_ADDED)
+
     def __add_feasibility_cut(self):
         """
         The method to add one or multiple :class:`FeasibilityCut` to :class:`MasterProblem`.
@@ -1333,6 +1336,9 @@ class BendersSolver:
 
         for cut in cuts:
             self.master_problem.add_cut(cut)
+
+        self._context.cuts_generated = []
+        self.__callback_action = self._trigger_callbacks(EVENTS.ON_FEAS_CUT_ADDED)
 
     def __update_result(self, time_start):
         self.result.n_sol += 1

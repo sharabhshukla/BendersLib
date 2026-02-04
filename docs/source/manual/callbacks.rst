@@ -20,26 +20,6 @@ like custom cut generation, problem-specific heuristics, and other acceleration 
 which can significantly improve performance, stability, and convergence.
 See :doc:`enhance` for advanced acceleration techniques implemented via callbacks.
 
-.. rubric:: Supported Callbacks
-
-.. autosummary::
-   :nosignatures:
-
-   ~CallbackBase.on_benders_start
-   ~CallbackBase.on_benders_end
-   ~CallbackBase.on_iteration_start
-   ~CallbackBase.on_iteration_end
-   ~CallbackBase.on_master_build
-   ~CallbackBase.on_before_master_solve
-   ~CallbackBase.on_after_master_solve
-   ~CallbackBase.on_new_lower_bound
-   ~CallbackBase.on_sub_build
-   ~CallbackBase.on_before_sub_solve
-   ~CallbackBase.on_after_sub_solve
-   ~CallbackBase.on_feas_cut_generated
-   ~CallbackBase.on_opti_cut_generated
-   ~CallbackBase.on_new_upper_bound
-
 The callback system in BendersLib operates on an event-driven basis.
 The :class:`BendersSolver` emits events at various stages of the decomposition process.
 When an event is emitted, the solver checks for any registered callbacks corresponding
@@ -85,6 +65,7 @@ Benders decomposition algorithm and the specific points at which each callback e
                 generate optimality cut
                 trigger :meth:`~CallbackBase.on_opti_cut_generated`
                 add optimality cut to master problem
+                trigger :meth:`~CallbackBase.on_opti_cut_added`
 
             else if subproblem is infeasible:
                 if converged or a callback signaled :attr:`~BendersConsts.TERMINATE`:
@@ -93,6 +74,7 @@ Benders decomposition algorithm and the specific points at which each callback e
                 generate feasibility cut
                 trigger :meth:`~CallbackBase.on_feas_cut_generated`
                 add feasibility cut to master problem
+                trigger :meth:`~CallbackBase.on_feas_cut_added`
 
         else:
             // master problem is infeasible or unbounded
@@ -102,6 +84,27 @@ Benders decomposition algorithm and the specific points at which each callback e
 
     trigger :meth:`~CallbackBase.on_benders_end`
 
+.. rubric:: Supported Callbacks
+
+.. autosummary::
+   :nosignatures:
+
+   ~CallbackBase.on_benders_start
+   ~CallbackBase.on_benders_end
+   ~CallbackBase.on_iteration_start
+   ~CallbackBase.on_iteration_end
+   ~CallbackBase.on_master_build
+   ~CallbackBase.on_before_master_solve
+   ~CallbackBase.on_after_master_solve
+   ~CallbackBase.on_sub_build
+   ~CallbackBase.on_before_sub_solve
+   ~CallbackBase.on_after_sub_solve
+   ~CallbackBase.on_opti_cut_generated
+   ~CallbackBase.on_feas_cut_generated
+   ~CallbackBase.on_opti_cut_added
+   ~CallbackBase.on_feas_cut_added
+   ~CallbackBase.on_new_lower_bound
+   ~CallbackBase.on_new_upper_bound
 
 How to Use Callbacks?
 ------------------------------------
