@@ -37,6 +37,8 @@ class BendersConsts:
     """Status indicating an unknown solver backend status."""
     ERROR = 'ERROR'
     """Status indicating an error occurred during solving."""
+    TERMINATED = 'TERMINATED'
+    """Status indicating the solving process was terminated by the user."""
 
     # Callback actions
     PROCEED = 'PROCEED'

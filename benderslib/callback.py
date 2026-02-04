@@ -2,13 +2,13 @@
 
 from abc import ABC
 from dataclasses import dataclass
-from typing import List, TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING, Callable
 
 from .consts import BendersConsts as CST
 
 # Avoid circular imports
 if TYPE_CHECKING:
-    from .core import BendersResult, MasterProblem, SubProblem, BendersSolver
+    from .core import BendersResult, MasterProblem, SubProblem, BendersSolver, Cut
 
 
 @dataclass
@@ -20,14 +20,16 @@ class BendersContext:
     passed as the sole argument to all callback methods in :class:`BendersCallback`.
     """
 
+    benders: "BendersSolver"
+    """The Benders decomposition solver instance."""
     master_problem: "MasterProblem"
     """The current master problem instance."""
     sub_problem: "SubProblem"
     """The current subproblem instance."""
     state: "BendersResult"
     """The current state of the Benders decomposition process."""
-    benders: "BendersSolver"
-    """The Benders decomposition solver instance."""
+    cuts_generated: list["Cut"] = None
+    """List of cuts generated but not yet added to the master problem."""
 
     def __str__(self):
         master_str = str(self.master_problem).replace('\n', '\n' + ' ' * 4)
@@ -61,7 +63,7 @@ class BendersCallback(ABC):
 
     .. code-block:: python
 
-        from benderslib.callback import BendersCallback, BendersContext
+        from benderslib import BendersCallback, BendersContext
 
         # Class-based callback
         class MyCallback(BendersCallback):
@@ -118,20 +120,12 @@ class BendersCallback(ABC):
         """Called after solving the subproblem."""
         ...
 
-    def on_cut_generated(self, context: BendersContext):
-        """Called when a optimality or feasibility cut is generated."""
-        ...
-
     def on_opti_cut_generated(self, context: BendersContext):
         """Called when an optimality cut is generated."""
         ...
 
     def on_feas_cut_generated(self, context: BendersContext):
         """Called when a feasibility cut is generated."""
-        ...
-
-    def on_new_incumbent(self, context: BendersContext):
-        """Called when a new incumbent (best-known) solution is found."""
         ...
 
     def on_new_lower_bound(self, context: BendersContext):
@@ -144,30 +138,64 @@ class BendersCallback(ABC):
 
 
 class _CallbackEvents:
-    """Enumeration of callback event names."""
+    """Enumeration of callback event names.
+
+    The event names correspond to the method names in :class:`BendersCallback`,
+    but are represented as uppercase strings.
+    When define a function-based callback, the function takes the name of the event
+    to be triggered.
+
+    Example
+    ---------------
+
+    .. code-block:: python
+
+        from benderslib import _CallbackEvents as EVENTS, BendersContext
+
+        def example_callback_function(EVENTS.ON_BENDERS_START, context: BendersContext):
+            print("Benders process started!")
+    """
 
     ON_BENDERS_START = "ON_BENDERS_START"
+    """See :meth:`BendersCallback.on_benders_start`."""
     ON_BENDERS_END = "ON_BENDERS_END"
+    """See :meth:`BendersCallback.on_benders_end`."""
     ON_ITERATION_START = "ON_ITERATION_START"
+    """See :meth:`BendersCallback.on_iteration_start`."""
     ON_ITERATION_END = "ON_ITERATION_END"
+    """See :meth:`BendersCallback.on_iteration_end`."""
     ON_MASTER_BUILD = "ON_MASTER_BUILD"
+    """See :meth:`BendersCallback.on_master_build`."""
     ON_SUB_BUILD = "ON_SUB_BUILD"
+    """See :meth:`BendersCallback.on_sub_build`."""
     ON_BEFORE_MASTER_SOLVE = "ON_BEFORE_MASTER_SOLVE"
+    """See :meth:`BendersCallback.on_before_master_solve`."""
     ON_AFTER_MASTER_SOLVE = "ON_AFTER_MASTER_SOLVE"
+    """See :meth:`BendersCallback.on_after_master_solve`."""
     ON_BEFORE_SUB_SOLVE = "ON_BEFORE_SUB_SOLVE"
+    """See :meth:`BendersCallback.on_before_sub_solve`."""
     ON_AFTER_SUB_SOLVE = "ON_AFTER_SUB_SOLVE"
-    ON_CUT_GENERATED = "ON_CUT_GENERATED"
+    """See :meth:`BendersCallback.on_after_sub_solve`."""
     ON_OPTI_CUT_GENERATED = "ON_OPTI_CUT_GENERATED"
+    """See :meth:`BendersCallback.on_opti_cut_generated`."""
     ON_FEAS_CUT_GENERATED = "ON_FEAS_CUT_GENERATED"
-    ON_NEW_INCUMBENT = "ON_NEW_INCUMBENT"
+    """See :meth:`BendersCallback.on_feas_cut_generated`."""
     ON_NEW_LOWER_BOUND = "ON_NEW_LOWER_BOUND"
+    """See :meth:`BendersCallback.on_new_lower_bound`."""
     ON_NEW_UPPER_BOUND = "ON_NEW_UPPER_BOUND"
+    """See :meth:`BendersCallback.on_new_upper_bound`."""
 
 
 class _CallbackManager:
+    """Manager for handling multiple Benders decomposition callbacks.
+
+    This class is initialized within :class:`BendersSolver` and is responsible for
+    registering and triggering callbacks at appropriate events during the Benders
+    decomposition process.
+    """
 
     def __init__(self):
-        self.callbacks: List[BendersCallback] = []
+        self.callbacks: list[BendersCallback] = []
 
     def register(self, callback: BendersCallback | Callable):
         # Handle functions as callbacks
@@ -179,8 +207,10 @@ class _CallbackManager:
         for callback in self.callbacks:
             event = event.lower()
             method = getattr(callback, event, None)
+
             if callable(method):
                 action = method(context)
+
                 if action == CST.TERMINATE:
                     return CST.TERMINATE
         return CST.PROCEED

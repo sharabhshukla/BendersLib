@@ -1195,8 +1195,9 @@ class BendersSolver:
         self.__prob = self.sub_problem.prob if isinstance(self.sub_problem, SubProblems) else None
 
         # Callbacks
-        self._context = BendersContext(self.master_problem, self.sub_problem, self.result, self)
+        self._context = BendersContext(self, self.master_problem, self.sub_problem, self.result, [])
         self._callback_manager = _CallbackManager()
+        self.__callback_terminate = False
 
         # Ensure at least one cut generator is provided
         assert self.optimality_cut or self.feasibility_cut, "Provide at least <optimality_cut> or <feasibility_cut>."
@@ -1316,6 +1317,9 @@ class BendersSolver:
         The method to add one or multiple :class:`OptimalityCut` to :class:`MasterProblem`.
         """
         cuts = self.optimality_cut._generate()
+        self._context.cuts_generated = cuts
+        self._trigger_callbacks(EVENTS.ON_OPTI_CUT_GENERATED)
+
         for cut in cuts:
             self.master_problem.add_cut(cut)
 
@@ -1324,6 +1328,9 @@ class BendersSolver:
         The method to add one or multiple :class:`FeasibilityCut` to :class:`MasterProblem`.
         """
         cuts = self.feasibility_cut._generate()
+        self._context.cuts_generated = cuts
+        self._trigger_callbacks(EVENTS.ON_FEAS_CUT_GENERATED)
+
         for cut in cuts:
             self.master_problem.add_cut(cut)
 
@@ -1381,6 +1388,11 @@ class BendersSolver:
             self.result.status = CST.OPTIMAL
             return True
 
+        # User-defined callback termination
+        if self.__callback_terminate:
+            self.result.status = CST.TERMINATED
+            return True
+
         return False
 
     def __preprocess(self):
@@ -1413,6 +1425,8 @@ class BendersSolver:
 
         # Initialize
         self.__preprocess()
+        self._trigger_callbacks(EVENTS.ON_MASTER_BUILD)
+        self._trigger_callbacks(EVENTS.ON_SUB_BUILD)
         self._trigger_callbacks(EVENTS.ON_BENDERS_START)
 
         self.result.status = CST.UNSOLVED
@@ -1424,7 +1438,10 @@ class BendersSolver:
         while self.result.n_iter <= self.params.iter_limit:
             self.result.n_iter += 1
             tm = time.perf_counter()
+            self._trigger_callbacks(EVENTS.ON_ITERATION_START)
+            self._trigger_callbacks(EVENTS.ON_BEFORE_MASTER_SOLVE)
             self.master_problem.solve()
+            self._trigger_callbacks(EVENTS.ON_AFTER_MASTER_SOLVE)
             self.result.runtime_master += time.perf_counter() - tm
 
             if self.master_problem.status == CST.OPTIMAL:
@@ -1432,7 +1449,9 @@ class BendersSolver:
                 var_values = self.master_problem.get_var_values(self.complicating_vars)
                 self.sub_problem.fix_vars(var_values)
                 ts = time.perf_counter()
+                self._trigger_callbacks(EVENTS.ON_BEFORE_SUB_SOLVE)
                 self.sub_problem.solve()
+                self._trigger_callbacks(EVENTS.ON_AFTER_SUB_SOLVE)
                 self.result.runtime_sub += time.perf_counter() - ts
 
                 # Sub problem is infeasible -> add feasibility cut
@@ -1471,6 +1490,8 @@ class BendersSolver:
             else:
                 self.result.status = CST.UNKNOWN
                 raise ValueError(f"Master problem returned an unexpected status: {self.master_problem.status}.")
+
+            self._trigger_callbacks(EVENTS.ON_ITERATION_END)
 
         # Finalize
         self.result.time = time.perf_counter() - time_start

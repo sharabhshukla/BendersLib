@@ -38,8 +38,6 @@ See :doc:`enhance` for advanced acceleration techniques implemented via callback
    ~BendersCallback.on_after_sub_solve
    ~BendersCallback.on_feas_cut_generated
    ~BendersCallback.on_opti_cut_generated
-   ~BendersCallback.on_cut_generated
-   ~BendersCallback.on_new_incumbent
    ~BendersCallback.on_new_upper_bound
 
 .. mermaid
@@ -61,56 +59,8 @@ The **function-based** callbacks is a simpler, more direct way to respond to eve
 maintain state. Each callback function is independent.
 A callback can also terminate the Benders process prematurely by returning the constant :attr:`~BendersConsts.TERMINATE`.
 
-The following example demonstrates how to define and register both types of callbacks,
-and how to use a callback to terminate the process.
+The following :doc:`example <../examples/simple_callback>` demonstrates how to define and register both types of callbacks.
 
-.. code-block:: python
-
-    from benderslib import ClassicalBenders, BendersCallback, BendersContext, BendersConsts
-    from benderslib.solvers import Gurobi
-
-    # --- 1. Define callbacks ---
-
-    # Class-based callback
-    class MyCallback(BendersCallback):
-        def on_benders_start(self, context: BendersContext):
-            print("Benders process has started.")
-
-        def on_iteration_end(self, context: BendersContext):
-            print(f"Iteration {context.state.n_iter} has ended.")
-            # Terminate if the lower bound exceeds a certain value
-            if context.state.lb > 500:
-                print("Termination condition met. Stopping Benders process.")
-                return BendersConsts.TERMINATE
-
-    # Function-based callback
-    def on_benders_end(context: BendersContext):
-        print("Benders process has finished.")
-        print(f"Final result: {context.state}")
-
-
-    # --- 2. Initialize BendersSolver ---
-
-    # (Assuming you have your master and subproblem models defined)
-    # master_model = ...
-    # sub_model = ...
-    benders_solver = ClassicalBenders.from_models(
-        master_model, Gurobi,
-        sub_model, Gurobi,
-        complicating_vars=complicating_vars
-    )
-
-
-    # --- 3. Register callbacks ---
-
-    benders_solver.register_callback(MyCallback())
-    benders_solver.register_callback(on_benders_end)
-
-    # --- 4. Run the solver ---
-
-    benders_solver.solve()
-
-.. admonition:: Example
-    :class: note
-
-    :doc:`../examples/simple_callback`
+.. literalinclude:: ../examples/simple_callback.py
+    :lines: 39-
+    :caption: Defining and registering callbacks in BendersLib

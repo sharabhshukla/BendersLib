@@ -13,7 +13,7 @@ The inheritance relationships are also shown in their respective sections.
     :caption: BendersLib Core Classes
     :align: center
 
-    flowchart LR
+    flowchart TB
 
     style Cut fill:#D6EAF8,stroke:#333,stroke-width:1px
     style OptimalityCut fill:#D6EAF8,stroke:#333,stroke-width:1px
