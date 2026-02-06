@@ -11,7 +11,7 @@ with custom subproblem solver using BendersLib.
 The BendersLib accept a function or an instance class inherited from :class:`LogicBasedSubProblem`
 as the input (``sub_problem``) of :class:`LogicBasedBenders`.
 
-For custom cut generators, please refer to :doc:`cbd_iis` and :doc:`ilshape_iis`.
+For custom cut generators, please refer to :doc:`cbd_iis` and :doc:`ilshaped_iis`.
 """
 
 # %%

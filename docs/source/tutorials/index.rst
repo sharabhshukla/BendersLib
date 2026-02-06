@@ -89,8 +89,8 @@ Contents
 
    classical.rst
    cbd.rst
-   lshape.rst
-   ilshape.rst
+   lshaped.rst
+   ilshaped.rst
    lbbd.rst
    gbd.rst
    nested.rst

@@ -17,12 +17,12 @@ A Benders decomposition variant usually require one or two features to work prop
 
 * **Dual**:
   The solver can provide dual values of constraints. This is essential for generating *classical optimality cuts*.
-  This feature can be required by :doc:`../tutorials/classical` and :doc:`../tutorials/lshape` implemented
+  This feature can be required by :doc:`../tutorials/classical` and :doc:`../tutorials/lshaped` implemented
   with :class:`ClassicalBenders` and :class:`LShaped`, respectively, if the user wants to add optimality cuts.
 * **Farkas**:
   The solver can provide a Farkas certificate of infeasibility (an extreme ray of the dual).
   This is used to generate *classical feasibility cuts*.
-  This feature can be required by :doc:`../tutorials/classical` and :doc:`../tutorials/lshape` implemented
+  This feature can be required by :doc:`../tutorials/classical` and :doc:`../tutorials/lshaped` implemented
   with :class:`ClassicalBenders` and :class:`LShaped`, respectively, if the user wants to add feasibility cuts.
 * **IIS**:
   The solver can find an Irreducible Inconsistent Subsystem (IIS).

@@ -5,7 +5,7 @@ from ..cuts import IntegerLShapedOCGen, IntegerLShapedFCGen
 
 
 class IntegerLShaped(BendersSolver):
-    """An implementation of :doc:`../tutorials/ilshape`.
+    """An implementation of :doc:`../tutorials/ilshaped`.
 
     It is for two-stage stochastic programming with binary complicating variables and integer recourse.
     It builds a Benders decomposition framework using the provided master problem,

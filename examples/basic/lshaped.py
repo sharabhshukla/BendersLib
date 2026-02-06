@@ -157,11 +157,11 @@ if __name__ == '__main__':
 #
 # .. admonition:: References
 #
-#     * Tutorial of the L-shaped method: :doc:`../../tutorials/lshape`
+#     * Tutorial of the L-shaped method: :doc:`../../tutorials/lshaped`
 #     * This example uses the following class: :class:`~benderslib.LShaped`
 #
 # .. seealso::
 #
-#     * Example of integer L-shaped method: :doc:`ilshape`
+#     * Example of integer L-shaped method: :doc:`ilshaped`
 #
 # .. tags:: l-shaped, solver: gurobi, stochastic

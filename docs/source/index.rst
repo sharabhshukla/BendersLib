@@ -121,8 +121,8 @@ with interfaces to popular solvers.
 *   Annotation Benders Decomposition: :ref:`Implementation <api-annotation>`, :doc:`Example <examples/basic/annotation_benders>`
 *   Classical Benders Decomposition: :doc:`Tutorial <tutorials/classical>`, :class:`~benderslib.ClassicalBenders`, :doc:`Example <examples/basic/classical_benders>`
 *   Combinatorial Benders Decomposition: :doc:`Tutorial <tutorials/cbd>`, :class:`~benderslib.CombinatorialBenders`, :doc:`Example <examples/basic/cbd>`
-*   L-shaped Method: :doc:`Tutorial <tutorials/lshape>`, :class:`~benderslib.LShaped`, :doc:`Example <examples/basic/lshape>`
-*   Integer L-shaped Method: :doc:`Tutorial <tutorials/ilshape>`, :class:`~benderslib.IntegerLShaped`, :doc:`Example <examples/basic/ilshape>`
+*   L-shaped Method: :doc:`Tutorial <tutorials/lshaped>`, :class:`~benderslib.LShaped`, :doc:`Example <examples/basic/lshaped>`
+*   Integer L-shaped Method: :doc:`Tutorial <tutorials/ilshaped>`, :class:`~benderslib.IntegerLShaped`, :doc:`Example <examples/basic/ilshaped>`
 *   **Customizing your own Benders Decomposition**: :doc:`Example <examples/api/custom_template>`
 
 The variants supported are not limited to the above.

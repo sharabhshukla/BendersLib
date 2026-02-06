@@ -23,7 +23,7 @@ Your problem is likely a good fit for Benders Decomposition if you can answer *y
   Benders Decomposition is designed for problems where variables can be split into two sets: complicating and subproblem variables.
   When the complicating variables are fixed to a specific value, the remaining problem should decompose into one
   or more independent and much simpler subproblems.
-  A :ref:`block-diagonal structure <tutorials-lshape-block>` connected by a few linking variables is a classic example of this.
+  A :ref:`block-diagonal structure <tutorials-lshaped-block>` connected by a few linking variables is a classic example of this.
 
 * **Does the problem become easy after fixing the complicating variables?**
 

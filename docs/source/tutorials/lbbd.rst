@@ -112,8 +112,8 @@ Logic-based Benders Cuts
 
 A key challenge in implementing LBBD is translating the general cut :math:`z \geq B_{\bar{x}^k}(x)` from
 the master problem into a concrete mathematical constraint.
-Unlike the standard cuts in :doc:`../tutorials/classical`, :doc:`../tutorials/cbd`, :doc:`../tutorials/lshape`,
-or :doc:`../tutorials/ilshape`, logic-based Benders cuts are problem-specific.
+Unlike the standard cuts in :doc:`../tutorials/classical`, :doc:`../tutorials/cbd`, :doc:`../tutorials/lshaped`,
+or :doc:`../tutorials/ilshaped`, logic-based Benders cuts are problem-specific.
 
 .. note::
     Hooker's Book (Chapter 3) [3]_ summarized various forms of logic-based Benders cuts,
@@ -128,14 +128,14 @@ or :doc:`../tutorials/ilshape`, logic-based Benders cuts are problem-specific.
 
        (x = \bar{x}^k) \Rightarrow (z \geq \beta_k)
 
-    This is essentially the :class:`CombinatorialOC` in :doc:`../tutorials/cbd` and :doc:`../tutorials/ilshape`.
+    This is essentially the :class:`CombinatorialOC` in :doc:`../tutorials/cbd` and :doc:`../tutorials/ilshaped`.
     It states that if the master problem again chooses the solution :math:`\bar{x}^k`,
     then the objective :math:`z` must be at least the lower bound :math:`\beta_k` that was inferred for this solution.
     This logical form can be directly translated into
     :abbr:`indicator constraints (where a constraint is activated only when a binary variable takes a certain value)`,
     which are supported by many modern mathematical programming solvers.
     It can be linearized using big-M formulations, which has been introduced
-    in :doc:`../tutorials/cbd` and :doc:`../tutorials/ilshape`.
+    in :doc:`../tutorials/cbd` and :doc:`../tutorials/ilshaped`.
 
     :math:`(x = \bar{x}^k) \Rightarrow (z \geq \beta_k)` is presented here for illustrative purposes.
     It can be weaker than :math:`z \geq B_{\bar{x}^k}(x)`
@@ -154,7 +154,7 @@ Depending on the subproblem outcome for a given :math:`\bar{x}^k`, the cut conve
 
 The LBBD framework is particularly well-suited for problems involving integer variables in both the master and subproblems.
 When applying LBBD to stochastic programming problems, cuts are generated for each discrete scenario or aggregated for all scenarios,
-similar to :doc:`../tutorials/lshape` and :doc:`../tutorials/ilshape`.
+similar to :doc:`../tutorials/lshaped` and :doc:`../tutorials/ilshaped`.
 
 .. note::
 
@@ -212,7 +212,7 @@ The main challenge in applying LBBD is to design a problem-specific cut generati
     * Hooker's book [3]_ that comprehensively covers LBBD theory and applications.
     * LBBD for planning and scheduling with specific examples and logic-based Benders cuts [4]_.
     * LBBD for stochastic optimization with specific examples and logic-based Benders cuts [5]_.
-    * **Examples**: :doc:`../examples/advanced/lbbd`, :doc:`../examples/advanced/lbbd_sp`, :doc:`../examples/advanced/lbbd_lshape`, and :doc:`../examples/applications/lbbd_location`.
+    * **Examples**: :doc:`../examples/advanced/lbbd`, :doc:`../examples/advanced/lbbd_sp`, :doc:`../examples/advanced/lbbd_lshaped`, and :doc:`../examples/applications/lbbd_location`.
 
 References
 ----------

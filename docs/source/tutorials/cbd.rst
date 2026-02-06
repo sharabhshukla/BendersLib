@@ -136,7 +136,7 @@ Combinatorial Optimality Cut
 
 .. note::
 
-    *   This type of cut can be seen a special case of integer L-shaped cut [2]_ (see :doc:`ilshape` for more details),
+    *   This type of cut can be seen a special case of integer L-shaped cut [2]_ (see :doc:`ilshaped` for more details),
         when there is only one scenario in stochastic programming.
     *   The value of :math:`M` should be as small as possible to keep the cut strong. A valid choice is any upper bound on the subproblem cost.
 

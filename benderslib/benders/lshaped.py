@@ -5,7 +5,7 @@ from ..cuts import LShapedOCGen, LShapedFCGen
 
 
 class LShaped(BendersSolver):
-    """An implementation of :doc:`../tutorials/lshape` (linear recourse).
+    """An implementation of :doc:`../tutorials/lshaped` (linear recourse).
 
     It builds a Benders decomposition framework using the provided master problem,
     subproblem, and complicating variables.

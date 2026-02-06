@@ -5,7 +5,7 @@ from ..cuts import LShapedFCGen, GeneLShapedOCGen
 
 
 class GeneLShaped(BendersSolver):
-    """An implementation of :doc:`../tutorials/lshape` (convex recourse).
+    """An implementation of :doc:`../tutorials/lshaped` (convex recourse).
 
     This method extends the L-shaped method to two-stage stochastic programming problems
     with convex second-stage (recourse) problems. It combines the multi-scenario

@@ -220,7 +220,7 @@ This method returns a set of variable names that are part of the IIS.
 .. admonition:: Example
     :class: note
 
-    :doc:`../examples/iis/index`, :doc:`../examples/advanced/cbd_iis`, :doc:`../examples/advanced/ilshape_iis`
+    :doc:`../examples/iis/index`, :doc:`../examples/advanced/cbd_iis`, :doc:`../examples/advanced/ilshaped_iis`
 
 
 Create Multiple Subproblems
@@ -257,7 +257,7 @@ This class takes an iterable of :class:`SubProblem` instances and their correspo
 .. admonition:: Example
     :class: note
 
-    :doc:`../examples/basic/lshape`, :doc:`../examples/advanced/lbbd_lshape`
+    :doc:`../examples/basic/lshaped`, :doc:`../examples/advanced/lbbd_lshaped`
 
 Solve and Access Results
 -------------------------------------------------
@@ -426,7 +426,7 @@ Simply create instances of your custom subproblem class for each scenario and pa
 .. admonition:: Example
     :class: note
 
-    See :doc:`../examples/advanced/lbbd_lshape` for how to implement the L-shaped method,
+    See :doc:`../examples/advanced/lbbd_lshaped` for how to implement the L-shaped method,
     which involves multiple subproblems, using logic-based Benders decomposition with custom subproblem classes.
 
 Multiple Custom Subproblems (function-based)

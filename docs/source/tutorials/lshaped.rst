@@ -58,7 +58,7 @@ has a clear **"L" shape**. The first-stage constraint matrix :math:`A` forms the
 matrices :math:`T_\omega` stack vertically below it. The recourse matrix :math:`W` forms a block-diagonal pattern,
 and the top-right of the overall matrix is all zeros.
 
-.. _tutorials-lshape-block:
+.. _tutorials-lshaped-block:
 
 .. math::
    \begin{pmatrix}
@@ -280,7 +280,7 @@ Users may formulate their problems to deterministic equivalents manually for com
     * BendersLib's implementation of the feasibility cut: :class:`ClassicalFC`.
     * BendersLib's implementation of the L-shaped methods:
       :class:`LShaped` (linear recourse) and :class:`GeneLShaped` (convex recourse).
-    * **Examples**: :doc:`../examples/basic/lshape` and :doc:`../examples/basic/glshape`.
+    * **Examples**: :doc:`../examples/basic/lshaped` and :doc:`../examples/basic/glshaped`.
 
 
 References

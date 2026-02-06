@@ -97,7 +97,7 @@ class CombinatorialOCGen(CutGenerator):
 
 
 class LShapedOCGen(CutGenerator):
-    """The optimality cut generator for :doc:`../tutorials/lshape` (linear recourse)."""
+    """The optimality cut generator for :doc:`../tutorials/lshaped` (linear recourse)."""
 
     def __init__(self, master_problem, sub_problem, params):
         super().__init__(master_problem, sub_problem, params)
@@ -159,7 +159,7 @@ class LShapedOCGen(CutGenerator):
 
 
 class LShapedFCGen(CutGenerator):
-    """The feasibility cut generator for :doc:`../tutorials/lshape`."""
+    """The feasibility cut generator for :doc:`../tutorials/lshaped`."""
 
     def __init__(self, master_problem, sub_problem, params):
         super().__init__(master_problem, sub_problem, params)
@@ -193,7 +193,7 @@ class LShapedFCGen(CutGenerator):
 
 
 class IntegerLShapedOCGen(CutGenerator):
-    """The optimality cut generator for :doc:`../tutorials/ilshape`."""
+    """The optimality cut generator for :doc:`../tutorials/ilshaped`."""
 
     def __init__(self, master_problem, sub_problem, params):
         super().__init__(master_problem, sub_problem, params)
@@ -240,7 +240,7 @@ class IntegerLShapedOCGen(CutGenerator):
 
 
 class IntegerLShapedFCGen(CutGenerator):
-    """The feasibility cut generator for :doc:`../tutorials/ilshape`."""
+    """The feasibility cut generator for :doc:`../tutorials/ilshaped`."""
 
     def __init__(self, master_problem, sub_problem, params):
         super().__init__(master_problem, sub_problem, params)
@@ -298,7 +298,7 @@ class GeneralizedFCGen(CutGenerator):
 
 
 class GeneLShapedOCGen(CutGenerator):
-    """The optimality cut generator for :doc:`../tutorials/lshape` (convex recourse)."""
+    """The optimality cut generator for :doc:`../tutorials/lshaped` (convex recourse)."""
 
     def __init__(self, master_problem, sub_problem, params):
         super().__init__(master_problem, sub_problem, params)

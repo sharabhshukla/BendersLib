@@ -266,7 +266,7 @@ class CombinatorialOC(OptimalityCut):
 
 
 class LShapedOC(OptimalityCut):
-    """The optimality cut for :doc:`../tutorials/lshape` (single-cut & linear recourse).
+    """The optimality cut for :doc:`../tutorials/lshaped` (single-cut & linear recourse).
 
     This class encapsulates the aggregation logic. It takes raw data from all
     scenarios (probabilities, duals, matrices) and computes the final cut.
@@ -485,7 +485,7 @@ class GeneralizedFC(ClassicalFC):
 
 
 class GeneLShapedOC(OptimalityCut):
-    """The optimality cut for :doc:`../tutorials/lshape` (single-cut & convex recourse).
+    """The optimality cut for :doc:`../tutorials/lshaped` (single-cut & convex recourse).
 
     It extends the L-shaped method to handle convex subproblems, acting as a hybrid
     of :class:`GeneralizedOC` and :class:`LShapedOC`. While :class:`LShapedOC` aggregates cuts from

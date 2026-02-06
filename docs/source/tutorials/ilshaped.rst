@@ -8,7 +8,7 @@ Integer L-shaped Method
 
 .. default-role:: raw-latex
 
-The Integer L-shaped method [1]_ extends the :doc:`cbd` and :doc:`lshape` to handle **two-stage stochastic integer programming**
+The Integer L-shaped method [1]_ extends the :doc:`cbd` and :doc:`lshaped` to handle **two-stage stochastic integer programming**
 with binary complicating variables in the first stage and integer recourse variables in the second stage.
 In these problems, the second-stage (recourse) decisions include integer variables, making the subproblems MILP rather than simple LP.
 Because MILPs do not have a strong, readily-available dual like LPs do, the classical Benders cuts derived from duality are not applicable.
@@ -28,7 +28,7 @@ The problem structure is similar to that of the standard L-shaped method, but th
                      & y_\omega \in Y_\omega, \quad \forall \omega \in \Omega
    \end{aligned}
 
-The key differences from the :doc:`lshape` are:
+The key differences from the :doc:`lshaped` are:
 
 *   The first-stage complicating variables :math:`x` are required to be **binary** for generating combinatorial cuts.
 *   The second-stage feasible region :math:`Y_\omega` contains **integer** variables, no longer just continuous ones.
@@ -145,7 +145,7 @@ This cut provides a lower bound on the expected recourse cost :math:`\theta`.
 Multi Integer Optimality Cut
 """""""""""""""""""""""""""""""
 
-Similar to the :doc:`lshape`, a multi-cut version can be derived where each scenario contributes its own cut.
+Similar to the :doc:`lshaped`, a multi-cut version can be derived where each scenario contributes its own cut.
 
 *   **Logic:** A separate recourse cost variable :math:`\theta_\omega` is introduced for each scenario in the master problem,
     with the objective :math:`c^T x + \sum_{\omega \in \Omega} p_\omega \theta_\omega`. A separate optimality cut is added for each scenario.
@@ -159,7 +159,7 @@ Similar to the :doc:`lshape`, a multi-cut version can be derived where each scen
     and :math:`L_\omega` is a lower bound on the individual recourse cost :math:`\theta_\omega`.
 
 .. note::
-    The tradeoff between single-cut and multi-cut in the :doc:`lshape` is also relevant to the Integer L-shaped method.
+    The tradeoff between single-cut and multi-cut in the :doc:`lshaped` is also relevant to the Integer L-shaped method.
 
     *   **Single-cut vs. Multi-cut:**
 
@@ -174,7 +174,7 @@ Similar to the :doc:`lshape`, a multi-cut version can be derived where each scen
 Algorithm
 -----------------------------------
 
-The iterative procedure combines the loops of the :doc:`lshape` method with the cut generation logic of the :doc:`cbd`.
+The iterative procedure combines the loops of the :doc:`lshaped` method with the cut generation logic of the :doc:`cbd`.
 
 #. **Initialization**
 
@@ -225,11 +225,11 @@ The iterative procedure combines the loops of the :doc:`lshape` method with the 
 
 .. seealso::
     *   Rahmaniani et al. [#]_ discussed Benders decomposition with discrete subproblems.
-    *   See :doc:`lshape` for the basis for the two-stage stochastic programming structure.
+    *   See :doc:`lshaped` for the basis for the two-stage stochastic programming structure.
     *   See :doc:`cbd` for the basis for the no-good cut and combinatorial optimality cut.
     * BendersLib's implementation of optimality and feasibility cuts: :class:`CombinatorialOC` and :class:`NoGoodFC`.
     * BendersLib's implementation of the Integer L-shaped method: :class:`IntegerLShaped`.
-    * **Examples**: :doc:`../examples/basic/ilshape` and :doc:`../examples/advanced/ilshape_iis`.
+    * **Examples**: :doc:`../examples/basic/ilshaped` and :doc:`../examples/advanced/ilshaped_iis`.
 
 
 References
