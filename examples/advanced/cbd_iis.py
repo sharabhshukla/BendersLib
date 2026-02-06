@@ -121,3 +121,5 @@ if __name__ == '__main__':
 #
 #     * Tutorial of Combinatorial Benders Decomposition: :doc:`../../tutorials/cbd`
 #     * This example uses the following classes: :class:`~benderslib.AnnotationBenders`, :class:`~benderslib.CombinatorialBenders`
+#
+# .. tags:: combinatorial, solver: gurobi, deterministic, custom cut, iis

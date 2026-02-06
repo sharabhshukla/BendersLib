@@ -88,3 +88,7 @@ if __name__ == '__main__':
     BD.solve()
 
     draw_curve(BD.result)
+
+# %%
+#
+# .. tags:: combinatorial, solver: cplex (cp), deterministic

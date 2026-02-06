@@ -66,3 +66,5 @@ print(master)
 # .. seealso::
 #
 #     * Automated decomposition based on master problem variables: :doc:`../../examples/basic/annotation_benders`
+#
+# .. tags:: solver: gurobi

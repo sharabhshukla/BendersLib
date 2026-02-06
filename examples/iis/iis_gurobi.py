@@ -42,3 +42,7 @@ if __name__ == '__main__':
     print("Optimization status :", sub_problem_solver.status)
     iis_vars = sub_problem_solver.compute_iis()
     print("Variables in the IIS:", iis_vars)
+
+# %%
+#
+# .. tags:: solver: gurobi, iis

@@ -35,7 +35,11 @@ extensions = [
     'sphinxcontrib.mermaid',  # Mermaid diagrams
     # 'sphinx_tabs.tabs',  # Tabbed content, works with Shibuya theme
     'sphinx_inline_tabs',
+    'sphinx_tags',
 ]
+
+# sphinx_tags configuration
+tags_create_tags = True
 
 autodoc_default_options = {
     'members': True,  # Document members (methods, attributes, etc.)

@@ -83,3 +83,7 @@ if __name__ == '__main__':
     BD.solve()
 
     draw_curve(BD.result)
+
+# %%
+#
+# .. tags:: classical, solver: ortools (cp), deterministic

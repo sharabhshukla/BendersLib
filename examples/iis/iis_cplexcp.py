@@ -51,3 +51,7 @@ if __name__ == '__main__':
     sub_problem_solver.solve()
     iis_vars = sub_problem_solver.compute_iis()
     print("Variables involved in the IIS:", iis_vars)
+
+# %%
+#
+# .. tags:: solver: cplex (cp), iis

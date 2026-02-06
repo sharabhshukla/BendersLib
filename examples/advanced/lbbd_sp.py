@@ -66,3 +66,5 @@ LBBD.solve()
 #
 #     * Tutorial of the Logic-based Benders Decomposition: :doc:`../../tutorials/lbbd`
 #     * This example uses the following class: :class:`LogicBasedBenders`
+#
+# .. tags:: lbbd, solver: gurobi, stochastic, custom subproblem

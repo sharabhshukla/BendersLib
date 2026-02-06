@@ -137,3 +137,5 @@ if __name__ == '__main__':
 # .. seealso::
 #
 #     * Example of the L-shaped method: :doc:`../basic/lshape`
+#
+# .. tags:: lbbd, l-shaped, solver: gurobi, stochastic, custom subproblem

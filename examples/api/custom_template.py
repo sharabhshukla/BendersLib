@@ -10,6 +10,7 @@ from gurobipy import Model
 from benderslib import BendersSolver, Cut, CutGenerator, MasterProblem, SubProblem, BendersParams
 from benderslib.solvers import Gurobi
 
+
 # %%
 # Define master problem and subproblem using your preferred solver interface:
 def master_problem():
@@ -72,3 +73,7 @@ if __name__ == '__main__':
         # optimality_cut=opti_cut_generator,
     )
     # BD.solve()
+
+# %%
+#
+# .. tags:: solver: gurobi, custom cut

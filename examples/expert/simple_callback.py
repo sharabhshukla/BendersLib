@@ -73,3 +73,7 @@ benders.register_callback(on_iteration_end)
 
 # Solve the problem
 benders.solve()
+
+# %%
+#
+# .. tags:: classical, solver: gurobi, deterministic, callback

@@ -102,3 +102,5 @@ if __name__ == '__main__':
 # .. seealso::
 #
 #     * Automated decomposition based on complicating variables: :doc:`annotation_benders`
+#
+# .. tags:: classical, solver: gurobi, deterministic

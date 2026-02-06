@@ -115,7 +115,7 @@ if __name__ == '__main__':
         sub_solver=Gurobi,
         complicating_vars=complicating_vars,
         prob=probs,
-        params=BendersParams(multi_opti_cut =True)
+        params=BendersParams(multi_opti_cut=True)
     )
     BD.solve()
 
@@ -149,3 +149,5 @@ if __name__ == '__main__':
 #     * Tutorial of the L-shaped method: :doc:`../../tutorials/lshape`
 #     * Tutorial of the Generalized Benders Decomposition: :doc:`../../tutorials/gbd`
 #     * This example uses the following class: :class:`~benderslib.benders.GeneLShaped`
+#
+# .. tags:: generalized, l-shaped, solver: gurobi, stochastic

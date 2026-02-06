@@ -166,3 +166,5 @@ if __name__ == '__main__':
 # .. seealso::
 #
 #     * Example of the L-shaped method: :doc:`../basic/lshape`
+#
+# .. tags:: integer l-shaped, solver: gurobi, stochastic, custom cut, iis

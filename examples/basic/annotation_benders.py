@@ -84,3 +84,5 @@ if __name__ == '__main__':
 # .. admonition:: References
 #
 #     This example uses the following classes: :class:`~benderslib.AnnotationBenders`, :class:`~benderslib.ClassicalBenders`
+#
+# .. tags:: classical, solver: gurobi, deterministic
