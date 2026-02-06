@@ -12,7 +12,7 @@ To create a master problem, you first need to build a ``model`` using one of the
 :ref:`supported solvers <solver-table>`' official modeling APIs.
 The solvers' official documentation provides detailed instructions on how to create models.
 Then, you can create a :class:`MasterProblem` instance by passing the ``model``
-wrapped with its corresponding :doc:`solver interface <../api/solver>` in BendersLib.
+wrapped with its corresponding :doc:`solver interface <../api/solvers>` in BendersLib.
 
 The Benders decomposition methods typically involve estimating the subproblem costs in the master problem.
 These estimates are represented by special variables called **estimator variables** (:math:`\theta` or :math:`\eta`).

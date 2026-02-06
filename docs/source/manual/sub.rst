@@ -12,7 +12,7 @@ To create a master problem, you first need to build a ``model`` using one of the
 :ref:`supported solvers <solver-table>`' official modeling APIs.
 The solvers' official documentation provides detailed instructions on how to create models.
 Then, you can create a :class:`SubProblem` instance by passing the ``model``
-wrapped with its corresponding :doc:`solver interface <../api/solver>` in BendersLib.
+wrapped with its corresponding :doc:`solver interface <../api/solvers>` in BendersLib.
 
 The complicating variables in the master problem **must** also appear in the subproblem with exactly the same names.
 This is crucial for the correct functioning.

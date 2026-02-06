@@ -28,7 +28,7 @@ class ProblemBase:
 
     def __init__(self, solver_backend: SolverBase):
         self.solver: SolverBase = solver_backend
-        """An instance of the solver backend (see classes in :doc:`../api/solver`)."""
+        """An instance of the solver backend (see classes in :doc:`../api/solvers`)."""
         self.model = self.solver.model
         """A copy of the original solver model instance.
         

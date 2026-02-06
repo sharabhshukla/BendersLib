@@ -26,7 +26,7 @@ class GeneralizedBenders(BendersSolver):
             the subproblem constraints must form a **linear system** with decision variables being continuous.
             When you need both types of cuts, the subproblem must satisfy both conditions.
 
-        - There are also limitations from :doc:`solver backends <../manual/solver>` regarding the types of problems
+        - There are also limitations from :doc:`solver backends <../manual/solvers>` regarding the types of problems
           that can be handled, please refer to the documentation of each solver for details.
 
     Parameters

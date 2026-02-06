@@ -91,7 +91,7 @@ Other variants of Benders Decomposition follow a similar workflow, please refer 
 Step 1: Building the Master Problem
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Build a master problem using the API of an off-the-shelf solver :doc:`supported by BendersLib <solver>`,
+Build a master problem using the API of an off-the-shelf solver :doc:`supported by BendersLib <solvers>`,
 such as Gurobi.
 
 .. code-block:: python
@@ -128,7 +128,7 @@ Wrap the solver model with BendersLib's :class:`~.solvers.Gurobi` interface and 
 Step 2: Building the Subproblem
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Build a subproblem using the API of an off-the-shelf solver :doc:`supported by BendersLib <solver>`,
+Build a subproblem using the API of an off-the-shelf solver :doc:`supported by BendersLib <solvers>`,
 such as Gurobi.
 The subproblem can use a different solver from the master problem.
 

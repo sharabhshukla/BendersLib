@@ -143,10 +143,10 @@ For complete, runnable code, please see the :doc:`../examples/index`.
    quickstart.rst
    components.rst
    workflow.rst
-   solver.rst
+   solvers.rst
    master.rst
    sub.rst
-   cut.rst
+   cuts.rst
    benders.rst
    callbacks.rst
    enhance.rst

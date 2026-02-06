@@ -37,7 +37,7 @@ and the necessary :doc:`Benders cuts <../api/cuts>` and :ref:`cut generators <cu
        BendersLib-->>User: 5. Return solution
 
 The workflow involves modeling the master and subproblems using a
-:doc:`supported solver interface <solver>`,
+:doc:`supported solver interface <solvers>`,
 and then passing these models to the Benders class specified for your chosen decomposition method.
 You can then configure :class:`BendersParams` such as convergence tolerance and maximum iterations
 before invoking the :class:`BendersSolver.solve()` method.

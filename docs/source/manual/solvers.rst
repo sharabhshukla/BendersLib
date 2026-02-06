@@ -269,7 +269,7 @@ Any built-in solver interface is inherited from one of them, with the attributes
 Adding a new solver interface requires implementing these attributes and methods,
 especially the `abstract methods <https://docs.python.org/3/library/abc.html#abc.abstractmethod>`_.
 See :class:`SolverBase`  nd :class:`SolverCPBase` for the comprehensive API reference,
-and :doc:`built-in solver interfaces <../api/solver>` for examples.
+and :doc:`built-in solver interfaces <../api/solvers>` for examples.
 Note that the solver interfaces are not designed to be used directly by end-users.
 Use :class:`MasterProblem` and :class:`SubProblem` instead,
 which internally utilize the solver interfaces to interact with the optimization solvers.

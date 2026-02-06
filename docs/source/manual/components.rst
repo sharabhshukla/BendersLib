@@ -63,7 +63,7 @@ coordinating the solving process between the **Master Problem** and the **Subpro
 The **Cut Generator** is responsible for extracting information from
 the master problems's and subproblem's results to create **Benders Cut**.
 A unified **Solver Interface** allows BendersLib to interact with
-:doc:`various external optimization solvers <solver>` to solve both the master and subproblems.
+:doc:`various external optimization solvers <solvers>` to solve both the master and subproblems.
 This design enables users to flexibly define and combine different Benders decomposition strategies
 to meet the demands of various complex optimization problems.
 
@@ -74,8 +74,8 @@ Below is a brief overview of the main components in BendersLib.
 Users may visit the respective :doc:`index` for how to use and customize each component.
 Detailed API for each component can be found in the :doc:`API reference <../api/index>`.
 
-* :doc:`solver`:
-  The solver component provides a unified interface to :doc:`various external optimization solvers <solver>`.
+* :doc:`solvers`:
+  The solver component provides a unified interface to :doc:`various external optimization solvers <solvers>`.
   It defines a common set of methods for interacting with any solver, such as building models, adding variables,
   adding constraints, and triggering the solution process.
   This abstraction allows the main Benders algorithm to remain independent of the specific solver used.
