@@ -160,7 +160,7 @@ This is particularly useful when implementing advanced non-standard Benders deco
 Custom Benders Cut
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-While BendersLib's :doc:`built-in cut types <../api/cut>` are convenient,
+While BendersLib's :doc:`built-in cut types <../api/cuts>` are convenient,
 you can create your own custom cut class for clarity or to encapsulate specific logic.
 A custom cut class should inherit from :class:`OptimalityCut` or :class:`FeasibilityCut`.
 The primary purpose of a custom cut class is to structure the data required for a cut
@@ -190,7 +190,7 @@ in a way that is meaningful and user-friendly for your specific problem.
                 # Call the parent constructor
                 super().__init__(vars=vars, coefs=coefs, rhs=rhs, sense='<=', name="NoGoodFC")
 
-   More examples can be found in the source code of :doc:`../api/cut`.
+   More examples can be found in the source code of :doc:`../api/cuts`.
 
 Custom Cut Generator (class-based)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -330,7 +330,7 @@ and the generated ``BendersCut`` is added back to the :class:`MasterProblem`.
 
 Below are the attributes and methods of the :class:`Cut` and :class:`CutGenerator` classes.
 :class:`OptimalityCut` and :class:`FeasibilityCut` inherit from :class:`Cut`, and share the same attributes and methods.
-Please refer to :doc:`Benders Cuts <../api/cut>` and :doc:`Cut Generators <../api/benders>`
+Please refer to :doc:`Benders Cuts <../api/cuts>` and :doc:`Cut Generators <../api/benders>`
 for the attributes and methods of specific implementations.
 
 .. rubric:: :class:`Cut` - Attributes

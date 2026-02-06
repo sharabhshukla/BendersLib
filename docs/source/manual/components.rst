@@ -111,7 +111,7 @@ Detailed API for each component can be found in the :doc:`API reference <../api/
 
     * :class:`ProblemBase`, :class:`SubProblem`, :class:`LogicBasedSubProblem`, :class:`SubProblems`
 
-* :doc:`cut` (and cut generator):
+* :doc:`cuts` (and cut generator):
   This component is responsible for defining and generating the Benders cuts that link the subproblem's results
   back to the master problem. It includes logic for creating different types of cuts,
   such as optimality and feasibility cuts, based on the subproblem's solution.

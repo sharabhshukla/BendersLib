@@ -198,7 +198,7 @@ Add Benders Cuts to Master Problem
 
 The :class:`MasterProblem` class provides an :meth:`~MasterProblem.add_cut` method to add Benders cuts.
 The method :meth:`~MasterProblem.add_cut` take an instance of the :class:`Cut` class or its
-subclasses (:class:`OptimalityCut`, :class:`FeasibilityCut`, and :doc:`more <../api/cut>`)
+subclasses (:class:`OptimalityCut`, :class:`FeasibilityCut`, and :doc:`more <../api/cuts>`)
 as an argument.
 
 An optimality cut is added when the subproblem is feasible and provides a lower bound on the subproblem's cost.
@@ -276,7 +276,7 @@ The :class:`Cut` class requires you to explicitly define all components of a lin
     master_problem.add_cut(custom_cut)
 
 While the cut definition method described above is general and flexible, it is verbose.
-For standard Benders cuts, refer to :doc:`../api/cut` for more convenient ways to create cuts.
+For standard Benders cuts, refer to :doc:`../api/cuts` for more convenient ways to create cuts.
 
 Access and Remove Cuts
 ------------------------------------------------

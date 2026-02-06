@@ -5,7 +5,7 @@ Overview
 ----------------------
 
 The diagram below illustrates the :doc:`core` and their relationships in BendersLib.
-Other classes, including ones in :doc:`data`, :doc:`solver`, :doc:`cut`, and :doc:`benders`
+Other classes, including ones in :doc:`data`, :doc:`solver`, :doc:`cuts`, and :doc:`benders`
 are omitted for clarity.
 The inheritance relationships are also shown in their respective sections.
 
@@ -61,7 +61,7 @@ Contents
    data.rst
    solver.rst
    core.rst
-   cut.rst
+   cuts.rst
    benders.rst
    callbacks.rst
    exceptions.rst

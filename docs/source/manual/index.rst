@@ -39,7 +39,7 @@ BendersLib offers a flexible and powerful framework for implementing Benders dec
 
 *   **Rapid Prototyping**:
     BendersLib implements :ref:`several common Benders decomposition algorithms <manual_builtin_benders>`.
-    It also includes various :doc:`built-in Benders cuts <../api/cut>`,
+    It also includes various :doc:`built-in Benders cuts <../api/cuts>`,
     enabling users to quickly prototype and validate their models.
     This allows researchers and practitioners to quickly test the feasibility of a Benders decomposition approach
     for their specific problem without implementing the entire algorithm from scratch.
