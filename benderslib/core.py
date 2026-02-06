@@ -1528,7 +1528,7 @@ class BendersSolver:
 
         callback : CallbackBase | Callable
             A callback instance inherited from :class:`CallbackBase` or
-            a function with signature ``func(context: BendersContext)``.
+            a function with signature ``func(context: BendersContext) -> CST.PROCEED | CST.TERMINATE | None``.
 
         Example
         ---------------

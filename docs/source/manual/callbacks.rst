@@ -30,9 +30,11 @@ If a callback returns :attr:`~BendersConsts.PROCEED` or does not return anything
 The following pseudocode (source of :func:`~BendersSolver.solve`) illustrates the main stages of the
 Benders decomposition algorithm and the specific points at which each callback event is triggered.
 
+.. _callbacks-timeline:
+
+.. rubric:: Timeline of Callback Triggers
+
 .. parsed-literal::
-   :class: benders-pseudocode
-   :name: Timeline of Callback Triggers in Benders Decomposition
 
     // solve() method of BendersSolver is called
     trigger :meth:`~CallbackBase.on_master_build`

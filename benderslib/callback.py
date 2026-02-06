@@ -2,7 +2,7 @@
 
 from abc import ABC
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Callable, Type
+from typing import TYPE_CHECKING, Callable, Type, Union
 
 from .consts import BendersConsts as CST
 
@@ -59,7 +59,7 @@ class CallbackBase(ABC):
 
     The callbacks are passed to Benders decomposition instances via :meth:`~BendersSolver.register_callback`.
 
-    See :doc:`../manual/callbacks` for the timeline of when each callback is triggered.
+    See :ref:`callbacks-timeline` for the precise timeline of when each callback is triggered.
 
     Example
     ---------------
@@ -83,67 +83,67 @@ class CallbackBase(ABC):
         BD.register_callback(on_benders_end)
     """
 
-    def on_benders_start(self, context: BendersContext):
+    def on_benders_start(self, context: BendersContext) -> Union[None, CST.PROCEED, CST.TERMINATE]:
         """Called at the start of the Benders decomposition process."""
         ...
 
-    def on_benders_end(self, context: BendersContext):
+    def on_benders_end(self, context: BendersContext) -> Union[None, CST.PROCEED, CST.TERMINATE]:
         """Called at the end of the Benders decomposition process."""
         ...
 
-    def on_iteration_start(self, context: BendersContext):
+    def on_iteration_start(self, context: BendersContext) -> Union[None, CST.PROCEED, CST.TERMINATE]:
         """Called at the start of each Benders decomposition iteration."""
         ...
 
-    def on_iteration_end(self, context: BendersContext):
+    def on_iteration_end(self, context: BendersContext) -> Union[None, CST.PROCEED, CST.TERMINATE]:
         """Called at the end of each Benders decomposition iteration."""
         ...
 
-    def on_master_build(self, context: BendersContext):
+    def on_master_build(self, context: BendersContext) -> Union[None, CST.PROCEED, CST.TERMINATE]:
         """Called after the master problem is built."""
         ...
 
-    def on_sub_build(self, context: BendersContext):
+    def on_sub_build(self, context: BendersContext) -> Union[None, CST.PROCEED, CST.TERMINATE]:
         """Called after the subproblem is built."""
         ...
 
-    def on_before_master_solve(self, context: BendersContext):
+    def on_before_master_solve(self, context: BendersContext) -> Union[None, CST.PROCEED, CST.TERMINATE]:
         """Called before solving the master problem."""
         ...
 
-    def on_after_master_solve(self, context: BendersContext):
+    def on_after_master_solve(self, context: BendersContext) -> Union[None, CST.PROCEED, CST.TERMINATE]:
         """Called after solving the master problem."""
         ...
 
-    def on_before_sub_solve(self, context: BendersContext):
+    def on_before_sub_solve(self, context: BendersContext) -> Union[None, CST.PROCEED, CST.TERMINATE]:
         """Called before solving the subproblem."""
         ...
 
-    def on_after_sub_solve(self, context: BendersContext):
+    def on_after_sub_solve(self, context: BendersContext) -> Union[None, CST.PROCEED, CST.TERMINATE]:
         """Called after solving the subproblem."""
         ...
 
-    def on_opti_cut_generated(self, context: BendersContext):
+    def on_opti_cut_generated(self, context: BendersContext) -> Union[None, CST.PROCEED, CST.TERMINATE]:
         """Called when an optimality cut is generated."""
         ...
 
-    def on_feas_cut_generated(self, context: BendersContext):
+    def on_feas_cut_generated(self, context: BendersContext) -> Union[None, CST.PROCEED, CST.TERMINATE]:
         """Called when a feasibility cut is generated."""
         ...
 
-    def on_opti_cut_added(self, context: BendersContext):
+    def on_opti_cut_added(self, context: BendersContext) -> Union[None, CST.PROCEED, CST.TERMINATE]:
         """Called when an optimality cut is added to the master problem."""
         ...
 
-    def on_feas_cut_added(self, context: BendersContext):
+    def on_feas_cut_added(self, context: BendersContext) -> Union[None, CST.PROCEED, CST.TERMINATE]:
         """Called when a feasibility cut is added to the master problem."""
         ...
 
-    def on_new_lower_bound(self, context: BendersContext):
+    def on_new_lower_bound(self, context: BendersContext) -> Union[None, CST.PROCEED, CST.TERMINATE]:
         """Called when a higher lower bound is found."""
         ...
 
-    def on_new_upper_bound(self, context: BendersContext):
+    def on_new_upper_bound(self, context: BendersContext) -> Union[None, CST.PROCEED, CST.TERMINATE]:
         """Called when a lower upper bound is found."""
         ...
 

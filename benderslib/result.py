@@ -30,9 +30,9 @@ class BendersResult:
     obj: float = float('Inf')
     """Best objective value found."""
     gap_abs: float = float('Inf')
-    """Absolute gap between upper and lower bounds, defined as `abs(ub - lb)`."""
+    """Absolute gap between upper and lower bounds, defined as ``abs(ub - lb)``."""
     gap: float = float('Inf')
-    """Relative gap between upper and lower bounds, defined as `abs(ub - lb) / abs(ub)`."""
+    """Relative gap between upper and lower bounds, defined as ``abs(ub - lb) / abs(ub)``."""
     n_sol: int = 0
     """Number of feasible solutions found."""
     n_iter: int = 0
