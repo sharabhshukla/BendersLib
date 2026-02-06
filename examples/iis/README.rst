@@ -1,5 +1,5 @@
 Computing IIS
 ----------------------
 
-This directory contains example scripts demonstrating how to compute an
-Irreducible Infeasible Subsystem (IIS) using various solver interfaces.
+This section contains examples demonstrating how to compute an
+Irreducible Infeasible Subsystem (IIS) using various :ref:`solver interfaces <solver-table>`.

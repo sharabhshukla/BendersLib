@@ -1,4 +1,4 @@
 Solver Usage
 ----------------------
 
-This directory contains example scripts that demonstrate how to use the solver interfaces provided by the library.
+This section contains examples that demonstrate how to use the :ref:`solver interfaces <solver-table>` provided by BendersLib.

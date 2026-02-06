@@ -86,7 +86,7 @@ Other variants of Benders Decomposition follow a similar workflow, please refer 
 .. admonition:: Example
     :class: note
 
-    The executable code is available at :doc:`../examples/classical_benders`.
+    The executable code is available at :doc:`../examples/basic/classical_benders`.
 
 Step 1: Building the Master Problem
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

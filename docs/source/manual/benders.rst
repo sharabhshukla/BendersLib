@@ -242,8 +242,8 @@ Finally, it uses the specified Benders method (:class:`ClassicalBenders` in this
 .. admonition:: Example
     :class: note
 
-    :ref:`manual_decompose_solve`, :doc:`../examples/annotation_benders`, :doc:`../examples/api/decompose`,
-    :doc:`../examples/cbd`
+    :ref:`manual_decompose_solve`, :doc:`../examples/basic/annotation_benders`, :doc:`../examples/api/decompose`,
+    :doc:`../examples/basic/cbd`
 
 Customization
 -------------------------------------------
@@ -297,7 +297,7 @@ Here is a code snippet showing how to set up a :class:`LogicBasedBenders` instan
       :ref:`Custom Cut (Generator) <manual_custom_cut>` and :ref:`Custom Subproblem(s) <manual_custom_sub>`.
     - The class :class:`LogicBasedBenders` for logic-based Benders decomposition.
     - **Executable Examples** (logic-based Benders decomposition):
-      :doc:`../examples/lbbd_sp`, :doc:`../examples/lbbd_lshape`, and :doc:`../examples/lbbd_location`.
+      :doc:`../examples/advanced/lbbd_sp`, :doc:`../examples/advanced/lbbd_lshape`, and :doc:`../examples/applications/lbbd_location`.
 
 ====
 

@@ -90,7 +90,7 @@ Gurobi
 .. admonition:: Example
     :class: note
 
-    :doc:`../examples/classical_benders`
+    :doc:`../examples/basic/classical_benders`
 
 Pyomo
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -188,8 +188,8 @@ Here is an example of how to create a master/sub problem from an annotated model
 .. admonition:: Example
     :class: note
 
-    :ref:`manual_decompose_solve`, :doc:`../examples/annotation_benders`, :doc:`../examples/api/decompose`,
-    :doc:`../examples/cbd`
+    :ref:`manual_decompose_solve`, :doc:`../examples/basic/annotation_benders`, :doc:`../examples/api/decompose`,
+    :doc:`../examples/basic/cbd`
 
 .. _manual_master_add_cut:
 

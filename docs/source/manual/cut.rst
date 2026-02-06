@@ -287,7 +287,7 @@ It is equivalent to the earlier class-based example.
 .. admonition:: Example
     :class: note
 
-    :doc:`../examples/ilshape_iis`, :doc:`../examples/lbbd`, :doc:`../examples/lbbd_location`
+    :doc:`../examples/advanced/ilshape_iis`, :doc:`../examples/advanced/lbbd`, :doc:`../examples/applications/lbbd_location`
 
 ====
 

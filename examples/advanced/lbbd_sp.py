@@ -64,5 +64,5 @@ LBBD.solve()
 #
 # .. admonition:: References
 #
-#     * Tutorial of the Logic-based Benders Decomposition: :doc:`../tutorials/lbbd`
+#     * Tutorial of the Logic-based Benders Decomposition: :doc:`../../tutorials/lbbd`
 #     * This example uses the following class: :class:`LogicBasedBenders`

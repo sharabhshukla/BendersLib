@@ -119,5 +119,5 @@ if __name__ == '__main__':
 #
 # .. admonition:: References
 #
-#     * Tutorial of Combinatorial Benders Decomposition: :doc:`../tutorials/cbd`
+#     * Tutorial of Combinatorial Benders Decomposition: :doc:`../../tutorials/cbd`
 #     * This example uses the following classes: :class:`~benderslib.AnnotationBenders`, :class:`~benderslib.CombinatorialBenders`

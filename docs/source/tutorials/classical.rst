@@ -228,7 +228,7 @@ We implemented the method in :class:`~benderslib.ClassicalBenders`, and automate
     * Rahmaniani et al. [#]_ and Aardal et al. [#]_ also provide the method's mathematical formulation.
     * BendersLib's implementation of optimality and feasibility cuts: :class:`ClassicalOC` and :class:`ClassicalFC`.
     * BendersLib's implementation of the Benders method: :class:`ClassicalBenders`.
-    * **Examples**: :doc:`../examples/classical_benders` and :doc:`../examples/annotation_benders`.
+    * **Examples**: :doc:`../examples/basic/classical_benders` and :doc:`../examples/basic/annotation_benders`.
 
 References
 ------------------------------

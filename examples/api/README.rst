@@ -1,4 +1,4 @@
 API Oriented
 ----------------------
 
-This directory contains example scripts that demonstrate how to use the API provided by the library.
+This section contains examples that demonstrate how to use the API provided by BendersLib.

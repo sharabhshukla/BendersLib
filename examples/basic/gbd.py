@@ -153,5 +153,5 @@ if __name__ == '__main__':
 #
 # .. admonition:: References
 #
-#     * Tutorial of the Generalized Benders Decomposition: :doc:`../tutorials/gbd`
+#     * Tutorial of the Generalized Benders Decomposition: :doc:`../../tutorials/gbd`
 #     * This example uses the following class: :class:`GeneralizedBenders`

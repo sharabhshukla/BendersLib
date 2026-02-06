@@ -146,6 +146,6 @@ if __name__ == '__main__':
 #
 # .. admonition:: References
 #
-#     * Tutorial of the L-shaped method: :doc:`../tutorials/lshape`
-#     * Tutorial of the Generalized Benders Decomposition: :doc:`../tutorials/gbd`
+#     * Tutorial of the L-shaped method: :doc:`../../tutorials/lshape`
+#     * Tutorial of the Generalized Benders Decomposition: :doc:`../../tutorials/gbd`
 #     * This example uses the following class: :class:`~benderslib.benders.GeneLShaped`

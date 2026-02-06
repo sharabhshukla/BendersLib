@@ -118,11 +118,11 @@ with interfaces to popular solvers.
 
 **Benders Decomposition Variants:**
 
-*   Annotation Benders Decomposition: :ref:`Implementation <api-annotation>`, :doc:`Example <examples/annotation_benders>`
-*   Classical Benders Decomposition: :doc:`Tutorial <tutorials/classical>`, :class:`~benderslib.ClassicalBenders`, :doc:`Example <examples/classical_benders>`
-*   Combinatorial Benders Decomposition: :doc:`Tutorial <tutorials/cbd>`, :class:`~benderslib.CombinatorialBenders`, :doc:`Example <examples/cbd>`
-*   L-shaped Method: :doc:`Tutorial <tutorials/lshape>`, :class:`~benderslib.LShaped`, :doc:`Example <examples/lshape>`
-*   Integer L-shaped Method: :doc:`Tutorial <tutorials/ilshape>`, :class:`~benderslib.IntegerLShaped`, :doc:`Example <examples/ilshape>`
+*   Annotation Benders Decomposition: :ref:`Implementation <api-annotation>`, :doc:`Example <examples/basic/annotation_benders>`
+*   Classical Benders Decomposition: :doc:`Tutorial <tutorials/classical>`, :class:`~benderslib.ClassicalBenders`, :doc:`Example <examples/basic/classical_benders>`
+*   Combinatorial Benders Decomposition: :doc:`Tutorial <tutorials/cbd>`, :class:`~benderslib.CombinatorialBenders`, :doc:`Example <examples/basic/cbd>`
+*   L-shaped Method: :doc:`Tutorial <tutorials/lshape>`, :class:`~benderslib.LShaped`, :doc:`Example <examples/basic/lshape>`
+*   Integer L-shaped Method: :doc:`Tutorial <tutorials/ilshape>`, :class:`~benderslib.IntegerLShaped`, :doc:`Example <examples/basic/ilshape>`
 *   **Customizing your own Benders Decomposition**: :doc:`Example <examples/api/custom_template>`
 
 The variants supported are not limited to the above.
@@ -217,8 +217,8 @@ Contents
    :maxdepth: 1
    :hidden:
 
-   GitHub <https://github.com/phguo/BendersLib>
-   PyPI <https://pypi.org/project/BendersLib/>
+   Benders.dev <https://benders.dev>
+   BendersLib @GitHub <https://github.com/phguo/BendersLib>
+   BendersLib @PyPI <https://pypi.org/project/BendersLib/>
    Getting Help <https://github.com/phguo/BendersLib/issues?q=is%3Aissue>
    Author <https://guo.ph>
-   Benders.dev <https://benders.dev>

@@ -47,7 +47,7 @@ autosummary_generate = True
 master_doc = 'index'
 templates_path = ['_templates']
 html_static_path = ['_static']
-exclude_patterns = []
+exclude_patterns = ['sg_execution_times.rst']
 autodoc_member_order = 'bysource'
 napoleon_numpy_docstring = True
 napoleon_google_docstring = True
@@ -60,52 +60,23 @@ html_css_files = [
 
 from sphinx_gallery.sorting import ExplicitOrder
 
-explicit_order = [
-    'classical_benders.py',
-    'annotation_benders.py',
-
-    'cbd.py',
-    'cbd_iis.py',
-
-    'lshape.py',
-    'ilshape.py',
-    'ilshape_iis.py',
-    'lbbd.py',
-    'lbbd_sp.py',
-    'lbbd_lshape.py',
-    'gbd.py',
-    'glshape.py',
-
-    'lbbd_location.py',
-
-    '*'
-]
-
 sphinx_gallery_conf = {
-    'examples_dirs': [
-        '../../examples',
-        '../../examples/solvers',
-        '../../examples/api',
-        '../../examples/iis',
-    ],
-    'gallery_dirs': [
-        'examples',
-        'examples/solvers',
-        'examples/api',
-        'examples/iis',
-    ],
+    'examples_dirs': ['../../examples'],
+    'gallery_dirs': ['examples'],
     # 'download_all_examples': False,
     'capture_repr': ('__repr__', '__str__', '_repr_html_'),
     'filename_pattern': r'\.py',
-    'within_subsection_order': ExplicitOrder(explicit_order),
-}
+    'subsection_order': ExplicitOrder([
+        '../../examples/basic',
+        '../../examples/advanced',
+        '../../examples/expert',
+        '../../examples/applications',
 
-# sphinx_gallery_conf = {
-#     'examples_dirs': ['../examples','../tutorials'],
-#     'subsection_order': ['../examples/sin_func',
-#                          '../examples/no_output',
-#                          '../tutorials/seaborn'],
-# }
+        '*',
+
+        '../../examples/api'
+    ])
+}
 
 # from pygments.styles import get_all_styles
 # print(list(get_all_styles()))

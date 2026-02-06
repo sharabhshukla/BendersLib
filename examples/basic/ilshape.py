@@ -147,7 +147,7 @@ if __name__ == '__main__':
 #
 # .. admonition:: References
 #
-#     * Tutorial of the integer L-shaped method: :doc:`../tutorials/ilshape`
+#     * Tutorial of the integer L-shaped method: :doc:`../../tutorials/ilshape`
 #     * This example uses the following class: :class:`~benderslib.IntegerLShaped`
 #
 # .. seealso::

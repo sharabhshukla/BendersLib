@@ -106,9 +106,10 @@ By defining a class, you can use instance attributes to store information across
 The **function-based** callbacks is a simpler, more direct way to respond to events when you don not  need to
 maintain state. Each callback function is independent.
 
-The following :doc:`example <../examples/simple_callback>` demonstrates how to define and register both types of callbacks.
+The following :doc:`example <../examples/expert/simple_callback>`
+demonstrates how to define and register both types of callbacks.
 
-.. literalinclude:: ../examples/simple_callback.py
+.. literalinclude:: ../examples/expert/simple_callback.py
     :lines: 39-
     :caption: Defining and registering callbacks in BendersLib
 

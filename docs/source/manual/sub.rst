@@ -94,7 +94,7 @@ Gurobi
 .. admonition:: Example
     :class: note
 
-    :doc:`../examples/classical_benders`
+    :doc:`../examples/basic/classical_benders`
 
 Pyomo
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -220,7 +220,7 @@ This method returns a set of variable names that are part of the IIS.
 .. admonition:: Example
     :class: note
 
-    :doc:`../examples/iis/index`, :doc:`../examples/cbd_iis`, :doc:`../examples/ilshape_iis`
+    :doc:`../examples/iis/index`, :doc:`../examples/advanced/cbd_iis`, :doc:`../examples/advanced/ilshape_iis`
 
 
 Create Multiple Subproblems
@@ -257,7 +257,7 @@ This class takes an iterable of :class:`SubProblem` instances and their correspo
 .. admonition:: Example
     :class: note
 
-    :doc:`../examples/lshape`, :doc:`../examples/lbbd_lshape`
+    :doc:`../examples/basic/lshape`, :doc:`../examples/advanced/lbbd_lshape`
 
 Solve and Access Results
 -------------------------------------------------
@@ -386,7 +386,7 @@ a class-based approach is recommended.
 .. admonition:: Example
     :class: note
 
-    - See :doc:`../examples/lbbd_location` for how to implement a custom subproblem solver
+    - See :doc:`../examples/applications/lbbd_location` for how to implement a custom subproblem solver
       with a function, using logic-based Benders decomposition.
 
 Multiple Custom Subproblems (class-based)
@@ -426,7 +426,7 @@ Simply create instances of your custom subproblem class for each scenario and pa
 .. admonition:: Example
     :class: note
 
-    See :doc:`../examples/lbbd_lshape` for how to implement the L-shaped method,
+    See :doc:`../examples/advanced/lbbd_lshape` for how to implement the L-shaped method,
     which involves multiple subproblems, using logic-based Benders decomposition with custom subproblem classes.
 
 Multiple Custom Subproblems (function-based)
@@ -439,7 +439,7 @@ then using that function as a subproblem in a Benders decomposition algorithm.
 .. admonition:: Example
     :class: note
 
-    See :doc:`../examples/lbbd_sp` for how to solve multiple subproblems
+    See :doc:`../examples/advanced/lbbd_sp` for how to solve multiple subproblems
     with a function, using logic-based Benders decomposition.
 
 ====

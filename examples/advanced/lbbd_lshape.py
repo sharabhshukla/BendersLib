@@ -130,10 +130,10 @@ if __name__ == '__main__':
 #
 # .. admonition:: References
 #
-#     * Tutorial of the Logic-based Benders Decomposition: :doc:`../tutorials/lbbd`
-#     * Tutorial of the L-shaped method: :doc:`../tutorials/lshape`
+#     * Tutorial of the Logic-based Benders Decomposition: :doc:`../../tutorials/lbbd`
+#     * Tutorial of the L-shaped method: :doc:`../../tutorials/lshape`
 #     * This example uses the following class: :class:`LogicBasedBenders`
 #
 # .. seealso::
 #
-#     * Example of the L-shaped method: :doc:`lshape`
+#     * Example of the L-shaped method: :doc:`../basic/lshape`
