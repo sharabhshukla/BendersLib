@@ -26,8 +26,11 @@ When an event is emitted, the solver checks for any registered callbacks corresp
 to that event and executes them sequentially.
 A callback can also terminate the Benders process prematurely by returning the constant :attr:`~BendersConsts.TERMINATE`;
 If a callback returns :attr:`~BendersConsts.PROCEED` or does not return anything, the Benders process continues as normal.
+Any :attr:`~BendersConsts.TERMINATE` signal is executed immediately after the current event completes,
+meaning that the subsequent steps in the current iteration will not be executed,
+with the :attr:`~BendersResult.status` of the Benders process set to :attr:`~BendersConsts.TERMINATED`.
 
-The following pseudocode (source of :func:`~BendersSolver.solve`) illustrates the main stages of the
+The following pseudocode (:func:`~BendersSolver.solve`) illustrates the main stages of the
 Benders decomposition algorithm and the specific points at which each callback event is triggered.
 
 .. _callbacks-timeline:
@@ -37,43 +40,46 @@ Benders decomposition algorithm and the specific points at which each callback e
 .. parsed-literal::
 
     // solve() method of BendersSolver is called
+
     trigger :meth:`~CallbackBase.on_master_build`
     trigger :meth:`~CallbackBase.on_sub_build`
     trigger :meth:`~CallbackBase.on_benders_start`
 
     iteration counter = 0
+
     while not converged:
         increment iteration counter
         trigger :meth:`~CallbackBase.on_iteration_start`
 
         trigger :meth:`~CallbackBase.on_before_master_solve`
-        solve master problem
+        **solve master problem**
         trigger :meth:`~CallbackBase.on_after_master_solve`
 
         if master problem is optimal:
             trigger :meth:`~CallbackBase.on_before_sub_solve`
-            solve subproblem
+            **solve subproblem**
             trigger :meth:`~CallbackBase.on_after_sub_solve`
 
             if subproblem is optimal:
                 if new lower bound is found:
                     trigger :meth:`~CallbackBase.on_new_lower_bound`
                 if new upper bound is found:
+                    // new best-known solution found
                     trigger :meth:`~CallbackBase.on_new_upper_bound`
 
-                if converged or a callback signaled :attr:`~BendersConsts.TERMINATE`:
+                if converged:
                     break
 
-                generate optimality cut
+                **generate optimality cut**
                 trigger :meth:`~CallbackBase.on_opti_cut_generated`
                 add optimality cut to master problem
                 trigger :meth:`~CallbackBase.on_opti_cut_added`
 
             else if subproblem is infeasible:
-                if converged or a callback signaled :attr:`~BendersConsts.TERMINATE`:
+                if converged:
                     break
 
-                generate feasibility cut
+                **generate feasibility cut**
                 trigger :meth:`~CallbackBase.on_feas_cut_generated`
                 add feasibility cut to master problem
                 trigger :meth:`~CallbackBase.on_feas_cut_added`
