@@ -257,6 +257,39 @@ A detailed description of the statistics is provided in :doc:`logging`.
     including but not limited to the above classical approach, and allows for customization beyond the built-in options.
     Please refer to :doc:`benders` for more details on other variants and their usage.
 
+Conventions
+-----------------------------------------------------
+
+BendersLib follows a set of conventions to ensure consistency and predictability.
+
+*   **Variable Bounds**:
+    BendersLib requires all decision variables to be **non-negative**.
+    Internally, all variable bounds are transfromed into explicit linear constraints.
+    Any lower bounds or upper bounds defined directly on a variable
+    during model creation will be converted into standard constraints.
+    This ensures that all boundary conditions are treated uniformly as
+    part of the constraint matrix within the framework.
+
+*   **Objective Sense**:
+    BendersLib standardizes on **minimization** problems. Maximization problems are not
+    supported and must be converted by the user. This is achieved by negating the
+    objective function (e.g., transforming :math:`\max c^T x` to :math:`\min -c^T x`).
+
+*   **Dual Values**:
+    The dual values from a subproblem's constraints are used to generate *optimality cuts*.
+    Their sign, however, can differ between solvers. This is because a constraint like
+    :math:`A y \ge b` might have a non-negative dual in one solver, while another solver
+    might internally use :math:`-A y \le -b` and report a dual with the opposite sign.
+    Both values are mathematically correct, corresponding to equivalent dual formulations.
+    BendersLib internally ensures consistent signs from all solver backends.
+
+*   **Extreme Rays**:
+    When a subproblem is infeasible, an *extreme ray* of its dual is used to generate a
+    *feasibility cut*. Similar to duals, its sign can be inverted. An extreme ray ``v``
+    defines a direction of unboundedness; if :math:`r` is a valid ray, so is :math:`-r` as they
+    describe the same unbounded line. A solver may return either. Both are correct and produce equivalent cuts.
+    BendersLib internally ensures consistent signs from all solver backends.
+
 References
 -----------------------------------------------------
 
