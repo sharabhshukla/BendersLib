@@ -1,7 +1,7 @@
 # coding:utf-8
 
 from abc import ABC
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Callable, Type, Union
 
 from .consts import BendersConsts as CST
@@ -21,15 +21,19 @@ class BendersContext:
     """
 
     benders: "BendersSolver"
-    """The Benders decomposition solver instance."""
+    """The Benders decomposition solver instance (:class:`BendersSolver`)."""
     master_problem: "MasterProblem"
-    """The current master problem instance."""
+    """The current master problem instance (:class:`MasterProblem`)."""
     sub_problem: "SubProblem"
-    """The current subproblem instance."""
+    """The current subproblem instance (:class:`SubProblem`, :class:`SubProblems`, :class:`LogicBasedSubProblem`)."""
     state: "BendersResult"
-    """The current state of the Benders decomposition process."""
-    cuts_generated: list["Cut"] = None
-    """A list of cuts generated but not yet added to the master problem."""
+    """The current state of the Benders decomposition process (:class:`BendersResult`)."""
+    current_comp_vals: dict[str, float] = field(default_factory=dict)
+    """A dictionary mapping complicating variable names to their current values in the master problem solution."""
+    current_opti_cuts: list["Cut"] = field(default_factory=list)
+    """A List of optimality cuts generated in the current iteration (:class:`OptimalityCut`)."""
+    current_feas_cuts: list["Cut"] = field(default_factory=list)
+    """A List of feasibility cuts generated in the current iteration (:class:`FeasibilityCut`)."""
 
     def __str__(self):
         master_str = str(self.master_problem).replace('\n', '\n' + ' ' * 4)

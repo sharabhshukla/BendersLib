@@ -1316,14 +1316,14 @@ class BendersSolver:
         The method to add one or multiple :class:`OptimalityCut` to :class:`MasterProblem`.
         """
         cuts = self.optimality_cut._generate()
-        self._context.cuts_generated = cuts
+        self._context.current_opti_cuts = cuts
         if self.__trigger_callbacks_and_terminate(EVENTS.ON_OPTI_CUT_GENERATED):
             return CST.TERMINATE
 
-        for cut in cuts:
+        for cut in self._context.current_opti_cuts:
             self.master_problem.add_cut(cut)
 
-        self._context.cuts_generated = []
+        self._context.current_opti_cuts = []
         if self.__trigger_callbacks_and_terminate(EVENTS.ON_OPTI_CUT_ADDED):
             return CST.TERMINATE
 
@@ -1332,14 +1332,14 @@ class BendersSolver:
         The method to add one or multiple :class:`FeasibilityCut` to :class:`MasterProblem`.
         """
         cuts = self.feasibility_cut._generate()
-        self._context.cuts_generated = cuts
+        self._context.current_feas_cuts = cuts
         if self.__trigger_callbacks_and_terminate(EVENTS.ON_FEAS_CUT_GENERATED):
             return CST.TERMINATE
 
-        for cut in cuts:
+        for cut in self._context.current_feas_cuts:
             self.master_problem.add_cut(cut)
 
-        self._context.cuts_generated = []
+        self._context.current_feas_cuts = []
         if self.__trigger_callbacks_and_terminate(EVENTS.ON_FEAS_CUT_ADDED):
             return CST.TERMINATE
 
@@ -1456,9 +1456,10 @@ class BendersSolver:
             if self.master_problem.status == CST.OPTIMAL:
                 # Master problem is optimal -> solve subproblem
                 var_values = self.master_problem.get_var_values(self.complicating_vars)
-                self.sub_problem.fix_vars(var_values)
-                ts = time.perf_counter()
+                self._context.current_comp_vals = var_values
                 if self.__trigger_callbacks_and_terminate(EVENTS.ON_BEFORE_SUB_SOLVE): break
+                ts = time.perf_counter()
+                self.sub_problem.fix_vars(self._context.current_comp_vals)
                 self.sub_problem.solve()
                 if self.__trigger_callbacks_and_terminate(EVENTS.ON_AFTER_SUB_SOLVE): break
                 self.result.runtime_sub += time.perf_counter() - ts

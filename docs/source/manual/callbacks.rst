@@ -56,8 +56,9 @@ Benders decomposition algorithm and the specific points at which each callback e
         trigger :meth:`~CallbackBase.on_after_master_solve`
 
         if master problem is optimal:
+            save :attr:`~BendersContext.current_comp_vals`
             trigger :meth:`~CallbackBase.on_before_sub_solve`
-            **solve subproblem**
+            **solve subproblem with** :attr:`~BendersContext.current_comp_vals`
             trigger :meth:`~CallbackBase.on_after_sub_solve`
 
             if subproblem is optimal:
@@ -71,8 +72,9 @@ Benders decomposition algorithm and the specific points at which each callback e
                     break
 
                 **generate optimality cut**
+                save :attr:`~BendersContext.current_opti_cuts`
                 trigger :meth:`~CallbackBase.on_opti_cut_generated`
-                add optimality cut to master problem
+                add :attr:`~BendersContext.current_opti_cuts` to master problem
                 trigger :meth:`~CallbackBase.on_opti_cut_added`
 
             else if subproblem is infeasible:
@@ -80,8 +82,9 @@ Benders decomposition algorithm and the specific points at which each callback e
                     break
 
                 **generate feasibility cut**
+                save :attr:`~BendersContext.current_feas_cuts`
                 trigger :meth:`~CallbackBase.on_feas_cut_generated`
-                add feasibility cut to master problem
+                add :attr:`~BendersContext.current_feas_cuts` cut to master problem
                 trigger :meth:`~CallbackBase.on_feas_cut_added`
 
         else:
@@ -92,7 +95,60 @@ Benders decomposition algorithm and the specific points at which each callback e
 
     trigger :meth:`~CallbackBase.on_benders_end`
 
-.. rubric:: Supported Callbacks
+How to Use Callbacks?
+------------------------------------
+
+There are two ways to create callbacks: as a class inheriting from :class:`CallbackBase` or as a standalone function.
+Both approaches receive a :class:`BendersContext` object, which provides access to the master problem, subproblem,
+and the current state of the decomposition.
+The **class-based** callbacks are ideal for complex logic that requires maintaining state between events.
+By defining a class, you can use instance attributes to store information across different callback calls.
+The **function-based** callbacks is a simpler, more direct way to respond to events when you don not  need to
+maintain state. Each callback function is independent.
+
+The following :doc:`example <../examples/simple_callback>` demonstrates how to define and register both types of callbacks.
+
+.. literalinclude:: ../examples/simple_callback.py
+    :lines: 39-
+    :caption: Defining and registering callbacks in BendersLib
+
+.. _manual_callback_attributes_methods:
+
+Attributes & Methods
+------------------------------------
+
+The class :class:`CallbackBase` is the abstract base class for creating ``CustomCallback``.
+It provides a set of methods that are triggered at specific events during the Benders decomposition process.
+Each callback method has a :class:`BendersContext` object, which contains the attributes listed below,
+providing access to the current state of the solver.
+During the iterations, callbacks are triggered by :class:`BendersSolver` at the appropriate times.
+
+.. mermaid::
+    :caption: Callback System Inheritance Diagram
+    :align: center
+
+    flowchart LR
+        BendersSolver -- triggers --> CustomCallback
+        CustomCallback -- has --> BendersContext
+        CustomCallback -- inherits --> CallbackBase
+
+        style BendersSolver fill:#f2f2f2,stroke:#333,stroke-width:1px
+        style CustomCallback fill:white,stroke:#333,stroke-width:1px
+
+.. rubric:: :class:`BendersContext` - Attributes
+
+.. autosummary::
+   :nosignatures:
+
+   ~BendersContext.benders
+   ~BendersContext.master_problem
+   ~BendersContext.sub_problem
+   ~BendersContext.state
+   ~BendersContext.current_comp_vals
+   ~BendersContext.current_opti_cuts
+   ~BendersContext.current_feas_cuts
+
+.. rubric:: :class:`CallbackBase` - Methods
 
 .. autosummary::
    :nosignatures:
@@ -113,20 +169,3 @@ Benders decomposition algorithm and the specific points at which each callback e
    ~CallbackBase.on_feas_cut_added
    ~CallbackBase.on_new_lower_bound
    ~CallbackBase.on_new_upper_bound
-
-How to Use Callbacks?
-------------------------------------
-
-There are two ways to create callbacks: as a class inheriting from :class:`CallbackBase` or as a standalone function.
-Both approaches receive a :class:`BendersContext` object, which provides access to the master problem, subproblem,
-and the current state of the decomposition.
-The **class-based** callbacks are ideal for complex logic that requires maintaining state between events.
-By defining a class, you can use instance attributes to store information across different callback calls.
-The **function-based** callbacks is a simpler, more direct way to respond to events when you don not  need to
-maintain state. Each callback function is independent.
-
-The following :doc:`example <../examples/simple_callback>` demonstrates how to define and register both types of callbacks.
-
-.. literalinclude:: ../examples/simple_callback.py
-    :lines: 39-
-    :caption: Defining and registering callbacks in BendersLib
