@@ -86,4 +86,4 @@ if __name__ == '__main__':
 
 # %%
 #
-# .. tags:: classical, solver: gurobi, deterministic, callback
+# .. tags:: classical, solver: gurobi, deterministic, callback, enhancement
