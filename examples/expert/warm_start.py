@@ -83,3 +83,7 @@ if __name__ == '__main__':
     AB.solve()
 
     draw_curve(AB.result)
+
+# %%
+#
+# .. tags:: classical, solver: gurobi, deterministic, callback
