@@ -1,4 +1,8 @@
 Examples
 ======================
 
-The examples below are `tagged <../_tags/tagsindex.html>`_ with the Benders method, solver backends, problem type, etc.
+.. admonition:: TAG
+    :class: note
+
+    The examples are `tagged <../_tags/tagsindex.html>`_ with the
+    Benders method, solver backends, problem type, etc, to enable filtering.
