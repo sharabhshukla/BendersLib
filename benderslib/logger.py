@@ -49,7 +49,7 @@ class BendersLogger:
 
         l = CST.LOG_ITER_WIDTH * 7
         logging.info("=" * l)
-        logging.info(f"BendersLib (v{__version__}, {__license__}, {__url__}) by {__author__} ({__copyright__})")
+        logging.info(f"BendersLib (v{__version__}, {__license__}, {__url__}) Copyright {__copyright__}")
         logging.info("-" * l)
 
         logging.info(self.benders)
