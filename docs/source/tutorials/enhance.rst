@@ -80,6 +80,8 @@ how BendersLib can be used to implement various acceleration techniques.
 Warm Starting
 ------------------------------
 
+[#]_
+
 Branch-and-Check Method
 ------------------------------
 
@@ -125,6 +127,9 @@ References
 .. [#] Hooker, J. (2024). Logic-Based Benders Decomposition: Theory and Applications. Springer International Publishing. https://doi.org/10.1007/978-3-031-45039-6
 .. [#] Naderi, B., & Roshanaei, V. (2020). Branch-Relax-and-Check: A tractable decomposition method for order acceptance and identical parallel machine scheduling. European Journal of Operational Research, 286(3), 811–827. https://doi.org/10.1016/j.ejor.2019.10.014
 .. [#] Nasirian, A., Zhang, L., Costa, A. M., & Abbasi, B. (2024). Multiskilled workforce staffing and scheduling: A logic-based benders’ decomposition approach. European Journal of Operational Research. https://doi.org/10.1016/j.ejor.2024.11.033
+
+.. Warm Starting
+.. [#] Bolusani, S., Besançon, M., Gleixner, A., Berthold, T., D’Ambrosio, C., Muñoz, G., Paat, J., & Thomopulos, D. (2024). The MIP Workshop 2023 Computational Competition on reoptimization. Mathematical Programming Computation. https://doi.org/10.1007/s12532-024-00256-w
 
 .. Branch-and-Benders Method
 .. [#] Thorsteinsson, E. S. (2001). Branch-and-check: A hybrid framework integrating mixed integer programming and constraint logic programming. In T. Walsh (Ed.), Principles and Practice of Constraint Programming—CP 2001 (pp. 16–30). Springer. https://doi.org/10.1007/3-540-45578-7_2
