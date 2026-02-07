@@ -1,7 +1,7 @@
 # coding:utf-8
 
 """
-Warm Start
+Early Stop
 =======================
 """
 
@@ -37,35 +37,40 @@ def make_original_problem():
 
 # %%
 # Define a custom callback to implement warm start.
-# You can store the previous master and subproblem solutions
-# as persistent data in the callback class, and use them to set
-# the initial solution for the master and subproblem in the
-# corresponding callback methods.
-class WarmStartCallback(CallbackBase):
+# The callback will terminate the Benders process
+# after a certain number of iterations,
+# when there is no improvement in the upper bound.
+class EarlyStop(CallbackBase):
 
-    def __init__(self):
-        self.pre_master_sol = {}
-        self.pre_sub_sol = {}
+    def __init__(self, n_iter_threshold):
+        self.n_iter_threshold = n_iter_threshold
+        self.best_ub = float('Inf')
+        self.iter_counter = 0
 
-    def on_before_master_solve(self, context):
-        model = context.master_problem.model
-        for var in model.getVars():
-            if var.VarName in self.pre_master_sol:
-                var.Start = self.pre_master_sol[var.VarName]
+    def on_iteration_end(self, context):
+        current_ub = context.state.ub
 
-    def on_after_master_solve(self, context):
-        if context.master_problem.status == CST.OPTIMAL:
-            self.pre_master_sol = context.master_problem.get_var_values()
+        if current_ub < self.best_ub:
+            # If new best solution is found
+            self.iter_counter = 0
+            self.best_ub = current_ub
+            return CST.PROCEED
 
-    def on_before_sub_solve(self, context):
-        model = context.sub_problem.model
-        for var in model.getVars():
-            if var.VarName in self.pre_sub_sol:
-                var.Start = self.pre_sub_sol[var.VarName]
+        else:
+            self.iter_counter += 1
 
-    def on_after_sub_solve(self, context):
-        if context.sub_problem.status == CST.OPTIMAL:
-            self.pre_sub_sol = context.sub_problem.get_var_values()
+            if self.iter_counter >= self.n_iter_threshold:
+                # If no improvement in upper bound for n_iter_threshold iterations
+
+                if not context.state.status == CST.UNSOLVED:
+                    # Ensure termination only happens with at least one solution found
+
+                    print(f"No improvement in upper bound for {self.n_iter_threshold} iterations, terminating...")
+
+                    # Return the termination signal to stop the Benders process
+                    return CST.TERMINATE
+            else:
+                return CST.PROCEED
 
 
 # %%
@@ -77,9 +82,8 @@ if __name__ == '__main__':
     # Create the Benders decomposition solver
     AB = AnnotationBenders(model, solver=Gurobi, complicating_vars=complicating_vars, benders=ClassicalBenders)
 
-    # Register the warm start callback
-    warm_start_callback = WarmStartCallback()
-    AB.benders_instance.register_callback(warm_start_callback)
+    # Register the callback
+    AB.benders_instance.register_callback(EarlyStop(10))
     AB.solve()
 
     draw_curve(AB.result)

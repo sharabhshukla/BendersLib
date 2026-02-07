@@ -22,8 +22,6 @@ def make_original_problem():
     model = Model("Original")
 
     n_vars = 20
-    # BendersLib will automatically convert variable bounds (lb and ub) to explicit constraints.
-    # However, your original model will not be changed. So, you can still access the original variable bounds.
     y = model.addVars(n_vars, name="y", lb=1, ub=40, vtype=GRB.INTEGER)
     z = model.addVars(n_vars, name="z", lb=1, ub=40, vtype=GRB.CONTINUOUS)
 
