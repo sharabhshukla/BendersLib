@@ -400,4 +400,4 @@ LBBD_no_relax.solve()
 #     * Tutorial of the Logic-based Benders Decomposition: :doc:`../../tutorials/lbbd`
 #     * This example uses the following class: :class:`~benderslib.LogicBasedBenders`
 #
-# .. tags:: lbbd, solver: gurobi, deterministic, custom subproblem, custom cut
+# .. tags:: benders: lbbd, solver: gurobi, deterministic, custom subproblem, custom cut

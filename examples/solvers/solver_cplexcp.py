@@ -91,4 +91,4 @@ if __name__ == '__main__':
 
 # %%
 #
-# .. tags:: combinatorial, solver: cplex (cp), deterministic
+# .. tags:: benders: combinatorial, solver: cplex (cp), deterministic

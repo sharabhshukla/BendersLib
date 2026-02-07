@@ -46,4 +46,4 @@ if __name__ == '__main__':
 
 # %%
 #
-# .. tags:: classical, solver: gurobi, deterministic
+# .. tags:: benders: classical, solver: gurobi, deterministic

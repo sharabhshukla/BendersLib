@@ -76,4 +76,4 @@ benders.solve()
 
 # %%
 #
-# .. tags:: classical, solver: gurobi, deterministic, callback
+# .. tags:: benders: classical, solver: gurobi, deterministic, callback

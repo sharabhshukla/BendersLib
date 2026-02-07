@@ -79,4 +79,4 @@ for i, sol in enumerate(save_cb.feasible_solutions):
 
 # %%
 #
-# .. tags:: classical, solver: gurobi, deterministic, callback
+# .. tags:: benders: classical, solver: gurobi, deterministic, callback

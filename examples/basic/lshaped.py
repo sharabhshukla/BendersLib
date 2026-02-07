@@ -164,4 +164,4 @@ if __name__ == '__main__':
 #
 #     * Example of integer L-shaped method: :doc:`ilshaped`
 #
-# .. tags:: l-shaped, solver: gurobi, stochastic
+# .. tags:: benders: l-shaped, solver: gurobi, stochastic

@@ -57,4 +57,4 @@ if __name__ == '__main__':
 
 # %%
 #
-# .. tags:: classical, solver: scip, deterministic
+# .. tags:: benders: classical, solver: scip, deterministic

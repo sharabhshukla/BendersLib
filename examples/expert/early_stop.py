@@ -90,4 +90,4 @@ if __name__ == '__main__':
 
 # %%
 #
-# .. tags:: classical, solver: gurobi, deterministic, callback, enhancement
+# .. tags:: benders: classical, solver: gurobi, deterministic, callback, enhancement

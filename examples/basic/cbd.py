@@ -127,4 +127,4 @@ if __name__ == '__main__':
 #
 #     * Combinatorial Benders Decomposition with customized cut generator: :doc:`../advanced/cbd_iis`
 #
-# .. tags:: combinatorial, solver: gurobi, deterministic
+# .. tags:: benders: combinatorial, solver: gurobi, deterministic

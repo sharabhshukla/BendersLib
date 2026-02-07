@@ -150,4 +150,4 @@ if __name__ == '__main__':
 #     * Tutorial of the Generalized Benders Decomposition: :doc:`../../tutorials/gbd`
 #     * This example uses the following class: :class:`~benderslib.benders.GeneLShaped`
 #
-# .. tags:: generalized, l-shaped, solver: gurobi, stochastic
+# .. tags:: benders: generalized, benders: l-shaped, solver: gurobi, stochastic

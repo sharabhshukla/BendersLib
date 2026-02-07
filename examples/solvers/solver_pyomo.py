@@ -86,4 +86,4 @@ if __name__ == '__main__':
 
 # %%
 #
-# .. tags:: classical, solver: pyomo, deterministic
+# .. tags:: benders: classical, solver: pyomo, deterministic

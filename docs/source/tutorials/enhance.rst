@@ -85,7 +85,7 @@ Warm Starting
 Branch-and-Check Method
 ------------------------------
 
-[#]_ [#]_
+[#]_ [#]_ [#]_
 
 Parallelization
 ------------------------------
@@ -134,6 +134,7 @@ References
 .. Branch-and-Benders Method
 .. [#] Thorsteinsson, E. S. (2001). Branch-and-check: A hybrid framework integrating mixed integer programming and constraint logic programming. In T. Walsh (Ed.), Principles and Practice of Constraint Programming—CP 2001 (pp. 16–30). Springer. https://doi.org/10.1007/3-540-45578-7_2
 .. [#] Gendron, B., Scutellà, M. G., Garroppo, R. G., Nencioni, G., & Tavanti, L. (2016). A branch-and-Benders-cut method for nonlinear power design in green wireless local area networks. European Journal of Operational Research, 255(1), 151–162. https://doi.org/10.1016/j.ejor.2016.04.058
+.. [#] Rubin, P. A. (2011, October 9). Benders Decomposition Then and Now. OR in an OB World. https://orinanobworld.blogspot.com/2011/10/benders-decomposition-then-and-now.html
 
 .. Pareto-optimal cuts
 .. [#] Magnanti, T. L., & Wong, R. T. (1981). Accelerating Benders Decomposition: Algorithmic Enhancement and Model Selection Criteria. Operations Research, 29(3), 464–484. https://doi.org/10.1287/opre.29.3.464

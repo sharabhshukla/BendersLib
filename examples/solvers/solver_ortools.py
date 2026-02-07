@@ -86,4 +86,4 @@ if __name__ == '__main__':
 
 # %%
 #
-# .. tags:: classical, solver: ortools (cp), deterministic
+# .. tags:: benders: classical, solver: ortools (cp), deterministic

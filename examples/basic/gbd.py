@@ -156,4 +156,4 @@ if __name__ == '__main__':
 #     * Tutorial of the Generalized Benders Decomposition: :doc:`../../tutorials/gbd`
 #     * This example uses the following class: :class:`GeneralizedBenders`
 #
-# .. tags:: generalized, solver: gurobi, deterministic
+# .. tags:: benders: generalized, solver: gurobi, deterministic

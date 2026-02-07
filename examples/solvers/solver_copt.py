@@ -45,4 +45,4 @@ if __name__ == '__main__':
 
 # %%
 #
-# .. tags:: classical, solver: copt, deterministic
+# .. tags:: benders: classical, solver: copt, deterministic

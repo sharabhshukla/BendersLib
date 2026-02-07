@@ -84,4 +84,4 @@ if __name__ == '__main__':
 
 # %%
 #
-# .. tags:: classical, solver: cplex, deterministic
+# .. tags:: benders: classical, solver: cplex, deterministic
