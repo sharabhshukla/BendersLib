@@ -109,9 +109,43 @@ maintain state. Each callback function is independent.
 The following :doc:`example <../examples/expert/simple_callback>`
 demonstrates how to define and register both types of callbacks.
 
-.. literalinclude:: ../examples/expert/simple_callback.py
-    :lines: 39-
+.. code-block:: python
     :caption: Defining and registering callbacks in BendersLib
+
+    # Class-based callback
+    class MyCallback(CallbackBase):
+        some_persistent_data = ">>>>>>>> Hi there! >>>>>>>>>"
+
+        def on_benders_start(self, context: BendersContext):
+            print("Benders process started!")
+            print(self.some_persistent_data)
+
+    # Function-based callback
+    def on_iteration_end(context: BendersContext):
+        print(f"Starting iteration: {context.state.n_iter} ...")
+
+        if context.state.n_iter == 1:
+            print("Reached maximum iterations, terminating...")
+            return CST.TERMINATE
+
+    master_model, complicating_vars = make_master_problem()
+    sub_model = make_sub_problem()
+
+    benders = ClassicalBenders.from_models(
+        master_model, Gurobi,
+        sub_model, Gurobi,
+        complicating_vars=complicating_vars
+    )
+
+    # Register the callback
+    benders.register_callback(MyCallback)
+    benders.register_callback(on_iteration_end)
+
+    benders.solve()
+
+.. seealso::
+
+    More examples of callbacks can be found in the :doc:`../examples/expert/index`.
 
 .. _manual_callback_attributes_methods:
 
