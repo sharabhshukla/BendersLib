@@ -154,7 +154,7 @@ sphinx_gallery_conf = {
 html_theme = "furo"
 html_title = "BendersLib"
 html_favicon = '_static/icon.ico'
-# html_logo = "_static/benderslib_v.png"
+html_logo = "_static/benderslib_v.png"
 navy_blue = "#0066CC"
 # nuaa_blue = "#0000ff"
 another_blue = "#0769CF"
@@ -182,6 +182,7 @@ html_theme_options = {
         "color-highlighted-background": "yellow",
     },
     # "announcement": "This is an Alpha release, the API may change in future and there might be bugs."
+    "sidebar_hide_name": True,
 }
 
 

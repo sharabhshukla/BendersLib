@@ -162,3 +162,9 @@ h2::before {
   }
 }
 /*!*override SHIBUYA theme brand color*!*/
+
+/* Make furo sidebar logo smaller */
+.sidebar-logo {
+    max-width: 155px;
+    height: auto;
+}
