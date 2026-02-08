@@ -95,7 +95,7 @@ the effort required to solve the master problem and subproblems can be reduced.
 .. admonition:: Example
     :class: seealso
 
-    The example (:doc:`../examples/expert/warm_start`) demonstrates how to implement
+    This example (:doc:`../examples/expert/warm_start`) demonstrates how to implement
     warm starting in BendersLib using :doc:`../manual/callbacks`.
 
 Branch-and-Check Method
@@ -120,7 +120,7 @@ allowing users to seamlessly integrate them for solving subproblems within the B
 .. admonition:: Example
     :class: seealso
 
-    The example (:doc:`../examples/applications/lbbd_location`) demonstrates how to
+    This example (:doc:`../examples/applications/lbbd_location`) demonstrates how to
     implement :ref:`customized subproblem solvers <manual_custom_sub>`
     within the :doc:`lbbd` framework using BendersLib.
 
@@ -167,7 +167,7 @@ divide the cut by the norm of its coefficients.
 .. admonition:: Example
     :class: seealso
 
-    The example (:doc:`../examples/expert/normalize_cut`) demonstrates how to
+    This example (:doc:`../examples/expert/normalize_cut`) demonstrates how to
     implement cut normalization in BendersLib using :doc:`../manual/callbacks`.
 
 Local Branching
@@ -187,7 +187,7 @@ true optimal solution is not critical, and a good-enough solution is acceptable.
 .. admonition:: Example
     :class: seealso
 
-    The example :doc:`../examples/expert/early_stop` demonstrates how to implement
+    This example (:doc:`../examples/expert/early_stop`) demonstrates how to implement
     early stopping in BendersLib using :doc:`../manual/callbacks`.
 
 References
