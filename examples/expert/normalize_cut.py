@@ -86,7 +86,7 @@ if __name__ == "__main__":
     )
 
     # Comment out the normalization callback to see the difference in performance.
-    benders.benders_instance.register_callback(CutNormalization())
+    benders.benders.register_callback(CutNormalization())
     benders.solve()
 
 # %%

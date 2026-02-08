@@ -79,7 +79,7 @@ if __name__ == '__main__':
 
     # Register the warm start callback
     warm_start_callback = WarmStartCallback()
-    AB.benders_instance.register_callback(warm_start_callback)
+    AB.benders.register_callback(warm_start_callback)
     AB.solve()
 
     draw_curve(AB.result)

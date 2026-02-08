@@ -102,9 +102,9 @@ class AnnotationBenders:
         if feasibility_cut is not None:
             benders_kwargs["feasibility_cut"] = feasibility_cut
 
-        self.benders_instance = benders(**benders_kwargs)
+        self.benders = benders(**benders_kwargs)
         """The Benders decomposition instance initialized from the ``benders`` parameter."""
-        self.result = self.benders_instance.result
+        self.result = self.benders.result
         """An instance of :class:`BendersResult` that stores the results and statistics."""
 
     @staticmethod
@@ -175,4 +175,4 @@ class AnnotationBenders:
 
         See :meth:`~benderslib.BendersSolver.solve` for details.
         """
-        self.benders_instance.solve()
+        self.benders.solve()

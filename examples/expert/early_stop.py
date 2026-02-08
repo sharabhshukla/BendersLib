@@ -83,7 +83,7 @@ if __name__ == '__main__':
     AB = AnnotationBenders(model, solver=Gurobi, complicating_vars=complicating_vars, benders=ClassicalBenders)
 
     # Register the callback
-    AB.benders_instance.register_callback(EarlyStop(10))
+    AB.benders.register_callback(EarlyStop(10))
     AB.solve()
 
     draw_curve(AB.result)
