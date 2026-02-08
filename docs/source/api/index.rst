@@ -17,17 +17,6 @@ The inheritance relationships are also shown in their respective sections.
 
     flowchart LR
 
-    style Cut fill:#D6EAF8,stroke:#333,stroke-width:1px
-    style CutGenerator fill:#D6EAF8,stroke:#333,stroke-width:1px
-
-    style SubProblem fill:#D5F5E3,stroke:#333,stroke-width:1px
-
-    style MasterProblem fill:#FEF9E7,stroke:#333,stroke-width:1px
-    style BendersSolver stroke:#333,stroke-width:1px
-
-    style CallbackBase fill:#f2f2f2,stroke:#333,stroke-width:1px
-    style BendersContext fill:#f2f2f2,stroke:#333,stroke-width:1px
-
     BendersSolver -- "has" --> MasterProblem
     BendersSolver -- "has" --> SubProblem
     BendersSolver -- "has" --> CutGenerator
@@ -41,7 +30,7 @@ The inheritance relationships are also shown in their respective sections.
     BendersContext -- "uses" --> MasterProblem
     BendersContext -- "uses" --> SubProblem
 
-In the above diagram, the classes are categorized into four groups based on their roles in
+In the above diagram, the classes are categorized into fiv groups based on their roles in
 the Benders decomposition process.
 
 - **Master Problem**:
@@ -62,6 +51,10 @@ the Benders decomposition process.
   process through callbacks. The :class:`CallbackBase` class serves as the base class for creating
   custom callbacks, while the :class:`BendersContext` class provides access to the current state
   of the solver during callback execution.
+- **Benders Solver**:
+  This group includes the :class:`BendersSolver` class, which serves as the main interface for
+  users to solve optimization problems using Benders decomposition. It orchestrates the interaction
+  between the master problem, subproblem, cut generation, and callbacks to efficiently solve the problem.
 
 Contents
 ----------------------
