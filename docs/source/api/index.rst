@@ -1,10 +1,12 @@
 API Reference
 ======================
 
+.. currentmodule:: benderslib
+
 Overview
 ----------------------
 
-The diagram below illustrates the :doc:`core` and their relationships in BendersLib.
+The diagram below illustrates the :doc:`core` and :doc:`callbacks` and their relationships in BendersLib.
 Other classes, including ones in :doc:`data`, :doc:`solvers`, :doc:`cuts`, and :doc:`benders`
 are omitted for clarity.
 The inheritance relationships are also shown in their respective sections.
@@ -13,50 +15,59 @@ The inheritance relationships are also shown in their respective sections.
     :caption: BendersLib Core Classes
     :align: center
 
-    flowchart TB
+    flowchart LR
 
     style Cut fill:#D6EAF8,stroke:#333,stroke-width:1px
-    style OptimalityCut fill:#D6EAF8,stroke:#333,stroke-width:1px
-    style FeasibilityCut fill:#D6EAF8,stroke:#333,stroke-width:1px
     style CutGenerator fill:#D6EAF8,stroke:#333,stroke-width:1px
 
     style SubProblem fill:#D5F5E3,stroke:#333,stroke-width:1px
-    style SubProblems fill:#D5F5E3,stroke:#333,stroke-width:1px
-    style LogicBasedSubProblem fill:#D5F5E3,stroke:#333,stroke-width:1px
 
     style MasterProblem fill:#FEF9E7,stroke:#333,stroke-width:1px
     style BendersSolver stroke:#333,stroke-width:1px
 
+    style CallbackBase fill:#f2f2f2,stroke:#333,stroke-width:1px
+    style BendersContext fill:#f2f2f2,stroke:#333,stroke-width:1px
+
     BendersSolver -- "has" --> MasterProblem
-    BendersSolver -. "has" .-> SubProblem
+    BendersSolver -- "has" --> SubProblem
     BendersSolver -- "has" --> CutGenerator
-    Cut -. "is added to" .-> MasterProblem
-    FeasibilityCut -. "is added to" .-> MasterProblem
-    OptimalityCut -. "is added to" .-> MasterProblem
-    CutGenerator -. "generates" .-> Cut
-    CutGenerator -. "generates" .-> OptimalityCut
-    CutGenerator -. "generates" .-> FeasibilityCut
-    CutGenerator -. "uses" .-> SubProblem
-    CutGenerator -. "uses" .-> SubProblems
-    CutGenerator -. "uses" .-> LogicBasedSubProblem
+    Cut -- "is added to" --> MasterProblem
+    CutGenerator -- "generates" --> Cut
+    CutGenerator -- "uses" --> SubProblem
     CutGenerator -- "uses" --> MasterProblem
-    OptimalityCut -- "inherits" --> Cut
-    FeasibilityCut -- "inherits" --> Cut
 
-    BendersSolver -. "has" .-> SubProblems
-    BendersSolver -. "has" .-> LogicBasedSubProblem
-    SubProblems -. "contains" .-> SubProblem
-    SubProblems -. "contains" .-> LogicBasedSubProblem
+    BendersSolver -- "triggers" --> CallbackBase
+    CallbackBase -- "uses" --> BendersContext
+    BendersContext -- "uses" --> MasterProblem
+    BendersContext -- "uses" --> SubProblem
 
+In the above diagram, the classes are categorized into four groups based on their roles in
+the Benders decomposition process.
 
-
-*\*Note: Dashed arrows indicate optional relationships, from which exactly one must be selected for each usage.*
+- **Master Problem**:
+  This group includes the :class:`MasterProblem` class, which represents the master problem in
+  the Benders decomposition framework. It is responsible for maintaining the current solution
+  and incorporating cuts generated from the subproblem.
+- **Sub Problem**:
+  This group includes the :class:`SubProblem` (:class:`SubProblems`, :class:`LogicBasedSubProblem`)
+  class, which represents the subproblem in the Benders decomposition framework. It is responsible
+  for solving the subproblem based on the current solution from the master problem.
+- **Cut Generation**:
+  This group includes the :class:`Cut` (:class:`OptimalityCut`, :class:`FeasibilityCut`) and
+  :class:`CutGenerator` classes, which are responsible for representing and generating cuts
+  that are added to the master problem based on the solutions obtained from the subproblem.
+- **Callback System**:
+  This group includes the :class:`CallbackBase` and :class:`BendersContext` classes, which
+  are responsible for providing a mechanism to customize the behavior of the Benders decomposition
+  process through callbacks. The :class:`CallbackBase` class serves as the base class for creating
+  custom callbacks, while the :class:`BendersContext` class provides access to the current state
+  of the solver during callback execution.
 
 Contents
 ----------------------
 
 .. toctree::
-   :maxdepth: -1
+   :maxdepth: 2
 
    data.rst
    solvers.rst
