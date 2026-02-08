@@ -5,7 +5,17 @@
 Home
 ===================================
 
-BendersLib is a powerful and extensible Python library for solving large-scale optimization problems using Benders decomposition. It provides a flexible framework for implementing various Benders decomposition variants and can be easily integrated with different solvers.
+**BendersLib** (https://benders.dev) is a Python library that supports a range of Benders decomposition variants,
+including :doc:`tutorials/classical`, :doc:`tutorials/cbd`, :doc:`tutorials/lshaped`, :doc:`tutorials/ilshaped`,
+:doc:`tutorials/gbd`, and :doc:`tutorials/lbbd`.
+While BendersLib provides :doc:`built-in implementations of these methods <api/benders>`,
+it is designed to be extensible. Users can implement custom Benders decomposition methods by
+customizing :ref:`subproblem solvers <manual_custom_sub>` and :ref:`cut generators <manual_custom_cut>`,
+and defining :doc:`callback functions <manual/callbacks>` for :doc:`enhancement strategies <tutorials/enhance>`.
+BendersLib is solver agnostic and has :doc:`built-in interfaces <manual/solvers>` for
+popular Mathematical Programming and Constraint Programming solvers.
+Its support for rapid prototyping and high extensibility are designed to meet the needs of
+both researchers and practitioners in Operations Research and related fields.
 
 Installation
 -----------------------------------
@@ -21,14 +31,8 @@ Test whether the installation is successful:
 
     import benderslib
     print(benderslib.__version__)
+
     # Should output the version number, e.g., "0.1.0"
-
-
-BendersLib requires the following packages (``requirements.txt``), which will be installed automatically.
-
-.. code-block:: text
-
-    gurobipy>=12.0.0
 
 
 Quickstart
@@ -38,10 +42,11 @@ BendersLib make you easy to switch from a standard MIP model to Benders decompos
 Here is a simple example of solving a gurobi MIP model with BendersLib:
 
 .. code-block:: python
-   :emphasize-lines: 17-22
 
     from benderslib import AnnotationBenders, ClassicalBenders
     from benderslib.solvers import Gurobi
+
+    # pip install gurobipy
     from gurobipy import Model, GRB
 
     # Create a standard Gurobi model

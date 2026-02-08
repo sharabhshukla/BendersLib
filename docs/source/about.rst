@@ -1,10 +1,24 @@
 About
 ================================
 
+**BendersLib** (https://benders.dev) is a Python library that supports a range of Benders decomposition variants,
+including :doc:`tutorials/classical`, :doc:`tutorials/cbd`, :doc:`tutorials/lshaped`, :doc:`tutorials/ilshaped`,
+:doc:`tutorials/gbd`, and :doc:`tutorials/lbbd`.
+While BendersLib provides :doc:`built-in implementations of these methods <api/benders>`,
+it is designed to be extensible. Users can implement custom Benders decomposition methods by
+customizing :ref:`subproblem solvers <manual_custom_sub>` and :ref:`cut generators <manual_custom_cut>`,
+and defining :doc:`callback functions <manual/callbacks>` for :doc:`enhancement strategies <tutorials/enhance>`.
+BendersLib is solver agnostic and has :doc:`built-in interfaces <manual/solvers>` for
+popular Mathematical Programming and Constraint Programming solvers.
+Its support for rapid prototyping and high extensibility are designed to meet the needs of
+both researchers and practitioners in Operations Research and related fields.
+
 Creator
 --------------------------------
 
-Peng-Hui Guo: https://guo.ph
+BendersLib was created by **Peng-Hui Guo** (郭鹏辉, https://guo.ph),
+who holds a PhD in Management Science and Engineering
+from Nanjing University of Aeronautics and Astronautics (NUAA), China.
 
 Contributors
 --------------------------------
