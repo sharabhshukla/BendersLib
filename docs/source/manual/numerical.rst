@@ -47,3 +47,36 @@ This logic is implemented in the ``__eq__`` method of the :class:`~core.Cut` cla
 To ensure consistency, the ``__hash__`` method is also adapted. It discretizes the floating-point numbers
 (coefficients and RHS) based on the tolerance before hashing. This guarantees that cuts considered equal
 under the specified tolerance will also have the same hash value, allowing them to be managed correctly.
+
+Handling Large Cutting Coefficients
+--------------------------------------------
+
+In Benders decomposition, cut coefficients can sometimes become excessively large, leading to numerical instability.
+Mathematically equivalent cuts can lead to different convergence performances due to the
+limitations of finite-precision floating-point arithmetic. Cuts with large coefficients
+can make the master problem's constraint matrix ill-conditioned, leading to slower
+convergence, inaccurate solutions, or even solver failure.
+For instance, consider two mathematically equivalent cuts
+
+.. math::
+
+   10^9 x + 10^9 y & \ge 10^9 \\
+   x + y & \ge 1.
+
+Solvers use tolerances to determine whether a solution satisfies a constraint.
+A constraint :math:`a^T x \ge b` is considered satisfied if :math:`a^T x - b \ge -\epsilon`,
+where :math:`\epsilon` is a small positive number (e.g., :math:`10^{-6}`).
+For the normalized constraint :math:`x + y \ge 1`, if a solution
+results in :math:`x+y = 1 - 10^{-7}`, its violation is only :math:`10^{-7}`.
+This solution is very close to the feasible boundary and would be accepted by the solver's tolerance.
+However, for the constraint with large coefficients, :math:`10^9 x + 10^9 y \ge 10^9`,
+the same solution yields :math:`10^9(x+y) = 10^9(1 - 10^{-7}) = 10^9 - 100`.
+The constraint violation is a massive :math:`100`.
+This far exceeds a solver's standard tolerance, and the solution would be flagged as infeasible.
+This makes the solver struggle to find a feasible solution, leading to slow convergence or failure.
+
+Normalizing the cut,
+even though it doesn't change the feasible region, creates a better-conditioned problem
+that is more numerically stable for the solver to handle, often resulting in faster and more reliable convergence.
+Readers can refer to :doc:`../examples/expert/normalize_cut` for an example of how to normalize cuts
+using :doc:`callbacks <../manual/callbacks>` in BendersLib.
