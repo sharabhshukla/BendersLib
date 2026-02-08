@@ -138,4 +138,4 @@ if __name__ == '__main__':
 #
 #     * Example of the L-shaped method: :doc:`../basic/lshaped`
 #
-# .. tags:: benders: lbbd, benders: l-shaped, solver: gurobi, stochastic, custom subproblem
+# .. tags:: benders: lbbd, benders: l-shaped, solver: gurobi, stochastic, custom: subproblem

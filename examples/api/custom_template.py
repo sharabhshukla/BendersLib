@@ -76,4 +76,4 @@ if __name__ == '__main__':
 
 # %%
 #
-# .. tags:: solver: gurobi, custom cut
+# .. tags:: solver: gurobi, custom: cut

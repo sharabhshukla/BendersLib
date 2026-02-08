@@ -6,7 +6,10 @@ but its convergence can be slow. To address this, various acceleration strategie
 been developed, which can be broadly categorized into two groups: those that
 **speed up the solution of each iteration** and those that **reduce the total number of iterations**
 required to find a solution.
-We also recommend these papers [#]_ [#]_ [#]_ [#]_ [#]_ for the taxonomy of acceleration strategies.
+
+.. seealso::
+
+    We also recommend these papers [#]_ [#]_ [#]_ [#]_ [#]_ for taxonomies of acceleration strategies.
 
 .. mermaid::
    :align: center
