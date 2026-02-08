@@ -107,7 +107,7 @@ The optimal *Lagrange multipliers* :math:`\bar{\lambda}` for the subproblem are 
 The values of Lagrange multipliers play a similar role to values of dual variables in classical Benders Decomposition.
 
 .. admonition:: Special Case: Separable Problems
-    :class: example
+    :class: note
 
     A common special case is when the functions :math:`f(x, y)` and :math:`g(x, y)`
     are separable between :math:`x` and :math:`y`.
@@ -168,7 +168,7 @@ Generalized Optimality Cut
     Therefore, the user must ensure that the problem is **linearly separable** as described below.
 
 .. admonition:: Special Case: Linear Optimality Cuts
-    :class: example
+    :class: note
 
     The generalized optimality cut becomes linear in :math:`x` if the functions :math:`f(x, y)` and :math:`g(x, y)`
     meet two conditions: they are separable between :math:`x` and :math:`y`,
@@ -278,7 +278,7 @@ Generalized Feasibility Cut
     Therefore, the user must ensure that the problem is **linearly separable** as described below.
 
 .. admonition:: Special Case: Linear Feasibility Cuts
-    :class: example
+    :class: note
 
     Similar to the optimality cut, the generalized feasibility cut becomes linear if the
     function :math:`g(x, y)` is separable and linear in :math:`x`.

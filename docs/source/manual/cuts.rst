@@ -167,7 +167,7 @@ The primary purpose of a custom cut class is to structure the data required for 
 in a way that is meaningful and user-friendly for your specific problem.
 
 .. admonition:: Example
-   :class: note
+   :class: seealso
 
    Here is an example of BendersLib's built-in :class:`NoGoodFC` cut,
    which excludes a specific binary solution from the master problem.
@@ -215,7 +215,7 @@ To create and use one class-based cut generator, follow these steps.
 - **Step 4**.  Pass the custom cut generator class (not an instance) to the Benders solver when instantiating it.
 
 .. admonition:: Example
-    :class: note
+    :class: seealso
 
     Here is an example of a custom cut generator that creates the :class:`NoGoodFC` instances.
 
@@ -285,7 +285,7 @@ It is equivalent to the earlier class-based example.
     solver.solve()
 
 .. admonition:: Example
-    :class: note
+    :class: seealso
 
     :doc:`../examples/advanced/ilshaped_iis`, :doc:`../examples/advanced/lbbd`, :doc:`../examples/applications/lbbd_location`
 

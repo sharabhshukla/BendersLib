@@ -120,6 +120,7 @@ or :doc:`../tutorials/ilshaped`, logic-based Benders cuts are problem-specific.
     including no-good cuts, analytical cuts, etc.
 
 .. admonition:: Example
+    :class: seealso
 
     When the expression :math:`B_{\bar{x}^k}(x)` in the original cut :math:`z \geq B_{\bar{x}^k}(x)`
     is replaced by :math:`\beta_k = B_{\bar{x}^k}(\bar{x}^k)`, the cut takes the following form.

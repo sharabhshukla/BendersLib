@@ -143,7 +143,8 @@ demonstrates how to define and register both types of callbacks.
 
     benders.solve()
 
-.. seealso::
+.. admonition:: Example
+    :class: seealso
 
     More examples of callbacks can be found in the :doc:`../examples/expert/index`.
 

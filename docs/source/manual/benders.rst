@@ -240,7 +240,7 @@ Finally, it uses the specified Benders method (:class:`ClassicalBenders` in this
     the algorithm will not function correctly since :class:`ClassicalBenders` assumes a Linear Programming subproblem.
 
 .. admonition:: Example
-    :class: note
+    :class: seealso
 
     :ref:`manual_decompose_solve`, :doc:`../examples/basic/annotation_benders`, :doc:`../examples/api/decompose`,
     :doc:`../examples/basic/cbd`

@@ -88,7 +88,7 @@ Gurobi
     print(master_problem)
 
 .. admonition:: Example
-    :class: note
+    :class: seealso
 
     :doc:`../examples/basic/classical_benders`
 
@@ -114,7 +114,7 @@ Pyomo
     print(master_problem)
 
 .. admonition:: Example
-    :class: note
+    :class: seealso
 
     Tested solver backends for :doc:`../examples/solvers/solver_pyomo`
 
@@ -186,7 +186,7 @@ Here is an example of how to create a master/sub problem from an annotated model
     sub_problem = SubProblem(Gurobi(sub_model))
 
 .. admonition:: Example
-    :class: note
+    :class: seealso
 
     :ref:`manual_decompose_solve`, :doc:`../examples/basic/annotation_benders`, :doc:`../examples/api/decompose`,
     :doc:`../examples/basic/cbd`

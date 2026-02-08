@@ -22,7 +22,7 @@ either to exclude the current solution or to refine the objective function in su
 This iterative cycle repeats until the objective values of the master problem and the subproblem converge,
 indicating that the optimal solution to the original problem has been found.
 
-.. note::
+.. seealso::
 
     All :doc:`Benders decomposition variants <../tutorials/index>` share the same key components:
     **master problem**, **subproblem**, **Benders cuts**, and the **iterative solving process**.
@@ -81,7 +81,7 @@ Detailed API for each component can be found in the :doc:`API reference <../api/
   This abstraction allows the main Benders algorithm to remain independent of the specific solver used.
 
 .. admonition:: Related classes
-    :class: note
+    :class: seealso
 
     * Abstraction: :class:`SolverBase`, :class:`SolverCPBase`
     * Solver interfaces: :class:`~.solvers.Gurobi`, :class:`~.solvers.Copt`, :class:`~.solvers.Pyomo`, :class:`~.solvers.Scip`,
@@ -95,7 +95,7 @@ Detailed API for each component can be found in the :doc:`API reference <../api/
   and establish a lower bound on the optimal objective.
 
 .. admonition:: Related classes
-    :class: note
+    :class: seealso
 
     * :class:`ProblemBase`, :class:`MasterProblem`
 
@@ -107,7 +107,7 @@ Detailed API for each component can be found in the :doc:`API reference <../api/
   For stochastic problems, this component can manage multiple subproblems representing different scenarios.
 
 .. admonition:: Related classes
-    :class: note
+    :class: seealso
 
     * :class:`ProblemBase`, :class:`SubProblem`, :class:`LogicBasedSubProblem`, :class:`SubProblems`
 
@@ -118,7 +118,7 @@ Detailed API for each component can be found in the :doc:`API reference <../api/
   This abstracts the logic of cut generation, allowing maintaining global attributes for cut management.
 
 .. admonition:: Related classes
-    :class: note
+    :class: seealso
 
     * Abstraction:
       :class:`CutGenerator`, :class:`Cut`, :class:`OptimalityCut`, :class:`FeasibilityCut`
@@ -142,7 +142,7 @@ Detailed API for each component can be found in the :doc:`API reference <../api/
   and other custom variants by users.
 
 .. admonition:: Related classes
-    :class: note
+    :class: seealso
 
     * Abstraction: :class:`BendersSolver`,
     * Benders methods: :class:`ClassicalBenders`, :class:`CombinatorialBenders`,

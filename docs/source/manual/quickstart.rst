@@ -84,7 +84,7 @@ to model and solve an optimization problem.
 Other variants of Benders Decomposition follow a similar workflow, please refer to :doc:`benders` for more details.
 
 .. admonition:: Example
-    :class: note
+    :class: seealso
 
     The executable code is available at :doc:`../examples/basic/classical_benders`.
 

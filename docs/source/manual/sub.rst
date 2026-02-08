@@ -92,7 +92,7 @@ Gurobi
     print(sub_problem)
 
 .. admonition:: Example
-    :class: note
+    :class: seealso
 
     :doc:`../examples/basic/classical_benders`
 
@@ -118,7 +118,7 @@ Pyomo
     print(sub_problem)
 
 .. admonition:: Example
-    :class: note
+    :class: seealso
 
     Tested solver backends for :doc:`../examples/solvers/solver_pyomo`
 
@@ -218,7 +218,7 @@ Not all solvers support IIS computation, refer to the :ref:`solver-table` for de
 This method returns a set of variable names that are part of the IIS.
 
 .. admonition:: Example
-    :class: note
+    :class: seealso
 
     :doc:`../examples/iis/index`, :doc:`../examples/advanced/cbd_iis`, :doc:`../examples/advanced/ilshaped_iis`
 
@@ -255,7 +255,7 @@ This class takes an iterable of :class:`SubProblem` instances and their correspo
     sub_problems = SubProblems(sub_problem_instances, prob=probs)
 
 .. admonition:: Example
-    :class: note
+    :class: seealso
 
     :doc:`../examples/basic/lshaped`, :doc:`../examples/advanced/lbbd_lshaped`
 
@@ -384,7 +384,7 @@ However, for more complex subproblems that require maintaining state across iter
 a class-based approach is recommended.
 
 .. admonition:: Example
-    :class: note
+    :class: seealso
 
     - See :doc:`../examples/applications/lbbd_location` for how to implement a custom subproblem solver
       with a function, using logic-based Benders decomposition.
@@ -424,7 +424,7 @@ Simply create instances of your custom subproblem class for each scenario and pa
     sub_problems = SubProblems(subproblem_instances, prob=probs)
 
 .. admonition:: Example
-    :class: note
+    :class: seealso
 
     See :doc:`../examples/advanced/lbbd_lshaped` for how to implement the L-shaped method,
     which involves multiple subproblems, using logic-based Benders decomposition with custom subproblem classes.
@@ -437,7 +437,7 @@ But you can define the logic of solving multiple subproblems within a function,
 then using that function as a subproblem in a Benders decomposition algorithm.
 
 .. admonition:: Example
-    :class: note
+    :class: seealso
 
     See :doc:`../examples/advanced/lbbd_sp` for how to solve multiple subproblems
     with a function, using logic-based Benders decomposition.
