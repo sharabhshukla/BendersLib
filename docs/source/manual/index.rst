@@ -149,7 +149,6 @@ For complete, runnable code, please see the :doc:`../examples/index`.
    cuts.rst
    benders.rst
    callbacks.rst
-   enhance.rst
    logging.rst
    numerical.rst
    howto.rst

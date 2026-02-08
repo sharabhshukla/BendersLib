@@ -77,7 +77,7 @@ and :ref:`custom solvers <manual_custom_sub>`, making it possible to incorporate
 cuts and local branching.
 
 Introductions to some of these strategies are provided below.
-Though they are not exhaustive, they serve as :doc:`examples <../manual/enhance>` of
+Though they are not exhaustive, they serve as examples of
 how BendersLib can be used to implement various acceleration techniques.
 
 Cut Management

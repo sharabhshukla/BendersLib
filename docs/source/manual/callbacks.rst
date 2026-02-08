@@ -18,7 +18,7 @@ extracting intermediate data, or customizing behavior without altering the core 
 They are the primary mechanism for extending the Benders decomposition with advanced strategies
 like custom cut generation, problem-specific heuristics, and other acceleration techniques,
 which can significantly improve performance, stability, and convergence.
-See :doc:`enhance` for advanced acceleration techniques implemented via callbacks.
+See :doc:`../tutorials/enhance` for advanced acceleration techniques supported by BendersLib.
 
 The callback system in BendersLib operates on an event-driven basis.
 The :class:`BendersSolver` emits events at various stages of the decomposition process.
