@@ -80,10 +80,23 @@ Introductions to some of these strategies are provided below.
 Though they are not exhaustive, they serve as :doc:`examples <../manual/enhance>` of
 how BendersLib can be used to implement various acceleration techniques.
 
+Cut Management
+------------------------------
+
 Warm Starting
 ------------------------------
 
-[#]_
+Warm starting [#]_ is a technique used to improve the performance of iterative optimization
+algorithms by providing a good initial solution or starting point. In the context of
+Benders decomposition, warm starting can be applied to both the master problem and
+the subproblems. By providing a high-quality initial solution (e.g., from the previous iteration),
+the effort required to solve the master problem and subproblems can be reduced.
+
+.. admonition:: Example
+    :class: seealso
+
+    The example (:doc:`../examples/expert/warm_start`) demonstrates how to implement
+    warm starting in BendersLib using :doc:`../manual/callbacks`.
 
 Branch-and-Check Method
 ------------------------------
@@ -96,6 +109,21 @@ Parallelization
 CP and Algorithmic Solvers
 ------------------------------
 
+When subproblems exhibit special combinatorial structures, using specialized algorithms
+instead of general-purpose Mathematical Programming solvers can be significantly more efficient.
+This is the core idea behind :doc:`lbbd` and :doc:`cbd`.
+Constraint Programming (CP) is a powerful paradigm for solving combinatorial problems.
+It can serve as a general purpose subproblem solver.
+BendersLib facilitates this by providing :ref:`backends for CP solvers <solver-table>`,
+allowing users to seamlessly integrate them for solving subproblems within the Benders decomposition framework.
+
+.. admonition:: Example
+    :class: seealso
+
+    The example (:doc:`../examples/applications/lbbd_location`) demonstrates how to
+    implement :ref:`customized subproblem solvers <manual_custom_sub>`
+    within the :doc:`lbbd` framework using BendersLib.
+
 Pareto-optimal Cut
 ------------------------------
 
@@ -103,6 +131,23 @@ Pareto-optimal Cut
 
 Global Valid Inequalities
 ------------------------------
+
+Global valid inequalities are constraints added to the master problem to strengthen
+the formulation and accelerate convergence. Unlike traditional Benders cuts,
+which are derived from specific subproblem solutions, these inequalities
+are valid for the overall problem.
+They often encapsulate a relaxation of the subproblem, expressed
+in terms of master problem variables [#]_.
+In stochastic programming, a global bound for the estimator variables of the
+recourse function can tighten the master problem by providing stronger lower bound [#]_.
+Symmetry breaking constraints also fall into this category.
+
+.. admonition:: Note
+    :class: seealso
+
+    Global valid inequalities can be added at the beginning
+    of the algorithm when building the master problem, using solver-specific APIs.
+    They can also be added dynamically during the algorithm, using :doc:`../manual/callbacks`.
 
 Cut Lifting
 ------------------------------
@@ -113,6 +158,18 @@ Trust Region Method
 Cut Normalization
 ------------------------------
 
+Cut normalization enhances numerical stability in Benders decomposition by scaling
+cuts that have large coefficients and right-hand side (RHS) values. Multiplying
+the cut by a factor produces an equivalent but more manageable cut, which can
+improve convergence speed and reliability. A common normalization method is to
+divide the cut by the norm of its coefficients.
+
+.. admonition:: Example
+    :class: seealso
+
+    The example (:doc:`../examples/expert/normalize_cut`) demonstrates how to
+    implement cut normalization in BendersLib using :doc:`../manual/callbacks`.
+
 Local Branching
 ------------------------------
 
@@ -120,6 +177,18 @@ Local Branching
 
 Early Stopping
 ------------------------------
+
+Early stopping is a practical strategy to terminate the Benders decomposition process
+before the theoretical optimality gap is closed. This is often done when the
+improvement in the objective function becomes negligible over several iterations.
+This can save significant computation time, especially when finding the
+true optimal solution is not critical, and a good-enough solution is acceptable.
+
+.. admonition:: Example
+    :class: seealso
+
+    The example :doc:`../examples/expert/early_stop` demonstrates how to implement
+    early stopping in BendersLib using :doc:`../manual/callbacks`.
 
 References
 ------------------------------
@@ -142,6 +211,10 @@ References
 .. Pareto-optimal cuts
 .. [#] Magnanti, T. L., & Wong, R. T. (1981). Accelerating Benders Decomposition: Algorithmic Enhancement and Model Selection Criteria. Operations Research, 29(3), 464–484. https://doi.org/10.1287/opre.29.3.464
 .. [#] Kaltis, T., & Saharidis, G. K. D. (2025). Literature review on Benders cut selection and a multiple cut generation scheme. INFOR: Information Systems and Operational Research. https://www.tandfonline.com/doi/abs/10.1080/03155986.2025.2540205
+
+.. Global Valid Inequalities
+.. [#] Hooker, J. N. (2019). Logic-based Benders decomposition for large-scale optimization. In J. M. Velásquez-Bermúdez, M. Khakifirooz, & M. Fathi (Eds.), Large Scale Optimization in Supply Chains and Smart Manufacturing: Theory and Applications (pp. 1–26). Springer International Publishing. https://doi.org/10.1007/978-3-030-22788-3_1
+.. [#] Guo, P., & Zhu, J. (2023). Capacity reservation for humanitarian relief: A logic-based Benders decomposition method with subgradient cut. European Journal of Operational Research, 311(3), 942–970. https://doi.org/10.1016/j.ejor.2023.06.006
 
 .. Local Branching
 .. [#] Fischetti, M., & Lodi, A. (2003). Local branching. Mathematical Programming, 98(1), 23–47. https://doi.org/10.1007/s10107-003-0395-5
