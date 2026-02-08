@@ -1513,7 +1513,7 @@ class BendersSolver:
 
         if self.__trigger_callbacks_and_terminate(EVENTS.ON_BENDERS_END): return
 
-    def register_callback(self, callback: CallbackBase | Callable) -> None:
+    def register_callback(self, callback: CallbackBase | Callable | Type[CallbackBase]) -> None:
         """Register a user-defined callback to be called during the Benders solving process.
 
         Users can define custom callbacks by inheriting from :class:`CallbackBase` and
@@ -1526,8 +1526,8 @@ class BendersSolver:
         Parameters
         ---------------
 
-        callback : CallbackBase | Callable
-            A callback instance inherited from :class:`CallbackBase` or
+        callback : CallbackBase | Callable | Type[CallbackBase]
+            A callback instance (or class) inherited from :class:`CallbackBase` or
             a function with signature ``func(context: BendersContext) -> CST.PROCEED | CST.TERMINATE | None``.
 
         Example
