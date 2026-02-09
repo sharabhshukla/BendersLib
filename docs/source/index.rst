@@ -1,6 +1,8 @@
 .. image:: _static/benderslib.png
    :align: center
+   :height: 250px
 
+------
 
 Home
 ===================================

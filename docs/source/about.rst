@@ -13,9 +13,6 @@ popular Mathematical Programming and Constraint Programming solvers.
 Its support for rapid prototyping and high extensibility are designed to meet the needs of
 both researchers and practitioners in Operations Research and related fields.
 
-Creator
---------------------------------
-
 BendersLib was created by **Peng-Hui Guo** (郭鹏辉, https://guo.ph),
 who holds a PhD in Management Science and Engineering
 from Nanjing University of Aeronautics and Astronautics (NUAA), China.
@@ -23,8 +20,8 @@ from Nanjing University of Aeronautics and Astronautics (NUAA), China.
 Contributors
 --------------------------------
 
-Acknowledgements
---------------------------------
+*Contributions to BendersLib are welcome! If you would like to contribute, please visit*
+:doc:`manual/contribution` *for more information.*
 
 Citing BendersLib
 --------------------------------
@@ -42,8 +39,21 @@ Guo, PH (2025). *BendersLib: An Extensible Benders Decomposition Library in Pyth
       howpublished = {\\url{https://github.com/phguo/BendersLib}}
     }
 
-Papers Citing BendersLib
---------------------------------
+.. rubric:: Papers Citing BendersLib
 
-*We update this list regularly. If you have a paper that cites
-BendersLib but is not listed here, please let us know!*
+*We update this list regularly. If you have a paper citing
+BendersLib and would like it listed here, please let us know!*
+
+------
+
+.. rubric:: Logo (vertical)
+
+.. image:: _static/benderslib_v.png
+   :align: center
+   :height: 280px
+
+.. rubric:: Logo (horizontal)
+
+.. image:: _static/benderslib.png
+   :align: center
+   :height: 250px
