@@ -9,7 +9,8 @@ required to find a solution.
 
 .. seealso::
 
-    We also recommend these papers [#]_ [#]_ [#]_ [#]_ [#]_ for taxonomies of acceleration strategies.
+    We recommend these papers [#]_ [#]_ [#]_ [#]_ [#]_, these slides [#]_ [#]_,
+    and this blog post [#]_ for discussions on enhancement strategies for Benders decomposition.
 
 .. mermaid::
    :align: center
@@ -101,7 +102,7 @@ the effort required to solve the master problem and subproblems can be reduced.
 Branch-and-Check Method
 ------------------------------
 
-[#]_ [#]_ [#]_
+[#]_ [#]_ [#]_ [#]_
 
 Parallelization
 ------------------------------
@@ -127,7 +128,7 @@ allowing users to seamlessly integrate them for solving subproblems within the B
 Pareto-optimal Cut
 ------------------------------
 
-[#]_  [#]_
+[#]_ [#]_ [#]_
 
 Global Valid Inequalities
 ------------------------------
@@ -154,6 +155,22 @@ Cut Lifting
 
 Trust Region Method
 ------------------------------
+
+The trust region method is a stabilization technique used to address the oscillatory behavior
+often observed in Benders decomposition, where master variable solutions can jump between
+distant points in the feasible region, slowing convergence. The core idea is to restrict the
+master problem's solution to a *trust region* around the current incumbent solution.
+This is achieved by adding a constraint that limits the distance between a new solution and the
+current best solution. By preventing drastic changes in the master variables, the trust region
+method promotes a more stable convergence.
+
+.. admonition:: Example
+    :class: seealso
+
+    Using :doc:`../manual/callbacks` provided by BendersLib, the trust region methods are implement in
+    this example (:doc:`../examples/expert/trust_region`) with L1 norm,
+    this example (:doc:`../examples/expert/trust_region_box`) with box constraints,
+    this example (:doc:`../examples/expert/trust_region_bin`) with Hamming distance [#]_.
 
 Cut Normalization
 ------------------------------
@@ -199,22 +216,32 @@ References
 .. [#] Hooker, J. (2024). Logic-Based Benders Decomposition: Theory and Applications. Springer International Publishing. https://doi.org/10.1007/978-3-031-45039-6
 .. [#] Naderi, B., & Roshanaei, V. (2020). Branch-Relax-and-Check: A tractable decomposition method for order acceptance and identical parallel machine scheduling. European Journal of Operational Research, 286(3), 811–827. https://doi.org/10.1016/j.ejor.2019.10.014
 .. [#] Nasirian, A., Zhang, L., Costa, A. M., & Abbasi, B. (2024). Multiskilled workforce staffing and scheduling: A logic-based benders’ decomposition approach. European Journal of Operational Research. https://doi.org/10.1016/j.ejor.2024.11.033
+.. Slides
+.. [#] Dalmeijer, K., & Tanneau, M. (2021, October 7). Benders 102—Acceleration techniques. https://github.com/mtanneau/or_tutorials
+.. [#] Frangioni, A. (2021, February 9). The Long Road to Practical Decomposition Methods Part III: Many Twists and Turns Part IV: A Useful Companion on the Road. AIRO PhD School 2021 & 5th AIRO Young Workshop, Dipartimento di Informatica, Universit`a di Pisa. https://www.plan4res.eu/wp-content/uploads/2021/02/Napoli-2021-II.pdf
+.. Blog
+.. [#] Maher, S. J. (2015). So you have decided to use Benders’ decomposition. Be prepared for what comes next!!! https://www.drstephenjmaher.com/blog/blog-entry.php?blogfile=bendersDecomp
 
 .. Warm Starting
 .. [#] Bolusani, S., Besançon, M., Gleixner, A., Berthold, T., D’Ambrosio, C., Muñoz, G., Paat, J., & Thomopulos, D. (2024). The MIP Workshop 2023 Computational Competition on reoptimization. Mathematical Programming Computation. https://doi.org/10.1007/s12532-024-00256-w
 
 .. Branch-and-Benders Method
 .. [#] Thorsteinsson, E. S. (2001). Branch-and-check: A hybrid framework integrating mixed integer programming and constraint logic programming. In T. Walsh (Ed.), Principles and Practice of Constraint Programming—CP 2001 (pp. 16–30). Springer. https://doi.org/10.1007/3-540-45578-7_2
+.. [#] Beck, J. C. (2010). Checking-Up on Branch-and-Check. In D. Cohen (Ed.), Principles and Practice of Constraint Programming – CP 2010 (pp. 84–98). Springer. https://doi.org/10.1007/978-3-642-15396-9_10
 .. [#] Gendron, B., Scutellà, M. G., Garroppo, R. G., Nencioni, G., & Tavanti, L. (2016). A branch-and-Benders-cut method for nonlinear power design in green wireless local area networks. European Journal of Operational Research, 255(1), 151–162. https://doi.org/10.1016/j.ejor.2016.04.058
 .. [#] Rubin, P. A. (2011, October 9). Benders Decomposition Then and Now. OR in an OB World. https://orinanobworld.blogspot.com/2011/10/benders-decomposition-then-and-now.html
 
 .. Pareto-optimal cuts
 .. [#] Magnanti, T. L., & Wong, R. T. (1981). Accelerating Benders Decomposition: Algorithmic Enhancement and Model Selection Criteria. Operations Research, 29(3), 464–484. https://doi.org/10.1287/opre.29.3.464
+.. [#] Fischetti, M., Salvagnin, D., & Zanette, A. (2010). A note on the selection of Benders’ cuts. Mathematical Programming, 124(1–2), 175–182. https://doi.org/10.1007/s10107-010-0365-7
 .. [#] Kaltis, T., & Saharidis, G. K. D. (2025). Literature review on Benders cut selection and a multiple cut generation scheme. INFOR: Information Systems and Operational Research. https://www.tandfonline.com/doi/abs/10.1080/03155986.2025.2540205
 
 .. Global Valid Inequalities
 .. [#] Hooker, J. N. (2019). Logic-based Benders decomposition for large-scale optimization. In J. M. Velásquez-Bermúdez, M. Khakifirooz, & M. Fathi (Eds.), Large Scale Optimization in Supply Chains and Smart Manufacturing: Theory and Applications (pp. 1–26). Springer International Publishing. https://doi.org/10.1007/978-3-030-22788-3_1
 .. [#] Guo, P., & Zhu, J. (2023). Capacity reservation for humanitarian relief: A logic-based Benders decomposition method with subgradient cut. European Journal of Operational Research, 311(3), 942–970. https://doi.org/10.1016/j.ejor.2023.06.006
+
+.. Trust Region Method
+.. [#] Santoso, T., Ahmed, S., Goetschalckx, M., & Shapiro, A. (2005). A stochastic programming approach for supply chain network design under uncertainty. European Journal of Operational Research, 167(1), 96–115. https://doi.org/10.1016/j.ejor.2004.01.046
 
 .. Local Branching
 .. [#] Fischetti, M., & Lodi, A. (2003). Local branching. Mathematical Programming, 98(1), 23–47. https://doi.org/10.1007/s10107-003-0395-5
