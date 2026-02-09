@@ -1347,7 +1347,9 @@ class BendersSolver:
         self.result.n_sol += 1
         self.result.status = CST.FEASIBLE
 
-        _new_lb_found = self.master_problem.get_obj() > self.result.lb
+        # _new_lb_found = self.master_problem.get_obj() > self.result.lb
+        # The master problem objective is monotonously non-decreasing with cut being added
+        _new_lb_found = True
         if _new_lb_found:
             self.result.lb = self.master_problem.get_obj()
         estimator_vals = self.master_problem.get_estimator_values()
