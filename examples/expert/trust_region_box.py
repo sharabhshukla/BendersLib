@@ -1,8 +1,8 @@
 # coding:utf-8
 
 """
-Trust Region Method (L1 Norm)
-==================================
+Trust Region Method (Box Constraints)
+=========================================
 """
 
 # %%
@@ -44,35 +44,25 @@ class TrustRegionCallback(CallbackBase):
         self._pre_master_sol = None
         self._trust_region_added = False
 
-        # Store the auxiliary variables and constraints added for the trust region, so that we can remove them later.
-        self._pre_aux_cons = []
-        self._pre_aux_vars = []
-        self._pre_tr_cons = None
+        # Store trust region constraints, so that we can remove them later.
+        self._pre_tr_cons = []
 
     def on_before_master_solve(self, context):
-        aux_vars = []
 
         if self._pre_master_sol and not self._trust_region_added:
 
             # Add a trust region constraint to restrict the master solution within
             # a certain radius from the trust region center (the best-known solution).
-            # The distance is computed using L1 norm, which can be linearized
-            # by introducing auxiliary variables and constraints.
 
             for var_name in self._pre_master_sol:
                 var = context.master_problem.model.getVarByName(var_name)
 
-                # The distance aux_var = |var - pre_master_sol[var_name]| is linearized.
-                aux_var = context.master_problem.model.addVar(name=f"aux_{var_name}", lb=0)
-                aux_cons_a = context.master_problem.model.addConstr(aux_var >= var - self._pre_master_sol[var_name])
-                aux_cons_b = context.master_problem.model.addConstr(aux_var >= self._pre_master_sol[var_name] - var)
+                # Add box constraint var \in [pre_master_sol[var_name] - radius, pre_master_sol[var_name] + radius]
+                box_cons_l = context.master_problem.model.addConstr(var >= self._pre_master_sol[var_name] - self.radius)
+                box_cons_u = context.master_problem.model.addConstr(var <= self._pre_master_sol[var_name] + self.radius)
 
-                aux_vars.append(aux_var)
-                self._pre_aux_cons.append(aux_cons_a)
-                self._pre_aux_cons.append(aux_cons_b)
-
-            self._pre_tr_cons = context.master_problem.model.addConstr(sum(aux_vars) <= self.radius)
-            self._pre_aux_vars.extend(aux_vars)
+                self._pre_tr_cons.append(box_cons_l)
+                self._pre_tr_cons.append(box_cons_u)
 
             self._trust_region_added = True
 
@@ -84,18 +74,9 @@ class TrustRegionCallback(CallbackBase):
         if self._pre_tr_cons:
             context.master_problem.model.remove(self._pre_tr_cons)
 
-        # Remove auxiliary constraints
-        if self._pre_aux_cons:
-            context.master_problem.model.remove(self._pre_aux_cons)
-            self._pre_aux_cons = []
-
-        # Remove auxiliary variables
-        if self._pre_aux_vars:
-            context.master_problem.model.remove(self._pre_aux_vars)
-            self._pre_aux_vars = []
-
         # Trust region is updated only when a new upper bound is found, so we can reset the flag here.
         self._trust_region_added = False
+        self._pre_tr_cons = []
 
 
 # %%
@@ -117,7 +98,7 @@ BD = AnnotationBenders(
     complicating_vars=complicating_vars,
     benders=ClassicalBenders
 )
-trust_region_callback = TrustRegionCallback(20)
+trust_region_callback = TrustRegionCallback(1)
 BD.benders.register_callback(trust_region_callback)
 BD.solve()
 draw_curve(BD.result)
