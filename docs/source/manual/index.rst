@@ -122,8 +122,12 @@ Consider one of these alternatives if BendersLib does not meet your requirements
       - C
       - Commercial
     * - `CPLEX <https://www.ibm.com/docs/en/icos/22.1.1?topic=optimizers-users-manual-cplex>`_
-      - An optimization solver that supports annotated Benders decomposition.
+      - An optimization solver that supports annotated Benders decomposition [5]_.
       - C/C++, Java, .NET
+      - Commercial
+    * - `AIMMS <https://documentation.aimms.com/language-reference/optimization-modeling-components/automatic-benders-decomposition/index.html>`__
+      - An optimization modeling system that supports automatic Benders decomposition.
+      - AIMMS Language
       - Commercial
 
 *\* Note: SCIP has a Python interface namely* `PySCIPOpt <https://pyscipopt.readthedocs.io>`_;
@@ -161,3 +165,4 @@ References
 .. [2] Maher, S. J. (2021). Implementing the branch-and-cut approach for a general purpose Benders’ decomposition framework. European Journal of Operational Research, 290(2), 479–498. https://doi.org/10.1016/j.ejor.2020.08.037
 .. [3] Biel, M., & Johansson, M. (2022). Efficient Stochastic Programming in Julia. INFORMS Journal on Computing, 34(4), 1885–1902. https://doi.org/10.1287/ijoc.2022.1158
 .. [4] Dowson, O., & Kapelevich, L. (2021). SDDP.jl: A Julia Package for Stochastic Dual Dynamic Programming. INFORMS Journal on Computing, 33(1), 27–33. https://doi.org/10.1287/ijoc.2020.0987
+.. [5] Bonami, P., Salvagnin, D., & Tramontani, A. (2020). Implementing Automatic Benders Decomposition in a Modern MIP Solver. In D. Bienstock & G. Zambelli (Eds.), Integer Programming and Combinatorial Optimization (pp. 78–90). Springer International Publishing. https://doi.org/10.1007/978-3-030-45771-6_7

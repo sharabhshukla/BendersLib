@@ -161,6 +161,7 @@ A Benders decomposition variant usually require one or two features to work prop
 .. Solver List by YALMIP:       https://yalmip.github.io/allsolvers/
 .. Solver List by PySCIPOpt:    https://pyscipopt.readthedocs.io/en/latest/solvers.html
 .. Solver List by CBC:          https://github.com/coin-or/Cbc
+.. Solver List by AIMMS:        https://documentation.aimms.com/platform/solvers/solvers.html
 
 .. [1] *Pyomo is a modeling language. Supported solvers must be installed separately, see*
        :ref:`solver-installation-table` *(by BendersLib),*
