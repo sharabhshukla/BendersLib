@@ -153,6 +153,8 @@ Symmetry breaking constraints also fall into this category.
 Cut Lifting
 ------------------------------
 
+.. _enhance_trust_region:
+
 Trust Region Method
 ------------------------------
 
@@ -168,9 +170,8 @@ method promotes a more stable convergence.
     :class: seealso
 
     Using :doc:`../manual/callbacks` provided by BendersLib, the trust region methods are implement in
-    this example (:doc:`../examples/expert/trust_region`) with L1 norm,
-    this example (:doc:`../examples/expert/trust_region_box`) with box constraints,
-    this example (:doc:`../examples/expert/trust_region_bin`) with Hamming distance [#]_.
+    :doc:`../examples/expert/trust_region_l1`, :doc:`../examples/expert/trust_region_box`,
+    and :doc:`../examples/expert/trust_region_bin` (with Hamming distance [#]_).
 
 Cut Normalization
 ------------------------------
