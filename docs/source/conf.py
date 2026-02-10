@@ -183,7 +183,7 @@ html_theme_options = {
         "color-highlighted-background": "yellow",
     },
     "announcement": "This is a "
-                    "<b><a href=\"https://en.wikipedia.org/wiki/Software_release_life_cycle#Beta\">Beta release</a></b>. "
+                    "<em><a href=\"https://en.wikipedia.org/wiki/Software_release_life_cycle#Beta\">Beta release</a></em>. "
                     "The API is subject to change, and bugs may be present. "
                     "Do not trust the results without further testing and validation.",
     "sidebar_hide_name": True,

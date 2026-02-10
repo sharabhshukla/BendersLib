@@ -1,4 +1,4 @@
-Contributor Guide
+Contributing
 ==================================================
 
 .. currentmodule:: benderslib
