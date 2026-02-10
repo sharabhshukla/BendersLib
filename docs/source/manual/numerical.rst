@@ -48,6 +48,8 @@ To ensure consistency, the ``__hash__`` method is also adapted. It discretizes t
 (coefficients and RHS) based on the tolerance before hashing. This guarantees that cuts considered equal
 under the specified tolerance will also have the same hash value, allowing them to be managed correctly.
 
+.. _manual_numerical_large_cut_coefficients:
+
 Handling Large Cutting Coefficients
 --------------------------------------------
 

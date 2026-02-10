@@ -176,7 +176,8 @@ Cut Normalization
 ------------------------------
 
 Cut normalization enhances numerical stability in Benders decomposition by scaling
-cuts that have large coefficients and right-hand side (RHS) values. Multiplying
+:ref:`cuts that have large coefficients <manual_numerical_large_cut_coefficients>`
+and right-hand side (RHS) values. Multiplying
 the cut by a factor produces an equivalent but more manageable cut, which can
 improve convergence speed and reliability. A common normalization method is to
 divide the cut by the norm of its coefficients.
