@@ -193,10 +193,23 @@ divide the cut by the norm of its coefficients.
     This example (:doc:`../examples/expert/normalize_cut`) demonstrates how to
     implement cut normalization in BendersLib using :doc:`../manual/callbacks`.
 
+.. _enhance_local_branching:
+
 Local Branching
 ------------------------------
 
-[#]_ [#]_
+Local branching [#]_ is a heuristic that explores the neighborhood of a good
+incumbent solution to find improved solutions. It works by adding a
+*local branching* constraint that limits the number of binary variables
+that can change their value from the incumbent, creating an easier-to-solve problem.
+In the context of Benders decomposition, this helps to find better upper bounds
+and generate different cuts to obtain better lower bounds, which can accelerate convergence [#]_.
+
+.. admonition:: Example
+    :class: seealso
+
+    This example (:doc:`../examples/expert/local_branch`) demonstrates how to
+    implement local branching in BendersLib using :doc:`../manual/callbacks`.
 
 .. _enhance_early_stop:
 
