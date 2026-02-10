@@ -175,6 +175,8 @@ method promotes a more stable convergence.
     :doc:`../examples/expert/trust_region_l1`, :doc:`../examples/expert/trust_region_box`,
     and :doc:`../examples/expert/trust_region_bin` (with Hamming distance [#]_).
 
+.. _enhance_cut_normalization:
+
 Cut Normalization
 ------------------------------
 

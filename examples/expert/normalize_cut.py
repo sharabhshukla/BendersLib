@@ -90,5 +90,8 @@ if __name__ == "__main__":
     benders.solve()
 
 # %%
+# .. seealso::
+#
+#    - A brief introduction to :ref:`enhance_cut_normalization`.
 #
 # .. tags:: benders: classical, solver: gurobi, deterministic, callback, enhancement
