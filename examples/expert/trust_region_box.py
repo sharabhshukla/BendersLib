@@ -39,8 +39,10 @@ def make_original_problem():
 # Define the trust region callback.
 class TrustRegionCallback(CallbackBase):
 
-    def __init__(self, radius):
+    def __init__(self, radius, till_iter):
         self.radius = radius
+        self.till_iter = till_iter
+
         self._pre_master_sol = None
         self._trust_region_added = False
 
@@ -70,13 +72,21 @@ class TrustRegionCallback(CallbackBase):
         # Save best-known solution as the trust region center
         self._pre_master_sol = context.master_problem.get_var_values()
 
-        # Remove trust region constraints
+        # Remove trust region
+        self._remove_trust_region(context)
+
+    def on_iteration_end(self, context):
+        # Remove trust region after certain iterations
+        if context.state.n_iter >= self.till_iter:
+            self._remove_trust_region(context)
+            self._trust_region_added = True
+
+    def _remove_trust_region(self, context):
         if self._pre_tr_cons:
             context.master_problem.model.remove(self._pre_tr_cons)
 
-        # Trust region is updated only when a new upper bound is found, so we can reset the flag here.
-        self._trust_region_added = False
         self._pre_tr_cons = []
+        self._trust_region_added = False
 
 
 # %%
@@ -88,6 +98,8 @@ class TrustRegionCallback(CallbackBase):
 #     In some extreme cases (small radius), trust region constraints may even make the master problem infeasible,
 #     causing the algorithm to fail.
 #
+#     Therefore, **trust region must be removed after certain iterations** to ensure global convergence.
+#
 # Run with the trust region callback.
 model, complicating_vars = make_original_problem()
 model_copy = model.copy()
@@ -98,7 +110,7 @@ BD = AnnotationBenders(
     complicating_vars=complicating_vars,
     benders=ClassicalBenders
 )
-trust_region_callback = TrustRegionCallback(1)
+trust_region_callback = TrustRegionCallback(1, 80)
 BD.benders.register_callback(trust_region_callback)
 BD.solve()
 draw_curve(BD.result)
@@ -115,5 +127,9 @@ BD_no_tr.solve()
 draw_curve(BD_no_tr.result)
 
 # %%
+# .. seealso::
+#
+#    - A brief introduction to :ref:`enhance_trust_region`.
+#    - **Examples**: :doc:`trust_region_l1`, :doc:`trust_region_box`, :doc:`trust_region_bin`
 #
 # .. tags:: benders: classical, solver: gurobi, deterministic, callback
