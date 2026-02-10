@@ -17,6 +17,8 @@ BendersLib was created by **Peng-Hui Guo** (郭鹏辉, https://guo.ph),
 who holds a PhD in Management Science and Engineering
 from Nanjing University of Aeronautics and Astronautics (NUAA), China.
 
+------
+
 Contributors
 --------------------------------
 
@@ -26,6 +28,8 @@ Contributors
 .. contributors:: phguo/BendersLib
     :avatars:
     :limit: 100
+
+------
 
 Citing BendersLib
 --------------------------------
@@ -49,6 +53,9 @@ Guo, PH (2025). *BendersLib: An Extensible Benders Decomposition Library in Pyth
 BendersLib and would like it listed here, please let us know!*
 
 ------
+
+Logo
+--------------------------------
 
 .. rubric:: Logo (vertical)
 

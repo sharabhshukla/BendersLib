@@ -17,9 +17,9 @@ today_date = __import__('datetime').datetime.now().strftime('%Y-%m-%d')
 today_year = __import__('datetime').datetime.now().year
 
 project = 'BendersLib'
-copyright = f'2025-{today_year} Peng-Hui Guo (latest update: {today_date})'
 author = 'Peng-Hui Guo'
 release = '0.0.1'
+copyright = f'2025-{today_year} {author} (Latest update: {today_date})'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -182,7 +182,10 @@ html_theme_options = {
         "color-api-name": another_blue,
         "color-highlighted-background": "yellow",
     },
-    # "announcement": "This is an Alpha release, the API may change in future and there might be bugs."
+    "announcement": "This is a "
+                    "<b><a href=\"https://en.wikipedia.org/wiki/Software_release_life_cycle#Beta\">Beta release</a></b>. "
+                    "The API is subject to change, and bugs may be present. "
+                    "Do not trust the results without further testing and validation.",
     "sidebar_hide_name": True,
 }
 
