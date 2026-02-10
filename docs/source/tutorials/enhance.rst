@@ -84,6 +84,8 @@ how BendersLib can be used to implement various acceleration techniques.
 Cut Management
 ------------------------------
 
+.. _enhance_warm_start:
+
 Warm Starting
 ------------------------------
 
@@ -193,6 +195,8 @@ Local Branching
 ------------------------------
 
 [#]_ [#]_
+
+.. _enhance_early_stop:
 
 Early Stopping
 ------------------------------

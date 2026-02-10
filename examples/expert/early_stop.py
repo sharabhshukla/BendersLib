@@ -89,5 +89,8 @@ if __name__ == '__main__':
     draw_curve(AB.result)
 
 # %%
+# .. seealso::
+#
+#    - A brief introduction to :ref:`enhance_early_stop`.
 #
 # .. tags:: benders: classical, solver: gurobi, deterministic, callback, enhancement
