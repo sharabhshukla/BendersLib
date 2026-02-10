@@ -78,7 +78,8 @@ A breif introduction of the components of these varaints is given below.
 
    * A review of Benders Decomposition by Rahmaniani et al. [9]_.
    * A review of Jacques Benders' life and work by Aardal et al. [10]_.
-   * Useful practical guidelines for implementing (Logic-based) Benders Decomposition (Section 2.7) [11]_.
+   * A review of Integer Linear Programming that covers Benders Decomposition by Clautiaux and Ljubić [11]_.
+   * Useful practical guidelines for implementing (Logic-based) Benders Decomposition (Section 2.7) [12]_.
 
 
 Contents
@@ -109,4 +110,5 @@ References
 .. [8] Kelley, Jr., J. E. (1960). The cutting-plane method for solving convex programs. Journal of the Society for Industrial and Applied Mathematics, 8(4), 703–712. https://doi.org/10.1137/0108053
 .. [9] Rahmaniani, R., Crainic, T. G., Gendreau, M., & Rei, W. (2017). The Benders Decomposition algorithm: A literature review. European Journal of Operational Research, 259(3), 801–817. https://doi.org/10.1016/j.ejor.2016.12.005
 .. [10] Aardal, K., Hurkens, C., & Lenstra, J. K. (2025). Jacques Benders and his decomposition algorithm. Operations Research Letters, 63, 107361. https://doi.org/10.1016/j.orl.2025.107361
-.. [11] Hooker, J. (2024). Logic-Based Benders Decomposition: Theory and Applications. Springer International Publishing. https://doi.org/10.1007/978-3-031-45039-6
+.. [11] Clautiaux, F., & Ljubić, I. (2025). Last fifty years of integer linear programming: A focus on recent practical advances. European Journal of Operational Research, 324(3), 707–731.
+.. [12] Hooker, J. (2024). Logic-Based Benders Decomposition: Theory and Applications. Springer International Publishing. https://doi.org/10.1007/978-3-031-45039-6
