@@ -36,6 +36,7 @@ extensions = [
     # 'sphinx_tabs.tabs',  # Tabbed content, works with Shibuya theme
     'sphinx_inline_tabs',
     'sphinx_tags',
+    'sphinx_contributors',
 ]
 
 # sphinx_tags configuration

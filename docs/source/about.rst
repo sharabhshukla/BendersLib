@@ -23,6 +23,10 @@ Contributors
 *Contributions to BendersLib are welcome! If you would like to contribute, please visit*
 :doc:`manual/contribution` *for more information.*
 
+.. contributors:: phguo/BendersLib
+    :avatars:
+    :limit: 100
+
 Citing BendersLib
 --------------------------------
 
