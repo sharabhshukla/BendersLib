@@ -11,6 +11,7 @@ from benderslib import AnnotationBenders, ClassicalBenders, CallbackBase
 from benderslib.solvers import Gurobi
 from gurobipy import Model, GRB
 import math
+from benderslib.utils import draw_curve
 
 
 def make_original_problem():
@@ -71,7 +72,7 @@ class CutNormalization(CallbackBase):
             cut.coefs = [c * scale for c in cut.coefs]
             cut.rhs *= scale
 
-            print(f"{cut.name} normalized with scale {scale}.")
+            # print(f"{cut.name} normalized with scale {scale}.")
 
 
 # %%
@@ -88,6 +89,8 @@ if __name__ == "__main__":
     # Comment out the normalization callback to see the difference in performance.
     benders.benders.register_callback(CutNormalization())
     benders.solve()
+    draw_curve(benders.result)
+
 
 # %%
 # .. seealso::

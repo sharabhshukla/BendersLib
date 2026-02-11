@@ -105,9 +105,9 @@ Cut Management
 As the number of iterations increases, the master problem
 can become encumbered by a large number of cuts, many of which may no longer be
 relevant or effective. This can significantly slow down the solution process.
-Cut management techniques aim to control the size of the master problem by
-selectively removing insignificant cuts. By keeping the master problem
-lean, the overall performance of the algorithm can be improved.
+Cut management, or *cut pooling*, techniques aim to control
+the size of the master problem by selectively removing insignificant cuts.
+By keeping the master problem lean, the overall performance of the algorithm can be improved.
 
 .. admonition:: Example
     :class: seealso
