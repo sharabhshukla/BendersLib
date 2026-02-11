@@ -44,7 +44,6 @@ required to find a solution.
 
        C1 --> C1b(Global Valid Inequalities);
        C1 --> C1a(Pareto-Optimal Cuts);
-       C1 --> C1c(Cut Lifting);
        C2 --> C2b(Cut Normalization);
        C2 --> C2a(Trust Region);
        C3 --> C3a(Local Branching);
@@ -59,7 +58,7 @@ required to find a solution.
        class A root;
        class B,C mainBranch;
        class B1,B2,C1,C2,C3 midLevel;
-       class B1a,B1b,C3c,B2a,B2b,B2d,C1a,C1b,C1c,C2a,C2b,C3a,C3b leaf;
+       class B1a,B1b,C3c,B2a,B2b,B2d,C1a,C1b,C2a,C2b,C3a,C3b leaf;
 
 BendersLib is designed with a flexible and extensible architecture that facilitates the
 implementation of these acceleration strategies. The library's :doc:`callback system <../manual/callbacks>` allows
@@ -178,11 +177,6 @@ Pareto-optimal Cut
 .. [#] Magnanti, T. L., & Wong, R. T. (1981). Accelerating Benders Decomposition: Algorithmic Enhancement and Model Selection Criteria. Operations Research, 29(3), 464–484. https://doi.org/10.1287/opre.29.3.464
 .. [#] Fischetti, M., Salvagnin, D., & Zanette, A. (2010). A note on the selection of Benders’ cuts. Mathematical Programming, 124(1–2), 175–182. https://doi.org/10.1007/s10107-010-0365-7
 .. [#] Kaltis, T., & Saharidis, G. K. D. (2025). Literature review on Benders cut selection and a multiple cut generation scheme. INFOR: Information Systems and Operational Research. https://www.tandfonline.com/doi/abs/10.1080/03155986.2025.2540205
-
-------
-
-Cut Lifting
-------------------------------
 
 ------
 
