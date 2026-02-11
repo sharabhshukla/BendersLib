@@ -13,6 +13,11 @@ popular Mathematical Programming and Constraint Programming solvers.
 Its support for rapid prototyping and high extensibility are designed to meet the needs of
 both researchers and practitioners in Operations Research and related fields.
 
+- Documentation:        https://benders.dev
+- GitHub Repository:    https://github.com/phguo/BendersLib
+- PyPI Package:         https://pypi.org/project/BendersLib
+- Paper:                https://\*\*\*
+
 ------
 
 Contributors

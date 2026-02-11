@@ -7,11 +7,6 @@ been developed, which can be broadly categorized into two groups: those that
 **speed up the solution of each iteration** and those that **reduce the total number of iterations**
 required to find a solution.
 
-.. seealso::
-
-    We recommend these papers [#]_ [#]_ [#]_ [#]_ [#]_, these slides [#]_ [#]_,
-    and this blog post [#]_ for discussions on enhancement strategies for Benders decomposition.
-
 .. mermaid::
    :align: center
    :caption: Benders Decomposition Acceleration Strategies
@@ -79,6 +74,8 @@ Introductions to some of these strategies are provided below.
 Though they are not exhaustive, they serve as examples of
 how BendersLib can be used to implement various acceleration techniques.
 
+------
+
 .. _enhance_warm_start:
 
 Warm Starting
@@ -96,11 +93,20 @@ the effort required to solve the master problem and subproblems can be reduced.
     This example (:doc:`../examples/expert/warm_start`) demonstrates how to implement
     warm starting in BendersLib using :doc:`../manual/callbacks`.
 
+.. Warm Starting
+.. [#] Bolusani, S., Besançon, M., Gleixner, A., Berthold, T., D’Ambrosio, C., Muñoz, G., Paat, J., & Thomopulos, D. (2024). The MIP Workshop 2023 Computational Competition on reoptimization. Mathematical Programming Computation. https://doi.org/10.1007/s12532-024-00256-w
+
+------
+
 Cut Management
 ------------------------------
 
+------
+
 Parallelization
 ------------------------------
+
+------
 
 CP and Algorithmic Solvers
 ------------------------------
@@ -119,6 +125,8 @@ allowing users to seamlessly integrate them for solving subproblems within the B
     This example (:doc:`../examples/applications/lbbd_location`) demonstrates how to
     implement :ref:`customized subproblem solvers <manual_custom_sub>`
     within the :doc:`lbbd` framework using BendersLib.
+
+------
 
 Global Valid Inequalities
 ------------------------------
@@ -140,13 +148,28 @@ Symmetry breaking constraints also fall into this category.
     of the algorithm when building the master problem, using solver-specific APIs.
     They can also be added dynamically during the algorithm, using :doc:`../manual/callbacks`.
 
+.. Global Valid Inequalities
+.. [#] Hooker, J. N. (2019). Logic-based Benders decomposition for large-scale optimization. In J. M. Velásquez-Bermúdez, M. Khakifirooz, & M. Fathi (Eds.), Large Scale Optimization in Supply Chains and Smart Manufacturing: Theory and Applications (pp. 1–26). Springer International Publishing. https://doi.org/10.1007/978-3-030-22788-3_1
+.. [#] Guo, P., & Zhu, J. (2023). Capacity reservation for humanitarian relief: A logic-based Benders decomposition method with subgradient cut. European Journal of Operational Research, 311(3), 942–970. https://doi.org/10.1016/j.ejor.2023.06.006
+
+------
+
 Pareto-optimal Cut
 ------------------------------
 
 [#]_ [#]_ [#]_
 
+.. Pareto-optimal cuts
+.. [#] Magnanti, T. L., & Wong, R. T. (1981). Accelerating Benders Decomposition: Algorithmic Enhancement and Model Selection Criteria. Operations Research, 29(3), 464–484. https://doi.org/10.1287/opre.29.3.464
+.. [#] Fischetti, M., Salvagnin, D., & Zanette, A. (2010). A note on the selection of Benders’ cuts. Mathematical Programming, 124(1–2), 175–182. https://doi.org/10.1007/s10107-010-0365-7
+.. [#] Kaltis, T., & Saharidis, G. K. D. (2025). Literature review on Benders cut selection and a multiple cut generation scheme. INFOR: Information Systems and Operational Research. https://www.tandfonline.com/doi/abs/10.1080/03155986.2025.2540205
+
+------
+
 Cut Lifting
 ------------------------------
+
+------
 
 .. _enhance_cut_normalization:
 
@@ -165,6 +188,8 @@ divide the cut by the norm of its coefficients.
 
     This example (:doc:`../examples/expert/normalize_cut`) demonstrates how to
     implement cut normalization in BendersLib using :doc:`../manual/callbacks`.
+
+------
 
 .. _enhance_trust_region:
 
@@ -186,6 +211,11 @@ method promotes a more stable convergence.
     :doc:`../examples/expert/trust_region_l1`, :doc:`../examples/expert/trust_region_box`,
     and :doc:`../examples/expert/trust_region_bin` (with Hamming distance [#]_).
 
+.. Trust Region Method
+.. [#] Santoso, T., Ahmed, S., Goetschalckx, M., & Shapiro, A. (2005). A stochastic programming approach for supply chain network design under uncertainty. European Journal of Operational Research, 167(1), 96–115. https://doi.org/10.1016/j.ejor.2004.01.046
+
+------
+
 .. _enhance_local_branching:
 
 Local Branching
@@ -204,10 +234,24 @@ and generate different cuts to obtain better lower bounds, which can accelerate 
     This example (:doc:`../examples/expert/local_branch`) demonstrates how to
     implement local branching in BendersLib using :doc:`../manual/callbacks`.
 
+.. Local Branching
+.. [#] Fischetti, M., & Lodi, A. (2003). Local branching. Mathematical Programming, 98(1), 23–47. https://doi.org/10.1007/s10107-003-0395-5
+.. [#] Rei, W., Cordeau, J.-F., Gendreau, M., & Soriano, P. (2009). Accelerating Benders Decomposition by Local Branching. INFORMS Journal on Computing, 21(2), 333–345. https://doi.org/10.1287/ijoc.1080.0296
+
+------
+
 Branch-and-Check Method
 ------------------------------
 
 [#]_ [#]_ [#]_ [#]_
+
+.. Branch-and-Benders Method
+.. [#] Thorsteinsson, E. S. (2001). Branch-and-check: A hybrid framework integrating mixed integer programming and constraint logic programming. In T. Walsh (Ed.), Principles and Practice of Constraint Programming—CP 2001 (pp. 16–30). Springer. https://doi.org/10.1007/3-540-45578-7_2
+.. [#] Beck, J. C. (2010). Checking-Up on Branch-and-Check. In D. Cohen (Ed.), Principles and Practice of Constraint Programming – CP 2010 (pp. 84–98). Springer. https://doi.org/10.1007/978-3-642-15396-9_10
+.. [#] Gendron, B., Scutellà, M. G., Garroppo, R. G., Nencioni, G., & Tavanti, L. (2016). A branch-and-Benders-cut method for nonlinear power design in green wireless local area networks. European Journal of Operational Research, 255(1), 151–162. https://doi.org/10.1016/j.ejor.2016.04.058
+.. [#] Rubin, P. A. (2011, October 9). Benders Decomposition Then and Now. OR in an OB World. https://orinanobworld.blogspot.com/2011/10/benders-decomposition-then-and-now.html
+
+------
 
 .. _enhance_early_stop:
 
@@ -226,8 +270,13 @@ true optimal solution is not critical, and a good-enough solution is acceptable.
     This example (:doc:`../examples/expert/early_stop`) demonstrates how to implement
     early stopping in BendersLib using :doc:`../manual/callbacks`.
 
+------
+
 References
 ------------------------------
+
+We recommend these papers [#]_ [#]_ [#]_ [#]_ [#]_, these slides [#]_ [#]_,
+and this blog post [#]_ for discussions on enhancement strategies for Benders decomposition.
 
 .. Review
 .. [#] Rahmaniani, R., Crainic, T. G., Gendreau, M., & Rei, W. (2017). The Benders decomposition algorithm: A literature review. European Journal of Operational Research, 259(3), 801–817. https://doi.org/10.1016/j.ejor.2016.12.005
@@ -240,28 +289,3 @@ References
 .. [#] Frangioni, A. (2021, February 9). The Long Road to Practical Decomposition Methods Part III: Many Twists and Turns Part IV: A Useful Companion on the Road. AIRO PhD School 2021 & 5th AIRO Young Workshop, Dipartimento di Informatica, Universit`a di Pisa. https://www.plan4res.eu/wp-content/uploads/2021/02/Napoli-2021-II.pdf
 .. Blog
 .. [#] Maher, S. J. (2015). So you have decided to use Benders’ decomposition. Be prepared for what comes next!!! https://www.drstephenjmaher.com/blog/blog-entry.php?blogfile=bendersDecomp
-
-.. Warm Starting
-.. [#] Bolusani, S., Besançon, M., Gleixner, A., Berthold, T., D’Ambrosio, C., Muñoz, G., Paat, J., & Thomopulos, D. (2024). The MIP Workshop 2023 Computational Competition on reoptimization. Mathematical Programming Computation. https://doi.org/10.1007/s12532-024-00256-w
-
-.. Global Valid Inequalities
-.. [#] Hooker, J. N. (2019). Logic-based Benders decomposition for large-scale optimization. In J. M. Velásquez-Bermúdez, M. Khakifirooz, & M. Fathi (Eds.), Large Scale Optimization in Supply Chains and Smart Manufacturing: Theory and Applications (pp. 1–26). Springer International Publishing. https://doi.org/10.1007/978-3-030-22788-3_1
-.. [#] Guo, P., & Zhu, J. (2023). Capacity reservation for humanitarian relief: A logic-based Benders decomposition method with subgradient cut. European Journal of Operational Research, 311(3), 942–970. https://doi.org/10.1016/j.ejor.2023.06.006
-
-.. Pareto-optimal cuts
-.. [#] Magnanti, T. L., & Wong, R. T. (1981). Accelerating Benders Decomposition: Algorithmic Enhancement and Model Selection Criteria. Operations Research, 29(3), 464–484. https://doi.org/10.1287/opre.29.3.464
-.. [#] Fischetti, M., Salvagnin, D., & Zanette, A. (2010). A note on the selection of Benders’ cuts. Mathematical Programming, 124(1–2), 175–182. https://doi.org/10.1007/s10107-010-0365-7
-.. [#] Kaltis, T., & Saharidis, G. K. D. (2025). Literature review on Benders cut selection and a multiple cut generation scheme. INFOR: Information Systems and Operational Research. https://www.tandfonline.com/doi/abs/10.1080/03155986.2025.2540205
-
-.. Trust Region Method
-.. [#] Santoso, T., Ahmed, S., Goetschalckx, M., & Shapiro, A. (2005). A stochastic programming approach for supply chain network design under uncertainty. European Journal of Operational Research, 167(1), 96–115. https://doi.org/10.1016/j.ejor.2004.01.046
-
-.. Local Branching
-.. [#] Fischetti, M., & Lodi, A. (2003). Local branching. Mathematical Programming, 98(1), 23–47. https://doi.org/10.1007/s10107-003-0395-5
-.. [#] Rei, W., Cordeau, J.-F., Gendreau, M., & Soriano, P. (2009). Accelerating Benders Decomposition by Local Branching. INFORMS Journal on Computing, 21(2), 333–345. https://doi.org/10.1287/ijoc.1080.0296
-
-.. Branch-and-Benders Method
-.. [#] Thorsteinsson, E. S. (2001). Branch-and-check: A hybrid framework integrating mixed integer programming and constraint logic programming. In T. Walsh (Ed.), Principles and Practice of Constraint Programming—CP 2001 (pp. 16–30). Springer. https://doi.org/10.1007/3-540-45578-7_2
-.. [#] Beck, J. C. (2010). Checking-Up on Branch-and-Check. In D. Cohen (Ed.), Principles and Practice of Constraint Programming – CP 2010 (pp. 84–98). Springer. https://doi.org/10.1007/978-3-642-15396-9_10
-.. [#] Gendron, B., Scutellà, M. G., Garroppo, R. G., Nencioni, G., & Tavanti, L. (2016). A branch-and-Benders-cut method for nonlinear power design in green wireless local area networks. European Journal of Operational Research, 255(1), 151–162. https://doi.org/10.1016/j.ejor.2016.04.058
-.. [#] Rubin, P. A. (2011, October 9). Benders Decomposition Then and Now. OR in an OB World. https://orinanobworld.blogspot.com/2011/10/benders-decomposition-then-and-now.html
