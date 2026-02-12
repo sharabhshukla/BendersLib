@@ -104,8 +104,8 @@ BD = AnnotationBenders(
     benders=ClassicalBenders
 )
 
-trust_region_callback = LocalBranchingCallback(2, till_iter=120)
-BD.benders.register_callback(trust_region_callback)
+callback = LocalBranchingCallback(2, till_iter=120)
+BD.benders.register_callback(callback)
 BD.solve()
 draw_curve(BD.result)
 

@@ -168,15 +168,29 @@ Symmetry breaking constraints also fall into this category.
 
 ------
 
+.. _enhance_pareto_optimal_cut:
+
 Pareto-optimal Cut
 ------------------------------
 
-[#]_ [#]_ [#]_
+When a subproblem is degenerate, its dual problem may have multiple optimal solutions,
+leading to different Benders cuts. A *Pareto-optimal cut*, also known as a
+Magnanti-Wong cut [#]_, is a non-dominated Benders cut, meaning no other cut
+generated from the same subproblem solution is stronger than it.
+Generating these cuts usually requires solving an additional problem relying on the
+subproblem solution. This extra effort can be avoided by using approximate core points [#]_.
+Comprehensive reviews on cut selection can be found in the literature review paper [#]_.
+
+.. admonition:: Example
+    :class: seealso
+
+    This example (:doc:`../examples/expert/pareto_cut`) demonstrates how to
+    implement Pareto-optimal cut in BendersLib using :doc:`../manual/callbacks`.
 
 .. Pareto-optimal cuts
 .. [#] Magnanti, T. L., & Wong, R. T. (1981). Accelerating Benders Decomposition: Algorithmic Enhancement and Model Selection Criteria. Operations Research, 29(3), 464–484. https://doi.org/10.1287/opre.29.3.464
-.. [#] Fischetti, M., Salvagnin, D., & Zanette, A. (2010). A note on the selection of Benders’ cuts. Mathematical Programming, 124(1–2), 175–182. https://doi.org/10.1007/s10107-010-0365-7
-.. [#] Kaltis, T., & Saharidis, G. K. D. (2025). Literature review on Benders cut selection and a multiple cut generation scheme. INFOR: Information Systems and Operational Research. https://www.tandfonline.com/doi/abs/10.1080/03155986.2025.2540205
+.. [#] Papadakos, N. (2008). Practical enhancements to the Magnanti–Wong method. Operations Research Letters, 36(4), 444–449. https://doi.org/10.1016/j.orl.2008.01.005
+.. [#] Kaltis, T., & Saharidis, G. K. D. (2026). Literature review on Benders cut selection and a multiple cut generation scheme. INFOR: Information Systems and Operational Research, 64(1), 244–270. https://doi.org/10.1080/03155986.2025.2540205
 
 ------
 
@@ -284,10 +298,11 @@ true optimal solution is not critical, and a good-enough solution is acceptable.
 References
 ------------------------------
 
-We recommend these papers [#]_ [#]_ [#]_ [#]_ [#]_, these slides [#]_ [#]_,
+We recommend these papers [#]_ [#]_ [#]_ [#]_ [#]_ [#]_, these slides [#]_ [#]_,
 and this blog post [#]_ for discussions on enhancement strategies for Benders decomposition.
 
 .. Review
+.. [#] Clautiaux, F., & Ljubić, I. (2025). Last fifty years of integer linear programming: A focus on recent practical advances. European Journal of Operational Research, 324(3), 707–731. https://doi.org/10.1016/j.ejor.2024.11.018
 .. [#] Rahmaniani, R., Crainic, T. G., Gendreau, M., & Rei, W. (2017). The Benders decomposition algorithm: A literature review. European Journal of Operational Research, 259(3), 801–817. https://doi.org/10.1016/j.ejor.2016.12.005
 .. [#] Rahmaniani, R., Crainic, T. G., Gendreau, M., & Rei, W. (2018). Accelerating the Benders Decomposition Method: Application to Stochastic Network Design Problems. SIAM Journal on Optimization, 28(1), 875–903. https://doi.org/10.1137/17M1128204
 .. [#] Hooker, J. (2024). Logic-Based Benders Decomposition: Theory and Applications. Springer International Publishing. https://doi.org/10.1007/978-3-031-45039-6
