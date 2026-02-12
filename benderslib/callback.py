@@ -2,7 +2,7 @@
 
 from abc import ABC
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Callable, Type, Union
+from typing import TYPE_CHECKING, Callable, Type
 
 from .consts import BendersConsts as CST
 
@@ -56,14 +56,16 @@ class CallbackBase(ABC):
     Alternatively, users can define standalone functions with names matching
     the methods in :class:`CallbackBase` to serve as lightweight callbacks.
 
-    A callback can terminate the Benders process prematurely by returning
+    A callbacks are passed to Benders decomposition instances via :meth:`~BendersSolver.register_callback`.
+    The callback can terminate the Benders process prematurely by returning
     the constant :attr:`~BendersConsts.TERMINATE`;
     If a callback returns :attr:`~BendersConsts.PROCEED` or does not return anything,
     the Benders process continues as normal.
 
-    The callbacks are passed to Benders decomposition instances via :meth:`~BendersSolver.register_callback`.
+    .. seealso::
 
-    See :ref:`callbacks-timeline` for the precise timeline of when each callback is triggered.
+        - See :ref:`callbacks-timeline` for the precise timeline of when each callback is triggered.
+        - See :doc:`../examples/expert/index` for callback usage examples.
 
     Example
     ---------------
@@ -87,68 +89,244 @@ class CallbackBase(ABC):
         BD.register_callback(on_benders_end)
     """
 
-    def on_benders_start(self, context: BendersContext) -> Union[None, CST.PROCEED, CST.TERMINATE]:
-        """Called at the start of the Benders decomposition process."""
+    def on_benders_start(self, context: BendersContext):
+        """Called at the start of the Benders decomposition process.
+
+        See :ref:`callbacks-timeline` for the precise timeline.
+
+        Returns
+        ---------------
+
+        :attr:`~benderslib.BendersConsts.TERMINATE`
+            If the callback determines that the Benders process should be terminated immediately.
+        :attr:`~benderslib.BendersConsts.PROCEED` or ``None``
+            If the callback determines that the Benders process should continue as normal.
+        """
         ...
 
-    def on_benders_end(self, context: BendersContext) -> Union[None, CST.PROCEED, CST.TERMINATE]:
-        """Called at the end of the Benders decomposition process."""
+    def on_benders_end(self, context: BendersContext):
+        """Called at the end of the Benders decomposition process.
+
+        See :ref:`callbacks-timeline` for the precise timeline.
+
+        Returns
+        ---------------
+
+        :attr:`~benderslib.BendersConsts.TERMINATE`
+            If the callback determines that the Benders process should be terminated immediately.
+        :attr:`~benderslib.BendersConsts.PROCEED` or ``None``
+            If the callback determines that the Benders process should continue as normal.
+        """
         ...
 
-    def on_iteration_start(self, context: BendersContext) -> Union[None, CST.PROCEED, CST.TERMINATE]:
-        """Called at the start of each Benders decomposition iteration."""
+    def on_iteration_start(self, context: BendersContext):
+        """Called at the start of each Benders decomposition iteration.
+
+        See :ref:`callbacks-timeline` for the precise timeline.
+
+        Returns
+        ---------------
+
+        :attr:`~benderslib.BendersConsts.TERMINATE`
+            If the callback determines that the Benders process should be terminated immediately.
+        :attr:`~benderslib.BendersConsts.PROCEED` or ``None``
+            If the callback determines that the Benders process should continue as normal.
+        """
         ...
 
-    def on_iteration_end(self, context: BendersContext) -> Union[None, CST.PROCEED, CST.TERMINATE]:
-        """Called at the end of each Benders decomposition iteration."""
+    def on_iteration_end(self, context: BendersContext):
+        """Called at the end of each Benders decomposition iteration.
+
+        See :ref:`callbacks-timeline` for the precise timeline.
+
+        Returns
+        ---------------
+
+        :attr:`~benderslib.BendersConsts.TERMINATE`
+            If the callback determines that the Benders process should be terminated immediately.
+        :attr:`~benderslib.BendersConsts.PROCEED` or ``None``
+            If the callback determines that the Benders process should continue as normal.
+        """
         ...
 
-    def on_master_build(self, context: BendersContext) -> Union[None, CST.PROCEED, CST.TERMINATE]:
-        """Called after the master problem is built."""
+    def on_master_build(self, context: BendersContext):
+        """Called after the master problem is built.
+
+        See :ref:`callbacks-timeline` for the precise timeline.
+
+        Returns
+        ---------------
+
+        :attr:`~benderslib.BendersConsts.TERMINATE`
+            If the callback determines that the Benders process should be terminated immediately.
+        :attr:`~benderslib.BendersConsts.PROCEED` or ``None``
+            If the callback determines that the Benders process should continue as normal.
+        """
         ...
 
-    def on_sub_build(self, context: BendersContext) -> Union[None, CST.PROCEED, CST.TERMINATE]:
-        """Called after the subproblem is built."""
+    def on_sub_build(self, context: BendersContext):
+        """Called after the subproblem is built.
+
+        See :ref:`callbacks-timeline` for the precise timeline.
+
+        Returns
+        ---------------
+
+        :attr:`~benderslib.BendersConsts.TERMINATE`
+            If the callback determines that the Benders process should be terminated immediately.
+        :attr:`~benderslib.BendersConsts.PROCEED` or ``None``
+            If the callback determines that the Benders process should continue as normal.
+        """
         ...
 
-    def on_before_master_solve(self, context: BendersContext) -> Union[None, CST.PROCEED, CST.TERMINATE]:
-        """Called before solving the master problem."""
+    def on_before_master_solve(self, context: BendersContext):
+        """Called before solving the master problem.
+
+        See :ref:`callbacks-timeline` for the precise timeline.
+
+        Returns
+        ---------------
+
+        :attr:`~benderslib.BendersConsts.TERMINATE`
+            If the callback determines that the Benders process should be terminated immediately.
+        :attr:`~benderslib.BendersConsts.PROCEED` or ``None``
+            If the callback determines that the Benders process should continue as normal.
+        """
         ...
 
-    def on_after_master_solve(self, context: BendersContext) -> Union[None, CST.PROCEED, CST.TERMINATE]:
-        """Called after solving the master problem."""
+    def on_after_master_solve(self, context: BendersContext):
+        """Called after solving the master problem.
+
+        See :ref:`callbacks-timeline` for the precise timeline.
+
+        Returns
+        ---------------
+
+        :attr:`~benderslib.BendersConsts.TERMINATE`
+            If the callback determines that the Benders process should be terminated immediately.
+        :attr:`~benderslib.BendersConsts.PROCEED` or ``None``
+            If the callback determines that the Benders process should continue as normal.
+        """
         ...
 
-    def on_before_sub_solve(self, context: BendersContext) -> Union[None, CST.PROCEED, CST.TERMINATE]:
-        """Called before solving the subproblem."""
+    def on_before_sub_solve(self, context: BendersContext):
+        """Called before solving the subproblem.
+
+        See :ref:`callbacks-timeline` for the precise timeline.
+
+        Returns
+        ---------------
+
+        :attr:`~benderslib.BendersConsts.TERMINATE`
+            If the callback determines that the Benders process should be terminated immediately.
+        :attr:`~benderslib.BendersConsts.PROCEED` or ``None``
+            If the callback determines that the Benders process should continue as normal.
+        """
         ...
 
-    def on_after_sub_solve(self, context: BendersContext) -> Union[None, CST.PROCEED, CST.TERMINATE]:
-        """Called after solving the subproblem."""
+    def on_after_sub_solve(self, context: BendersContext):
+        """Called after solving the subproblem.
+
+        See :ref:`callbacks-timeline` for the precise timeline.
+
+        Returns
+        ---------------
+
+        :attr:`~benderslib.BendersConsts.TERMINATE`
+            If the callback determines that the Benders process should be terminated immediately.
+        :attr:`~benderslib.BendersConsts.PROCEED` or ``None``
+            If the callback determines that the Benders process should continue as normal.
+        """
         ...
 
-    def on_opti_cut_generated(self, context: BendersContext) -> Union[None, CST.PROCEED, CST.TERMINATE]:
-        """Called when an optimality cut is generated."""
+    def on_opti_cut_generated(self, context: BendersContext):
+        """Called when an optimality cut is generated.
+
+        See :ref:`callbacks-timeline` for the precise timeline.
+
+        Returns
+        ---------------
+
+        :attr:`~benderslib.BendersConsts.TERMINATE`
+            If the callback determines that the Benders process should be terminated immediately.
+        :attr:`~benderslib.BendersConsts.PROCEED` or ``None``
+            If the callback determines that the Benders process should continue as normal.
+        """
         ...
 
-    def on_feas_cut_generated(self, context: BendersContext) -> Union[None, CST.PROCEED, CST.TERMINATE]:
-        """Called when a feasibility cut is generated."""
+    def on_feas_cut_generated(self, context: BendersContext):
+        """Called when a feasibility cut is generated.
+
+        See :ref:`callbacks-timeline` for the precise timeline.
+
+        Returns
+        ---------------
+
+        :attr:`~benderslib.BendersConsts.TERMINATE`
+            If the callback determines that the Benders process should be terminated immediately.
+        :attr:`~benderslib.BendersConsts.PROCEED` or ``None``
+            If the callback determines that the Benders process should continue as normal.
+        """
         ...
 
-    def on_opti_cut_added(self, context: BendersContext) -> Union[None, CST.PROCEED, CST.TERMINATE]:
-        """Called when an optimality cut is added to the master problem."""
+    def on_opti_cut_added(self, context: BendersContext):
+        """Called when an optimality cut is added to the master problem.
+
+        See :ref:`callbacks-timeline` for the precise timeline.
+
+        Returns
+        ---------------
+
+        :attr:`~benderslib.BendersConsts.TERMINATE`
+            If the callback determines that the Benders process should be terminated immediately.
+        :attr:`~benderslib.BendersConsts.PROCEED` or ``None``
+            If the callback determines that the Benders process should continue as normal.
+        """
         ...
 
-    def on_feas_cut_added(self, context: BendersContext) -> Union[None, CST.PROCEED, CST.TERMINATE]:
-        """Called when a feasibility cut is added to the master problem."""
+    def on_feas_cut_added(self, context: BendersContext):
+        """Called when a feasibility cut is added to the master problem.
+
+        See :ref:`callbacks-timeline` for the precise timeline.
+
+        Returns
+        ---------------
+
+        :attr:`~benderslib.BendersConsts.TERMINATE`
+            If the callback determines that the Benders process should be terminated immediately.
+        :attr:`~benderslib.BendersConsts.PROCEED` or ``None``
+            If the callback determines that the Benders process should continue as normal.
+        """
         ...
 
-    def on_new_lower_bound(self, context: BendersContext) -> Union[None, CST.PROCEED, CST.TERMINATE]:
-        """Called when a higher lower bound is found."""
+    def on_new_lower_bound(self, context: BendersContext):
+        """Called when a higher lower bound is found.
+
+        See :ref:`callbacks-timeline` for the precise timeline.
+
+        Returns
+        ---------------
+
+        :attr:`~benderslib.BendersConsts.TERMINATE`
+            If the callback determines that the Benders process should be terminated immediately.
+        :attr:`~benderslib.BendersConsts.PROCEED` or ``None``
+            If the callback determines that the Benders process should continue as normal.
+        """
         ...
 
-    def on_new_upper_bound(self, context: BendersContext) -> Union[None, CST.PROCEED, CST.TERMINATE]:
-        """Called when a lower upper bound is found."""
+    def on_new_upper_bound(self, context: BendersContext):
+        """Called when a lower upper bound is found.
+
+        See :ref:`callbacks-timeline` for the precise timeline.
+
+        Returns
+        ---------------
+
+        :attr:`~benderslib.BendersConsts.TERMINATE`
+            If the callback determines that the Benders process should be terminated immediately.
+        :attr:`~benderslib.BendersConsts.PROCEED` or ``None``
+            If the callback determines that the Benders process should continue as normal.
+        """
         ...
 
 
