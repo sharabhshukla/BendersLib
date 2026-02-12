@@ -148,6 +148,24 @@ demonstrates how to define and register both types of callbacks.
 
     More examples of callbacks can be found in the :doc:`../examples/expert/index`.
 
+Registering Multiple Callbacks
+------------------------------------
+
+BendersLib supports registering multiple callbacks for the same event.
+When multiple callbacks are registered for a single event, they are
+**executed sequentially in the order they were registered** in that event.
+This allows for modular design, where different callbacks can
+handle different aspects of the same event without interfering
+with each other. For example, one callback could be responsible for
+logging the progress of the algorithm, while another could be
+responsible for implementing a custom stopping criterion.
+
+.. warning::
+
+    **Use caution when registering multiple callbacks**, especially
+    for the same event, as they may interact unexpectedly, particularly
+    if they modify the same attributes in the :class:`BendersContext`.
+
 .. _manual_callback_attributes_methods:
 
 Attributes & Methods
