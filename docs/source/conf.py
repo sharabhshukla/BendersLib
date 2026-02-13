@@ -155,7 +155,7 @@ sphinx_gallery_conf = {
 html_theme = "furo"
 html_title = "BendersLib"
 html_favicon = '_static/icon.ico'
-html_logo = "_static/benderslib_v.png"
+html_logo = "_static/benderslib_t.png"
 navy_blue = "#0066CC"
 # nuaa_blue = "#0000ff"
 another_blue = "#0769CF"
@@ -182,10 +182,10 @@ html_theme_options = {
         "color-api-name": another_blue,
         "color-highlighted-background": "yellow",
     },
-    "announcement": "This is a "
-                    "<em><a href=\"https://en.wikipedia.org/wiki/Software_release_life_cycle#Beta\">Beta release</a></em>. "
-                    "The API is subject to change, and bugs may be present. "
-                    "Do not trust the results without further testing and validation.",
+    # "announcement": "This is a "
+    #                 "<em><a href=\"https://en.wikipedia.org/wiki/Software_release_life_cycle#Beta\">Beta release</a></em>. "
+    #                 "The API is subject to change, and bugs may be present. "
+    #                 "Do not trust the results without further testing and validation.",
     "sidebar_hide_name": True,
 }
 
@@ -234,26 +234,26 @@ html_theme_options = {
 # }
 
 
-def skip_mangled_private_members(app, what, name, obj, skip, options):
-    exclude_list = ['_abc_impl']
-    if name in exclude_list:
-        return True  # Skip specific members
-    if name.startswith('__') and not name.endswith('__'):
-        return True  # Skip mangled private members
-    return None  # Use default logic for others
-
-
-def prepend_caution(app, docname, source):
-    caution_text = """
-.. attention::
-    This is an `Alpha version <https://en.wikipedia.org/wiki/Software_release_life_cycle#Alpha>`_, 
-    the API may change in future and there might be bugs.
-    `Bug and feature reports <https://github.com/phguo/BendersLib/issues>`_ are welcome!
-   
-"""
-    source[0] = caution_text + source[0]
-
-
-def setup(app):
-    # app.connect('source-read', prepend_caution)
-    app.connect('autodoc-skip-member', skip_mangled_private_members)
+# def skip_mangled_private_members(app, what, name, obj, skip, options):
+#     exclude_list = ['_abc_impl']
+#     if name in exclude_list:
+#         return True  # Skip specific members
+#     if name.startswith('__') and not name.endswith('__'):
+#         return True  # Skip mangled private members
+#     return None  # Use default logic for others
+#
+#
+# def prepend_caution(app, docname, source):
+#     caution_text = """
+# .. attention::
+#     This is an `Alpha version <https://en.wikipedia.org/wiki/Software_release_life_cycle#Alpha>`_,
+#     the API may change in future and there might be bugs.
+#     `Bug and feature reports <https://github.com/phguo/BendersLib/issues>`_ are welcome!
+#
+# """
+#     source[0] = caution_text + source[0]
+#
+#
+# def setup(app):
+#     # app.connect('source-read', prepend_caution)
+#     app.connect('autodoc-skip-member', skip_mangled_private_members)
