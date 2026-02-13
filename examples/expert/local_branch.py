@@ -133,4 +133,4 @@ draw_curve(BD_no_tr.result)
 #    - A brief introduction to :ref:`enhance_local_branching`.
 #    - **Examples**: :doc:`trust_region_bin`
 #
-# .. tags:: benders: classical, solver: gurobi, deterministic, callback
+# .. tags:: benders: classical, solver: gurobi, deterministic, callback, enhancement

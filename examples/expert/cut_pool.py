@@ -142,4 +142,4 @@ draw_curve(BD_no_cm.result)
 #
 #    - A brief introduction to :ref:`enhance_cut_management`.
 #
-# .. tags:: benders: classical, solver: gurobi, deterministic, callback
+# .. tags:: benders: classical, solver: gurobi, deterministic, callback, enhancement

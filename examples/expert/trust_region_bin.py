@@ -135,4 +135,4 @@ draw_curve(BD_no_tr.result)
 #    - A brief introduction to :ref:`enhance_trust_region`.
 #    - **Examples**: :doc:`trust_region_l1`, :doc:`trust_region_box`, :doc:`trust_region_bin`, :doc:`local_branch`
 #
-# .. tags:: benders: classical, solver: gurobi, deterministic, callback
+# .. tags:: benders: classical, solver: gurobi, deterministic, callback, enhancement

@@ -151,4 +151,4 @@ draw_curve(BD.result)
 
 # %%
 #
-# .. tags:: benders: classical, solver: gurobi, deterministic, callback
+# .. tags:: benders: classical, solver: gurobi, deterministic, callback, enhancement

@@ -139,4 +139,4 @@ draw_curve(BD.result)
 #
 #    - A brief introduction to :ref:`enhance_pareto_optimal_cut`.
 #
-# .. tags:: benders: classical, solver: gurobi, deterministic, callback
+# .. tags:: benders: classical, solver: gurobi, deterministic, callback, enhancement
