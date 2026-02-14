@@ -30,12 +30,12 @@ Any :attr:`~BendersConsts.TERMINATE` signal is executed immediately after the cu
 meaning that the subsequent steps in the current iteration will not be executed,
 with the :attr:`~BendersResult.status` of the Benders process set to :attr:`~BendersConsts.TERMINATED`.
 
-The following pseudocode (:func:`~BendersSolver.solve`) illustrates the main stages of the
-Benders decomposition algorithm and the specific points at which each callback event is triggered.
-
 .. _callbacks-timeline:
 
 .. rubric:: Timeline of Callback Triggers
+
+The following pseudocode (:func:`~BendersSolver.solve`) illustrates the main stages of the
+Benders decomposition algorithm and the specific points at which each callback event is triggered.
 
 .. parsed-literal::
 
@@ -94,6 +94,59 @@ Benders decomposition algorithm and the specific points at which each callback e
         trigger :meth:`~CallbackBase.on_iteration_end`
 
     trigger :meth:`~CallbackBase.on_benders_end`
+
+.. _branch-and-check-timeline:
+
+.. rubric:: Timeline of Branch-and-Check Callback Triggers
+
+The following pseudocode (:func:`~BendersSolver.bnc_solve`) illustrates the main stages of the
+:ref:`branch-and-check method <enhance_branch_and_check>` and the specific points at which
+each callback event is triggered.
+Note that the callback events :meth:`~CallbackBase.on_before_master_solve` and
+:meth:`~CallbackBase.on_after_master_solve` are not triggered in the branch-and-check method.
+
+.. parsed-literal::
+
+    // bnc_solve() method of BendersSolver is called
+
+    trigger :meth:`~CallbackBase.on_master_build`
+    trigger :meth:`~CallbackBase.on_sub_build`
+    trigger :meth:`~CallbackBase.on_benders_start`
+
+    // Master problem is solved using a MIP solver with a callback
+    // The following events are triggered within the solver's callback at each node
+
+    if node is integer and feasible:
+        trigger :meth:`~CallbackBase.on_iteration_start`
+        save :attr:`~BendersContext.current_comp_vals`
+        trigger :meth:`~CallbackBase.on_before_sub_solve`
+        **solve subproblem with** :attr:`~BendersContext.current_comp_vals`
+        trigger :meth:`~CallbackBase.on_after_sub_solve`
+
+        if subproblem is optimal:
+            if new lower bound is found:
+                trigger :meth:`~CallbackBase.on_new_lower_bound`
+            if new upper bound is found:
+                // new best-known solution found
+                trigger :meth:`~CallbackBase.on_new_upper_bound`
+
+            **generate optimality cut**
+            save :attr:`~BendersContext.current_opti_cuts`
+            trigger :meth:`~CallbackBase.on_opti_cut_generated`
+            add :attr:`~BendersContext.current_opti_cuts` to master problem at the current node
+            trigger :meth:`~CallbackBase.on_opti_cut_added`
+
+        else if subproblem is infeasible:
+            **generate feasibility cut**
+            save :attr:`~BendersContext.current_feas_cuts`
+            trigger :meth:`~CallbackBase.on_feas_cut_generated`
+            add :attr:`~BendersContext.current_feas_cuts` cut to master problem at the current node
+            trigger :meth:`~CallbackBase.on_feas_cut_added`
+
+        trigger :meth:`~CallbackBase.on_iteration_end`
+
+    trigger :meth:`~CallbackBase.on_benders_end`
+
 
 How to Use Callbacks?
 ------------------------------------

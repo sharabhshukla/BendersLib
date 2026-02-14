@@ -1552,12 +1552,15 @@ class BendersSolver:
 
     def __bnc_callback(self, master_problem):
         self.result.n_iter += 1
+        if self.__trigger_callbacks_and_terminate(EVENTS.ON_ITERATION_START): return CST.TERMINATE
 
         var_values = master_problem.get_var_values(self.complicating_vars)
         self._context.current_comp_vals = var_values
+        if self.__trigger_callbacks_and_terminate(EVENTS.ON_BEFORE_SUB_SOLVE): return CST.TERMINATE
         ts = time.perf_counter()
         self.sub_problem.fix_vars(self._context.current_comp_vals)
         self.sub_problem.solve()
+        if self.__trigger_callbacks_and_terminate(EVENTS.ON_AFTER_SUB_SOLVE): return CST.TERMINATE
         self.result.runtime_sub += time.perf_counter() - ts
 
         # Sub problem is infeasible -> add feasibility cut
@@ -1577,6 +1580,8 @@ class BendersSolver:
         else:
             self.result.status = CST.UNKNOWN
             raise ValueError(f"Subproblem returned an unexpected status: {self.sub_problem.status}.")
+
+        if self.__trigger_callbacks_and_terminate(EVENTS.ON_ITERATION_END): return CST.TERMINATE
 
     def bnc_solve(self):
         """Solve the problem using branch-and-check method.
@@ -1633,6 +1638,10 @@ class BendersSolver:
 
         # Initialize
         self.__preprocess()
+        if self.__trigger_callbacks_and_terminate(EVENTS.ON_MASTER_BUILD): return
+        if self.__trigger_callbacks_and_terminate(EVENTS.ON_SUB_BUILD): return
+        if self.__trigger_callbacks_and_terminate(EVENTS.ON_BENDERS_START): return
+
         self.result.status = CST.UNSOLVED
         self.result.n_iter = 0
         self.__time_start = time.perf_counter()
@@ -1655,6 +1664,8 @@ class BendersSolver:
         self.result.runtime_master = self.result.time - self.result.runtime_sub
 
         self.__logger.log_end()
+
+        if self.__trigger_callbacks_and_terminate(EVENTS.ON_BENDERS_END): return
 
     def register_callback(self, callback: CallbackBase | Callable | Type[CallbackBase]) -> None:
         """Register a user-defined callback to be called during the Benders solving process.

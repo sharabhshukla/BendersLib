@@ -224,6 +224,10 @@ class CallbackBase(ABC):
 
         See :ref:`callbacks-timeline` for the precise timeline.
 
+        .. caution::
+
+           Not supported in the branch-and-check method.
+
         Parameters
         ---------------
 
@@ -245,6 +249,10 @@ class CallbackBase(ABC):
         """Called after solving the master problem.
 
         See :ref:`callbacks-timeline` for the precise timeline.
+
+        .. caution::
+
+           Not supported in the branch-and-check method.
 
         Parameters
         ---------------
