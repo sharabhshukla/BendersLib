@@ -94,6 +94,12 @@ class CallbackBase(ABC):
 
         See :ref:`callbacks-timeline` for the precise timeline.
 
+        Parameters
+        ---------------
+
+        context: :class:`BendersContext`
+            The context object containing information about the current state of the Benders decomposition process.
+
         Returns
         ---------------
 
@@ -108,6 +114,12 @@ class CallbackBase(ABC):
         """Called at the end of the Benders decomposition process.
 
         See :ref:`callbacks-timeline` for the precise timeline.
+
+        Parameters
+        ---------------
+
+        context: :class:`BendersContext`
+            The context object containing information about the current state of the Benders decomposition process.
 
         Returns
         ---------------
@@ -124,6 +136,13 @@ class CallbackBase(ABC):
 
         See :ref:`callbacks-timeline` for the precise timeline.
 
+        Parameters
+        ---------------
+
+        context: :class:`BendersContext`
+            The context object containing information about the current state of the Benders decomposition process.
+
+
         Returns
         ---------------
 
@@ -138,6 +157,13 @@ class CallbackBase(ABC):
         """Called at the end of each Benders decomposition iteration.
 
         See :ref:`callbacks-timeline` for the precise timeline.
+
+        Parameters
+        ---------------
+
+        context: :class:`BendersContext`
+            The context object containing information about the current state of the Benders decomposition process.
+
 
         Returns
         ---------------
@@ -154,6 +180,13 @@ class CallbackBase(ABC):
 
         See :ref:`callbacks-timeline` for the precise timeline.
 
+        Parameters
+        ---------------
+
+        context: :class:`BendersContext`
+            The context object containing information about the current state of the Benders decomposition process.
+
+
         Returns
         ---------------
 
@@ -168,6 +201,13 @@ class CallbackBase(ABC):
         """Called after the subproblem is built.
 
         See :ref:`callbacks-timeline` for the precise timeline.
+
+        Parameters
+        ---------------
+
+        context: :class:`BendersContext`
+            The context object containing information about the current state of the Benders decomposition process.
+
 
         Returns
         ---------------
@@ -184,6 +224,13 @@ class CallbackBase(ABC):
 
         See :ref:`callbacks-timeline` for the precise timeline.
 
+        Parameters
+        ---------------
+
+        context: :class:`BendersContext`
+            The context object containing information about the current state of the Benders decomposition process.
+
+
         Returns
         ---------------
 
@@ -198,6 +245,13 @@ class CallbackBase(ABC):
         """Called after solving the master problem.
 
         See :ref:`callbacks-timeline` for the precise timeline.
+
+        Parameters
+        ---------------
+
+        context: :class:`BendersContext`
+            The context object containing information about the current state of the Benders decomposition process.
+
 
         Returns
         ---------------
@@ -214,6 +268,13 @@ class CallbackBase(ABC):
 
         See :ref:`callbacks-timeline` for the precise timeline.
 
+        Parameters
+        ---------------
+
+        context: :class:`BendersContext`
+            The context object containing information about the current state of the Benders decomposition process.
+
+
         Returns
         ---------------
 
@@ -228,6 +289,13 @@ class CallbackBase(ABC):
         """Called after solving the subproblem.
 
         See :ref:`callbacks-timeline` for the precise timeline.
+
+        Parameters
+        ---------------
+
+        context: :class:`BendersContext`
+            The context object containing information about the current state of the Benders decomposition process.
+
 
         Returns
         ---------------
@@ -244,6 +312,13 @@ class CallbackBase(ABC):
 
         See :ref:`callbacks-timeline` for the precise timeline.
 
+        Parameters
+        ---------------
+
+        context: :class:`BendersContext`
+            The context object containing information about the current state of the Benders decomposition process.
+
+
         Returns
         ---------------
 
@@ -258,6 +333,13 @@ class CallbackBase(ABC):
         """Called when a feasibility cut is generated.
 
         See :ref:`callbacks-timeline` for the precise timeline.
+
+        Parameters
+        ---------------
+
+        context: :class:`BendersContext`
+            The context object containing information about the current state of the Benders decomposition process.
+
 
         Returns
         ---------------
@@ -274,6 +356,13 @@ class CallbackBase(ABC):
 
         See :ref:`callbacks-timeline` for the precise timeline.
 
+        Parameters
+        ---------------
+
+        context: :class:`BendersContext`
+            The context object containing information about the current state of the Benders decomposition process.
+
+
         Returns
         ---------------
 
@@ -288,6 +377,13 @@ class CallbackBase(ABC):
         """Called when a feasibility cut is added to the master problem.
 
         See :ref:`callbacks-timeline` for the precise timeline.
+
+        Parameters
+        ---------------
+
+        context: :class:`BendersContext`
+            The context object containing information about the current state of the Benders decomposition process.
+
 
         Returns
         ---------------
@@ -304,6 +400,13 @@ class CallbackBase(ABC):
 
         See :ref:`callbacks-timeline` for the precise timeline.
 
+        Parameters
+        ---------------
+
+        context: :class:`BendersContext`
+            The context object containing information about the current state of the Benders decomposition process.
+
+
         Returns
         ---------------
 
@@ -318,6 +421,13 @@ class CallbackBase(ABC):
         """Called when a lower upper bound is found.
 
         See :ref:`callbacks-timeline` for the precise timeline.
+
+        Parameters
+        ---------------
+
+        context: :class:`BendersContext`
+            The context object containing information about the current state of the Benders decomposition process.
+
 
         Returns
         ---------------
