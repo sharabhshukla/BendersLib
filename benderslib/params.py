@@ -83,6 +83,19 @@ class BendersParams:
     You should ensure that the solver used for the subproblem supports IIS computation, see :ref:`solver-table`.
     """
 
+    # branch-and-check method
+    use_bnc: bool = False
+    """Whether to use the branch-and-check (branch-and-Benders-cut) method. 
+    
+    If ``True``, the Benders cut are added as lazy constraints during the branch-and-bound process of the master problem,
+    instead of being added after solving the master problem to optimality.
+    If ``False``, the classical implementation is used, where the master problem is solved 
+    to optimality before adding Benders cuts.
+    
+    Setting ``use_bnc = True`` and calling :meth:`BendersSolver.solve()` 
+    is equivalent to using :meth:`BendersSolver.bnc_solve()` directly.
+    """
+
     # Logging
     log_freq_sec: float = 0.5
     """Frequency (in seconds) to log messages to the console/file."""

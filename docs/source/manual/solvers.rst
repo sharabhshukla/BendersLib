@@ -30,6 +30,14 @@ A Benders decomposition variant usually require one or two features to work prop
   This feature usually works with :doc:`../tutorials/cbd` and :doc:`../tutorials/lbbd` implemented
   with :class:`CombinatorialBenders` and :class:`LogicBasedBenders`, respectively, if the user wants to add no-good
   feasibility cuts.
+* **BnC**:
+  The solver supports :ref:`branch-and-check <enhance_branch_and_check>`, or branch-and-Benders-cut,
+  a modern implementation of Benders decomposition
+  that integrates cut generation into the branch-and-bound algorithm of the master problem solver.
+  Instead of solving the master problem to optimality at each iteration, it checks the feasibility
+  and optimality of the current solution at each node of the branch-and-bound tree and adds cuts as needed.
+  This requires the master problem solver to support callback functions for adding cuts during the
+  branch-and-bound process.
 
 .. list-table:: Supported Solvers' Features
     :widths: auto
@@ -42,6 +50,7 @@ A Benders decomposition variant usually require one or two features to work prop
       - Dual
       - Farkas
       - IIS
+      - BnC
       - License [2]_
     * - **COPT**
       - :class:`~.solvers.Copt`
@@ -49,6 +58,7 @@ A Benders decomposition variant usually require one or two features to work prop
       - ✅
       - ✅
       - ✅
+      -
       - Commercial
     * - **CPLEX**
       - :class:`~.solvers.Cplex` (Mathematical Programming)
@@ -56,6 +66,7 @@ A Benders decomposition variant usually require one or two features to work prop
       - ✅
       - ✅
       - ✅
+      -
       - Commercial
     * - **CPLEX**
       - :class:`~.solvers.CplexCP` (Constraint Programming)
@@ -63,10 +74,12 @@ A Benders decomposition variant usually require one or two features to work prop
       - ❌
       - ❌
       - ✅
+      -
       - Commercial
     * - **Gurobi**
       - :class:`~.solvers.Gurobi`
       - `Doc <https://docs.gurobi.com>`__
+      - ✅
       - ✅
       - ✅
       - ✅
@@ -77,6 +90,7 @@ A Benders decomposition variant usually require one or two features to work prop
       - ❌
       - ❌
       - ✅ [7]_
+      -
       - Open-source
     * - **SCIP**
       - :class:`~.solvers.Scip`
@@ -84,10 +98,12 @@ A Benders decomposition variant usually require one or two features to work prop
       - 🟨 [3]_
       - ✅
       - ✅
+      -
       - Open-source
     * - **Pyomo** [1]_:
       - :class:`~.solvers.Pyomo`
       - `Doc <https://pyomo.readthedocs.io>`__
+      - \-
       - \-
       - \-
       - \-
@@ -98,6 +114,7 @@ A Benders decomposition variant usually require one or two features to work prop
       - ✅
       - ❌
       - ❌
+      -
       - Open-source
     * - CPLEX
       - :class:`~.solvers.Pyomo` (``'cplex'``, ``'cplex_direct'`` [4]_)
@@ -105,6 +122,7 @@ A Benders decomposition variant usually require one or two features to work prop
       - ✅
       - ❌
       - 🟥 [8]_
+      -
       - Commercial
     * - GLPK
       - :class:`~.solvers.Pyomo` (``'glpk'``)
@@ -112,6 +130,7 @@ A Benders decomposition variant usually require one or two features to work prop
       - ✅
       - ❌
       - ❌
+      -
       - Open-source
     * - Gurobi
       - :class:`~.solvers.Pyomo` (``'gurobi'``, ``'gurobi_direct'`` [4]_)
@@ -119,6 +138,7 @@ A Benders decomposition variant usually require one or two features to work prop
       - ✅
       - ❌
       - 🟥 [8]_
+      -
       - Commercial
     * - HiGHS
       - :class:`~.solvers.Pyomo` (``'highs'``)
@@ -126,6 +146,7 @@ A Benders decomposition variant usually require one or two features to work prop
       - ✅
       - ❌
       - ❌
+      -
       - Open-source
     * - MOSEK
       - :class:`~.solvers.Pyomo` (``'mosek'``, ``'mosek_direct'`` [4]_)
@@ -133,6 +154,7 @@ A Benders decomposition variant usually require one or two features to work prop
       - ✅
       - ❌
       - ❌
+      -
       - Commercial
     * - SCIP
       - :class:`~.solvers.Pyomo` (``'scip'``)
@@ -140,6 +162,7 @@ A Benders decomposition variant usually require one or two features to work prop
       - 🟥 [5]_
       - ❌
       - ❌
+      -
       - Open-source
     * - Xpress
       - :class:`~.solvers.Pyomo` (``'xpress'``, ``'xpress_direct'`` [4]_)
@@ -147,6 +170,7 @@ A Benders decomposition variant usually require one or two features to work prop
       - ✅
       - ❌
       - 🟥 [8]_
+      -
       - Commercial
 
 .. Nonlinear Solvers: IPOPT, Minotaur, Baron, KNITRO

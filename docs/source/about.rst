@@ -39,7 +39,7 @@ from Nanjing University of Aeronautics and Astronautics (NUAA), China.
 Citing BendersLib
 --------------------------------
 
-Guo, PH (2025). *BendersLib: An Extensible Benders Decomposition Library in Python*. Retrieved from https://github.com/phguo/BendersLib
+    Guo, PH (2025). *BendersLib: An Extensible Benders Decomposition Library in Python*. Retrieved from https://github.com/phguo/BendersLib
 
 .. code-block:: bibtex
 

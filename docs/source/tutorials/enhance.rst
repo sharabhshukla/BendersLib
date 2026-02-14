@@ -263,12 +263,27 @@ and generate different cuts to obtain better lower bounds, which can accelerate 
 
 ------
 
+.. _enhance_branch_and_check:
+
 Branch-and-Check Method
 ------------------------------
 
-[#]_ [#]_ [#]_ [#]_
+The branch-and-check method [#]_ [#]_, also known as branch-and-Benders-cut method [#]_,
+integrates Benders decomposition into a branch-and-bound framework.
+Instead of repeatedly solving the master problem to optimality, it generates cuts at branch-and-bound nodes,
+avoiding the need to build a new tree at each iteration.
+Cuts can be generated from feasible or incumbent solutions.
+This strategy requires the underlying solver's callback functionality [#]_
+and allows for a more efficient exploration of the solution space.
 
-.. Branch-and-Benders Method
+.. admonition:: Example
+    :class: seealso
+
+    - BendersLib's implementation can be used via :meth:`~benderslib.BendersSolver.bnc_solve`.
+    - This example (:doc:`../examples/basic/branch_check`) shows a
+      problem solved with the branch-and-check method.
+
+.. Branch-and-check Method
 .. [#] Thorsteinsson, E. S. (2001). Branch-and-check: A hybrid framework integrating mixed integer programming and constraint logic programming. In T. Walsh (Ed.), Principles and Practice of Constraint Programming—CP 2001 (pp. 16–30). Springer. https://doi.org/10.1007/3-540-45578-7_2
 .. [#] Beck, J. C. (2010). Checking-Up on Branch-and-Check. In D. Cohen (Ed.), Principles and Practice of Constraint Programming – CP 2010 (pp. 84–98). Springer. https://doi.org/10.1007/978-3-642-15396-9_10
 .. [#] Gendron, B., Scutellà, M. G., Garroppo, R. G., Nencioni, G., & Tavanti, L. (2016). A branch-and-Benders-cut method for nonlinear power design in green wireless local area networks. European Journal of Operational Research, 255(1), 151–162. https://doi.org/10.1016/j.ejor.2016.04.058

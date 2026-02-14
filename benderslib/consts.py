@@ -26,7 +26,7 @@ class BendersConsts:
     FEASIBLE = 'FEASIBLE'
     """Status indicating at least one feasible solution has been found."""
     OPTIMAL = 'OPTIMAL'
-    """Status indicating an optimal solution has been found."""
+    """Status indicating an optimal (within tolerances) solution has been found."""
     INFEASIBLE = 'INFEASIBLE'
     """Status indicating the problem is infeasible."""
     UNBOUNDED = 'UNBOUNDED'

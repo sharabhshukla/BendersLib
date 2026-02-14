@@ -188,6 +188,51 @@ class Gurobi(SolverBase):
         self.model.optimize()
         self._update_status('GUROBI', self.model.Status)
 
+    def __callback(self, model, where):
+        if where == GRB.Callback.MIPSOL:
+            self._callback_where = 'INCUMBENT'
+
+            # self.__callback_handler is a function passed from ProblemBase,
+            # SolverBase make 'self' as the argument and pass it to this function,
+            # so that users can access SolverBase's methods in ProblemBase.
+            r = self.__callback_handler(self)
+
+            if r == CST.TERMINATE:
+                model.terminate()
+
+        if where == GRB.Callback.MIPNODE:
+            ...
+
+    def _bnc_solve(self, callback_handler) -> None:
+        self.model.setParam('LazyConstraints', 1)
+        # self.model.setParam('Threads', 1)
+
+        self.__callback_handler = callback_handler
+        self.model.optimize(self.__callback)
+        self._update_status('GUROBI', self.model.Status)
+
+    def _cb_get_obj(self):
+        obj = self.model.cbGet(GRB.Callback.MIPSOL_OBJ)
+        return obj
+
+    def _cb_get_bound(self):
+        return self.model.cbGet(GRB.Callback.MIPSOL_OBJBND)
+
+    def _cb_get_var_values(self, vars: list[str] | None = None) -> dict[str, float]:
+        vars = vars or self._all_vars
+        res = {var_name: self.model.cbGetSolution(self.model.getVarByName(var_name)) for var_name in vars}
+        return res
+
+    def _cb_add_cut(self, cut) -> None:
+        lhs = sum(coef * self.model.getVarByName(var) for var, coef in zip(cut.vars, cut.coefs))
+
+        if cut.sense == CST.EQ:
+            self.model.cbLazy(lhs == cut.rhs)
+        elif cut.sense == CST.LE:
+            self.model.cbLazy(lhs <= cut.rhs)
+        elif cut.sense == CST.GE:
+            self.model.cbLazy(lhs >= cut.rhs)
+
     def compute_iis(self) -> set[str]:
         self.model.computeIIS()
 

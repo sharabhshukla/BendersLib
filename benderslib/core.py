@@ -39,6 +39,10 @@ class ProblemBase:
         self.status = CST.UNSOLVED
         """The status of the problem (see :class:`BendersConsts` for possible values)."""
 
+        # For branch-and-check
+        self._using_bnc = False
+        self.__handler = None
+
     def __repr__(self):
         n_vars = len(self.solver._all_vars)
         n = "Master Problem"
@@ -155,7 +159,8 @@ class ProblemBase:
                 all_values = problem.get_var_values()
 
         """
-        return self.solver.get_var_values(vars)
+        var_vals = self.solver._cb_get_var_values(vars) if self._using_bnc else self.solver.get_var_values(vars)
+        return var_vals
 
     def get_var_coefs(self, vars: list[str] | None = None) -> dict[str, list]:
         """
@@ -262,11 +267,25 @@ class ProblemBase:
 
                 obj_val = problem.get_obj()
         """
-        return self.solver.get_obj()
+        obj = self.solver._cb_get_obj() if self._using_bnc else self.solver.get_obj()
+        return obj
 
     def solve(self) -> None:
         """Solve the problem and update the :attr:`status` attribute."""
         self.solver.solve()
+        self.status = self.solver.status
+
+    def __callback_proxy(self, solver):
+        self._callback_where = solver._callback_where
+        # self.__handler is a function passed from BendersSolver,
+        # ProblemBase make 'self' as the argument and pass it to this function,
+        # so that users can access SolverBase's methods in BendersSolver via ProblemBase.
+        return self.__handler(self)
+
+    def _bnc_solve(self, callback_handler):
+        self._using_bnc = True
+        self.__handler = callback_handler
+        self.solver._bnc_solve(self.__callback_proxy)
         self.status = self.solver.status
 
     def compute_iis(self) -> set[str]:
@@ -402,12 +421,7 @@ class MasterProblem(ProblemBase):
             The name of the added cut in the master problem.
         """
 
-        if cut in self.optimality_cuts or cut in self.feasibility_cuts:
-            # raise Exception(f"Duplicate cut detected: {cut}")
-
-            BendersLogger.warning(f"Duplicate cut is ignored: {cut}")
-            return None
-        else:
+        if not cut in self.cuts.values() or self._using_bnc:
             if cut.ctype == CST.OPTIMALITY:
                 cut_id = f"OC{next(self.__oc_id)}"
                 cut.name = f"{cut.name}_{cut_id}"
@@ -418,8 +432,21 @@ class MasterProblem(ProblemBase):
                 self.feasibility_cuts.add(cut)
 
             self.cuts[cut.name] = cut
-            self.solver.add_cut(cut, name=cut.name)
+
+            if self._using_bnc:
+                self.solver._cb_add_cut(cut)
+            else:
+                self.solver.add_cut(cut, name=cut.name)
+
             return cut.name
+
+        elif cut in self.cuts.values():
+            # Duplicate cut checking only applies to non branch-and-check mode,
+            # as in branch-and-check, the same cut may be added multiple times across different nodes.
+
+            # raise Exception(f"Duplicate cut detected: {cut}")
+            BendersLogger.warning(f"Duplicate cut is ignored: {cut}")
+            return None
 
     def remove_cut(self, cut_name: str) -> None:
         """Remove a cut from the master problem by its name.
@@ -1351,7 +1378,10 @@ class BendersSolver:
         # The master problem objective is monotonously non-decreasing with cut being added
         _new_lb_found = True
         if _new_lb_found:
-            self.result.lb = self.master_problem.get_obj()
+            if self.master_problem._using_bnc:
+                self.result.lb = self.master_problem.solver._cb_get_bound()
+            else:
+                self.result.lb = self.master_problem.get_obj()
         estimator_vals = self.master_problem.get_estimator_values()
 
         if isinstance(self.sub_problem, SubProblem) or not self.params.multi_opti_cut:
@@ -1365,7 +1395,11 @@ class BendersSolver:
                 for i, p in enumerate(self.__prob)
             )
 
-        self.result.ub = self.result.lb - theta + self.sub_problem.get_obj()
+        if self.master_problem._using_bnc:
+            self.result.ub = self.master_problem.get_obj() - theta + self.sub_problem.get_obj()
+        else:
+            self.result.ub = self.result.lb - theta + self.sub_problem.get_obj()
+
         _new_ub_found = self.result.ub < self.result.obj
         if _new_ub_found:
             self.result.obj = self.result.ub
@@ -1374,7 +1408,7 @@ class BendersSolver:
         self.result.gap_abs = abs(self.result.obj - self.result.lb)
         if abs(self.result.ub) > self.params.tol_abs:
             # Non-zero ub
-            self.result.gap = self.result.gap_abs / abs(self.result.ub)
+            self.result.gap = self.result.gap_abs / abs(self.result.obj)
         else:
             # Zero ub
             self.result.gap = 0 if self.result.lb == 0 else float('Inf')
@@ -1433,6 +1467,9 @@ class BendersSolver:
         After calling this method, the results and statistics of the Benders decomposition process can be accessed
         through the :attr:`BendersSolver.result` attribute, which is an instance of :class:`BendersResult`.
         """
+        if self.params.use_bnc:
+            # Return to avoid running code outside the while loop
+            return self.bnc_solve()
 
         # Initialize
         self.__preprocess()
@@ -1471,8 +1508,7 @@ class BendersSolver:
                     # Ensure bounds are recorded for in all iterations, even when subproblem is infeasible
                     self.result.lb_list.append(self.result.lb)
                     self.result.ub_list.append(self.result.ub)
-                    if self.__terminate(time_start):
-                        break
+                    if self.__terminate(time_start): break
                     if self.__add_feasibility_cut() == CST.TERMINATE: break
 
                 # Sub problem is optimal -> add optimality cut
@@ -1480,8 +1516,7 @@ class BendersSolver:
                     if self.__update_result(time_start) == CST.TERMINATE: break
                     _time_pre_log = self.__logger.log_line(time_start, _time_pre_log)
                     # REACH OPTIMALITY
-                    if self.__terminate(time_start):
-                        break
+                    if self.__terminate(time_start): break
                     if self.__add_optimality_cut() == CST.TERMINATE: break
 
                 # Sub problem is neither infeasible nor optimal -> error
@@ -1514,6 +1549,112 @@ class BendersSolver:
         self.__logger.log_end()
 
         if self.__trigger_callbacks_and_terminate(EVENTS.ON_BENDERS_END): return
+
+    def __bnc_callback(self, master_problem):
+        self.result.n_iter += 1
+
+        var_values = master_problem.get_var_values(self.complicating_vars)
+        self._context.current_comp_vals = var_values
+        ts = time.perf_counter()
+        self.sub_problem.fix_vars(self._context.current_comp_vals)
+        self.sub_problem.solve()
+        self.result.runtime_sub += time.perf_counter() - ts
+
+        # Sub problem is infeasible -> add feasibility cut
+        if self.sub_problem.status == CST.INFEASIBLE:
+            self.result.lb_list.append(self.result.lb)
+            self.result.ub_list.append(self.result.ub)
+            if self.__terminate(self.__time_start): return CST.TERMINATE
+            if self.__add_feasibility_cut() == CST.TERMINATE: return CST.TERMINATE
+
+        # Sub problem is optimal -> add optimality cut
+        elif self.sub_problem.status == CST.OPTIMAL:
+            if self.__update_result(self.__time_start) == CST.TERMINATE: return CST.TERMINATE
+            self._time_pre_log = self.__logger.log_line(self.__time_start, self._time_pre_log)
+            if self.__terminate(self.__time_start): return CST.TERMINATE
+            if self.__add_optimality_cut() == CST.TERMINATE: return CST.TERMINATE
+
+        else:
+            self.result.status = CST.UNKNOWN
+            raise ValueError(f"Subproblem returned an unexpected status: {self.sub_problem.status}.")
+
+    def bnc_solve(self):
+        """Solve the problem using branch-and-check method.
+
+        :ref:`branch-and-check <enhance_branch_and_check>`, or branch-and-Benders-cut, is a
+        modern implementation of the Benders decomposition
+        method that integrates the cut generation process into the branch-and-bound algorithm of the
+        master problem solver. Instead of solving the master problem to optimality at each iteration,
+        it checks the feasibility and optimality of the current solution at each node of the branch-and-bound
+        tree and adds cuts as needed.
+
+        The branch-and-check method is epically efficient when the subproblem is relatively easy to solve
+        (than the master problem) and the number of cuts needed is large, as it avoids solving the master
+        problem multiple times. However, it requires the master problem solver to support callback functions
+        for adding cuts during the branch-and-bound process, which is supported by only a subset of
+        :doc:`solver interfaces <../manual/solvers>`.
+
+        When running branch-and-check, BendersLib does not check whether the cut generated has been
+        already added to the master problem, as another node may encounter the same solution and
+        generate the same cut, which is not necessarily redundant in branch-and-check.
+        This differs from running the traditional Benders method using :meth:`~BendersSolver.solve()`,
+        which warns users about duplicate cuts and skips adding them to the master problem.
+
+        The definition of the lower bound (and the gap) in branch-and-check is different from
+        the traditional Benders decomposition, as the master problem is not necessarily solved
+        to optimality when cuts are added. Therefore, the master problem objective value at
+        the current node may not be a valid lower bound for the original problem.
+        In branch-and-check, the lower bound is  obtained from the best bound of the master problem at the current node.
+        Therefore, users should be cautious when interpreting the results and statistics
+        in branch-and-check, and keep in mind that it is not directly comparable
+        to the traditional Benders decomposition. The latter is usually stronger.
+
+        The :attr:`~BendersResult.runtime_master` also differs from the traditional Benders decomposition,
+        as there is not a clear separation that can be used to record the time of solving the master problem.
+        In branch-and-check, :attr:`~BendersResult.runtime_master` simply equals the total
+        runtime (:attr:`~BendersResult.runtime`) minus the time spent on solving
+        the subproblem (:attr:`~BendersResult.runtime_sub`).
+
+        This method can also be used by setting :attr:`~BendersParams.use_bnc` to ``True``
+        and calling :meth:`~BendersSolver.solve()`, which will internally call this method.
+
+        Example
+        ---------------
+
+        .. code-block:: python
+
+            BD = BendersSolver(...)
+
+            BD.bnc_solve()
+            # or equivalently
+            BD.params.use_bnc = True
+            BD.solve()
+        """
+
+        # Initialize
+        self.__preprocess()
+        self.result.status = CST.UNSOLVED
+        self.result.n_iter = 0
+        self.__time_start = time.perf_counter()
+        self._time_pre_log = self.__time_start
+        self.__logger.log_title()
+
+        # Loop
+        self.master_problem._bnc_solve(self.__bnc_callback)
+
+        # Finalize
+        self.result.n_opt_cuts = len(self.master_problem.optimality_cuts)
+        self.result.n_feas_cuts = len(self.master_problem.feasibility_cuts)
+        self.result.n_cuts = self.result.n_opt_cuts + self.result.n_feas_cuts
+        # Update the status when master problem solved without termination
+        if self.master_problem.status == CST.OPTIMAL:
+            self.master_problem._using_bnc = False
+            self.__update_result(self.__time_start)
+            self.__terminate(self.__time_start)
+        self.result.time = time.perf_counter() - self.__time_start
+        self.result.runtime_master = self.result.time - self.result.runtime_sub
+
+        self.__logger.log_end()
 
     def register_callback(self, callback: CallbackBase | Callable | Type[CallbackBase]) -> None:
         """Register a user-defined callback to be called during the Benders solving process.
