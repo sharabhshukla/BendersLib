@@ -17,8 +17,9 @@ import random
 
 from benderslib import MasterProblem, SubProblems, GeneLShaped, CST, BendersParams
 from benderslib.solvers import Gurobi
+from benderslib.utils import draw_curve
+
 from gurobipy import Model, GRB, QuadExpr, quicksum
-from matplotlib import pyplot as plt
 
 
 def first_stage_model(n_plants):
@@ -103,6 +104,8 @@ if __name__ == '__main__':
     BD = GeneLShaped(master_problem, sub_problems, complicating_vars)
     BD.solve()
 
+    draw_curve(BD.result)
+
     # Multi-cut version
     # Master and Sub models are required to be re-defined,
     # since they have been modified (by adding cuts) in the previous solve.
@@ -119,15 +122,7 @@ if __name__ == '__main__':
     )
     BD.solve()
 
-    # Plot convergence
-    plt.plot(BD.result.lb_list, label='Lower Bound')
-    plt.plot(BD.result.ub_list, label='Upper Bound')
-    plt.xlabel('Iteration')
-    plt.ylabel('Objective Value')
-    plt.title('Benders Decomposition')
-    plt.legend()
-    plt.grid(True)
-    plt.show()
+    draw_curve(BD.result)
 
     # --- Solve with Deterministic Equivalent ---
     de_model = deterministic_equivalent_model(n_plants, scenarios, probs)

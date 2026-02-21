@@ -12,8 +12,9 @@ This method is suitable for problems where the complicating variables are binary
 # Define the original problem:
 from benderslib import AnnotationBenders, CombinatorialBenders
 from benderslib.solvers import Gurobi
+from benderslib.utils import draw_curve
+
 from gurobipy import Model, GRB
-from matplotlib import pyplot as plt
 
 
 def make_original_problem(has_sub_objective):
@@ -106,15 +107,7 @@ if __name__ == '__main__':
     # )
     # AB.solve()
 
-    # Draw convergence curve
-    plt.plot(AB.result.lb_list, label='Lower Bound')
-    plt.plot(AB.result.ub_list, label='Upper Bound')
-    plt.xlabel('Iteration')
-    plt.ylabel('Objective Value')
-    plt.title('Benders Decomposition')
-    plt.legend()
-    plt.grid(True)
-    plt.show()
+    draw_curve(AB.result)
 
 # %%
 #

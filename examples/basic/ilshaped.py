@@ -16,8 +16,9 @@ import random
 
 from benderslib import IntegerLShaped
 from benderslib.solvers import Gurobi
+from benderslib.utils import draw_curve
+
 from gurobipy import Model, GRB
-from matplotlib import pyplot as plt
 
 
 def first_stage_model(n_plants):
@@ -116,6 +117,8 @@ if __name__ == '__main__':
     L.params.log_freq_sec = 0.1
     L.solve()
 
+    draw_curve(L.result)
+
     # Multi-cut Integer L-shaped solver
     # Master and Sub models are required to be re-defined,
     # since they have been modified (by adding cuts) in the previous solve.
@@ -133,15 +136,7 @@ if __name__ == '__main__':
     L.params.log_freq_sec = 0.1
     L.solve()
 
-    # Draw convergence curve
-    plt.plot(L.result.lb_list, label='Lower Bound')
-    plt.plot(L.result.ub_list, label='Upper Bound')
-    plt.xlabel('Iteration')
-    plt.ylabel('Objective Value')
-    plt.title('Benders Decomposition')
-    plt.legend()
-    plt.grid(True)
-    plt.show()
+    draw_curve(L.result)
 
 # %%
 #

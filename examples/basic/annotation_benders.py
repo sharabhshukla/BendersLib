@@ -14,8 +14,9 @@ Annotation Benders Decomposition
 # Define the original problem:
 from benderslib import AnnotationBenders, ClassicalBenders
 from benderslib.solvers import Gurobi
+from benderslib.utils import draw_curve
+
 from gurobipy import Model, GRB
-import matplotlib.pyplot as plt
 
 
 def make_original_problem():
@@ -67,15 +68,7 @@ if __name__ == '__main__':
     # print(AB.result.solution)
     print(f"Obj: {AB.result.obj}")
 
-    # Draw convergence curve
-    plt.plot(AB.result.lb_list, label='Lower Bound')
-    plt.plot(AB.result.ub_list, label='Upper Bound')
-    plt.xlabel('Iteration')
-    plt.ylabel('Objective Value')
-    plt.title('Benders Decomposition')
-    plt.legend()
-    plt.grid(True)
-    plt.show()
+    draw_curve(AB.result)
 
 # %%
 #
