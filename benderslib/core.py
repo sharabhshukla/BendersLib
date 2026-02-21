@@ -284,7 +284,6 @@ class ProblemBase:
         return self.__handler(self)
 
     def _bnc_solve(self, callback_handler):
-        self.solver.params = self.params
         self._using_bnc = True
         self.__handler = callback_handler
         self.solver._bnc_solve(self.__callback_proxy)
@@ -1219,6 +1218,16 @@ class BendersSolver:
         # Override params in master and subproblem
         master_problem.params = params
         sub_problem.params = params
+
+        if getattr(master_problem, 'solver', None) is not None:
+            master_problem.solver.params = params
+        if getattr(sub_problem, 'solver', None) is not None:
+            if isinstance(sub_problem, SubProblems):
+                for sub in sub_problem.sub_problems:
+                    if getattr(sub, 'solver', None) is not None:
+                        sub.solver.params = params
+            else:
+                sub_problem.solver.params = params
 
         # Public attributes
         self.master_problem = master_problem

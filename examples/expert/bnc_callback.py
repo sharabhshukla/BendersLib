@@ -8,9 +8,9 @@ Callback in Branch-and-Check Method
 # %%
 # Prepare the problem for Benders decomposition.
 
-from benderslib import ClassicalBenders, AnnotationBenders, CallbackBase, BendersContext, CST
+from benderslib import ClassicalBenders, AnnotationBenders, BendersContext, CST
 from benderslib.solvers import Gurobi
-from benderslib.utils import draw_curve
+from benderslib.utils import draw_curve, is_all_integer
 from gurobipy import Model, GRB
 
 
@@ -37,44 +37,63 @@ def make_original_problem():
 
 
 # %%
-# Define the callback.
+# Define the callback, which generates optimality cuts only from integer solutions
+# in the early iterations, and turns off cut generation from fractional solutions
+# after a specified number of iterations.
 
-class BncCallback(CallbackBase):
-
-    def __init__(self):
-        self.feasible_solutions = []
-
-    def on_opti_cut_generated(self, context: BendersContext):
-        if context.where == CST.INCUMBENT:
-            sol = context.sub_problem.get_var_values()
-            self.feasible_solutions.append(sol)
+def on_opti_cut_generated(context: BendersContext):
+    if context.benders.result.n_iter <= 50:
 
         if context.where == CST.NODE:
-            pass
+            int_vars = context.master_problem.solver._int_vars
+            int_vars += context.master_problem.solver._bin_vars
+            master_sol = context.master_problem.get_var_values(int_vars)
+
+            if not is_all_integer(master_sol.values()):
+                # Add optimality cuts from only integer solutions
+                context.current_opti_cuts = []
+
+    else:
+        # Turn off cut generation from fractional solutions
+        # after a specified number of iterations
+        context.benders.params.bnc_frac_sol = False
 
 
 # %%
-# Solve the problem using Branch-and-Check method:
+# Solve the problem using Branch-and-Check method with the defined callback.
 
 model, complicating_vars = make_original_problem()
+model_copy = model.copy()
+
 BD = AnnotationBenders(
     model,
     solver=Gurobi,
     complicating_vars=complicating_vars,
     benders=ClassicalBenders
 )
-# BD.benders.params.tol_rel = 0.05
-# BD.params.bnc_frac_sol = True
-callback = BncCallback()
-BD.benders.register_callback(callback)
+
+BD.benders.params.bnc_frac_sol = True
+
+BD.benders.register_callback(on_opti_cut_generated)
 BD.benders.bnc_solve()
+
 draw_curve(BD.result)
 
-print(f"\nFound {len(callback.feasible_solutions)} feasible solutions.")
+# %%
+# Solve the problem using trivial Branch-and-Check method.
+
+BD = AnnotationBenders(
+    model_copy,
+    solver=Gurobi,
+    complicating_vars=complicating_vars,
+    benders=ClassicalBenders
+)
+BD.benders.bnc_solve()
+draw_curve(BD.result)
 
 # %%
 # .. seealso::
 #
 #    - A brief introduction to :ref:`enhance_branch_and_check`.
 #
-# .. tags:: benders: classical, solver: gurobi, deterministic, callback, branch-and-check
+# .. tags:: benders: classical, solver: gurobi, deterministic, callback, branch-and-check, enhancement
