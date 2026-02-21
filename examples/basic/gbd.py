@@ -23,13 +23,16 @@ with subproblem being a convex Quadratic Programming (QP) problem
 """
 
 # %%
-# Define master problem and subproblem:
-import gurobipy as gp
-from gurobipy import GRB
+# Define master problem and subproblem.
+
+import random
 
 from benderslib import GeneralizedBenders, MasterProblem, SubProblem, ClassicalBenders, ClassicalFCGen
 from benderslib.solvers import Gurobi
-import random
+from benderslib.utils import draw_curve
+
+import gurobipy as gp
+from gurobipy import GRB
 
 
 def create_master_problem(warehouse_num, price, budget):
@@ -72,7 +75,8 @@ def create_sub_problem(warehouse_num, demand, max_shortage_ratio, linear_obj, li
 
 
 # %%
-# Define complete model for validation:
+# Define a complete model for validation.
+
 def create_complete_model(warehouse_num, price, budget, demand, max_shortage_ratio, linear_obj, linear_cone):
     model = gp.Model("complete")
 
@@ -107,53 +111,62 @@ def create_complete_model(warehouse_num, price, budget, demand, max_shortage_rat
 
 
 # %%
-# Solve with Generalized Benders Decomposition:
-if __name__ == '__main__':
-    # Data
-    warehouse_num = 8
-    random.seed(1)
-    price = [random.randrange(10, 50) for _ in range(warehouse_num)]
-    demand = [random.randrange(20, 100) for _ in range(warehouse_num)]
-    budget = 50000
-    max_shortage_ratio = .8
-    linear_obj = False
-    linear_con = True
+# Solve the problem using Generalized Benders Decomposition.
 
-    # Create master problem
-    master_problem_model, complicating_vars = create_master_problem(warehouse_num, price, budget)
-    master_problem = MasterProblem(Gurobi(master_problem_model))
+# Data
+warehouse_num = 8
+random.seed(1)
+price = [random.randrange(10, 50) for _ in range(warehouse_num)]
+demand = [random.randrange(20, 100) for _ in range(warehouse_num)]
+budget = 50000
+max_shortage_ratio = .8
+linear_obj = False
+linear_con = True
 
-    # Create sub problem
-    sub_problem_model = create_sub_problem(warehouse_num, demand, max_shortage_ratio, linear_obj, linear_con)
-    sub_problem = SubProblem(Gurobi(sub_problem_model))
+# Create master problem
+master_problem_model, complicating_vars = create_master_problem(warehouse_num, price, budget)
+master_problem = MasterProblem(Gurobi(master_problem_model))
 
-    # Create Benders decomposition instance
-    # benders = GeneralizedBenders(
-    #     master_problem=master_problem,
-    #     sub_problem=sub_problem,
-    #     complicating_vars=complicating_vars
-    # )
-    benders = GeneralizedBenders.from_models(
-        master_model=master_problem_model,
-        sub_model=sub_problem_model,
-        master_solver=Gurobi,
-        sub_solver=Gurobi,
-        complicating_vars=complicating_vars,
-    )
-    benders.solve()
+# Create sub problem
+sub_problem_model = create_sub_problem(warehouse_num, demand, max_shortage_ratio, linear_obj, linear_con)
+sub_problem = SubProblem(Gurobi(sub_problem_model))
 
-    # Complete model for validation
-    complete_model = create_complete_model(
-        warehouse_num, price, budget, demand, max_shortage_ratio, linear_obj, linear_con)
-    complete_model.optimize()
-    if complete_model.Status == GRB.OPTIMAL:
-        print(f"\nComplete model objective: {complete_model.ObjVal:.2f}")
+# Create Benders decomposition instance
+BD = GeneralizedBenders.from_models(
+    master_model=master_problem_model,
+    sub_model=sub_problem_model,
+    master_solver=Gurobi,
+    sub_solver=Gurobi,
+    complicating_vars=complicating_vars,
+)
+
+# BD = GeneralizedBenders(
+#     master_problem=master_problem,
+#     sub_problem=sub_problem,
+#     complicating_vars=complicating_vars
+# )
+
+# This example works well with the branch-and-check method, try it!
+# BD.params.use_bnc = True
+
+BD.solve()
+
+print(f"Benders Decomposition Obj:  {BD.result.obj:.2f}")
+draw_curve(BD.result)
+
+# %%
+# Solve the problem using Gurobi directly for comparison.
+
+complete_model = create_complete_model(
+    warehouse_num, price, budget, demand, max_shortage_ratio, linear_obj, linear_con)
+complete_model.optimize()
+print(f"Complete Model Obj:         {complete_model.ObjVal:.2f}")
 
 # %%
 #
-# .. admonition:: References
+# .. seealso::
 #
 #     * Tutorial of the Generalized Benders Decomposition: :doc:`../../tutorials/gbd`
 #     * This example uses the following class: :class:`GeneralizedBenders`
 #
-# .. tags:: benders: generalized, solver: gurobi, deterministic
+# .. tags:: benders: generalized, solver: gurobi, deterministic, branch-and-check

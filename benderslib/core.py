@@ -1485,9 +1485,6 @@ class BendersSolver:
             # Stochastic problem with multiple estimators
             self.master_problem._add_estimators(multiple=True, prob=self.__prob, lb=self.params.theta_lb)
 
-        # Other preprocessing steps can be added here
-        ...
-
     def solve(self) -> None:
         """Solve the problem using Benders decomposition.
 
@@ -1655,6 +1652,13 @@ class BendersSolver:
         This method can also be used by setting :attr:`~BendersParams.use_bnc` to ``True``
         and calling :meth:`~BendersSolver.solve()`, which will internally call this method.
 
+        .. caution::
+
+            The method :meth:`~benderslib.BendersSolver.bnc_solve` is incompatible with
+            Benders decomposition instances that have a purely continuous master problem.
+            This is because the branch-and-check method generates cuts on nodes of the
+            branch-and-bound tree, which does not exist for Linear Programming problems.
+
         Example
         ---------------
 
@@ -1687,11 +1691,19 @@ class BendersSolver:
         self.result.n_opt_cuts = len(self.master_problem.optimality_cuts)
         self.result.n_feas_cuts = len(self.master_problem.feasibility_cuts)
         self.result.n_cuts = self.result.n_opt_cuts + self.result.n_feas_cuts
-        # Update the status when master problem solved without termination
+
+        # Update the status when master problem solved without termination,
+        # which implies that the optimum is found.
         if self.master_problem.status == CST.OPTIMAL:
-            self.master_problem._using_bnc = False
-            self.__update_result(self.__time_start)
-            self.__terminate(self.__time_start)
+            if self.sub_problem.status == CST.OPTIMAL:
+                # We need to update the bound of the last iteration,
+                # if the subproblem is optimal.
+                self.master_problem._using_bnc = False
+                self.__update_result(self.__time_start)
+            # Determine the final status.
+            # self.__terminate(self.__time_start)
+            self.result.status = CST.OPTIMAL
+
         self.result.time = time.perf_counter() - self.__time_start
         self.result.runtime_master = self.result.time - self.result.runtime_sub
 

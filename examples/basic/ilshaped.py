@@ -10,7 +10,7 @@ However, the complicating variables must be pure binary.
 """
 
 # %%
-# Define the first-stage problem:
+# Define the first-stage problem.
 
 import random
 
@@ -33,13 +33,14 @@ def first_stage_model(n_plants):
 
 
 # %%
-# Define the second-stage problem:
+# Define the second-stage problem.
+
 def second_stage_model(n_plants, scenarios, penalty):
     for s, demand in enumerate(scenarios):
         model = Model(f"SecondStage_{s}")
 
         # Complicating variables should have the **SAME names** as in the first-stage model
-        open = model.addVars(n_plants, vtype=GRB.BINARY, name="open")
+        open = model.addVars(n_plants, name="open")
         shortage = model.addVars(n_plants, vtype=GRB.BINARY, name="shortage")
 
         # Minimize shortage
@@ -55,7 +56,8 @@ def second_stage_model(n_plants, scenarios, penalty):
 
 
 # %%
-# Define the deterministic equivalent problem for verification:
+# Define the deterministic equivalent problem for verification.
+
 def deterministic_equivalent_model(n_plants, scenarios, probs, penalty):
     probs = [1 / len(scenarios) for _ in range(len(scenarios))] if probs[0] is None else probs
 
@@ -83,70 +85,76 @@ def deterministic_equivalent_model(n_plants, scenarios, probs, penalty):
 
 
 # %%
-# Solve the problem using the deterministic equivalent (for clarity and verification) and the integer L-shaped method:
-if __name__ == '__main__':
-    # Data
-    # random.seed(1)
-    n_plants = 7
-    n_scenarios = 2
-    penalty = 10
-    scenarios = [[random.choice([0, 1]) for _ in range(n_plants)] for _ in range(n_scenarios)]
-    probs = [1.3 for _ in range(n_scenarios)]
+# Solve the problem using the deterministic equivalent.
 
-    # Deterministic equivalent solution
-    de_model = deterministic_equivalent_model(n_plants, scenarios, probs, penalty)
-    de_model.optimize()
-    if de_model.Status == GRB.OPTIMAL:
-        print(f"Deterministic Equivalent Obj: {de_model.ObjVal:.4f}\n")
-    else:
-        print("Deterministic Equivalent Problem is infeasible or unbounded.\n")
+# Data
+random.seed(1)
+n_plants = 7
+n_scenarios = 2
+penalty = 10
+scenarios = [[random.choice([0, 1]) for _ in range(n_plants)] for _ in range(n_scenarios)]
+probs = [1.3 for _ in range(n_scenarios)]
 
-    # Solver models
-    master_model, complicating_vars = first_stage_model(n_plants)
-    sub_models = second_stage_model(n_plants, scenarios, penalty)
+# Deterministic equivalent solution
+de_model = deterministic_equivalent_model(n_plants, scenarios, probs, penalty)
+de_model.optimize()
+print(f"Deterministic Equivalent Obj: {de_model.ObjVal:.4f}")
 
-    # Integer L-shaped solver
-    L = IntegerLShaped.from_models(
-        master_model=master_model,
-        master_solver=Gurobi,
-        sub_model=sub_models,
-        sub_solver=Gurobi,
-        complicating_vars=complicating_vars,
-        prob=probs,
-    )
-    L.params.log_freq_sec = 0.1
-    L.solve()
+# %%
+# Solve the problem using the single-cut integer L-shaped method.
 
-    draw_curve(L.result)
+# Solver models
+master_model, complicating_vars = first_stage_model(n_plants)
+sub_models = second_stage_model(n_plants, scenarios, penalty)
 
-    # Multi-cut Integer L-shaped solver
-    # Master and Sub models are required to be re-defined,
-    # since they have been modified (by adding cuts) in the previous solve.
-    master_model, complicating_vars = first_stage_model(n_plants)
-    sub_models = second_stage_model(n_plants, scenarios, penalty)
-    L = IntegerLShaped.from_models(
-        master_model=master_model,
-        master_solver=Gurobi,
-        sub_model=sub_models,
-        sub_solver=Gurobi,
-        complicating_vars=complicating_vars,
-        prob=probs,
-    )
-    L.params.multi_opti_cut = True
-    L.params.log_freq_sec = 0.1
-    L.solve()
+# Integer L-shaped solver
+L = IntegerLShaped.from_models(
+    master_model=master_model,
+    master_solver=Gurobi,
+    sub_model=sub_models,
+    sub_solver=Gurobi,
+    complicating_vars=complicating_vars,
+    prob=probs,
+)
 
-    draw_curve(L.result)
+# This example works well with the branch-and-check method, try it!
+# L.params.use_bnc = True
+
+L.solve()
+
+draw_curve(L.result)
+
+# %%
+# Solve the problem using the multi-cut integer L-shaped method.
+
+# Multi-cut Integer L-shaped solver
+# Master and Sub models are required to be re-defined,
+# since they have been modified (by adding cuts) in the previous solve.
+master_model, complicating_vars = first_stage_model(n_plants)
+sub_models = second_stage_model(n_plants, scenarios, penalty)
+L = IntegerLShaped.from_models(
+    master_model=master_model,
+    master_solver=Gurobi,
+    sub_model=sub_models,
+    sub_solver=Gurobi,
+    complicating_vars=complicating_vars,
+    prob=probs,
+)
+
+L.params.multi_opti_cut = True
+# This example works well with the branch-and-check method, try it!
+# L.params.use_bnc = True
+
+L.solve()
+
+draw_curve(L.result)
 
 # %%
 #
-# .. admonition:: References
+# .. seealso::
 #
 #     * Tutorial of the integer L-shaped method: :doc:`../../tutorials/ilshaped`
 #     * This example uses the following class: :class:`~benderslib.IntegerLShaped`
-#
-# .. seealso::
-#
 #     * Example of the L-shaped method: :doc:`lshaped`
 #
-# .. tags:: benders: integer l-shaped, solver: gurobi, stochastic
+# .. tags:: benders: integer l-shaped, solver: gurobi, stochastic, branch-and-check

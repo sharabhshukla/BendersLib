@@ -4,14 +4,15 @@
 Simple Classical Benders Example
 ==================================
 
+This example explicitly defines master problem and subproblem for Benders decomposition.
 """
 
 # %%
-# This example explicitly defines master problem and subproblem for Benders decomposition.
-#
-# Define a simple MILP problem:
+# Define a simple MILP problem.
+
 from benderslib import BendersParams, MasterProblem, SubProblem, ClassicalBenders
 from benderslib.solvers import Gurobi
+
 from gurobipy import Model, GRB
 
 
@@ -32,7 +33,8 @@ def make_original_problem():
 
 
 # %%
-# Define master problem and subproblem for Benders decomposition:
+# Define master problem and subproblem for Benders decomposition.
+
 def make_master_problem():
     model = Model("Master")
 
@@ -61,46 +63,42 @@ def make_sub_problem():
 
 
 # %%
-# Solving using Gurobi and Benders Decomposition:
-if __name__ == '__main__':
-    # Solve original problem using Gurobi
-    model = make_original_problem()
-    model.optimize()
-    if model.Status == GRB.OPTIMAL:
-        print("Original Problem Solution:")
-        # print({v.VarName: v.X for v in model.getVars()})
-        print(f"Obj: {model.ObjVal}\n")
-    else:
-        print("Original Problem Solution: Infeasible or Unbounded\n")
+# Solve the problem using Gurobi.
 
-    # Solving using Benders Decomposition:
+model = make_original_problem()
+model.optimize()
+print(f"Original Problem Obj: {model.ObjVal}")
 
-    # Define master problem
-    master_model, complicating_vars = make_master_problem()
-    # master_problem = MasterProblem(solver_backend=Gurobi(master_model))
+# %%
+# Solve the problem using Classical Benders Decomposition.
 
-    # Define subproblem
-    sub_model = make_sub_problem()
-    # sub_problem = SubProblem(solver_backend=Gurobi(sub_model))
+# Define master problem
+master_model, complicating_vars = make_master_problem()
 
-    # Create and solve Benders Decomposition instance
-    BD = ClassicalBenders.from_models(master_model, Gurobi, sub_model, Gurobi, complicating_vars=complicating_vars)
-    # BD = ClassicalBenders(master_problem, sub_problem, complicating_vars=complicating_vars)
+# Define subproblem
+sub_model = make_sub_problem()
 
-    BD.solve()
-    print("\nBenders Decomposition Solution:")
-    # print(BD.result.solution)
-    print(f"Obj: {BD.result.obj}\n")
+# Create and solve Benders Decomposition instance
+BD = ClassicalBenders.from_models(master_model, Gurobi, sub_model, Gurobi, complicating_vars=complicating_vars)
+
+# # An alternative way to create Benders Decomposition instance
+# master_problem = MasterProblem(solver_backend=Gurobi(master_model))
+# sub_problem = SubProblem(solver_backend=Gurobi(sub_model))
+# BD = ClassicalBenders(master_problem, sub_problem, complicating_vars=complicating_vars)
+
+# This example works well with the branch-and-check method, try it!
+# BD.params.use_bnc = True
+
+BD.solve()
+
+print(f"Benders Decomposition Obj: {BD.result.obj}")
 
 # %%
 #
-# .. admonition:: References
+# .. seealso::
 #
 #     * Tutorial of Classical Benders Decomposition: :doc:`../../tutorials/classical`
 #     * This example uses the following class: :class:`~benderslib.ClassicalBenders`
-#
-# .. seealso::
-#
 #     * Automated decomposition based on complicating variables: :doc:`annotation_benders`
 #
-# .. tags:: benders: classical, solver: gurobi, deterministic
+# .. tags:: benders: classical, solver: gurobi, deterministic, branch-and-check

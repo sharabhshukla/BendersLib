@@ -11,7 +11,7 @@ problem is a convex program (e.g., a Quadratic Programming problem).
 """
 
 # %%
-# Define the first-stage problem:
+# Define the first-stage problem.
 
 import random
 
@@ -25,7 +25,7 @@ from gurobipy import Model, GRB, QuadExpr, quicksum
 def first_stage_model(n_plants):
     model = Model("FirstStage")
 
-    capacity = model.addVars(n_plants, name="capacity")
+    capacity = model.addVars(n_plants, vtype=GRB.INTEGER, name="capacity")
     model.setObjective(capacity.sum(), GRB.MINIMIZE)
 
     model.update()
@@ -34,7 +34,8 @@ def first_stage_model(n_plants):
 
 
 # %%
-# Define the second-stage problem with a convex objective:
+# Define the second-stage problem with a convex objective.
+
 def second_stage_model(n_plants, scenarios):
     """Defines the second-stage (sub) problems for each scenario."""
     for s, demand in enumerate(scenarios):
@@ -54,11 +55,12 @@ def second_stage_model(n_plants, scenarios):
 
 
 # %%
-# Define the deterministic equivalent problem for verification:
+# Define the deterministic equivalent problem for verification.
+
 def deterministic_equivalent_model(n_plants, scenarios, probs):
     model = Model('DE')
 
-    capacity = model.addVars(n_plants, name="capacity")
+    capacity = model.addVars(n_plants, vtype=GRB.INTEGER, name="capacity")
     shortage = model.addVars(len(scenarios), n_plants, lb=0, name="shortage")
 
     # Objective: first-stage cost + expected second-stage cost (including quadratic term)
@@ -83,66 +85,71 @@ def deterministic_equivalent_model(n_plants, scenarios, probs):
 
 
 # %%
-# Solve the problem using the deterministic equivalent (for clarity and verification) and the L-shaped method:
-if __name__ == '__main__':
-    # Data
-    random.seed(5)
-    n_plants = 5
-    n_scenarios = 10
-    scenarios = [[random.randint(10, 220) for _ in range(n_plants)] for _ in range(n_scenarios)]
-    probs = [1 / n_scenarios for _ in range(n_scenarios)]
+# Solve the problem using the single-cut Generalized L-shaped method.
 
-    # --- Solve with Generalized L-shaped Method ---
-    # Initialize Master and Subproblems
-    fs_model, complicating_vars = first_stage_model(n_plants)
-    ss_models = list(second_stage_model(n_plants, scenarios))
+# Data
+random.seed(1)
+n_plants = 5
+n_scenarios = 10
+scenarios = [[random.randint(10, 220) for _ in range(n_plants)] for _ in range(n_scenarios)]
+probs = [1 / n_scenarios for _ in range(n_scenarios)]
 
-    master_problem = MasterProblem(Gurobi(fs_model))
-    sub_problems = SubProblems([Gurobi(m) for m in ss_models], prob=probs)
+# Master and subproblems
+fs_model, complicating_vars = first_stage_model(n_plants)
+ss_models = list(second_stage_model(n_plants, scenarios))
 
-    # Initialize and run the Benders solver
-    BD = GeneLShaped(master_problem, sub_problems, complicating_vars)
-    BD.solve()
+master_problem = MasterProblem(Gurobi(fs_model))
+sub_problems = SubProblems([Gurobi(m) for m in ss_models], prob=probs)
 
-    draw_curve(BD.result)
+BD = GeneLShaped(master_problem, sub_problems, complicating_vars)
 
-    # Multi-cut version
-    # Master and Sub models are required to be re-defined,
-    # since they have been modified (by adding cuts) in the previous solve.
-    fs_model, complicating_vars = first_stage_model(n_plants)
-    ss_models = list(second_stage_model(n_plants, scenarios))
-    BD = GeneLShaped.from_models(
-        master_model=fs_model,
-        master_solver=Gurobi,
-        sub_model=ss_models,
-        sub_solver=Gurobi,
-        complicating_vars=complicating_vars,
-        prob=probs,
-        params=BendersParams(multi_opti_cut=True)
-    )
-    BD.solve()
+# This example works well with the branch-and-check method, try it!
+# BD.params.use_bnc = True
 
-    draw_curve(BD.result)
+BD.solve()
 
-    # --- Solve with Deterministic Equivalent ---
-    de_model = deterministic_equivalent_model(n_plants, scenarios, probs)
-    de_model.optimize()
-    if de_model.Status == GRB.OPTIMAL:
-        print(f"DE Obj: {de_model.ObjVal}")
-    else:
-        print("Deterministic Equivalent Problem is infeasible or unbounded.")
+# draw_curve(BD.result)
 
-    if BD.result.status == CST.OPTIMAL:
-        print(f"BD Obj: {BD.result.obj}")
-    else:
-        print("Benders Decomposition did not find an optimal solution.")
+# %%
+# Solve the problem using the multi-cut Generalized L-shaped method.
+
+# Multi-cut version
+# Master and Sub models are required to be re-defined,
+# since they have been modified (by adding cuts) in the previous solve.
+fs_model, complicating_vars = first_stage_model(n_plants)
+ss_models = list(second_stage_model(n_plants, scenarios))
+BD = GeneLShaped.from_models(
+    master_model=fs_model,
+    master_solver=Gurobi,
+    sub_model=ss_models,
+    sub_solver=Gurobi,
+    complicating_vars=complicating_vars,
+    prob=probs,
+    params=BendersParams(multi_opti_cut=True)
+)
+
+# This example works well with the branch-and-check method, try it!
+# BD.params.use_bnc = True
+
+BD.solve()
+
+# draw_curve(BD.result)
+
+# %%
+# Solve the deterministic equivalent problem for verification.
+
+de_model = deterministic_equivalent_model(n_plants, scenarios, probs)
+de_model.optimize()
+
+print(f"Deterministic Equivalent Obj: {de_model.ObjVal:.4f}")
+print(f"Benders Decomposition    Obj: {BD.result.obj:.4f}")
 
 # %%
 #
-# .. admonition:: References
+# .. seealso::
 #
 #     * Tutorial of the L-shaped method: :doc:`../../tutorials/lshaped`
 #     * Tutorial of the Generalized Benders Decomposition: :doc:`../../tutorials/gbd`
 #     * This example uses the following class: :class:`~benderslib.benders.GeneLShaped`
 #
-# .. tags:: benders: generalized, benders: l-shaped, solver: gurobi, stochastic
+# .. tags:: benders: generalized, benders: l-shaped, solver: gurobi, stochastic, branch-and-check

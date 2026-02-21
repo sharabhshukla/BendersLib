@@ -4,14 +4,14 @@
 Annotation Benders Decomposition
 =======================================
 
+This example automatically decomposes a mixed-integer programming problem into a master problem
+and a subproblem based on the specified complicating variables, and then solves it using
+the classical Benders decomposition method.
 """
 
 # %%
-# This example automatically decomposes a mixed-integer programming problem into a master problem
-# and a subproblem based on the specified complicating variables, and then solves it using
-# the classical Benders decomposition method.
-#
-# Define the original problem:
+# Define the original problem.
+
 from benderslib import AnnotationBenders, ClassicalBenders
 from benderslib.solvers import Gurobi
 from benderslib.utils import draw_curve
@@ -42,38 +42,33 @@ def make_original_problem():
 
 
 # %%
-# Solve the problem using Gurobi and Annotation Benders Decomposition:
-if __name__ == '__main__':
-    # Solve original problem for comparison
-    model, complicating_vars = make_original_problem()
-    model.optimize()
-    if model.Status == GRB.OPTIMAL:
-        print("Original Problem Solution:")
-        # var_values = {v.VarName: v.X for v in model.getVars()}
-        # print(var_values)
-        print(f"Obj: {model.ObjVal}\n")
-    else:
-        print("Original Problem Solution: Infeasible or Unbounded\n")
+# Solve the problem using Gurobi.
 
-    # Solve with Benders Decomposition
-    AB = AnnotationBenders(model, solver=Gurobi, complicating_vars=complicating_vars, benders=ClassicalBenders)
-    AB.solve()
+model, complicating_vars = make_original_problem()
+model.optimize()
+print(f"Original Problem Obj: {model.ObjVal}")
 
-    # # Another way: Manually decompose the model and create ClassicalBenders instance
-    # master_model, sub_model = AnnotationBenders.decompose(model, Gurobi, complicating_vars, solver_model=True)
-    # AB = ClassicalBenders.from_models(master_model, Gurobi, sub_model, Gurobi, complicating_vars=complicating_vars)
-    # AB.solve()
+# %%
+# Solve the problem using Annotation Benders Decomposition.
 
-    print("\nBenders Decomposition Solution:")
-    # print(AB.result.solution)
-    print(f"Obj: {AB.result.obj}")
+AB = AnnotationBenders(model, solver=Gurobi, complicating_vars=complicating_vars, benders=ClassicalBenders)
 
-    draw_curve(AB.result)
+# # Another way: Manually decompose the model and create ClassicalBenders instance
+# master_model, sub_model = AnnotationBenders.decompose(model, Gurobi, complicating_vars, solver_model=True)
+# AB = ClassicalBenders.from_models(master_model, Gurobi, sub_model, Gurobi, complicating_vars=complicating_vars)
+
+# This example works well with the branch-and-check method, try it!
+# AB.params.use_bnc = True
+
+AB.solve()
+
+draw_curve(AB.result)
+print(f"Benders Decomposition Obj: {AB.result.obj}")
 
 # %%
 #
-# .. admonition:: References
+# .. seealso::
 #
 #     This example uses the following classes: :class:`~benderslib.AnnotationBenders`, :class:`~benderslib.ClassicalBenders`
 #
-# .. tags:: benders: classical, solver: gurobi, deterministic
+# .. tags:: benders: classical, solver: gurobi, deterministic, branch-and-check

@@ -23,7 +23,7 @@ from gurobipy import Model, GRB
 def first_stage_model(n_plants):
     model = Model("FirstStage")
 
-    capacity = model.addVars(n_plants, name="capacity")
+    capacity = model.addVars(n_plants, vtype=GRB.INTEGER, name="capacity")
     model.setObjective(capacity.sum(), GRB.MINIMIZE)
 
     model.update()
@@ -32,7 +32,7 @@ def first_stage_model(n_plants):
 
 
 # %%
-# Define the second-stage problem:
+# Define the second-stage problem.
 def second_stage_model(n_plants, scenarios, total_capacity):
     for s, demand in enumerate(scenarios):
         model = Model(f"SecondStage_{s}")
@@ -51,7 +51,7 @@ def second_stage_model(n_plants, scenarios, total_capacity):
 
 
 # %%
-# Define the deterministic equivalent problem for verification:
+# Define the deterministic equivalent problem for verification.
 def deterministic_equivalent_model(n_plants, scenarios, probs, total_capacity):
     probs = [1 / len(scenarios) for _ in range(len(scenarios))] if probs[0] is None else probs
 
@@ -81,82 +81,84 @@ def deterministic_equivalent_model(n_plants, scenarios, probs, total_capacity):
 
 
 # %%
-# Solve the problem using the deterministic equivalent (for clarity and verification):
-if __name__ == '__main__':
-    # Data
-    random.seed(5)
-    n_plants = 5
-    n_scenarios = 30
-    total_capacity = 10
-    scenarios = [[random.randint(10, 220) for _ in range(n_plants)] for _ in range(n_scenarios)]
-    probs = [1.3 for _ in range(n_scenarios)]
+# Solve the problem using the deterministic equivalent (for clarity and verification).
 
-    # Deterministic equivalent solution
-    de_model = deterministic_equivalent_model(n_plants, scenarios, probs, total_capacity)
-    de_model.optimize()
-    if de_model.Status == GRB.OPTIMAL:
-        print(f"Deterministic Equivalent Obj: {de_model.ObjVal:.4f}\n")
-    else:
-        print("Deterministic Equivalent Problem is infeasible or unbounded.\n")
+# Data
+random.seed(5)
+n_plants = 5
+n_scenarios = 30
+total_capacity = 10
+scenarios = [[random.randint(10, 220) for _ in range(n_plants)] for _ in range(n_scenarios)]
+probs = [1.3 for _ in range(n_scenarios)]
 
-    # Solver models
-    master_model, complicating_vars = first_stage_model(n_plants)
-    sub_models = second_stage_model(n_plants, scenarios, total_capacity)
+# Deterministic equivalent solution
+de_model = deterministic_equivalent_model(n_plants, scenarios, probs, total_capacity)
+de_model.optimize()
+print(f"Deterministic Equivalent Obj: {de_model.ObjVal:.4f}")
 
-    # # Create L-shaped solver
-    # master_problem = MasterProblem(solver_backend=Gurobi(master_model))
-    # sub_problems = (SubProblem(solver_backend=Gurobi(sub_model)) for sub_model in sub_models)
-    # sub_problems = SubProblems(sub_problems, prob=probs)
-    # L = LShaped(
-    #     master_problem=master_problem,
-    #     sub_problem=sub_problems,
-    #     complicating_vars=complicating_vars,
-    # )
+# %%
+# Solve the problem using the single-cut L-shaped method.
 
-    # Another way to create L-shaped solver
-    L = LShaped.from_models(
-        master_model=master_model,
-        master_solver=Gurobi,
-        sub_model=sub_models,
-        sub_solver=Gurobi,
-        complicating_vars=complicating_vars,
-        prob=probs,
-    )
+# Solver models
+master_model, complicating_vars = first_stage_model(n_plants)
+sub_models = second_stage_model(n_plants, scenarios, total_capacity)
 
-    L.params.log_freq_sec = 0.0
-    L.solve()
+# # Create L-shaped solver
+# master_problem = MasterProblem(solver_backend=Gurobi(master_model))
+# sub_problems = (SubProblem(solver_backend=Gurobi(sub_model)) for sub_model in sub_models)
+# sub_problems = SubProblems(sub_problems, prob=probs)
+# L = LShaped(
+#     master_problem=master_problem,
+#     sub_problem=sub_problems,
+#     complicating_vars=complicating_vars,
+# )
 
-    draw_curve(L.result)
+# Another way to create L-shaped solver
+L = LShaped.from_models(
+    master_model=master_model,
+    master_solver=Gurobi,
+    sub_model=sub_models,
+    sub_solver=Gurobi,
+    complicating_vars=complicating_vars,
+    prob=probs,
+)
 
-    # Multi-cut L-shaped solution
-    # Master and Sub models are required to be re-defined,
-    # since they have been modified (by adding cuts) in the previous solve.
-    master_model, complicating_vars = first_stage_model(n_plants)
-    sub_models = second_stage_model(n_plants, scenarios, total_capacity)
-    L = LShaped.from_models(
-        master_model=master_model,
-        master_solver=Gurobi,
-        sub_model=sub_models,
-        sub_solver=Gurobi,
-        complicating_vars=complicating_vars,
-        prob=probs,
-    )
-    L.params.multi_opti_cut = True
-    L.params.multi_feas_cut = True
-    L.params.log_freq_sec = 0.0
-    L.solve()
+# This example works well with the branch-and-check method, try it!
+# L.params.use_bnc = True
 
-    draw_curve(L.result)
+L.solve()
+draw_curve(L.result)
+
+# %%
+# Solve the problem using the multi-cut L-shaped method.
+
+# Master and Sub models are required to be re-defined,
+# since they have been modified (by adding cuts) in the previous solve.
+master_model, complicating_vars = first_stage_model(n_plants)
+sub_models = second_stage_model(n_plants, scenarios, total_capacity)
+L = LShaped.from_models(
+    master_model=master_model,
+    master_solver=Gurobi,
+    sub_model=sub_models,
+    sub_solver=Gurobi,
+    complicating_vars=complicating_vars,
+    prob=probs,
+)
+
+L.params.multi_opti_cut = True
+L.params.multi_feas_cut = True
+# This example works well with the branch-and-check method, try it!
+# L.params.use_bnc = True
+
+L.solve()
+draw_curve(L.result)
 
 # %%
 #
-# .. admonition:: References
+# .. seealso::
 #
 #     * Tutorial of the L-shaped method: :doc:`../../tutorials/lshaped`
 #     * This example uses the following class: :class:`~benderslib.LShaped`
-#
-# .. seealso::
-#
 #     * Example of integer L-shaped method: :doc:`ilshaped`
 #
-# .. tags:: benders: l-shaped, solver: gurobi, stochastic
+# .. tags:: benders: l-shaped, solver: gurobi, stochastic, branch-and-check

@@ -2,6 +2,7 @@
 
 import os
 import yaml
+import math
 
 from benderslib import BendersResult
 
@@ -72,3 +73,36 @@ def is_all_integer(vals, tol=1e-5):
         if abs(v - round(v)) > tol:
             return False
     return True
+
+
+def normalize_cut(cut, max_norm: float = 1e5):
+    """
+    Normalize a Benders cut if its L2 norm exceeds a threshold.
+
+    This function scales down the cut's coefficients and right-hand side
+    if the L2 norm of the coefficient vector is greater than `max_norm`.
+    This can help improve numerical stability in the master problem solver.
+
+    Parameters
+    ----------
+
+    cut : Cut
+        The Benders cut to normalize.
+    max_norm : float, optional
+        The maximum allowed L2 norm for the cut's coefficients.
+        Defaults to 1e5.
+    """
+    # Extract coefficients
+    a = cut.coefs
+
+    # Calculate L2 norm
+    norm = math.sqrt(sum(c * c for c in a))
+
+    if norm > max_norm:
+        scale = max_norm / norm
+
+        # Modify the cut
+        cut.coefs = [c * scale for c in cut.coefs]
+        cut.rhs *= scale
+
+    return cut

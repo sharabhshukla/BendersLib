@@ -203,12 +203,17 @@ class IntegerLShapedOCGen(CutGenerator):
         This method generates a single :class:`CombinatorialOC` optimality cut aggregating all subproblems (scenarios).
         """
         bin_var_values = self.master_problem.get_var_values(self.complicating_vars)
+        bin_var_values = {var: round(value) for var, value in bin_var_values.items()}
         sub_obj = self.sub_problem.get_obj()
         estimator = self.master_problem.estimators[0]
         theta_lb = self.master_problem.get_estimator_values()[estimator]
 
-        cut = CombinatorialOC(bin_var_values, sub_obj, big_m=sub_obj - theta_lb, estimator=estimator)
-        return [cut]
+        cuts = []
+        if sub_obj - theta_lb > self.params.tol_obj_diff:
+            cut = CombinatorialOC(bin_var_values, sub_obj, big_m=sub_obj - theta_lb, estimator=estimator)
+            cuts.append(cut)
+
+        return cuts
 
     def _multi_cuts(self) -> list[CombinatorialOC]:
         """

@@ -247,7 +247,8 @@ class Gurobi(SolverBase):
             bound = self.model.cbGet(GRB.Callback.MIPNODE_OBJBND)
         else:
             raise Exception("Invalid callback where. Expected 'INCUMBENT' or 'NODE'.")
-        return bound
+
+        return bound if bound > -GRB.INFINITY else float('-inf')
 
     def _cb_get_var_values(self, vars: list[str] | None = None) -> dict[str, float]:
         vars = vars or [v.VarName for v in self.model.getVars()]

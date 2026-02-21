@@ -9,7 +9,7 @@ This method is suitable for problems where the complicating variables are binary
 """
 
 # %%
-# Define the original problem:
+# Define the original problem.
 from benderslib import AnnotationBenders, CombinatorialBenders
 from benderslib.solvers import Gurobi
 from benderslib.utils import draw_curve
@@ -58,66 +58,61 @@ def make_original_problem(has_sub_objective):
 
 
 # %%
-# Solve the problem using Gurobi and Combinatorial Benders Decomposition:
-if __name__ == '__main__':
-    # With subproblem objective
-    model, complicating_vars = make_original_problem(has_sub_objective=True)
-    # Without subproblem objective
-    # model, complicating_vars = make_original_problem(has_sub_objective=False)
+# Solve the problem using Gurobi.
 
-    # Solve with Gurobi
-    model.optimize()
-    if model.Status == GRB.OPTIMAL:
-        print("Original Problem Solution:")
-        # var_values = {v.VarName: v.X for v in model.getVars()}
-        # print(var_values)
-        print(f"Obj: {model.ObjVal}\n")
-    else:
-        print("Original Problem Solution: Infeasible or Unbounded\n")
+# With subproblem objective
+model, complicating_vars = make_original_problem(has_sub_objective=True)
+# Without subproblem objective
+# model, complicating_vars = make_original_problem(has_sub_objective=False)
 
-    # Using .from_models() method
-    # Decompose the original problem into master and subproblem
-    master_model, sub_model = AnnotationBenders.decompose(
-        original_problem=model,
-        solver=Gurobi,
-        master_vars=complicating_vars,
-        solver_model=True
-    )
-    AB = CombinatorialBenders.from_models(
-        master_model=master_model,
-        master_solver=Gurobi,
-        sub_model=sub_model,
-        sub_solver=Gurobi,
-        complicating_vars=complicating_vars,
-    )
-    AB.solve()
-    print("\nBenders Decomposition Solution:")
-    # print(AB.result.solution)
-    print(f"Obj: {AB.result.obj}")
+# Solve with Gurobi
+model.optimize()
+print(f"Original Problem Obj: {model.ObjVal}")
 
-    # Simpler way
-    # Master and Sub models are required to be re-defined,
-    # since they have been modified (by adding cuts) in the previous solve.
-    # model, complicating_vars = make_original_problem(has_sub_objective=True)
-    # AB = AnnotationBenders(
-    #     original_problem=model,
-    #     solver=Gurobi,
-    #     complicating_vars=complicating_vars,
-    #     benders=CombinatorialBenders
-    # )
-    # AB.solve()
+# %%
+# Solve the problem using Combinatorial Benders Decomposition.
 
-    draw_curve(AB.result)
+# Using .from_models() method
+# Decompose the original problem into master and subproblem
+master_model, sub_model = AnnotationBenders.decompose(
+    original_problem=model,
+    solver=Gurobi,
+    master_vars=complicating_vars,
+    solver_model=True
+)
+AB = CombinatorialBenders.from_models(
+    master_model=master_model,
+    master_solver=Gurobi,
+    sub_model=sub_model,
+    sub_solver=Gurobi,
+    complicating_vars=complicating_vars,
+)
+
+# Simpler way
+# Master and Sub models are required to be re-defined,
+# since they have been modified (by adding cuts) in the previous solve.
+# model, complicating_vars = make_original_problem(has_sub_objective=True)
+# AB = AnnotationBenders(
+#     original_problem=model,
+#     solver=Gurobi,
+#     complicating_vars=complicating_vars,
+#     benders=CombinatorialBenders
+# )
+
+# This example works well with the branch-and-check method, try it!
+# AB.params.use_bnc = True
+
+AB.solve()
+
+print(f"Benders Decomposition Obj: {AB.result.obj}")
+draw_curve(AB.result)
 
 # %%
 #
-# .. admonition:: References
+# .. seealso::
 #
 #     * Tutorial of Combinatorial Benders Decomposition: :doc:`../../tutorials/cbd`
 #     * This example uses the following classes: :class:`~benderslib.AnnotationBenders`, :class:`~benderslib.CombinatorialBenders`
-#
-# .. seealso::
-#
 #     * Combinatorial Benders Decomposition with customized cut generator: :doc:`../advanced/cbd_iis`
 #
-# .. tags:: benders: combinatorial, solver: gurobi, deterministic
+# .. tags:: benders: combinatorial, solver: gurobi, deterministic, branch-and-check
