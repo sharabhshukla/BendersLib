@@ -15,8 +15,10 @@ For custom cut generators, please refer to :doc:`cbd_iis` and :doc:`ilshaped_iis
 """
 
 # %%
-# Define the master problem:
-from benderslib import CST, MasterProblem, LogicBasedBenders, CombinatorialFCGen, LogicBasedSubProblem, NoGoodFC
+# Define the master problem.
+
+from benderslib import (CST, MasterProblem, LogicBasedBenders,
+                        CombinatorialFCGen, LogicBasedSubProblem, NoGoodFC, CombinatorialOCGen)
 from benderslib.solvers import Gurobi
 from gurobipy import Model, GRB
 
@@ -37,6 +39,7 @@ def master_model(n_plants):
 # The input is a dictionary of complicating variable values.
 # The output is a tuple:
 # (:attr:`LogicBasedSubProblem.status`, :attr:`LogicBasedSubProblem.obj`, :attr:`LogicBasedSubProblem.var_values`).
+
 def sub_solver(complicating_var_values):
     # Sub problem is feasible if all plants are opened.
     if sum(complicating_var_values.values()) == len(complicating_var_values):
@@ -47,6 +50,7 @@ def sub_solver(complicating_var_values):
 # %%
 # Inherit from :class:`LogicBasedSubProblem` to define a custom subproblem.
 # At least implement the :meth:`LogicBasedSubProblem.solve` method.
+
 class SubProblem(LogicBasedSubProblem):
 
     def __init__(self, complicating_vars):
@@ -64,7 +68,8 @@ class SubProblem(LogicBasedSubProblem):
 
 
 # %%
-# Custom feasibility cut generator:
+# Define a custom feasibility cut generator.
+
 def feasibility_cut_generator(master_problem, sub_problem):
     open_vars = sub_problem.complicating_var_values
     zeros = [i for i, val in open_vars.items() if val <= 0.01]
@@ -81,7 +86,8 @@ def feasibility_cut_generator(master_problem, sub_problem):
 
 
 # %%
-# Function as subproblem solver:
+# Function as subproblem solver.
+
 n_plants = 8
 master_model, complicating_vars = master_model(n_plants)
 master_model_copy = master_model.copy()
@@ -89,28 +95,40 @@ master_model_copy = master_model.copy()
 master_problem = MasterProblem(Gurobi(master_model))
 LBBD = LogicBasedBenders(
     master_problem=master_problem,
+    # Use the function defined above as a subproblem solver
     sub_problem=sub_solver,
     complicating_vars=complicating_vars,
     feasibility_cut=CombinatorialFCGen,
+    # Optimality cut is required for the branch-and-check method,
+    # as the subproblem can be feasible for some master node solutions.
+    optimality_cut=CombinatorialOCGen,
 )
+# This example works well with the branch-and-check method, try it!
+# LBBD.params.use_bnc = True
+
 LBBD.solve()
 
 # %%
-# Class instance as subproblem solver:
+# Function as cut generator.
+
 master_problem = MasterProblem(Gurobi(master_model_copy))
 LBBD = LogicBasedBenders(
     master_problem=master_problem,
     sub_problem=SubProblem(complicating_vars),
     complicating_vars=complicating_vars,
+    # Use the function defined above as a cut generator
     feasibility_cut=feasibility_cut_generator
 )
+# This example works well with the branch-and-check method, try it!
+# LBBD.params.use_bnc = True
+
 LBBD.solve()
 
 # %%
 #
-# .. admonition:: References
+# .. seealso::
 #
 #     * Tutorial of the Logic-based Benders Decomposition: :doc:`../../tutorials/lbbd`
 #     * This example uses the following class: :class:`LogicBasedBenders`
 #
-# .. tags:: benders: lbbd, solver: gurobi, deterministic, custom: subproblem, custom: cut
+# .. tags:: benders: lbbd, solver: gurobi, deterministic, custom: subproblem, custom: cut, branch-and-check

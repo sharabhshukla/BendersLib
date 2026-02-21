@@ -15,12 +15,14 @@ import random
 from benderslib import MasterProblem, LogicBasedBenders, SubProblems, SubProblem, IntegerLShapedOCGen, \
     LogicBasedSubProblem, CST
 from benderslib.solvers import Gurobi
+from benderslib.utils import draw_curve
 
 from gurobipy import Model, GRB
 
 
 # %%
-# Define the first-stage problem:
+# Define the first-stage problem.
+
 def first_stage_model(n_plants):
     model = Model("FirstStage")
 
@@ -33,7 +35,8 @@ def first_stage_model(n_plants):
 
 
 # %%
-# Define the second-stage problem:
+# Define the second-stage problem.
+
 def second_stage_model(n_plants, scenarios, penalty):
     for s, demand in enumerate(scenarios):
         model = Model(f"SecondStage_{s}")
@@ -52,7 +55,8 @@ def second_stage_model(n_plants, scenarios, penalty):
 
 
 # %%
-# Alternatively, define the second-stage problem using :class:`LogicBasedSubProblem` and :class:`SubProblems`:
+# Alternatively, define the second-stage problem using :class:`LogicBasedSubProblem` and :class:`SubProblems`.
+
 class Sub(LogicBasedSubProblem):
     def __init__(self, complicating_vars, model: Model):
         self.model = model
@@ -82,60 +86,67 @@ class Sub(LogicBasedSubProblem):
             raise Exception("Subproblem not solved to optimality or infeasibility.")
 
 
-if __name__ == '__main__':
-    # Data
-    random.seed(1)
-    n_plants = 7
-    n_scenarios = 3
-    penalty = 2
-    scenarios = [[random.choice([0, 1]) for _ in range(n_plants)] for _ in range(n_scenarios)]
-    probs = [1 / len(scenarios) for _ in range(n_scenarios)]
+# %%
+# Prepare components for Benders decomposition instance.
 
-    # First-stage model
-    first_stage, complicating_vars = first_stage_model(n_plants)
-    first_stage_copy = first_stage.copy()
+# Data
+random.seed(1)
+n_plants = 7
+n_scenarios = 3
+penalty = 2
+scenarios = [[random.choice([0, 1]) for _ in range(n_plants)] for _ in range(n_scenarios)]
+probs = [1 / len(scenarios) for _ in range(n_scenarios)]
 
-    # Second-stage models
-    sub_models = list(second_stage_model(n_plants, scenarios, penalty))
+# First-stage model
+first_stage, complicating_vars = first_stage_model(n_plants)
+first_stage_copy = first_stage.copy()
 
-    # MasterProblem instance
-    master_problem = MasterProblem(Gurobi(first_stage))
+# Second-stage models
+sub_models = list(second_stage_model(n_plants, scenarios, penalty))
 
-    # SubProblems instance
-    # sub_problem = SubProblems([SubProblem(Gurobi(m)) for m in sub_models], prob=probs)
-    # Alternative way using LogicBasedSubProblem
-    # sub_problem = SubProblems([Sub(complicating_vars, m) for m in sub_models], prob=probs)
+# MasterProblem instance
+master_problem = MasterProblem(Gurobi(first_stage))
 
-    # LBBD = LogicBasedBenders(
-    #     master_problem=master_problem,
-    #     sub_problem=sub_problem,
-    #     complicating_vars=complicating_vars,
-    #     optimality_cut=IntegerLShapedOCGen,
-    # )
+# %%
+# Solve the problem using Logic-Based Benders Decomposition.
 
-    LBBD = LogicBasedBenders.from_models(
-        master_model=first_stage_copy,
-        master_solver=Gurobi,
-        sub_model=sub_models,
-        sub_solver=Gurobi,
-        complicating_vars=complicating_vars,
-        optimality_cut=IntegerLShapedOCGen,
-        prob=probs,
-    )
+# SubProblems instance
+# sub_problem = SubProblems([SubProblem(Gurobi(m)) for m in sub_models], prob=probs)
+# Alternative way using LogicBasedSubProblem
+# sub_problem = SubProblems([Sub(complicating_vars, m) for m in sub_models], prob=probs)
 
-    # LBBD.params.multi_opti_cut = True
-    LBBD.solve()
+# LBBD = LogicBasedBenders(
+#     master_problem=master_problem,
+#     sub_problem=sub_problem,
+#     complicating_vars=complicating_vars,
+#     optimality_cut=IntegerLShapedOCGen,
+# )
+
+LBBD = LogicBasedBenders.from_models(
+    master_model=first_stage_copy,
+    master_solver=Gurobi,
+    sub_model=sub_models,
+    sub_solver=Gurobi,
+    complicating_vars=complicating_vars,
+    optimality_cut=IntegerLShapedOCGen,
+    prob=probs,
+)
+
+# LBBD.params.multi_opti_cut = True
+# This example works well with the branch-and-check method, try it!
+LBBD.params.use_bnc = True
+
+LBBD.solve()
+
+draw_curve(LBBD.result)
 
 # %%
 #
-# .. admonition:: References
+# .. seealso::
 #
 #     * Tutorial of the Logic-based Benders Decomposition: :doc:`../../tutorials/lbbd`
 #     * Tutorial of the L-shaped method: :doc:`../../tutorials/lshaped`
 #     * This example uses the following class: :class:`LogicBasedBenders`
-#
-# .. seealso::
-#
 #     * Example of the L-shaped method: :doc:`../basic/lshaped`
 #
-# .. tags:: benders: lbbd, benders: l-shaped, solver: gurobi, stochastic, custom: subproblem
+# .. tags:: benders: lbbd, benders: l-shaped, solver: gurobi, stochastic, custom: subproblem, branch-and-check

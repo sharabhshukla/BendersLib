@@ -11,7 +11,7 @@ This example using the Irreducible Infeasible Subsystem (IIS) to generate strong
 """
 
 # %%
-# Define the first-stage problem:
+# Define the first-stage problem.
 
 import random
 
@@ -33,7 +33,8 @@ def first_stage_model(n_plants):
 
 
 # %%
-# Define the second-stage problem:
+# Define the second-stage problem.
+
 def second_stage_model(n_plants, scenarios):
     models = []
 
@@ -52,7 +53,8 @@ def second_stage_model(n_plants, scenarios):
 
 
 # %%
-# Define the deterministic equivalent problem for verification:
+# Define the deterministic equivalent problem for verification.
+
 def deterministic_equivalent_model(n_plants, scenarios):
     model = Model('DE')
 
@@ -73,11 +75,14 @@ def deterministic_equivalent_model(n_plants, scenarios):
 
 
 # %%
-# **Define stronger customized Benders feasibility cut using IIS:**
+# Define stronger customized Benders feasibility cut using IIS.
+
 def cut_generator(master_problem: MasterProblem, sub_problem: SubProblems):
     """
-    Generate a stronger feasibility cut using the Irreducible Infeasible Subsystem (IIS) of the subproblem.
-    Though `master_problem` is not used, it is required as a placeholder for the callback function.
+    Generate a stronger feasibility cut using the
+    Irreducible Infeasible Subsystem (IIS) of the subproblem.
+    Though `master_problem` is not used,
+    it is required as a placeholder for the callback function.
     """
 
     # Avoid duplicate cuts
@@ -94,7 +99,8 @@ def cut_generator(master_problem: MasterProblem, sub_problem: SubProblems):
             # sp.write("subproblem.ilp")
 
             # Get the names of the variables in the IIS
-            # v.IISLB and v.IISUB can be either 0 (False) or 1 (True), indicating whether the LB or UB is part of the IIS.
+            # v.IISLB and v.IISUB can be either 0 (False) or 1 (True),
+            # indicating whether the LB or UB is part of the IIS.
             iis_vars = [v.VarName for v in sp.getVars() if v.IISLB or v.IISUB]
             iis_var_values = master_problem.get_var_values(iis_vars)
 
@@ -105,66 +111,77 @@ def cut_generator(master_problem: MasterProblem, sub_problem: SubProblems):
 
 
 # %%
-# Solve the problem using the deterministic equivalent (for clarity and verification):
-if __name__ == '__main__':
-    # Data
-    # random.seed(1)
-    n_plants = 9
-    n_scenarios = 2
-    scenarios = [[random.choice([0, 1]) for _ in range(n_plants)] for _ in range(n_scenarios)]
+# Solve the problem using the deterministic equivalent.
 
-    # Deterministic equivalent solution
-    de_model = deterministic_equivalent_model(n_plants, scenarios)
-    de_model.optimize()
-    if de_model.Status == GRB.OPTIMAL:
-        print(f"Deterministic Equivalent Obj: {de_model.ObjVal:.4f}\n")
-    else:
-        print("Deterministic Equivalent Problem is infeasible or unbounded.\n")
+# Data
+random.seed(1)
+n_plants = 9
+n_scenarios = 2
+scenarios = [[random.choice([0, 1]) for _ in range(n_plants)] for _ in range(n_scenarios)]
 
-    # Without IIS-based cuts
-    master_model, complicating_vars = first_stage_model(n_plants)
-    sub_models = second_stage_model(n_plants, scenarios)
-    L = IntegerLShaped.from_models(
-        master_model=master_model,
-        master_solver=Gurobi,
-        sub_model=sub_models,
-        sub_solver=Gurobi,
-        complicating_vars=complicating_vars,
-    )
-    L.solve()
+# Deterministic equivalent solution
+de_model = deterministic_equivalent_model(n_plants, scenarios)
+de_model.optimize()
+print(f"Deterministic Equivalent Obj: {de_model.ObjVal:.4f}")
 
-    # With IIS-based cuts
-    master_model, complicating_vars = first_stage_model(n_plants)
-    sub_models = second_stage_model(n_plants, scenarios)
-    L_IIS = IntegerLShaped.from_models(
-        master_model=master_model,
-        master_solver=Gurobi,
-        sub_model=sub_models,
-        sub_solver=Gurobi,
-        complicating_vars=complicating_vars,
-        feasibility_cut=cut_generator,
-    )
-    L_IIS.solve()
+# %%
+# Solve the problem using the integer L-shaped method + Naive cuts.
 
-    print()
-    print(f"Sol. Time (IIS vs Naive): {L_IIS.result.time:.4f}, {L.result.time:.4f}")
-    print(f"Num. Cuts (IIS vs Naive): {L_IIS.result.n_cuts}, {L.result.n_cuts}")
+# Without IIS-based cuts
+master_model, complicating_vars = first_stage_model(n_plants)
+sub_models = second_stage_model(n_plants, scenarios)
+L = IntegerLShaped.from_models(
+    master_model=master_model,
+    master_solver=Gurobi,
+    sub_model=sub_models,
+    sub_solver=Gurobi,
+    complicating_vars=complicating_vars,
+)
+# This example works well with the branch-and-check method, try it!
+L.params.use_bnc = True
 
-    # Plot cut added
-    plt.bar(['IIS-based Cuts', 'Naive Cuts'], [L_IIS.result.n_cuts, L.result.n_cuts], color=['blue', 'orange'])
-    plt.ylabel('Number of Feasibility Cuts Added')
-    plt.title('Comparison of Feasibility Cuts Added')
-    plt.show()
+L.solve()
+
+# %%
+# Solve the problem using the integer L-shaped method + IIS-based cuts.
+
+# With IIS-based cuts
+master_model, complicating_vars = first_stage_model(n_plants)
+sub_models = second_stage_model(n_plants, scenarios)
+L_IIS = IntegerLShaped.from_models(
+    master_model=master_model,
+    master_solver=Gurobi,
+    sub_model=sub_models,
+    sub_solver=Gurobi,
+    complicating_vars=complicating_vars,
+    feasibility_cut=cut_generator,
+)
+# This example works well with the branch-and-check method, try it!
+L_IIS.params.use_bnc = True
+
+L_IIS.solve()
+
+# %%
+# Compare the results.
+
+print(f"Sol. Time (IIS vs Naive): {L_IIS.result.runtime:.4f}, {L.result.runtime:.4f}")
+print(f"Num. Cuts (IIS vs Naive): {L_IIS.result.n_cuts}, {L.result.n_cuts}")
+
+plt.bar(
+    ['IIS-based Cuts', 'Naive Cuts'],
+    [L_IIS.result.n_cuts, L.result.n_cuts],
+    color=['blue', 'orange']
+)
+plt.ylabel('Number of Feasibility Cuts Added')
+plt.title('Comparison of Feasibility Cuts Added')
+plt.show()
 
 # %%
 #
-# .. admonition:: References
+# .. seealso::
 #
 #     * Tutorial of the integer L-shaped method: :doc:`../../tutorials/ilshaped`
 #     * This example uses the following class: :class:`~benderslib.IntegerLShaped`
-#
-# .. seealso::
-#
 #     * Example of the L-shaped method: :doc:`../basic/lshaped`
 #
-# .. tags:: benders: integer l-shaped, solver: gurobi, stochastic, custom: cut, iis
+# .. tags:: benders: integer l-shaped, solver: gurobi, stochastic, custom: cut, iis, branch-and-check

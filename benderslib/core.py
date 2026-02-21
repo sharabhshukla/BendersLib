@@ -1570,7 +1570,7 @@ class BendersSolver:
             if self.__trigger_callbacks_and_terminate(EVENTS.ON_ITERATION_END): break
 
         # Finalize
-        self.result.time = time.perf_counter() - time_start
+        self.result.runtime = time.perf_counter() - time_start
         self.result.n_opt_cuts = len(self.master_problem.optimality_cuts)
         self.result.n_feas_cuts = len(self.master_problem.feasibility_cuts)
         self.result.n_cuts = self.result.n_opt_cuts + self.result.n_feas_cuts
@@ -1692,20 +1692,28 @@ class BendersSolver:
         self.result.n_feas_cuts = len(self.master_problem.feasibility_cuts)
         self.result.n_cuts = self.result.n_opt_cuts + self.result.n_feas_cuts
 
-        # Update the status when master problem solved without termination,
-        # which implies that the optimum is found.
         if self.master_problem.status == CST.OPTIMAL:
-            if self.sub_problem.status == CST.OPTIMAL:
-                # We need to update the bound of the last iteration,
-                # if the subproblem is optimal.
-                self.master_problem._using_bnc = False
-                self.__update_result(self.__time_start)
-            # Determine the final status.
-            # self.__terminate(self.__time_start)
+            # Update the status when the master branch-and-bound tree
+            # is exhausted and the callback is not triggered to terminate
+            # the process. This suggests that the global optimum is found.
+            # However, the LB and UB can be not met, which are updated here.
+
             self.result.status = CST.OPTIMAL
 
-        self.result.time = time.perf_counter() - self.__time_start
-        self.result.runtime_master = self.result.time - self.result.runtime_sub
+            self.master_problem._using_bnc = False
+            obj = self.master_problem.get_obj()
+
+            # To be more precise, we should obtain the bound from the solver's model.
+            self.result.lb = obj
+            self.result.ub = obj
+            self.result.obj = obj
+            self.result.lb_list.append(obj)
+            self.result.ub_list.append(obj)
+            self.result.gap = 0.0
+            self.result.gap_abs = 0.0
+
+        self.result.runtime = time.perf_counter() - self.__time_start
+        self.result.runtime_master = self.result.runtime - self.result.runtime_sub
 
         self.__logger.log_end()
 

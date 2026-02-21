@@ -9,7 +9,8 @@ with customized Benders cuts.
 """
 
 # %%
-# Define the original problem:
+# Define the original problem.
+
 from benderslib import AnnotationBenders, CombinatorialBenders, NoGoodFC, MasterProblem, SubProblem
 from benderslib.solvers import Gurobi
 from gurobipy import Model, GRB
@@ -40,11 +41,14 @@ def make_original_problem():
 
 
 # %%
-# Define stronger customized Benders feasibility cut using IIS:
+# Define stronger customized Benders feasibility cut using IIS.
+
 def cut_generator(master_problem: MasterProblem, sub_problem: SubProblem):
     """
-    Generate a stronger feasibility cut using the Irreducible Infeasible Subsystem (IIS) of the subproblem.
-    Though `master_problem` is not used, it is required as a placeholder for the callback function.
+    Generate a stronger feasibility cut using the
+    Irreducible Infeasible Subsystem (IIS) of the subproblem.
+    Though `master_problem` is not used,
+    it is required as a placeholder for the callback function.
     """
 
     # Compute the IIS of the subproblem
@@ -54,7 +58,8 @@ def cut_generator(master_problem: MasterProblem, sub_problem: SubProblem):
     # sp.write("subproblem.ilp")
 
     # Get the names of the variables in the IIS
-    # v.IISLB and v.IISUB can be either 0 (False) or 1 (True), indicating whether the LB or UB is part of the IIS.
+    # v.IISLB and v.IISUB can be either 0 (False) or 1 (True),
+    # indicating whether the LB or UB is part of the IIS.
     iis_vars = [v.VarName for v in sp.getVars() if v.IISLB or v.IISUB]
     iis_var_values = master_problem.get_var_values(iis_vars)
 
@@ -63,63 +68,65 @@ def cut_generator(master_problem: MasterProblem, sub_problem: SubProblem):
 
 
 # %%
-# Solve the problem using Gurobi and Combinatorial Benders Decomposition:
-if __name__ == '__main__':
-    # With subproblem objective
-    model, complicating_vars = make_original_problem()
+# Solve the problem using Gurobi.
 
-    # Solve with Gurobi
-    model.optimize()
-    if model.Status == GRB.OPTIMAL:
-        print("Original Problem Solution:")
-        # var_values = {v.VarName: v.X for v in model.getVars()}
-        # print(var_values)
-        print(f"Obj: {model.ObjVal}\n")
-    else:
-        print("Original Problem Solution: Infeasible or Unbounded\n")
+model, complicating_vars = make_original_problem()
+model_copy = model.copy()
 
-    # Solve with Benders Decomposition + IIS-based cuts
-    AB = AnnotationBenders(
-        model,
-        solver=Gurobi,
-        complicating_vars=complicating_vars,
-        # Customized feasibility cut generator
-        feasibility_cut=cut_generator,
-        benders=CombinatorialBenders,
-    )
-    # Modify the cut generator to use IIS-based feasibility cuts
-    AB.solve()
+model.optimize()
+print(f"Original Problem Obj: {model.ObjVal}")
 
-    # Solve with Benders Decomposition + Naive cuts
-    AB_copy = AnnotationBenders(
-        model,
-        solver=Gurobi,
-        complicating_vars=complicating_vars,
-        benders=CombinatorialBenders,
-    )
-    # Turn of IIS cuts
-    AB_copy.params.use_iis_cut = False
-    AB_copy.solve()
+# %%
+# Solve the problem using Combinatorial Benders Decomposition + IIS-based cuts.
 
-    print()
-    print(f"Sol. Time (IIS vs Naive): {AB.result.time:.4f}, {AB_copy.result.time:.4f}")
-    print(f"Num. Cuts (IIS vs Naive): {AB.result.n_cuts}, {AB_copy.result.n_cuts}")
+AB = AnnotationBenders(
+    model,
+    solver=Gurobi,
+    complicating_vars=complicating_vars,
+    # Customized feasibility cut generator
+    feasibility_cut=cut_generator,
+    benders=CombinatorialBenders,
+)
+# This example works well with the branch-and-check method, try it!
+AB.params.use_bnc = True
 
-    # Plot cut added
-    plt.bar(
-        ['IIS-based Cuts', 'Naive Cuts'],
-        [AB.result.n_cuts, AB_copy.result.n_cuts],
-        color=['blue', 'orange']
-    )
-    plt.ylabel('Number of Benders Cuts Added')
-    plt.title('Comparison of Benders Cuts Added')
-    plt.show()
+AB.solve()
+
+# %%
+# Solve the problem using Combinatorial Benders Decomposition + Naive cuts.
+
+AB_ = AnnotationBenders(
+    model_copy,
+    solver=Gurobi,
+    complicating_vars=complicating_vars,
+    benders=CombinatorialBenders,
+)
+# This example works well with the branch-and-check method, try it!
+AB_.params.use_bnc = True
+
+AB_.solve()
+
+# %%
+# Compare the results.
+
+print(f"Sol. Time (IIS vs Naive): {AB.result.runtime:.4f}, {AB_.result.runtime:.4f}")
+print(f"Num. Cuts (IIS vs Naive): {AB.result.n_cuts}, {AB_.result.n_cuts}")
+
+plt.bar(
+    ['IIS-based Cuts', 'Naive Cuts'],
+    [AB.result.n_cuts, AB_.result.n_cuts],
+    color=['blue', 'orange']
+)
+plt.ylabel('Number of Benders Cuts Added')
+plt.title('Comparison of Benders Cuts Added')
+plt.show()
 
 # %%
 #
-# .. admonition:: References
+# .. seealso::
 #
 #     * Tutorial of Combinatorial Benders Decomposition: :doc:`../../tutorials/cbd`
-#     * This example uses the following classes: :class:`~benderslib.AnnotationBenders`, :class:`~benderslib.CombinatorialBenders`
+#     * This example uses the following classes: :class:`~benderslib.AnnotationBenders`,
+#       :class:`~benderslib.CombinatorialBenders`
 #
-# .. tags:: benders: combinatorial, solver: gurobi, deterministic, custom: cut, iis
+# .. tags:: benders: combinatorial, solver: gurobi, deterministic, custom: cut, iis, branch-and-check
