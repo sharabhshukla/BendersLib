@@ -59,7 +59,7 @@ class ClassicalBenders(BendersSolver):
             complicating_vars: list[str],
             optimality_cut=ClassicalOCGen,
             feasibility_cut=ClassicalFCGen,
-            params: BendersParams = BendersParams()
+            params: BendersParams | None = None
     ):
         super().__init__(
             master_problem,
@@ -81,7 +81,7 @@ class ClassicalBenders(BendersSolver):
             optimality_cut=ClassicalOCGen,
             feasibility_cut=ClassicalFCGen,
             prob=None,
-            params: BendersParams = BendersParams()
+            params: BendersParams | None = None
     ):
         return super().from_models(
             master_model,

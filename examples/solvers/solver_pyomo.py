@@ -58,12 +58,12 @@ if __name__ == '__main__':
         'gurobi',
         'gurobi_direct',
         'highs',
-        'mosek',
-        'mosek_direct',
         'xpress',
         'xpress_direct',
 
-        # 'scip',  # Unable to obtain correct duals with bound constraints
+        # 'mosek',        # License expires in one month
+        # 'mosek_direct', # License expires in one month
+        # 'scip',         # Unable to obtain correct duals with bound constraints
     ]
 
     for solver in solvers:

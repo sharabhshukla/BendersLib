@@ -73,7 +73,7 @@ class GeneralizedBenders(BendersSolver):
             complicating_vars: list[str],
             optimality_cut=GeneralizedOCGen,
             feasibility_cut=GeneralizedFCGen,
-            params: BendersParams = BendersParams()
+            params: BendersParams | None = None
     ):
         super().__init__(
             master_problem,
@@ -95,7 +95,7 @@ class GeneralizedBenders(BendersSolver):
             optimality_cut=GeneralizedOCGen,
             feasibility_cut=GeneralizedFCGen,
             prob=None,
-            params: BendersParams = BendersParams()
+            params: BendersParams | None = None
     ):
         return super().from_models(
             master_model,

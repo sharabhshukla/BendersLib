@@ -46,6 +46,12 @@ class BendersConsts:
     TERMINATE = 'TERMINATE'
     """Action in a callback function to terminate the Benders algorithm."""
 
+    # Callback where
+    INCUMBENT = 'INCUMBENT'
+    """Identifier for the Branch-and-check callback trigger location."""
+    NODE = 'NODE'
+    """Identifier for the Branch-and-check callback trigger location."""
+
     # Estimator
     ESTIMATOR_NAME = 'theta'
     """Name of the estimator variable in the master problem."""

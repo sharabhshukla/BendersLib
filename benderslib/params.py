@@ -85,7 +85,7 @@ class BendersParams:
 
     # branch-and-check method
     use_bnc: bool = False
-    """Whether to use the branch-and-check (branch-and-Benders-cut) method. 
+    """**[Branch-and-check]** Whether to use the branch-and-check (branch-and-Benders-cut) method. 
     
     If ``True``, the Benders cut are added as lazy constraints during the branch-and-bound process of the master problem,
     instead of being added after solving the master problem to optimality.
@@ -94,6 +94,16 @@ class BendersParams:
     
     Setting ``use_bnc = True`` and calling :meth:`BendersSolver.solve()` 
     is equivalent to using :meth:`BendersSolver.bnc_solve()` directly.
+    """
+    bnc_frac_sol: bool = False
+    """**[Branch-and-check]** Whether to use fractional solutions to generate Benders cuts in the branch-and-check method.
+    
+    If ``True``, Benders cuts are generated from fractional solutions of the master problem.
+    If ``False``, Benders cuts are generated only from integer feasible solutions of the master problem.
+    If you implement callbacks with :attr:`~benderslib.BendersContext.where` being 
+    :attr:`~benderslib.BendersConsts.NODE`, this parameter is required to be ``True``, 
+    since the solutions at the nodes can be fractional. Otherwise no cuts will be generated at the nodes,
+    and the callback implemented will not work.
     """
 
     # Logging
@@ -111,13 +121,11 @@ class BendersParams:
 
     def __repr__(self):
         # Only print non-default parameters
-        default = BendersParams()
-
         non_default_params = []
         for field in fields(self):
             field_name = field.name
             current_value = getattr(self, field_name)
-            default_value = getattr(default, field_name)
+            default_value = field.default
             if current_value != default_value:
                 n = field_name + ':'
                 non_default_params.append(

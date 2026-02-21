@@ -14,6 +14,7 @@ def draw_curve(result: BendersResult):
 
     ax1.plot(result.lb_list, label='LB')
     ax1.plot(result.ub_list, label='UB')
+    ax1.plot(result.obj_list, label='Incumbent')
     ax1.set_xlabel('Iteration')
     ax1.set_ylabel('Objective')
     ax1.set_title('Benders Decomposition')
@@ -64,3 +65,10 @@ def load_config(section: str = None, file='config.yaml') -> dict:
     if section:
         return config.get(section, {}) or {}
     return config
+
+
+def is_all_integer(vals, tol=1e-5):
+    for v in vals:
+        if abs(v - round(v)) > tol:
+            return False
+    return True

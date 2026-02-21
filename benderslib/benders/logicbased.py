@@ -89,7 +89,7 @@ class LogicBasedBenders(BendersSolver):
             complicating_vars: list[str],
             optimality_cut: Type[CutGenerator] | Callable | None = None,
             feasibility_cut: Type[CutGenerator] | Callable | None = None,
-            params: BendersParams = BendersParams()
+            params: BendersParams | None = None
     ):
         if inspect.isfunction(sub_problem):
             sub_problem = _FuncWrapperSub(complicating_vars, sub_problem)

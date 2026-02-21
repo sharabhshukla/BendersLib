@@ -8,7 +8,7 @@ Callback in Branch-and-Check Method
 # %%
 # Prepare the problem for Benders decomposition.
 
-from benderslib import ClassicalBenders, AnnotationBenders, CallbackBase, BendersContext
+from benderslib import ClassicalBenders, AnnotationBenders, CallbackBase, BendersContext, CST
 from benderslib.solvers import Gurobi
 from benderslib.utils import draw_curve
 from gurobipy import Model, GRB
@@ -45,8 +45,12 @@ class BncCallback(CallbackBase):
         self.feasible_solutions = []
 
     def on_opti_cut_generated(self, context: BendersContext):
-        sol = context.sub_problem.get_var_values()
-        self.feasible_solutions.append(sol)
+        if context.where == CST.INCUMBENT:
+            sol = context.sub_problem.get_var_values()
+            self.feasible_solutions.append(sol)
+
+        if context.where == CST.NODE:
+            pass
 
 
 # %%
@@ -60,16 +64,17 @@ BD = AnnotationBenders(
     benders=ClassicalBenders
 )
 # BD.benders.params.tol_rel = 0.05
+# BD.params.bnc_frac_sol = True
 callback = BncCallback()
 BD.benders.register_callback(callback)
 BD.benders.bnc_solve()
 draw_curve(BD.result)
 
-print(f"\nFound {len(callback.feasible_solutions)} feasible solutions during the BNC process.")
+print(f"\nFound {len(callback.feasible_solutions)} feasible solutions.")
 
 # %%
 # .. seealso::
 #
 #    - A brief introduction to :ref:`enhance_branch_and_check`.
 #
-# .. tags:: benders: classical, solver: gurobi, deterministic, callback
+# .. tags:: benders: classical, solver: gurobi, deterministic, callback, branch-and-check

@@ -19,12 +19,12 @@ solvers = [
     'gurobi',
     'gurobi_direct',
     'highs',
-    'mosek',
-    'mosek_direct',
     'xpress',
     'xpress_direct',
 
-    'scip',  # Unable to obtain correct dual values
+    # 'mosek',        # License expires in one month
+    # 'mosek_direct', # License expires in one month
+    # 'scip',         # Unable to obtain correct dual values
 ]
 
 

@@ -66,7 +66,7 @@ class GeneLShaped(BendersSolver):
             complicating_vars: list[str],
             optimality_cut=GeneLShapedOCGen,
             feasibility_cut=LShapedFCGen,
-            params: BendersParams = BendersParams()
+            params: BendersParams | None = None
     ):
         super().__init__(
             master_problem,
@@ -88,7 +88,7 @@ class GeneLShaped(BendersSolver):
             optimality_cut=GeneLShapedOCGen,
             feasibility_cut=LShapedFCGen,
             prob=None,
-            params: BendersParams = BendersParams()
+            params: BendersParams | None = None
     ):
         return super().from_models(
             master_model,

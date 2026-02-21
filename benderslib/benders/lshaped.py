@@ -65,7 +65,7 @@ class LShaped(BendersSolver):
             complicating_vars: list[str],
             optimality_cut=LShapedOCGen,
             feasibility_cut=LShapedFCGen,
-            params: BendersParams = BendersParams()
+            params: BendersParams | None = None
     ):
         super().__init__(
             master_problem,
@@ -87,7 +87,7 @@ class LShaped(BendersSolver):
             optimality_cut=LShapedOCGen,
             feasibility_cut=LShapedFCGen,
             prob=None,
-            params: BendersParams = BendersParams()
+            params: BendersParams | None = None
     ):
         return super().from_models(
             master_model,

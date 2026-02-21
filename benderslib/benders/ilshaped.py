@@ -67,7 +67,7 @@ class IntegerLShaped(BendersSolver):
             complicating_vars: list[str],
             optimality_cut=IntegerLShapedOCGen,
             feasibility_cut=IntegerLShapedFCGen,
-            params: BendersParams = BendersParams()
+            params: BendersParams | None = None
     ):
         super().__init__(
             master_problem,
@@ -89,7 +89,7 @@ class IntegerLShaped(BendersSolver):
             optimality_cut=IntegerLShapedOCGen,
             feasibility_cut=IntegerLShapedFCGen,
             prob=None,
-            params: BendersParams = BendersParams()
+            params: BendersParams | None = None
     ):
         return super().from_models(
             master_model,

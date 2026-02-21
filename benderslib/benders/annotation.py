@@ -82,13 +82,13 @@ class AnnotationBenders:
             master_vars: list[str] = None,
             optimality_cut=None,
             feasibility_cut=None,
-            params: BendersParams = BendersParams(),
+            params: BendersParams | None = None,
     ):
         master_vars = master_vars if master_vars is not None else complicating_vars
         master_problem, sub_problem = self.decompose(original_problem, solver, master_vars)
 
         # Attributes
-        self.params = params
+        self.params = params if params is not None else BendersParams()
         """The parameters that can be set by the user (see :class:`BendersParams`)."""
 
         benders_kwargs = {

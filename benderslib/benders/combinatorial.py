@@ -59,7 +59,7 @@ class CombinatorialBenders(BendersSolver):
             complicating_vars: list[str],
             optimality_cut=CombinatorialOCGen,
             feasibility_cut=CombinatorialFCGen,
-            params: BendersParams = BendersParams()
+            params: BendersParams | None = None
     ):
         super().__init__(
             master_problem,
@@ -81,7 +81,7 @@ class CombinatorialBenders(BendersSolver):
             optimality_cut=CombinatorialOCGen,
             feasibility_cut=CombinatorialFCGen,
             prob=None,
-            params: BendersParams = BendersParams()
+            params: BendersParams | None = None
     ):
         return super().from_models(
             master_model,

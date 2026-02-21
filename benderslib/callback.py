@@ -34,6 +34,31 @@ class BendersContext:
     """A List of optimality cuts generated in the current iteration (:class:`OptimalityCut`)."""
     current_feas_cuts: list["Cut"] = field(default_factory=list)
     """A List of feasibility cuts generated in the current iteration (:class:`FeasibilityCut`)."""
+    where: str = ""
+    """An identifier for the Branch-and-check callback trigger location (:attr:`~benderslib.BendersConsts.INCUMBENT` or :attr:`~benderslib.BendersConsts.NODE`).
+    
+    This attributes is only relevant for callbacks in the Branch-and-check method.
+    By default, the Branch-and-check callbacks are triggered when an incumbent solution
+    is found. One can set :attr:`~benderslib.BendersParams.bnc_frac_sol` to ``True`` 
+    to trigger callbacks at fractional solutions as well, in which case this attribute 
+    will be set to :attr:`~benderslib.BendersConsts.NODE` for those triggers.
+    
+    Example
+    ---------------
+    
+    .. code-block:: python
+    
+        def on_opti_cut_generated(self, context: BendersContext):
+            if context.where == CST.INCUMBENT:
+                print("Optimality cut generated at an incumbent solution!")
+            if context.where == CST.NODE:
+                print("Optimality cut generated at a fractional solution!")
+        
+        BD = BendersSolver(...)
+        BD.params.bnc_frac_sol = True
+        BD.register_callback(on_opti_cut_generated)
+        BD.bnc_solve()
+    """
 
     def __str__(self):
         master_str = str(self.master_problem).replace('\n', '\n' + ' ' * 4)
@@ -513,6 +538,7 @@ class _CallbackManager:
 
     def trigger(self, event: str, context: BendersContext):
         for callback in self.callbacks:
+            context.where = context.master_problem._callback_where
             event = event.lower()
             method = getattr(callback, event, None)
 

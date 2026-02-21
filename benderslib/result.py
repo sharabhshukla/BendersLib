@@ -29,6 +29,8 @@ class BendersResult:
     """List of upper bounds over iterations."""
     obj: float = float('Inf')
     """Best objective value found."""
+    obj_list: list = field(default_factory=list)
+    """List of objective values of incumbent solutions found over iterations."""
     gap_abs: float = float('Inf')
     """Absolute gap between upper and lower bounds, defined as ``abs(ub - lb)``."""
     gap: float = float('Inf')

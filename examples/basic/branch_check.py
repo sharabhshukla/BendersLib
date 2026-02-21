@@ -57,4 +57,4 @@ draw_curve(BD.result)
 #    - Its classical implementation counterpart is :doc:`annotation_benders`.
 #      The acceleration is remarkable!!
 #
-# .. tags:: benders: classical, solver: gurobi, deterministic, enhancement
+# .. tags:: benders: classical, solver: gurobi, deterministic, enhancement, branch-and-check

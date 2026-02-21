@@ -42,6 +42,7 @@ class ProblemBase:
         # For branch-and-check
         self._using_bnc = False
         self.__handler = None
+        self._callback_where = None
 
     def __repr__(self):
         n_vars = len(self.solver._all_vars)
@@ -283,6 +284,7 @@ class ProblemBase:
         return self.__handler(self)
 
     def _bnc_solve(self, callback_handler):
+        self.solver.params = self.params
         self._using_bnc = True
         self.__handler = callback_handler
         self.solver._bnc_solve(self.__callback_proxy)
@@ -346,7 +348,7 @@ class MasterProblem(ProblemBase):
             self,
             solver_backend: SolverBase,
             complicating_vars: list = None,
-            params: BendersParams = BendersParams()
+            params: BendersParams | None = None
     ):
         super().__init__(solver_backend)
 
@@ -361,7 +363,7 @@ class MasterProblem(ProblemBase):
         """A dictionary mapping cut names to their corresponding instances."""
         self.estimators: list[str] = []
         """A list of estimator variable names added to the master problem."""
-        self.params: BendersParams = params
+        self.params: BendersParams | None = params if params is not None else BendersParams()
         """The parameters that can be set by the user (see :class:`BendersParams`)."""
 
         # Private attributes
@@ -506,14 +508,14 @@ class SubProblem(ProblemBase):
             self,
             solver_backend: SolverBase,
             complicating_vars: list = None,
-            params: BendersParams = BendersParams()
+            params: BendersParams | None = None
     ):
         super().__init__(solver_backend)
 
         # Public attributes
         self.complicating_vars = complicating_vars
         """A list of names of the complicating variables."""
-        self.params = params
+        self.params = params if params is not None else BendersParams()
         """The parameters that can be set by the user (see :class:`BendersParams`)."""
 
 
@@ -534,7 +536,11 @@ class LogicBasedSubProblem(ABC):
         If not provided, default parameters will be used.
     """
 
-    def __init__(self, complicating_vars: list[str], params: BendersParams = BendersParams()):
+    def __init__(
+            self,
+            complicating_vars: list[str],
+            params: BendersParams | None = None
+    ):
         self.complicating_vars: list[str] = complicating_vars
         """A list of names of the complicating variables.
         
@@ -565,7 +571,7 @@ class LogicBasedSubProblem(ABC):
         """The values of variables in the subproblem after solving."""
         self.status = CST.UNSOLVED
         """The status of the problem (see :class:`BendersConsts` for possible values)."""
-        self.params: BendersParams = params
+        self.params: BendersParams | None = params if params is not None else BendersParams()
         """The parameters that can be set by the user (see :class:`BendersParams`)."""
 
     @abstractmethod
@@ -683,8 +689,14 @@ class LogicBasedSubProblem(ABC):
 class _FuncWrapperSub(LogicBasedSubProblem):
     """A wrapper class to allow using a function as a logic-based subproblem."""
 
-    def __init__(self, complicating_vars, func: Callable, params: BendersParams = BendersParams()):
+    def __init__(
+            self,
+            complicating_vars,
+            func: Callable,
+            params: BendersParams | None = None
+    ):
         self._func = func
+        params = params if params is not None else BendersParams()
         super().__init__(complicating_vars, params)
 
     def solve(self):
@@ -738,7 +750,7 @@ class SubProblems:
             self,
             sub_problems: Iterable,
             prob: list[float] | None = None,
-            params: BendersParams = BendersParams()
+            params: BendersParams | None = None
     ):
         self.sub_problems = list(sub_problems)
         """A list of :class:`SubProblem` or :class:`LogicBasedSubProblem` instances."""
@@ -747,7 +759,7 @@ class SubProblems:
         
         If ``None``, equal weights are assumed.
         """
-        self.params: BendersParams = params
+        self.params: BendersParams | None = params if params is not None else BendersParams()
         """The parameters that can be set by the user (see :class:`BendersParams`)."""
         self.status = CST.UNSOLVED
         """The status of the problem (see :class:`BendersConsts` for possible values)."""
@@ -1076,7 +1088,7 @@ class CutGenerator(ABC):
             self,
             master_problem: MasterProblem,
             sub_problem: SubProblem | SubProblems,
-            params: BendersParams = BendersParams()
+            params: BendersParams | None = None
     ):
         self.master_problem = master_problem
         """The master problem instance."""
@@ -1084,7 +1096,7 @@ class CutGenerator(ABC):
         """The subproblem instance."""
         self.complicating_vars = master_problem.complicating_vars
         """A list of names of the complicating variables."""
-        self.params = params
+        self.params = params if params is not None else BendersParams()
         """The parameters that can be set by the user (see :class:`BendersParams`)."""
 
         assert set(self.complicating_vars) == set(sub_problem.complicating_vars), \
@@ -1130,8 +1142,15 @@ class CutGenerator(ABC):
 class _FuncWrapperCut(CutGenerator):
     """A wrapper class to allow using a function as a cut generator."""
 
-    def __init__(self, master_problem, sub_problem, func: Callable, params: BendersParams = BendersParams()):
+    def __init__(
+            self,
+            master_problem,
+            sub_problem,
+            func: Callable,
+            params: BendersParams | None = None
+    ):
         self._func = func
+        params = params if params is not None else BendersParams()
         super().__init__(master_problem, sub_problem, params)
 
     def generate(self):
@@ -1190,8 +1209,9 @@ class BendersSolver:
             complicating_vars: list[str],
             optimality_cut=None,
             feasibility_cut=None,
-            params: BendersParams = BendersParams()
+            params: BendersParams | None = None
     ):
+        params = params if params is not None else BendersParams()
         # Override complicating vars in master and subproblem
         master_problem.complicating_vars = complicating_vars
         sub_problem.complicating_vars = complicating_vars
@@ -1248,7 +1268,7 @@ class BendersSolver:
             optimality_cut: Type[CutGenerator] | Callable = None,
             feasibility_cut: Type[CutGenerator] | Callable = None,
             prob: list[float] | None = None,
-            params: BendersParams = BendersParams()
+            params: BendersParams | None = None
     ):
         """Class method to create a :class:`BendersSolver` instance directly from solver models.
 
@@ -1306,7 +1326,7 @@ class BendersSolver:
                 complicating_vars = complicating_vars
             )
         """
-
+        params = params if params is not None else BendersParams()
         master_problem = MasterProblem(master_solver(master_model))
 
         if isinstance(sub_model, Iterable):
@@ -1415,6 +1435,7 @@ class BendersSolver:
 
         self.result.lb_list.append(self.result.lb)
         self.result.ub_list.append(self.result.ub)
+        self.result.obj_list.append(self.result.obj)
         self.result.runtime = time.perf_counter() - time_start
 
         # Callbacks for new bounds
@@ -1508,6 +1529,7 @@ class BendersSolver:
                     # Ensure bounds are recorded for in all iterations, even when subproblem is infeasible
                     self.result.lb_list.append(self.result.lb)
                     self.result.ub_list.append(self.result.ub)
+                    self.result.obj_list.append(self.result.obj)
                     if self.__terminate(time_start): break
                     if self.__add_feasibility_cut() == CST.TERMINATE: break
 
@@ -1567,6 +1589,7 @@ class BendersSolver:
         if self.sub_problem.status == CST.INFEASIBLE:
             self.result.lb_list.append(self.result.lb)
             self.result.ub_list.append(self.result.ub)
+            self.result.obj_list.append(self.result.obj)
             if self.__terminate(self.__time_start): return CST.TERMINATE
             if self.__add_feasibility_cut() == CST.TERMINATE: return CST.TERMINATE
 

@@ -4,6 +4,7 @@ from gurobipy import Model, GRB
 
 from ..consts import BendersConsts as CST
 from ._base import SolverBase
+from ..utils import is_all_integer
 
 
 class Gurobi(SolverBase):
@@ -190,7 +191,7 @@ class Gurobi(SolverBase):
 
     def __callback(self, model, where):
         if where == GRB.Callback.MIPSOL:
-            self._callback_where = 'INCUMBENT'
+            self._callback_where = CST.INCUMBENT
 
             # self.__callback_handler is a function passed from ProblemBase,
             # SolverBase make 'self' as the argument and pass it to this function,
@@ -200,8 +201,14 @@ class Gurobi(SolverBase):
             if r == CST.TERMINATE:
                 model.terminate()
 
-        if where == GRB.Callback.MIPNODE:
-            ...
+        if where == GRB.Callback.MIPNODE and self.params.bnc_frac_sol:
+            if model.cbGet(GRB.Callback.MIPNODE_STATUS) == GRB.OPTIMAL:
+                self._callback_where = CST.NODE
+
+                r = self.__callback_handler(self)
+
+                if r == CST.TERMINATE:
+                    model.terminate()
 
     def _bnc_solve(self, callback_handler) -> None:
         self.model.setParam('LazyConstraints', 1)
@@ -212,16 +219,46 @@ class Gurobi(SolverBase):
         self._update_status('GUROBI', self.model.Status)
 
     def _cb_get_obj(self):
-        obj = self.model.cbGet(GRB.Callback.MIPSOL_OBJ)
+        if self._callback_where == CST.INCUMBENT:
+            obj = self.model.cbGet(GRB.Callback.MIPSOL_OBJ)
+
+        elif self._callback_where == CST.NODE:
+            var_vals = self._cb_get_var_values()
+
+            # Check whether the node solution is integer feasible.
+            vals = [var_vals[var_name] for var_name in self._bin_vars + self._int_vars]
+            is_int = is_all_integer(vals, self.model.Params.IntFeasTol)
+
+            # - Calculate the true objective value of the node solution,
+            #   since Gurobi does not provide a direct method to do so.
+            # - If the node solution is not integer feasible, we set
+            #   the objective value to +infinity, so that the Benders
+            #   upper bound will not be updated.
+            obj = sum(self.model.getVarByName(n).Obj * v for n, v in var_vals.items()) if is_int else float('inf')
+
+        else:
+            raise Exception("Invalid callback where. Expected 'INCUMBENT' or 'NODE'.")
         return obj
 
     def _cb_get_bound(self):
-        return self.model.cbGet(GRB.Callback.MIPSOL_OBJBND)
+        if self._callback_where == CST.INCUMBENT:
+            bound = self.model.cbGet(GRB.Callback.MIPSOL_OBJBND)
+        elif self._callback_where == CST.NODE:
+            bound = self.model.cbGet(GRB.Callback.MIPNODE_OBJBND)
+        else:
+            raise Exception("Invalid callback where. Expected 'INCUMBENT' or 'NODE'.")
+        return bound
 
     def _cb_get_var_values(self, vars: list[str] | None = None) -> dict[str, float]:
-        vars = vars or self._all_vars
-        res = {var_name: self.model.cbGetSolution(self.model.getVarByName(var_name)) for var_name in vars}
-        return res
+        vars = vars or [v.VarName for v in self.model.getVars()]
+
+        if self._callback_where == CST.INCUMBENT:
+            vals = {n: self.model.cbGetSolution(self.model.getVarByName(n)) for n in vars}
+        elif self._callback_where == CST.NODE:
+            vals = {n: self.model.cbGetNodeRel(self.model.getVarByName(n)) for n in vars}
+        else:
+            raise Exception("Invalid callback where. Expected 'INCUMBENT' or 'NODE'.")
+        return vals
 
     def _cb_add_cut(self, cut) -> None:
         lhs = sum(coef * self.model.getVarByName(var) for var, coef in zip(cut.vars, cut.coefs))
