@@ -10,9 +10,11 @@ The problem is solved with an integer programming model and Logic-based Benders 
 When using Logic-based Benders Decomposition,
 we demonstrate how to define a custom subproblem solver and a custom cut generator.
 
-.. admonition:: References
+.. seealso::
 
-   * Fazel-Zarandi, M. M., & Beck, J. C. (2012). Using logic-based Benders decomposition to solve the capacity- and distance-constrained plant location problem. INFORMS Journal on Computing, 24(3), 387–398. https://doi.org/10.1287/ijoc.1110.0458
+   * Fazel-Zarandi, M. M., & Beck, J. C. (2012). Using logic-based Benders decomposition to solve the
+     capacity- and distance-constrained plant location problem. INFORMS Journal on Computing, 24(3),
+     387–398. https://doi.org/10.1287/ijoc.1110.0458
 """
 
 # %%
@@ -20,16 +22,18 @@ we demonstrate how to define a custom subproblem solver and a custom cut generat
 # ---------------------------
 
 # %%
-# Import necessary packages:
+# Import necessary packages.
+
 import random
 from gurobipy import Model, GRB, quicksum
 from itertools import product
-from benderslib import LogicBasedBenders, MasterProblem, CST, Cut
+from benderslib import LogicBasedBenders, MasterProblem, CST, Cut, CombinatorialOCGen
 from benderslib.solvers import Gurobi
 
 
 # %%
-# Define the function to generate problem instance data:
+# Define the function to generate problem instance data.
+
 def generate_problem_data(num_clients, num_facilities, max_vehicles_per_facility, random_seed=None):
     if random_seed is not None:
         random.seed(random_seed)
@@ -72,7 +76,8 @@ def generate_problem_data(num_clients, num_facilities, max_vehicles_per_facility
 
 
 # %%
-# Define the function to solve the **integer programming** formulation:
+# Define the function to solve the **integer programming** formulation.
+
 def solve_ip(problem_data, enable_reinforcement=True):
     I = problem_data["client_indices"]
     J = problem_data["facility_indices"]
@@ -140,7 +145,8 @@ def solve_ip(problem_data, enable_reinforcement=True):
 
 
 # %%
-# Generate problem data and solve the integer programming formulation:
+# Generate problem data and solve the integer programming formulation.
+
 instance_data = generate_problem_data(
     num_clients=10,
     num_facilities=4,
@@ -159,7 +165,8 @@ solve_ip(instance_data)
 # ^^^^^^^^^^^^^^^^^^
 
 # %%
-# Define the **master problem** for Logic-based Benders decomposition:
+# Define the **master problem** for Logic-based Benders decomposition.
+
 def make_master_problem(problem_data, sub_relaxation=True):
     I = problem_data["client_indices"]
     J = problem_data["facility_indices"]
@@ -221,7 +228,10 @@ def make_master_problem(problem_data, sub_relaxation=True):
 #    **Adding subproblem relaxations expressed as master problem variables can significantly improve the convergence of
 #    Logic-based Benders decomposition,** as discussed in:
 #
-#    * Hooker, J. N. (2019). Logic-based Benders decomposition for large-scale optimization. In J. M. Velásquez-Bermúdez, M. Khakifirooz, & M. Fathi (Eds.), Large Scale Optimization in Supply Chains and Smart Manufacturing: Theory and Applications (pp. 1–26). Springer International Publishing. https://doi.org/10.1007/978-3-030-22788-3_1
+#    * Hooker, J. N. (2019). Logic-based Benders decomposition for large-scale optimization.
+#      In J. M. Velásquez-Bermúdez, M. Khakifirooz, & M. Fathi (Eds.), Large Scale Optimization
+#      in Supply Chains and Smart Manufacturing: Theory and Applications (pp. 1–26).
+#      Springer International Publishing. https://doi.org/10.1007/978-3-030-22788-3_1
 
 
 # %%
@@ -229,13 +239,14 @@ def make_master_problem(problem_data, sub_relaxation=True):
 # ^^^^^^^^^^^^^^^^^^
 
 # %%
-# Define the **subproblem** solver for Logic-based Benders decomposition:
+# Define the **subproblem** solver for Logic-based Benders decomposition.
 #
 # .. note::
 #
 #    In this example, the subproblem checks for feasibility. Benders feasibility cuts will be generated
 #    when the subproblem is infeasible (any facility is infeasible). When all the facilities are feasible,
 #    the optimum is reached.
+
 def subproblem_solver(complicating_var_values):
     I = instance_data["client_indices"]
     J = instance_data["facility_indices"]
@@ -281,6 +292,7 @@ def subproblem_solver(complicating_var_values):
 #    **Bin Packing Problem**: Given a set of items with sizes and a set of bins with fixed capacity,
 #    the bin packing problem aims to pack all items into the minimum number of bins without exceeding
 #    the capacity of any bin.
+
 def _bin_packing_ffd(capacity: float | int, items: list[float | int]):
     """A simple bin packing solver using first-fit decreasing (FFD) algorithm."""
     bins = []
@@ -332,7 +344,8 @@ def _bin_packing_exact(capacity: float | int, items: list[float | int]):
 # ^^^^^^^^^^^^^^^^^^^^^^^
 
 # %%
-# Define the **feasibility cut generator** for Logic-based Benders decomposition:
+# Define the **feasibility cut generator** for Logic-based Benders decomposition.
+
 def feasibility_cut_generator(master_problem, sub_problem):
     I = instance_data["client_indices"]
     J = instance_data["facility_indices"]
@@ -372,32 +385,46 @@ def feasibility_cut_generator(master_problem, sub_problem):
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 # %%
-# Initialize a Logic-based Benders decomposition instance and solve it:
+# Initialize a Logic-based Benders decomposition instance and solve it.
+
 master_model, complicating_vars = make_master_problem(instance_data)
 LBBD = LogicBasedBenders(
     master_problem=MasterProblem(Gurobi(master_model)),
     sub_problem=subproblem_solver,
     complicating_vars=complicating_vars,
-    feasibility_cut=feasibility_cut_generator
+    feasibility_cut=feasibility_cut_generator,
+    # Optimality cut is required for the branch-and-check method,
+    # as the subproblem can be feasible for some master node solutions.
+    optimality_cut=CombinatorialOCGen,
 )
+# This example works well with the branch-and-check method, try it!
+LBBD.params.use_bnc = True
+
 LBBD.solve()
 
 # %%
-# Now, remove the subproblem relaxation from the master problem and solve again:
+# Now, remove the subproblem relaxation from the master problem and solve again.
+
 master_model_no_relax, complicating_vars = make_master_problem(instance_data, sub_relaxation=False)
 LBBD_no_relax = LogicBasedBenders(
     master_problem=MasterProblem(Gurobi(master_model_no_relax)),
     sub_problem=subproblem_solver,
     complicating_vars=complicating_vars,
-    feasibility_cut=feasibility_cut_generator
+    feasibility_cut=feasibility_cut_generator,
+    # Optimality cut is required for the branch-and-check method,
+    # as the subproblem can be feasible for some master node solutions.
+    optimality_cut=CombinatorialOCGen,
 )
+# This example works well with the branch-and-check method, try it!
+LBBD.params.use_bnc = True
+
 LBBD_no_relax.solve()
 
 # %%
 #
-# .. admonition:: References
+# .. seealso::
 #
 #     * Tutorial of the Logic-based Benders Decomposition: :doc:`../../tutorials/lbbd`
 #     * This example uses the following class: :class:`~benderslib.LogicBasedBenders`
 #
-# .. tags:: benders: lbbd, solver: gurobi, deterministic, custom: subproblem, custom: cut
+# .. tags:: benders: lbbd, solver: gurobi, deterministic, custom: subproblem, custom: cut, branch-and-check
