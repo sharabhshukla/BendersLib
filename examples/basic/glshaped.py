@@ -108,7 +108,7 @@ BD = GeneLShaped(master_problem, sub_problems, complicating_vars)
 
 BD.solve()
 
-# draw_curve(BD.result)
+draw_curve(BD.result)
 
 # %%
 # Solve the problem using the multi-cut Generalized L-shaped method.
@@ -133,7 +133,7 @@ BD = GeneLShaped.from_models(
 
 BD.solve()
 
-# draw_curve(BD.result)
+draw_curve(BD.result)
 
 # %%
 # Solve the deterministic equivalent problem for verification.
