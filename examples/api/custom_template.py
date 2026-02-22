@@ -6,13 +6,17 @@ Template for Customizing Benders Decomposition
 
 """
 
+# %%
+# Import necessary modules from BendersLib and your preferred solver interface.
+
 from gurobipy import Model
 from benderslib import BendersSolver, Cut, CutGenerator, MasterProblem, SubProblem, BendersParams
 from benderslib.solvers import Gurobi
 
 
 # %%
-# Define master problem and subproblem using your preferred solver interface:
+# Define master problem and subproblem using your preferred solver interface.
+
 def master_problem():
     return Model("Master")
 
@@ -24,6 +28,7 @@ def sub_problems():
 # %%
 # Use classes to define feasibility cut and optimality cut, if you want preserve some state during iterations,
 # or the cut generation process is complex.
+
 class OptiCut(CutGenerator):
 
     def __init__(self, master_problem: MasterProblem, sub_problem: SubProblem, params: BendersParams):
@@ -47,6 +52,7 @@ class FeasCut(CutGenerator):
 # %%
 # BendersLib also supports defining cut generator functions directly.
 # The signature of the cut generator functions should follow the example below.
+
 def opti_cut_generator(master_problem, sub_problem) -> list[Cut]:
     ...
 
@@ -54,6 +60,9 @@ def opti_cut_generator(master_problem, sub_problem) -> list[Cut]:
 def feas_cut_generator(master_problem, sub_problem) -> list[Cut]:
     ...
 
+
+# %%
+# Prepare components to build the Benders instance, and then solve it.
 
 if __name__ == '__main__':
     master_model = master_problem()

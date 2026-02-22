@@ -11,14 +11,13 @@ without manually defining the master and sub problems.
 """
 
 # %%
-# Import necessary modules:
+# Create the original problem.
+
 from gurobipy import Model, GRB
 from benderslib import AnnotationBenders
 from benderslib.solvers import Gurobi
 
 
-# %%
-# Create the original problem:
 def make_original_problem():
     model = Model("Original")
 
@@ -42,7 +41,8 @@ def make_original_problem():
 
 
 # %%
-# Obtain the master and sub problems:
+# Obtain the master and sub problems.
+
 model, complicating_vars = make_original_problem()
 master, sub = AnnotationBenders.decompose(
     original_problem=model,
@@ -57,14 +57,11 @@ print(master)
 
 # %%
 #
-# .. admonition:: References
+# .. seealso::
 #
 #     * This example uses the following class: :class:`~benderslib.AnnotationBenders`
 #     * See :func:`~benderslib.solvers.Gurobi.make_master_problem` for details on how the master problem is constructed.
 #     * See :func:`~benderslib.solvers.Gurobi.make_sub_problem` for details on how the subproblem is constructed.
-#
-# .. seealso::
-#
 #     * Automated decomposition based on master problem variables: :doc:`../../examples/basic/annotation_benders`
 #
 # .. tags:: solver: gurobi
