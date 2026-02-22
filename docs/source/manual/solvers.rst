@@ -66,7 +66,7 @@ A Benders decomposition variant usually require one or two features to work prop
       - ✅
       - ✅
       - ✅
-      -
+      - ✅
       - Commercial
     * - **CPLEX**
       - :class:`~.solvers.CplexCP` (Constraint Programming)

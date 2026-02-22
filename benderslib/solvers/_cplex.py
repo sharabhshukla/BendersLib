@@ -1,9 +1,11 @@
 # coding:utf-8
 
-from cplex import Cplex as CplexModel, infinity as CPLEX_INFINITY
+from cplex import Cplex as CplexModel, infinity as CPLEX_INFINITY, SparsePair
+from cplex.callbacks import MIPInfoCallback, LazyConstraintCallback, IncumbentCallback
 
 from ..consts import BendersConsts as CST
 from ._base import SolverBase
+from ..utils import is_all_integer
 
 
 class Cplex(SolverBase):
@@ -195,6 +197,58 @@ class Cplex(SolverBase):
         self.model.solve()
         self._update_status('CPLEX', self.model.solution.get_status())
 
+    def _bnc_solve(self, callback_handler) -> None:
+        self.model.parameters.mip.strategy.search.set(
+            self.model.parameters.mip.strategy.search.values.traditional
+        )
+
+        # Callback
+        self._callback_handler = callback_handler
+        self.model.set_problem_type(self.model.problem_type.MILP)
+
+        info_callback = self.model.register_callback(_CplexCallback)
+        info_callback.set_handler(self)
+
+        # Solve
+        self.model.solve()
+        self._update_status('CPLEX', self.model.solution.get_status())
+
+    def _cb_get_obj(self):
+        if self._callback_where == CST.INCUMBENT:
+            obj = self._callback_context.get_objective_value()
+
+        elif self._callback_where == CST.NODE:
+            obj = self._callback_context.get_objective_value()
+
+            # Check whether the node solution is integer feasible.
+            is_int = sum(self._callback_context.get_feasibilities()) == 0
+
+            # var_vals = self._cb_get_var_values()
+            # vals = [var_vals[var_name] for var_name in self._bin_vars + self._int_vars]
+            # is_int = is_all_integer(vals, self.model.parameters.mip.tolerances.integrality.get())
+
+            # Set obj to +inf if the node solution is not integer feasible.
+            obj = obj if is_int else float('inf')
+        else:
+            raise Exception("Invalid callback where. Expected 'INCUMBENT' or 'NODE'.")
+        return obj
+
+    def _cb_get_bound(self):
+        # "Returns the best objective value among unexplored nodes."
+        bound = self._callback_context.get_best_objective_value()
+        return bound if bound > -CPLEX_INFINITY else float('-inf')
+
+    def _cb_get_var_values(self, vars: list[str] | None = None) -> dict[str, float]:
+        vars = vars or self._all_vars
+        vals = self._callback_context.get_values(vars)
+        res = dict(zip(vars, vals))
+        return res
+
+    def _cb_add_cut(self, cut) -> None:
+        expr = SparsePair(ind=cut.vars, val=cut.coefs)
+        sense_map = {CST.EQ: "E", CST.LE: "L", CST.GE: "G"}
+        self._callback_context.add(constraint=expr, sense=sense_map[cut.sense], rhs=cut.rhs)
+
     def compute_iis(self) -> set[str]:
         self.model.conflict.refine()
 
@@ -266,3 +320,27 @@ class Cplex(SolverBase):
         sub.linear_constraints.delete(_cons_to_remove_name)
 
         return sub
+
+
+class _CplexCallback(LazyConstraintCallback, MIPInfoCallback):
+    def set_handler(self, handler: Cplex):
+        self.handler = handler
+
+    def __call__(self):
+        if self.get_solution_source() == IncumbentCallback.solution_source.node_solution:
+            self.handler._callback_where = CST.NODE
+        else:
+            self.handler._callback_where = CST.INCUMBENT
+
+        # Only incumbent is used to generate cut
+        # if self.has_incumbent():
+        #     self.handler._callback_where = CST.INCUMBENT
+        # else:
+        #     self.handler._callback_where = CST.NODE
+
+        self.handler._callback_context = self
+
+        r = self.handler._callback_handler(self.handler)
+
+        if r == CST.TERMINATE:
+            self.abort()

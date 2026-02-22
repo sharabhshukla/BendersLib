@@ -30,7 +30,7 @@ def make_original_problem():
 
 def make_model():
     model = cplex.Cplex()
-    n_vars = 10
+    n_vars = 15
 
     # Add variables
     y_names = [f"y_{i}" for i in range(n_vars)]
@@ -73,15 +73,20 @@ def make_model():
 
 if __name__ == '__main__':
     model, complicating_vars = make_model()
+    model_copy = cplex.Cplex(model)
+
     model.solve()
     print("\n CPLEX Objective value:", model.solution.get_objective_value())
 
-    print()
     BD = AnnotationBenders(model, solver=Cplex, complicating_vars=complicating_vars, benders=ClassicalBenders)
+    BD.solve()
+
+    BD = AnnotationBenders(model_copy, solver=Cplex, complicating_vars=complicating_vars, benders=ClassicalBenders)
+    BD.params.use_bnc = True
     BD.solve()
 
     draw_curve(BD.result)
 
 # %%
 #
-# .. tags:: benders: classical, solver: cplex, deterministic
+# .. tags:: benders: classical, solver: cplex, deterministic, branch-and-check

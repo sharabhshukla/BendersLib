@@ -217,7 +217,7 @@ class Copt(SolverBase):
     def _bnc_solve(self, callback_handler) -> None:
         self.model.setParam('LazyConstraints', 1)
 
-        # Register callback
+        # Callback
         self._callback_handler = callback_handler
         self.__copt_cb = _CoptCallback(self)
         self.model.setCallback(self.__copt_cb, COPT.CBCONTEXT_MIPSOL | COPT.CBCONTEXT_MIPNODE)
