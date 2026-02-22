@@ -137,6 +137,10 @@ class BendersParams:
     :attr:`~benderslib.BendersConsts.NODE`, this parameter is required to be ``True``, 
     since the solutions at the nodes can be fractional. Otherwise no cuts will be generated at the nodes,
     and the callback implemented will not work.
+    
+    .. danger::
+        
+        This feature is experimental and might not be supported by all solvers.
     """
 
     # Logging

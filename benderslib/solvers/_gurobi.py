@@ -264,12 +264,13 @@ class Gurobi(SolverBase):
     def _cb_add_cut(self, cut) -> None:
         lhs = sum(coef * self.model.getVarByName(var) for var, coef in zip(cut.vars, cut.coefs))
 
-        if cut.sense == CST.EQ:
-            self.model.cbLazy(lhs == cut.rhs)
-        elif cut.sense == CST.LE:
-            self.model.cbLazy(lhs <= cut.rhs)
-        elif cut.sense == CST.GE:
-            self.model.cbLazy(lhs >= cut.rhs)
+        _sense_map = {
+            CST.EQ: GRB.EQUAL,
+            CST.LE: GRB.LESS_EQUAL,
+            CST.GE: GRB.GREATER_EQUAL
+        }
+
+        self.model.cbLazy(lhs, _sense_map[cut.sense], cut.rhs)
 
     def compute_iis(self) -> set[str]:
         self.model.computeIIS()

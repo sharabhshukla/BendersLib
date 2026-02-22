@@ -35,14 +35,18 @@ def make_original_problem():
 
 if __name__ == '__main__':
     model, complicating_vars = make_original_problem()
+    model_copy = model.clone()
     model.solve()
 
-    print()
     BD = AnnotationBenders(model, solver=Copt, complicating_vars=complicating_vars, benders=ClassicalBenders)
+    BD.solve()
+
+    BD = AnnotationBenders(model_copy, solver=Copt, complicating_vars=complicating_vars, benders=ClassicalBenders)
+    BD.params.use_bnc = True
     BD.solve()
 
     draw_curve(BD.result)
 
 # %%
 #
-# .. tags:: benders: classical, solver: copt, deterministic
+# .. tags:: benders: classical, solver: copt, deterministic, branch-and-check

@@ -1,9 +1,32 @@
 # coding:utf-8
 
-from coptpy import Model, LinExpr, COPT
+from coptpy import Model, LinExpr, COPT, CallbackBase
 
 from ..consts import BendersConsts as CST
 from ._base import SolverBase
+
+
+class _CoptCallback(CallbackBase):
+    def __init__(self, solver_instance):
+        super().__init__()
+        self.solver = solver_instance
+
+    def callback(self):
+        if self.where() == COPT.CBCONTEXT_MIPSOL:
+            self.solver._callback_where = CST.INCUMBENT
+
+            r = self.solver._callback_handler(self.solver)
+
+            if r == CST.TERMINATE:
+                self.interrupt()
+
+        if self.where() == COPT.CBCONTEXT_MIPNODE and self.solver.params.bnc_frac_sol:
+            self.solver._callback_where = CST.NODE
+
+            r = self.solver._callback_handler(self.solver)
+
+            if r == CST.TERMINATE:
+                self.interrupt()
 
 
 class Copt(SolverBase):
@@ -47,6 +70,10 @@ class Copt(SolverBase):
         self._constr_num = len(self.model.getConstrs())
 
         self.__setup_model(solver_options)
+
+        # For BnC callback
+        self._callback_handler = None
+        self._callback_where = None
 
     def __standardize(self):
         self.__sense_to_minimize()
@@ -171,12 +198,13 @@ class Copt(SolverBase):
         for var, coef in zip(cut.vars, cut.coefs):
             lhs.addTerm(self.model.getVarByName(var), coef)
 
-        if cut.sense == CST.EQ:
-            self.model.addConstr(lhs == cut.rhs, name=name)
-        elif cut.sense == CST.LE:
-            self.model.addConstr(lhs <= cut.rhs, name=name)
-        elif cut.sense == CST.GE:
-            self.model.addConstr(lhs >= cut.rhs, name=name)
+        _sense_map = {
+            CST.EQ: COPT.EQUAL,
+            CST.LE: COPT.LESS_EQUAL,
+            CST.GE: COPT.GREATER_EQUAL
+        }
+
+        self.model.addConstr(lhs, sense=_sense_map[cut.sense], rhs=cut.rhs, name=name)
 
     def remove_cut(self, cut_name: str) -> None:
         con = self.model.getConstrByName(cut_name)
@@ -185,6 +213,60 @@ class Copt(SolverBase):
     def solve(self) -> None:
         self.model.solve()
         self._update_status('COPT', self.model.status)
+
+    def _bnc_solve(self, callback_handler) -> None:
+        self.model.setParam('LazyConstraints', 1)
+
+        # Register callback
+        self._callback_handler = callback_handler
+        self.__copt_cb = _CoptCallback(self)
+        self.model.setCallback(self.__copt_cb, COPT.CBCONTEXT_MIPSOL | COPT.CBCONTEXT_MIPNODE)
+
+        # Solve
+        self.model.solve()
+        self._update_status('COPT', self.model.status)
+
+    def _cb_get_obj(self):
+        if self._callback_where == CST.INCUMBENT:
+            obj = self.__copt_cb.getInfo(COPT.cbinfo.MipCandObj)
+
+        elif self._callback_where == CST.NODE:
+            obj = self.__copt_cb.getInfo(COPT.cbinfo.RelaxSolObj)
+
+        else:
+            raise Exception("Invalid callback where. Expected 'INCUMBENT' or 'NODE'.")
+
+        return obj
+
+    def _cb_get_bound(self):
+        bound = self.__copt_cb.getInfo(COPT.cbinfo.BestBnd)
+
+        return bound if bound > -COPT.INFINITY else float('-inf')
+
+    def _cb_get_var_values(self, vars: list[str] | None = None) -> dict[str, float]:
+        vars = vars or [v.getName() for v in self.model.getVars()]
+
+        if self._callback_where == CST.INCUMBENT:
+            vals = {n: self.__copt_cb.getSolution(self.model.getVarByName(n)) for n in vars}
+        elif self._callback_where == CST.NODE:
+            vals = {n: self.__copt_cb.getRelaxSol(self.model.getVarByName(n)) for n in vars}
+        else:
+            raise Exception("Invalid callback where. Expected 'INCUMBENT' or 'NODE'.")
+
+        return vals
+
+    def _cb_add_cut(self, cut) -> None:
+        lhs = LinExpr()
+        for var, coef in zip(cut.vars, cut.coefs):
+            lhs.addTerm(self.model.getVarByName(var), coef)
+
+        _sense_map = {
+            CST.EQ: COPT.EQUAL,
+            CST.LE: COPT.LESS_EQUAL,
+            CST.GE: COPT.GREATER_EQUAL
+        }
+
+        self.__copt_cb.addLazyConstr(lhs, sense=_sense_map[cut.sense], rhs=cut.rhs)
 
     def compute_iis(self) -> set[str]:
         self.model.computeIIS()

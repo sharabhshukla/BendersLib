@@ -58,7 +58,7 @@ A Benders decomposition variant usually require one or two features to work prop
       - ✅
       - ✅
       - ✅
-      -
+      - ✅
       - Commercial
     * - **CPLEX**
       - :class:`~.solvers.Cplex` (Mathematical Programming)
@@ -74,7 +74,7 @@ A Benders decomposition variant usually require one or two features to work prop
       - ❌
       - ❌
       - ✅
-      -
+      - ❌
       - Commercial
     * - **Gurobi**
       - :class:`~.solvers.Gurobi`
@@ -90,7 +90,7 @@ A Benders decomposition variant usually require one or two features to work prop
       - ❌
       - ❌
       - ✅ [7]_
-      -
+      - ❌
       - Open-source
     * - **SCIP**
       - :class:`~.solvers.Scip`
