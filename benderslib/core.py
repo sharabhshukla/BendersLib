@@ -850,6 +850,15 @@ class SubProblems:
             var_values[i] = sub.get_var_values(vars)
         return var_values
 
+    def __update_status(self):
+        if all(sub.status == CST.OPTIMAL for sub in self.sub_problems):
+            self.status = CST.OPTIMAL
+        elif any(sub.status == CST.INFEASIBLE for sub in self.sub_problems):
+            self.status = CST.INFEASIBLE
+        else:
+            self.status = CST.UNKNOWN
+            raise RuntimeError("SubProblems status could not be determined.")
+
     def solve(self) -> None:
         """Solve all subproblems and update the :attr:`status` attribute.
 
@@ -858,18 +867,44 @@ class SubProblems:
 
         It ise used by :meth:`BendersSolver.solve`.
         """
+        if self.params.parallel_sub:
+            return self.prl_solve()
+
         for sub in self.sub_problems:
             sub.solve()
             if sub.status == CST.INFEASIBLE and not self.params.multi_feas_cut:
                 break
 
-        if all(sub.status == CST.OPTIMAL for sub in self.sub_problems):
-            self.status = CST.OPTIMAL
-        elif any(sub.status == CST.INFEASIBLE for sub in self.sub_problems):
-            self.status = CST.INFEASIBLE
-        else:
-            self.status = CST.UNKNOWN
-            raise RuntimeError("SubProblems status could not be determined.")
+        self.__update_status()
+
+    def prl_solve(self) -> None:
+        """Solve all subproblems in parallel and update the :attr:`status` attribute.
+
+        If any subproblem is infeasible and :attr:`BendersParams.multi_feas_cut` is ``False``,
+        the solving process will stop early.
+
+        It ise used by :meth:`BendersSolver.solve`.
+        """
+        from concurrent.futures import ThreadPoolExecutor, as_completed
+
+        threads = self.params.parallel_threads
+        assert isinstance(threads, int) and (threads > 0 or threads == -1), \
+            "<parallel_threads> must be a non-negative integer or -1."
+
+        max_workers = threads if threads > 0 else None
+
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            futures = {executor.submit(sub.solve): sub for sub in self.sub_problems}
+            for future in as_completed(futures):
+                sub = futures[future]
+                future.result()
+
+                if sub.status == CST.INFEASIBLE and not self.params.multi_feas_cut:
+                    # Terminate the remaining subproblems
+                    executor.shutdown(wait=False, cancel_futures=True)
+                    break
+
+        self.__update_status()
 
 
 class Cut:

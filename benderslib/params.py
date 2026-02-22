@@ -32,10 +32,12 @@ class BendersParams:
     """
 
     # Theta (estimator in master problem for subproblem's objective)
+
     theta_lb: float = 0
     """Lower bound for the theta variable in the master problem."""
 
     # Numerical
+
     tol_obj_diff: float = 1e-6
     """Tolerance for estimator values and subproblem objective values comparison.
     
@@ -50,6 +52,7 @@ class BendersParams:
     """
 
     # Convergence
+
     tol_abs: float = 1e-6
     """Absolute tolerance for convergence, terminate when ``abs(UB - LB) <= tol_abs``."""
     tol_rel: float = 1e-6
@@ -60,16 +63,45 @@ class BendersParams:
     """Iteration limit for the Benders algorithm."""
 
     # L-shaped method
+
     multi_opti_cut: bool = False
-    """**[L-shaped method]** Whether to add multiple optimality cuts per scenario in each iteration of the L-shaped method."""
-    multi_feas_cut: bool = False
-    """**[L-shaped method]** Whether to add multiple feasibility cuts per scenario in each iteration of the L-shaped method.
+    """**[L-shaped method]** Whether to add multiple optimality cuts per scenario in the L-shaped method.
     
-    If ``False``, one feasibility cut is added when a infeasible subproblem is found;
-    If ``True``, all extreme rays are used to generate multiple feasibility cuts.
+    If ``True``, estimator variables are added to the master problem for each scenario, 
+    and an optimality cut is added for each scenario in each iteration;
+    If ``False``, only one estimator variable is added to the master problem,
+    and an aggregated optimality cut is added.
+    One need to trade-off between the size of the master problem and the 
+    number of iterations when deciding whether to use multiple optimality cuts.
+    """
+    multi_feas_cut: bool = False
+    """**[L-shaped method]** Whether to add multiple feasibility cuts per scenario in the L-shaped method.
+    
+    If ``True``, all extreme rays are used to generate multiple feasibility cuts;
+    If ``False``, one feasibility cut is added when a infeasible subproblem is found,
+    and the subsequent subproblems will not be solved.
+    """
+    parallel_sub: bool = False
+    """**[L-shaped method]** Whether to solve subproblems in parallel in the L-shaped method.
+    
+    If ``True``, the subproblems in a :class:`~benderslib.SubProblems` instance are solved in parallel;
+    If ``False``, the subproblems are solved sequentially.
+    Note that parallelizing subproblems may lead to faster convergence in some problems, 
+    but may not always be beneficial. You should consider the size of the problem, 
+    the number of scenarios, and the available computational resources when deciding 
+    whether to use parallelization.
+    """
+    parallel_threads: int = -1
+    """**[L-shaped method]** Number of threads to use for parallel subproblem solving.
+    
+    This parameter is used when :attr:`~BendersParams.parallel_sub` is ``True``. 
+    If set to a positive integer, it specifies the number of threads to use for 
+    parallel subproblem solving. If set to ``-1``, BendersLib will determine 
+    the number of threads to use based on the available CPU cores.
     """
 
     # Combinatorial Benders
+
     use_iis_cut: bool = False
     """**[Combinatorial Benders]** Whether to use IIS-based feasibility cuts.
     
@@ -83,7 +115,8 @@ class BendersParams:
     You should ensure that the solver used for the subproblem supports IIS computation, see :ref:`solver-table`.
     """
 
-    # branch-and-check method
+    # Branch-and-check method
+
     use_bnc: bool = False
     """**[Branch-and-check]** Whether to use the branch-and-check (branch-and-Benders-cut) method. 
     
@@ -107,6 +140,7 @@ class BendersParams:
     """
 
     # Logging
+
     log_freq_sec: float = 0.5
     """Frequency (in seconds) to log messages to the console/file."""
     log_freq_iter: int = 1

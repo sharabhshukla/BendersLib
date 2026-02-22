@@ -120,6 +120,21 @@ By keeping the master problem lean, the overall performance of the algorithm can
 Parallelization
 ------------------------------
 
+In Stochastic Programming, the L-shaped methods (:doc:`lshaped`, :doc:`ilshaped`)
+often yield subproblems that can be solved in parallel. This can significantly
+reduce the solution time per iteration. BendersLib supports this feature through the
+:attr:`~benderslib.BendersParams.parallel_sub` parameter. However, the overhead of
+parallelization may outweigh the benefits if subproblems are solved very quickly.
+It is advisable to benchmark to see if parallelization is advantageous
+for your specific problem.
+
+.. admonition:: Example
+    :class: seealso
+
+    These examples (:doc:`../examples/basic/lshaped`, :doc:`../examples/basic/ilshaped`,
+    :doc:`../examples/basic/glshaped`, :doc:`../examples/advanced/ilshaped_iis`)
+    demonstrate how to enable parallel subproblem solving in BendersLib.
+
 ------
 
 CP and Algorithmic Solvers
@@ -280,8 +295,8 @@ and allows for a more efficient exploration of the solution space.
     :class: seealso
 
     - BendersLib's implementation can be used via :meth:`~benderslib.BendersSolver.bnc_solve`.
-    - This example (:doc:`../examples/basic/branch_check`) shows a
-      problem solved with the branch-and-check method.
+    - These examples (:doc:`tag: branch-and-check <../_tags/branch-and-check>`) demonstrate
+      how to enable Branch-and-check method in BendersLib.
 
 .. Branch-and-check Method
 .. [#] Thorsteinsson, E. S. (2001). Branch-and-check: A hybrid framework integrating mixed integer programming and constraint logic programming. In T. Walsh (Ed.), Principles and Practice of Constraint Programming—CP 2001 (pp. 16–30). Springer. https://doi.org/10.1007/3-540-45578-7_2

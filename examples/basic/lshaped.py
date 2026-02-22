@@ -86,7 +86,7 @@ def deterministic_equivalent_model(n_plants, scenarios, probs, total_capacity):
 # Data
 random.seed(5)
 n_plants = 5
-n_scenarios = 30
+n_scenarios = 150
 total_capacity = 10
 scenarios = [[random.randint(10, 220) for _ in range(n_plants)] for _ in range(n_scenarios)]
 probs = [1.3 for _ in range(n_scenarios)]
@@ -99,7 +99,6 @@ print(f"Deterministic Equivalent Obj: {de_model.ObjVal:.4f}")
 # %%
 # Solve the problem using the single-cut L-shaped method.
 
-# Solver models
 master_model, complicating_vars = first_stage_model(n_plants)
 sub_models = second_stage_model(n_plants, scenarios, total_capacity)
 
@@ -123,32 +122,11 @@ L = LShaped.from_models(
     prob=probs,
 )
 
+# L.params.multi_opti_cut = True
+# L.params.multi_feas_cut = True
 # This example works well with the branch-and-check method, try it!
 # L.params.use_bnc = True
-
-L.solve()
-draw_curve(L.result)
-
-# %%
-# Solve the problem using the multi-cut L-shaped method.
-
-# Master and Sub models are required to be re-defined,
-# since they have been modified (by adding cuts) in the previous solve.
-master_model, complicating_vars = first_stage_model(n_plants)
-sub_models = second_stage_model(n_plants, scenarios, total_capacity)
-L = LShaped.from_models(
-    master_model=master_model,
-    master_solver=Gurobi,
-    sub_model=sub_models,
-    sub_solver=Gurobi,
-    complicating_vars=complicating_vars,
-    prob=probs,
-)
-
-L.params.multi_opti_cut = True
-L.params.multi_feas_cut = True
-# This example works well with the branch-and-check method, try it!
-# L.params.use_bnc = True
+L.params.parallel_sub = True
 
 L.solve()
 draw_curve(L.result)
@@ -161,4 +139,4 @@ draw_curve(L.result)
 #     * This example uses the following class: :class:`~benderslib.LShaped`
 #     * Example of integer L-shaped method: :doc:`ilshaped`
 #
-# .. tags:: benders: l-shaped, solver: gurobi, stochastic, branch-and-check
+# .. tags:: benders: l-shaped, solver: gurobi, stochastic, branch-and-check, enhancement

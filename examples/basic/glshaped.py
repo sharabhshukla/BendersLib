@@ -90,7 +90,7 @@ def deterministic_equivalent_model(n_plants, scenarios, probs):
 # Data
 random.seed(1)
 n_plants = 5
-n_scenarios = 10
+n_scenarios = 20
 scenarios = [[random.randint(10, 220) for _ in range(n_plants)] for _ in range(n_scenarios)]
 probs = [1 / n_scenarios for _ in range(n_scenarios)]
 
@@ -101,39 +101,15 @@ ss_models = list(second_stage_model(n_plants, scenarios))
 master_problem = MasterProblem(Gurobi(fs_model))
 sub_problems = SubProblems([Gurobi(m) for m in ss_models], prob=probs)
 
-BD = GeneLShaped(master_problem, sub_problems, complicating_vars)
+L = GeneLShaped(master_problem, sub_problems, complicating_vars)
 
+# L.params.multi_opti_cut = True
 # This example works well with the branch-and-check method, try it!
-# BD.params.use_bnc = True
+# L.params.use_bnc = True
+# L.params.parallel_sub = True
 
-BD.solve()
-
-draw_curve(BD.result)
-
-# %%
-# Solve the problem using the multi-cut Generalized L-shaped method.
-
-# Multi-cut version
-# Master and Sub models are required to be re-defined,
-# since they have been modified (by adding cuts) in the previous solve.
-fs_model, complicating_vars = first_stage_model(n_plants)
-ss_models = list(second_stage_model(n_plants, scenarios))
-BD = GeneLShaped.from_models(
-    master_model=fs_model,
-    master_solver=Gurobi,
-    sub_model=ss_models,
-    sub_solver=Gurobi,
-    complicating_vars=complicating_vars,
-    prob=probs,
-    params=BendersParams(multi_opti_cut=True)
-)
-
-# This example works well with the branch-and-check method, try it!
-# BD.params.use_bnc = True
-
-BD.solve()
-
-draw_curve(BD.result)
+L.solve()
+draw_curve(L.result)
 
 # %%
 # Solve the deterministic equivalent problem for verification.
@@ -142,7 +118,7 @@ de_model = deterministic_equivalent_model(n_plants, scenarios, probs)
 de_model.optimize()
 
 print(f"Deterministic Equivalent Obj: {de_model.ObjVal:.4f}")
-print(f"Benders Decomposition    Obj: {BD.result.obj:.4f}")
+print(f"Benders Decomposition    Obj: {L.result.obj:.4f}")
 
 # %%
 #
@@ -152,4 +128,4 @@ print(f"Benders Decomposition    Obj: {BD.result.obj:.4f}")
 #     * Tutorial of the Generalized Benders Decomposition: :doc:`../../tutorials/gbd`
 #     * This example uses the following class: :class:`~benderslib.benders.GeneLShaped`
 #
-# .. tags:: benders: generalized, benders: l-shaped, solver: gurobi, stochastic, branch-and-check
+# .. tags:: benders: generalized, benders: l-shaped, solver: gurobi, stochastic, branch-and-check, enhancement

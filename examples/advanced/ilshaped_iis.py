@@ -139,6 +139,8 @@ L = IntegerLShaped.from_models(
 )
 # This example works well with the branch-and-check method, try it!
 L.params.use_bnc = True
+# L.params.parallel_sub = True
+# L.params.multiple_feas_cut = True
 
 L.solve()
 
@@ -158,6 +160,8 @@ L_IIS = IntegerLShaped.from_models(
 )
 # This example works well with the branch-and-check method, try it!
 L_IIS.params.use_bnc = True
+# L_IIS.params.parallel_sub = True
+# L_IIS.params.multiple_feas_cut = True
 
 L_IIS.solve()
 
@@ -184,4 +188,4 @@ plt.show()
 #     * This example uses the following class: :class:`~benderslib.IntegerLShaped`
 #     * Example of the L-shaped method: :doc:`../basic/lshaped`
 #
-# .. tags:: benders: integer l-shaped, solver: gurobi, stochastic, custom: cut, iis, branch-and-check
+# .. tags:: benders: integer l-shaped, solver: gurobi, stochastic, custom: cut, iis, branch-and-check, enhancement

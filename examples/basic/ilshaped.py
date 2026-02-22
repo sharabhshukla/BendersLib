@@ -90,7 +90,7 @@ def deterministic_equivalent_model(n_plants, scenarios, probs, penalty):
 # Data
 random.seed(1)
 n_plants = 7
-n_scenarios = 2
+n_scenarios = 18
 penalty = 10
 scenarios = [[random.choice([0, 1]) for _ in range(n_plants)] for _ in range(n_scenarios)]
 probs = [1.3 for _ in range(n_scenarios)]
@@ -117,36 +117,12 @@ L = IntegerLShaped.from_models(
     prob=probs,
 )
 
+# L.params.multi_opti_cut = True
 # This example works well with the branch-and-check method, try it!
 # L.params.use_bnc = True
+L.params.parallel_sub = True
 
 L.solve()
-
-draw_curve(L.result)
-
-# %%
-# Solve the problem using the multi-cut integer L-shaped method.
-
-# Multi-cut Integer L-shaped solver
-# Master and Sub models are required to be re-defined,
-# since they have been modified (by adding cuts) in the previous solve.
-master_model, complicating_vars = first_stage_model(n_plants)
-sub_models = second_stage_model(n_plants, scenarios, penalty)
-L = IntegerLShaped.from_models(
-    master_model=master_model,
-    master_solver=Gurobi,
-    sub_model=sub_models,
-    sub_solver=Gurobi,
-    complicating_vars=complicating_vars,
-    prob=probs,
-)
-
-L.params.multi_opti_cut = True
-# This example works well with the branch-and-check method, try it!
-# L.params.use_bnc = True
-
-L.solve()
-
 draw_curve(L.result)
 
 # %%
@@ -157,4 +133,4 @@ draw_curve(L.result)
 #     * This example uses the following class: :class:`~benderslib.IntegerLShaped`
 #     * Example of the L-shaped method: :doc:`lshaped`
 #
-# .. tags:: benders: integer l-shaped, solver: gurobi, stochastic, branch-and-check
+# .. tags:: benders: integer l-shaped, solver: gurobi, stochastic, branch-and-check, enhancement
