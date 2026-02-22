@@ -7,9 +7,11 @@ Local Branching
 
 # %%
 # Prepare the problem for Benders decomposition.
+
 from benderslib import ClassicalBenders, AnnotationBenders, CallbackBase
 from benderslib.solvers import Gurobi
 from benderslib.utils import draw_curve
+
 from gurobipy import Model, GRB, LinExpr
 
 
@@ -37,6 +39,7 @@ def make_original_problem():
 
 # %%
 # Define the local branching callback.
+
 class LocalBranchingCallback(CallbackBase):
 
     def __init__(self, radius, till_iter):
@@ -106,6 +109,7 @@ BD = AnnotationBenders(
 
 callback = LocalBranchingCallback(2, till_iter=120)
 BD.benders.register_callback(callback)
+
 BD.solve()
 draw_curve(BD.result)
 
@@ -115,15 +119,16 @@ draw_curve(BD.result)
 #     It can be observed that with local branching constraints, the time required to solve
 #     the master problem is significantly reduced, since only a subregion is explored.
 #     Solutions to the master problem obtained from a subregion can also generate useful cuts.
-
-# %%
+#
 # Run without the local branching callback.
+
 BD_no_tr = AnnotationBenders(
     model_copy,
     solver=Gurobi,
     complicating_vars=complicating_vars,
     benders=ClassicalBenders
 )
+
 BD_no_tr.solve()
 draw_curve(BD_no_tr.result)
 

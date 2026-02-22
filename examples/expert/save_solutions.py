@@ -7,8 +7,10 @@ Save All Feasible Solutions
 
 # %%
 # Prepare the master and subproblem for Benders decomposition.
+
 from benderslib import ClassicalBenders, CallbackBase, CST
 from benderslib.solvers import Gurobi
+
 from gurobipy import Model, GRB
 
 
@@ -35,6 +37,7 @@ def make_sub_problem():
 
 # %%
 # Define a custom callback to save all feasible solutions.
+
 class SaveSolutionsCallback(CallbackBase):
     def __init__(self):
         self.feasible_solutions = []
@@ -55,11 +58,12 @@ class SaveSolutionsCallback(CallbackBase):
 
 
 # %%
-# Using the callback in the Benders decomposition process.
+# Use the callback in the Benders decomposition process.
+
 master_model, complicating_vars = make_master_problem()
 sub_model = make_sub_problem()
 
-benders = ClassicalBenders.from_models(
+BD = ClassicalBenders.from_models(
     master_model, Gurobi,
     sub_model, Gurobi,
     complicating_vars=complicating_vars
@@ -67,10 +71,10 @@ benders = ClassicalBenders.from_models(
 
 # Register the callback
 save_cb = SaveSolutionsCallback()
-benders.register_callback(save_cb)
+BD.register_callback(save_cb)
 
 # Solve the problem
-benders.solve()
+BD.solve()
 
 # Print all saved feasible solutions
 print("\nAll feasible solutions found during the Benders process:")

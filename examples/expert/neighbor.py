@@ -11,6 +11,7 @@ Cut from Master Solution Neighbor
 from benderslib import ClassicalBenders, AnnotationBenders, CallbackBase, ClassicalOC, CST
 from benderslib.solvers import Gurobi
 from benderslib.utils import draw_curve
+
 from gurobipy import Model, GRB
 
 
@@ -121,9 +122,9 @@ class TwoCuts(CallbackBase):
 #
 #    The cut is generated from the subproblem solved at a neighbor of the current master solution,
 #    and it is added to the master problem only if it is violated by the current master solution.
-
-# %%
+#
 # Run with the callback.
+
 model, complicating_vars = make_original_problem()
 model_copy = model.copy()
 
@@ -133,22 +134,32 @@ BD = AnnotationBenders(
     complicating_vars=complicating_vars,
     benders=ClassicalBenders
 )
+
 callback = TwoCuts()
 BD.benders.register_callback(callback)
+
+# This example works well with the branch-and-check method, try it!
+# BD.params.use_bnc = True
+
 BD.solve()
 draw_curve(BD.result)
 
 # %%
 # Run without the callback.
+
 BD = AnnotationBenders(
     model_copy,
     solver=Gurobi,
     complicating_vars=complicating_vars,
     benders=ClassicalBenders
 )
+
+# This example works well with the branch-and-check method, try it!
+# BD.params.use_bnc = True
+
 BD.solve()
 draw_curve(BD.result)
 
 # %%
 #
-# .. tags:: benders: classical, solver: gurobi, deterministic, callback, enhancement
+# .. tags:: benders: classical, solver: gurobi, deterministic, callback, enhancement, branch-and-check

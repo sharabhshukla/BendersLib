@@ -8,8 +8,10 @@ Simple Callback
 
 # %%
 # Prepare the master and subproblem for Benders decomposition.
+
 from benderslib import ClassicalBenders, CallbackBase, BendersContext, CST
 from benderslib.solvers import Gurobi
+
 from gurobipy import Model, GRB
 
 
@@ -36,6 +38,7 @@ def make_sub_problem():
 
 # %%
 # Define a custom callback by inheriting from CallbackBase.
+
 class MyCallback(CallbackBase):
     some_persistent_data = ">>>>>>>> Hi there! >>>>>>>>>"
 
@@ -46,6 +49,7 @@ class MyCallback(CallbackBase):
 
 # %%
 # Define a lightweight function as a callback.
+
 def on_iteration_end(context: BendersContext):
     print(f"Starting iteration: {context.state.n_iter} ...")
 
@@ -55,24 +59,26 @@ def on_iteration_end(context: BendersContext):
 
 
 # %%
-# Using the callback in the Benders decomposition process.
+# Use the callback in the Benders decomposition process.
+
 master_model, complicating_vars = make_master_problem()
 sub_model = make_sub_problem()
 
-benders = ClassicalBenders.from_models(
+BD = ClassicalBenders.from_models(
     master_model, Gurobi,
     sub_model, Gurobi,
     complicating_vars=complicating_vars
 )
+
 # Turn off console logging
-benders.params.log_to_console = False
+BD.params.log_to_console = False
 
 # Register the callback
-benders.register_callback(MyCallback)
-benders.register_callback(on_iteration_end)
+BD.register_callback(MyCallback)
+BD.register_callback(on_iteration_end)
 
 # Solve the problem
-benders.solve()
+BD.solve()
 
 # %%
 #

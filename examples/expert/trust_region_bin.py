@@ -7,9 +7,11 @@ Trust Region Method (Hamming Distance)
 
 # %%
 # Prepare the problem for Benders decomposition.
+
 from benderslib import ClassicalBenders, AnnotationBenders, CallbackBase
 from benderslib.solvers import Gurobi
 from benderslib.utils import draw_curve
+
 from gurobipy import Model, GRB, LinExpr
 
 
@@ -37,6 +39,7 @@ def make_original_problem():
 
 # %%
 # Define the trust region callback.
+
 class TrustRegionCallback(CallbackBase):
 
     def __init__(self, radius, till_iter=20):
@@ -104,6 +107,7 @@ class TrustRegionCallback(CallbackBase):
 #     Therefore, **trust region must be removed after certain iterations** to ensure global convergence.
 #
 # Run with the trust region callback.
+
 model, complicating_vars = make_original_problem()
 model_copy = model.copy()
 
@@ -113,19 +117,23 @@ BD = AnnotationBenders(
     complicating_vars=complicating_vars,
     benders=ClassicalBenders
 )
+
 trust_region_callback = TrustRegionCallback(4, till_iter=80)
 BD.benders.register_callback(trust_region_callback)
+
 BD.solve()
 draw_curve(BD.result)
 
 # %%
 # Run without the trust region callback.
+
 BD_no_tr = AnnotationBenders(
     model_copy,
     solver=Gurobi,
     complicating_vars=complicating_vars,
     benders=ClassicalBenders
 )
+
 BD_no_tr.solve()
 draw_curve(BD_no_tr.result)
 

@@ -7,11 +7,14 @@ Cut Normalization
 
 # %%
 # Prepare the problem for Benders decomposition.
+
+import math
+
 from benderslib import AnnotationBenders, ClassicalBenders, CallbackBase
 from benderslib.solvers import Gurobi
-from gurobipy import Model, GRB
-import math
 from benderslib.utils import draw_curve
+
+from gurobipy import Model, GRB
 
 
 def make_original_problem():
@@ -39,6 +42,7 @@ def make_original_problem():
 
 # %%
 # Define a callback to normalize Benders cuts if their norm exceeds a threshold.
+
 class CutNormalization(CallbackBase):
 
     # This callback hooks into the cut generation process and checks the L2 norm
@@ -76,25 +80,28 @@ class CutNormalization(CallbackBase):
 
 
 # %%
-# Using the callback in the Benders decomposition process.
-if __name__ == "__main__":
-    model, complicating_vars = make_original_problem()
-    benders = AnnotationBenders(
-        model,
-        solver=Gurobi,
-        complicating_vars=complicating_vars,
-        benders=ClassicalBenders
-    )
+# Use the callback in the Benders decomposition process.
 
-    # Comment out the normalization callback to see the difference in performance.
-    benders.benders.register_callback(CutNormalization())
-    benders.solve()
-    draw_curve(benders.result)
+model, complicating_vars = make_original_problem()
+BD = AnnotationBenders(
+    model,
+    solver=Gurobi,
+    complicating_vars=complicating_vars,
+    benders=ClassicalBenders
+)
 
+# Comment out the normalization callback to see the difference in performance.
+BD.benders.register_callback(CutNormalization())
+
+# This example works well with the branch-and-check method, try it!
+# BD.params.use_bnc = True
+
+BD.solve()
+draw_curve(BD.result)
 
 # %%
 # .. seealso::
 #
 #    - A brief introduction to :ref:`enhance_cut_normalization`.
 #
-# .. tags:: benders: classical, solver: gurobi, deterministic, callback, enhancement
+# .. tags:: benders: classical, solver: gurobi, deterministic, callback, enhancement, branch-and-check

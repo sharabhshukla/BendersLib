@@ -11,6 +11,7 @@ Pareto-optimal Cut
 from benderslib import ClassicalBenders, AnnotationBenders, CallbackBase, ClassicalOC
 from benderslib.solvers import Gurobi
 from benderslib.utils import draw_curve
+
 from gurobipy import Model, GRB
 
 
@@ -38,6 +39,7 @@ def make_original_problem():
 
 # %%
 # Define the (approximate) Pareto-optimal cut callback.
+
 class ParetoCut(CallbackBase):
 
     def __init__(self):
@@ -98,11 +100,11 @@ class ParetoCut(CallbackBase):
 #
 # .. seealso::
 #
-#    Papadakos, N. (2008). Practical enhancements to the Magnanti–Wong method. Operations Research Letters, 36(4), 444–449. https://doi.org/10.1016/j.orl.2008.01.005
+#    Papadakos, N. (2008). Practical enhancements to the Magnanti–Wong method.
+#    Operations Research Letters, 36(4), 444–449. https://doi.org/10.1016/j.orl.2008.01.005
 #
-
-# %%
 # Run with the callback.
+
 model, complicating_vars = make_original_problem()
 model_copy = model.copy()
 
@@ -112,8 +114,10 @@ BD = AnnotationBenders(
     complicating_vars=complicating_vars,
     benders=ClassicalBenders
 )
+
 callback = ParetoCut()
 BD.benders.register_callback(callback)
+
 BD.solve()
 draw_curve(BD.result)
 
@@ -122,15 +126,16 @@ draw_curve(BD.result)
 #
 #     With stronger cuts, in the early stage of the algorithm,
 #     both the upper and lower bounds improve significantly.
-
-# %%
+#
 # Run without the callback.
+
 BD = AnnotationBenders(
     model_copy,
     solver=Gurobi,
     complicating_vars=complicating_vars,
     benders=ClassicalBenders
 )
+
 BD.solve()
 draw_curve(BD.result)
 

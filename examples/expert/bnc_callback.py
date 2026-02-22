@@ -11,6 +11,7 @@ Callback in Branch-and-Check Method
 from benderslib import ClassicalBenders, AnnotationBenders, BendersContext, CST
 from benderslib.solvers import Gurobi
 from benderslib.utils import draw_curve, is_all_integer
+
 from gurobipy import Model, GRB
 
 
@@ -88,6 +89,7 @@ BD = AnnotationBenders(
     complicating_vars=complicating_vars,
     benders=ClassicalBenders
 )
+
 BD.benders.bnc_solve()
 draw_curve(BD.result)
 

@@ -7,9 +7,11 @@ Early Stop
 
 # %%
 # Prepare the problem for Benders decomposition.
+
 from benderslib import AnnotationBenders, ClassicalBenders, CallbackBase, CST
 from benderslib.utils import draw_curve
 from benderslib.solvers import Gurobi
+
 from gurobipy import Model, GRB
 
 
@@ -40,6 +42,7 @@ def make_original_problem():
 # The callback will terminate the Benders process
 # after a certain number of iterations,
 # when there is no improvement in the upper bound.
+
 class EarlyStop(CallbackBase):
 
     def __init__(self, n_iter_threshold):
@@ -74,23 +77,26 @@ class EarlyStop(CallbackBase):
 
 
 # %%
-# Using the callback in the Benders decomposition process.
-if __name__ == '__main__':
-    # Solve original problem for comparison
-    model, complicating_vars = make_original_problem()
+# Use the callback in the Benders decomposition process.
 
-    # Create the Benders decomposition solver
-    AB = AnnotationBenders(model, solver=Gurobi, complicating_vars=complicating_vars, benders=ClassicalBenders)
+# Solve original problem for comparison
+model, complicating_vars = make_original_problem()
 
-    # Register the callback
-    AB.benders.register_callback(EarlyStop(10))
-    AB.solve()
+# Create the Benders decomposition solver
+AB = AnnotationBenders(model, solver=Gurobi, complicating_vars=complicating_vars, benders=ClassicalBenders)
 
-    draw_curve(AB.result)
+# Register the callback
+AB.benders.register_callback(EarlyStop(10))
+
+# This example works well with the branch-and-check method, try it!
+# AB.params.use_bnc = True
+
+AB.solve()
+draw_curve(AB.result)
 
 # %%
 # .. seealso::
 #
 #    - A brief introduction to :ref:`enhance_early_stop`.
 #
-# .. tags:: benders: classical, solver: gurobi, deterministic, callback, enhancement
+# .. tags:: benders: classical, solver: gurobi, deterministic, callback, enhancement, branch-and-check

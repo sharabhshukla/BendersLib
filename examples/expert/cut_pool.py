@@ -11,6 +11,7 @@ Cut Management
 from benderslib import ClassicalBenders, AnnotationBenders, CallbackBase
 from benderslib.solvers import Gurobi
 from benderslib.utils import draw_curve
+
 from gurobipy import Model, GRB
 
 
@@ -38,6 +39,7 @@ def make_original_problem():
 
 # %%
 # Define the cut management callback.
+
 class CutPooling(CallbackBase):
 
     def __init__(self, ratio, frequency):
@@ -105,6 +107,7 @@ class CutPooling(CallbackBase):
 
 # %%
 # Run with the callback.
+
 model, complicating_vars = make_original_problem()
 model_copy = model.copy()
 
@@ -114,8 +117,10 @@ BD = AnnotationBenders(
     complicating_vars=complicating_vars,
     benders=ClassicalBenders
 )
+
 callback = CutPooling(ratio=0.9, frequency=20)
 BD.benders.register_callback(callback)
+
 BD.solve()
 draw_curve(BD.result)
 
@@ -125,15 +130,16 @@ draw_curve(BD.result)
 #    This example demonstrate that the estimator (:math:`\theta`) can be approximated by a subset of
 #    cuts. By only adding the most violated cuts to the master problem, we can reduce the number of
 #    constraints in the master problem.
-
-# %%
+#
 # Run without the callback.
+
 BD_no_cm = AnnotationBenders(
     model_copy,
     solver=Gurobi,
     complicating_vars=complicating_vars,
     benders=ClassicalBenders
 )
+
 BD_no_cm.solve()
 draw_curve(BD_no_cm.result)
 
