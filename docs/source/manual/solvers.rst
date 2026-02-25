@@ -107,7 +107,7 @@ A Benders decomposition variant usually require one or two features to work prop
       - ✅
       - Open-source
     * - **Pyomo** [3]_:
-      - :class:`~.solvers.Pyomo` ``(m, solver='xxx')``
+      - :class:`~.solvers.Pyomo`
       - `Doc <https://pyomo.readthedocs.io>`__
       - \-
       - \-
@@ -119,7 +119,7 @@ A Benders decomposition variant usually require one or two features to work prop
       - `Doc <https://www.coin-or.org/Cbc/cbcuserguide.html>`__
       - ✅
       - ❌
-      - ❌
+      - ✅
       - ❌
       - Open-source
     * - CPLEX
@@ -127,7 +127,7 @@ A Benders decomposition variant usually require one or two features to work prop
       - `Doc <https://www.ibm.com/docs/en/icos/22.1.2?topic=optimizers-users-manual-cplex>`__
       - ✅
       - ❌
-      - 🟥 [4]_
+      - ✅
       - ❌
       - Commercial
     * - GLPK
@@ -135,7 +135,7 @@ A Benders decomposition variant usually require one or two features to work prop
       - `Doc <https://www.gnu.org/software/glpk/>`__
       - ✅
       - ❌
-      - ❌
+      - ✅
       - ❌
       - Open-source
     * - Gurobi
@@ -143,7 +143,7 @@ A Benders decomposition variant usually require one or two features to work prop
       - `Doc <https://docs.gurobi.com>`__
       - ✅
       - ❌
-      - 🟥 [4]_
+      - ✅
       - ❌
       - Commercial
     * - HiGHS
@@ -159,15 +159,15 @@ A Benders decomposition variant usually require one or two features to work prop
       - `Doc <https://docs.mosek.com>`__
       - ✅
       - ❌
-      - ❌
+      - ✅
       - ❌
       - Commercial
     * - SCIP
       - ``'scip'``
       - `Doc <https://www.scipopt.org>`__
-      - 🟥 [5]_
+      - 🟥 [2]_
       - ❌
-      - ❌
+      - ✅
       - ❌
       - Open-source
     * - Xpress
@@ -175,22 +175,20 @@ A Benders decomposition variant usually require one or two features to work prop
       - `Doc <https://www.fico.com/en/products/fico-xpress-optimization>`__
       - ✅
       - ❌
-      - 🟥 [4]_
+      - ✅
       - ❌
       - Commercial
 
 .. [1] *Here we only use the CP-SAT solver provided by OR-Tools for Constraint Programming (CP).*
 .. [2] *SCIP may return incorrect dual values*
-       (`this discussion <https://stackoverflow.com/a/79562415/6729710>`_ *and*
+       (*see* `this discussion <https://stackoverflow.com/a/79562415/6729710>`_ *and*
        `documentation <https://pyscipopt.readthedocs.io/en/latest/tutorials/constypes.html#constraint-information>`_;
-       `this issue <https://github.com/scipopt/PySCIPOpt/issues/228>`_).
+       *and* `this issue <https://github.com/scipopt/PySCIPOpt/issues/228>`_).
+       *All-zero dual values are returned when using SCIP in Pyomo.*
 .. [3] *Pyomo is a modeling language. Supported solvers must be installed separately, see*
        :ref:`solver-installation-table` *(by BendersLib),*
        `installation instruction <https://pyomo.readthedocs.io/en/stable/getting_started/solvers.html>`_ *(by Pyomo),*
        *and* `supported solvers <https://github.com/Pyomo/pyomo/tree/main/pyomo/solvers/plugins/solvers>`_.
-.. [4] *Pyomo supports IIS through a third-party module that requires file I/O.*
-       *We do not provide this feature in BendersLib.*
-.. [5] *All-zero dual values are returned when using SCIP in Pyomo.*
 
 .. Nonlinear Solvers: IPOPT, Minotaur, Baron, KNITRO
 .. CP Solvers: Xpress Kalis, python-constraint, Z3, via MiniZinc (https://docs.minizinc.dev/en/stable/solvers.html)

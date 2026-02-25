@@ -1,10 +1,13 @@
 # coding:utf-8
 
+import io
+import logging
+
 import pyomo.environ as pyo
 from pyomo.core import Var, Objective, Constraint, Suffix
 from pyomo.core.expr.visitor import identify_variables
 from pyomo.repn import generate_standard_repn
-# from pyomo.contrib.iis import write_iis
+from pyomo.contrib.iis.mis import compute_infeasibility_explanation as mis
 
 from ..consts import BendersConsts as CST
 from ._base import SolverBase
@@ -192,19 +195,54 @@ class Pyomo(SolverBase):
             self.model.solutions.load_from(results)
 
     def compute_iis(self):
-        raise NotImplementedError("IIS computation is not supported in the Pyomo interface.")
+        log_stream = io.StringIO()
 
-        _temp_ilp_file = "_temp_iis.ilp"
-        _solver_name = self.__solver_name
-        _solver_name.replace('_direct', '')
+        logging.getLogger('pyomo').setLevel(logging.ERROR)
+        logger = logging.getLogger('pyomo.contrib.iis')
+        logger.propagate = False
 
-        assert _solver_name in ['cplex', 'gurobi', 'xpress'], \
-            "Pyomo IIS computation is only supported for 'cplex', 'gurobi', and 'xpress'."
+        logger.setLevel(logging.INFO)
+        handler = logging.StreamHandler(log_stream)
+        logger.addHandler(handler)
 
-        _temp_ilp_file = write_iis(self.model, _temp_ilp_file, _solver_name)
-        var_names = read_lp(_temp_ilp_file)
+        _solver = pyo.SolverFactory(self.__solver_name, load_solutions=False)
+        mis(self.model, solver=_solver, logger=logger)
+        logger.removeHandler(handler)
+        logger.propagate = True
 
-        return var_names
+        output = log_stream.getvalue()
+
+        return self.__get_mis_vars(output)
+
+    def __get_mis_vars(self, mis_output: str):
+        mis_cons = []
+        mis_vars = set()
+
+        in_mis_section = False
+        for line in mis_output.splitlines():
+            line = line.strip()
+            if not line:
+                continue
+
+            if "Computed Minimal Intractable System (MIS)!" in line:
+                in_mis_section = True
+                continue
+
+            if in_mis_section:
+                parts = line.split('\t')
+                for part in parts:
+                    part = part.strip()
+                    if part.startswith("constraint:"):
+                        mis_cons.append(part.replace("constraint:", "").strip())
+                    elif part.startswith("ub of var") or part.startswith("lb of var"):
+                        mis_vars.add(part.split()[-1])
+
+        for c_name in mis_cons:
+            constraint = getattr(self.model, c_name)
+            for var in identify_variables(constraint.expr):
+                mis_vars.add(var.name)
+
+        return mis_vars
 
     @staticmethod
     def make_master_problem(original_model: pyo.ConcreteModel, master_vars: list[str]) -> pyo.ConcreteModel:
