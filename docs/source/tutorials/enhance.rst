@@ -224,8 +224,11 @@ divide the cut by the norm of its coefficients.
 .. admonition:: Example
     :class: seealso
 
-    This example (:doc:`../examples/expert/normalize_cut`) demonstrates how to
-    implement cut normalization in BendersLib using :doc:`../manual/callbacks`.
+    - This example (:doc:`../examples/expert/normalize_cut`) demonstrates how to
+      implement cut normalization in BendersLib using :doc:`../manual/callbacks`.
+    - More easily, use the parameters
+      :attr:`~benderslib.BendersParams.cut_normalize` and
+      :attr:`~benderslib.BendersParams.cut_max_norm`.
 
 ------
 

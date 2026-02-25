@@ -12,6 +12,7 @@ from .result import BendersResult
 from .solvers import SolverBase
 from .logger import BendersLogger
 from .callback import BendersContext, CallbackBase, _CallbackEvents as EVENTS, _CallbackManager
+from .utils import normalize_cut
 
 
 class ProblemBase:
@@ -1407,6 +1408,11 @@ class BendersSolver:
         The method to add one or multiple :class:`OptimalityCut` to :class:`MasterProblem`.
         """
         cuts = self.optimality_cut._generate()
+
+        # Normalize cuts
+        if self.params.cut_normalize:
+            cuts = [normalize_cut(cut, self.params.cut_max_norm) for cut in cuts]
+
         self._context.current_opti_cuts = cuts
         if self.__trigger_callbacks_and_terminate(EVENTS.ON_OPTI_CUT_GENERATED):
             return CST.TERMINATE
@@ -1423,6 +1429,11 @@ class BendersSolver:
         The method to add one or multiple :class:`FeasibilityCut` to :class:`MasterProblem`.
         """
         cuts = self.feasibility_cut._generate()
+
+        # Normalize cuts
+        if self.params.cut_normalize:
+            cuts = [normalize_cut(cut, self.params.cut_max_norm) for cut in cuts]
+
         self._context.current_feas_cuts = cuts
         if self.__trigger_callbacks_and_terminate(EVENTS.ON_FEAS_CUT_GENERATED):
             return CST.TERMINATE

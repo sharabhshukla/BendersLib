@@ -3,12 +3,6 @@ Data Classes
 
 .. currentmodule:: benderslib
 
-Constants
---------------------------------------
-
-.. autoclass:: BendersConsts
-   :inherited-members:
-
 Parameters
 --------------------------------------
 
@@ -21,3 +15,9 @@ Results and Statistics
 .. autoclass:: BendersResult
    :inherited-members:
    :show-inheritance:
+
+Constants
+--------------------------------------
+
+.. autoclass:: BendersConsts
+   :inherited-members:

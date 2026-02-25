@@ -50,6 +50,24 @@ class BendersParams:
     When adding a cut, if all coefficients and right-hand side (RHS) differ from an existing cut 
     by no more than ``tol_cut_diff``, the new cut is considered duplicate and will not be added.
     """
+    cut_normalize: bool = False
+    """Whether to normalize the cut coefficients and right-hand side (RHS) when adding a cut.
+    
+    If ``True``, the cut coefficients and RHS are normalized to have an L2 norm of at 
+    most :attr:`~BendersParams.cut_max_norm` before being added to the master problem.
+    This can help improve numerical stability in the master problem solver, especially 
+    when the :ref:`cut coefficients have large magnitudes <manual_numerical_large_cut_coefficients>`.
+    If ``False``, the cut coefficients and RHS are not normalized, and are added to 
+    the master problem as they are generated.
+    """
+    cut_max_norm: float = 1e5
+    """The maximum allowed L2 norm for the cuts' coefficients when normalizing cuts.
+
+    This parameter is used when :attr:`~BendersParams.cut_normalize` is ``True``.
+    When normalizing a cut, if the L2 norm of the cut's coefficient vector exceeds this threshold,
+    the coefficients and right-hand side (RHS) of the cut are scaled down to have an L2 norm equal 
+    to this threshold; otherwise, the cut is not modified.
+    """
 
     # Convergence
 
