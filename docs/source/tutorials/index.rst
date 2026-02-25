@@ -94,7 +94,6 @@ Contents
    ilshaped.rst
    lbbd.rst
    gbd.rst
-   nested.rst
    enhance.rst
 
 References
