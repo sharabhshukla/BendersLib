@@ -1,7 +1,7 @@
 # coding:utf-8
 
 """
-CPLEX CP IIS
+CP Optimizer IIS
 =======================================
 
 """

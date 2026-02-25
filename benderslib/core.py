@@ -1744,6 +1744,7 @@ class BendersSolver:
             self.result.obj = obj
             self.result.lb_list.append(obj)
             self.result.ub_list.append(obj)
+            self.result.obj_list.append(obj)
             self.result.gap = 0.0
             self.result.gap_abs = 0.0
 

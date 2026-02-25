@@ -90,14 +90,14 @@ Please refer to :ref:`solver-table` for solver features and license requirements
       - ``pip install coptpy``
       - N/A
       - `Install <https://guide.coap.online/copt/en-doc/pythoninterface.html#chappythoninterface>`__
-    * - **CPLEX** [1]_
+    * - **CPLEX**
       - ``pip install cplex``
       - ``conda install ibmdecisionoptimization::cplex``
-      - `Install <https://www.ibm.com/docs/en/icos/22.1.2?topic=cplex-installing>`__ [2]_
-    * - **CPLEX** (CP) [3]_
+      - `Install <https://www.ibm.com/docs/en/icos/22.1.2?topic=cplex-installing>`__ [1]_
+    * - **CP Optimizer**
       - ``pip install docplex``
       - ``conda install ibmdecisionoptimization::docplex``
-      - `Install <https://www.ibm.com/docs/en/icos/22.1.2?topic=cplex-installing>`__ [2]_
+      - `Install <https://www.ibm.com/docs/en/icos/22.1.2?topic=cplex-installing>`__ [1]_
     * - **Gurobi**
       - ``pip install gurobipy``
       - ``conda install gurobi::gurobi``
@@ -110,7 +110,7 @@ Please refer to :ref:`solver-table` for solver features and license requirements
       - ``pip install pyscipopt``
       - ``conda install conda-forge::pyscipopt``
       - `Install <https://pyscipopt.readthedocs.io/en/latest/install.html>`__
-    * - **Pyomo** [4]_:
+    * - **Pyomo** [2]_:
       - ``pip install pyomo``
       - ``conda install conda-forge::pyomo``
       - `Install <https://pyomo.readthedocs.io/en/stable/getting_started/installation.html>`__
@@ -147,13 +147,10 @@ Please refer to :ref:`solver-table` for solver features and license requirements
       - ``conda install fico-xpress::xpress``
       - `Install <https://www.fico.com/fico-xpress-optimization/docs/latest/installguide/dhtml/chapinst1.html>`__
 
-.. [1] *The CPLEX Mathematical Programming API used in BendersLib.*
-.. [2] *Previous commands install only the Python API. You still need to install the solver engine separately.*
-.. [3] *The CPLEX Constraint Programming (CP) API used in BendersLib.*
-.. [4]  *Pyomo is a modeling language. Supported solvers must be installed separately, see*
+.. [1] *Previous commands install only the Python API. You still need to install the solver engine separately.*
+.. [2]  *Pyomo is a modeling language. Supported solvers must be installed separately, see*
         `installation instruction <https://pyomo.readthedocs.io/en/stable/getting_started/solvers.html>`_ *(by Pyomo)*
         *and* `supported solvers <https://github.com/Pyomo/pyomo/tree/main/pyomo/solvers/plugins/solvers>`_.
-        *The above list of solvers is not exhaustive. BendersLib's Pyomo interface can also utilize other solvers supported by Pyomo.*
 
 Troubleshooting
 ------------------------------------

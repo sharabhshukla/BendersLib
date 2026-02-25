@@ -1,9 +1,43 @@
 # coding:utf-8
 
-from pyscipopt import Model, Expr, SCIP_PARAMSETTING
+from pyscipopt import Model, Expr, SCIP_PARAMSETTING, Conshdlr, SCIP_RESULT, SCIP_PROPTIMING, SCIP_PRESOLTIMING
 
 from ..consts import BendersConsts as CST
 from ._base import SolverBase
+
+
+class _ScipConshdlr(Conshdlr):
+
+    def __init__(self, solver_instance):
+        super().__init__()
+        self.solver = solver_instance
+
+    def conscheck(self, constraints, solution, check_integrality, check_lp_rows, print_reason, completely, **results):
+        return {"result": SCIP_RESULT.INFEASIBLE}
+
+    def consenfolp(self, constraints, n_useful_conss, sol_infeasible):
+        self.solver._callback_where = CST.INCUMBENT
+
+        # SCIP may call this with sol=None, which means the current LP solution.
+        # We are only interested in integer feasible solutions.
+        # getBestSol() gives us the best integer solution found so far.
+
+        sol = self.model.getBestSol()
+        if sol is None:
+            return {"result": SCIP_RESULT.DIDNOTRUN}
+
+        benders_result = self.solver._callback_handler(self.solver)
+
+        if benders_result == CST.TERMINATE:
+            self.model.interruptSolve()
+            return {"result": SCIP_RESULT.FEASIBLE}
+
+        return {"result": SCIP_RESULT.INFEASIBLE}
+
+    def conslock(self, constraint, locktype, nlockspos, nlocksneg):
+        # Lock all master problem variables.
+        for var in self.solver._vars_map.values():
+            self.model.addVarLocks(var, nlocksneg, nlockspos)
 
 
 class Scip(SolverBase):
@@ -23,6 +57,8 @@ class Scip(SolverBase):
 
     __SCIP_VAR_UB = 1e20
     """Default upper bound for SCIP variables."""
+    __SCIP_INVALID = 1e99
+    """A large number that SCIP uses to indicate invalid duals or extreme rays."""
 
     def __init__(self, model: Model, solver_options: dict = None) -> None:
         super().__init__(model)
@@ -34,6 +70,8 @@ class Scip(SolverBase):
         # Attributes required by SolverBase
         self.model = model
         self.status = CST.UNSOLVED
+
+        self._callback_where = None
 
         self._sense = CST.MIN if self.model.getObjectiveSense() == 'minimize' else CST.MAX
         self._all_vars = list(self._vars_map.keys())
@@ -165,18 +203,26 @@ class Scip(SolverBase):
     def get_dual_values(self) -> list[float]:
         cons = self.model.getConss(transformed=False)
         duals = [self.model.getDualSolVal(c) for c in cons]
+
+        if self.__SCIP_INVALID in duals:
+            raise ValueError("SCIP returned an invalid dual value with 1e+99.")
+
         return duals
 
     def get_extreme_ray(self) -> list[float]:
         cons = self.model.getConss(transformed=False)
         ray = [self.model.getDualfarkasLinear(c) for c in cons]
 
+        if self.__SCIP_INVALID in ray:
+            raise ValueError("SCIP returned an invalid extreme ray with 1e+99.")
+
         # SCIP returns Farkas Dual with opposite sign to Gurobi
         ray = [-r for r in ray]
         return ray
 
     def get_obj(self) -> float:
-        return self.model.getObjVal()
+        obj = self.model.getObjVal()
+        return obj
 
     def add_cut(self, cut, name=None) -> None:
         lhs = sum(coef * self._vars_map[var] for var, coef in zip(cut.vars, cut.coefs))
@@ -203,6 +249,50 @@ class Scip(SolverBase):
         # self.model.freeTransform()
         self.model.optimize()
         self._update_status('SCIP', self.model.getStatus().lower())
+
+    def _bnc_solve(self, callback_handler) -> None:
+        # Callback
+        self._callback_handler = callback_handler
+
+        # Constraint handler
+        # https://github.com/scipopt/PySCIPOpt/blob/master/examples/finished/lotsizing_lazy.py
+        # https://github.com/scipopt/PySCIPOpt/blob/master/examples/unfinished/tsp_lazy.py
+        conshdlr = _ScipConshdlr(self)
+        self.model.includeConshdlr(
+            conshdlr, "BendersCut", "Constraint handler for Benders cuts",
+            sepapriority=0, enfopriority=-1, chckpriority=-1, sepafreq=-1, propfreq=-1,
+            eagerfreq=-1, maxprerounds=0, delaysepa=False, delayprop=False, needscons=False,
+            presoltiming=SCIP_PRESOLTIMING.FAST, proptiming=SCIP_PROPTIMING.BEFORELP
+        )
+
+        # Solve
+        self.model.optimize()
+        self._update_status('SCIP', self.model.getStatus().lower())
+
+    def _cb_get_obj(self):
+        obj = self.model.getObjVal()
+        return obj
+
+    def _cb_get_bound(self):
+        lb = self.model.getLowerbound()
+        return lb
+
+    def _cb_get_var_values(self, vars: list[str] | None = None) -> dict[str, float]:
+        vars_to_get = vars or self._all_vars
+        sol = self.model.getBestSol()
+
+        return {var: self.model.getSolVal(sol, self._vars_map[var]) for var in vars_to_get}
+
+    def _cb_add_cut(self, cut) -> None:
+
+        lhs = sum(coef * self._vars_map[var] for var, coef in zip(cut.vars, cut.coefs))
+
+        if cut.sense == CST.EQ:
+            self.model.addCons(lhs == cut.rhs)
+        elif cut.sense == CST.LE:
+            self.model.addCons(lhs <= cut.rhs)
+        elif cut.sense == CST.GE:
+            self.model.addCons(lhs >= cut.rhs)
 
     def compute_iis(self) -> set[str]:
         self.model.hideOutput()

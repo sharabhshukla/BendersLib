@@ -13,8 +13,8 @@ def draw_curve(result: BendersResult):
     # Draw convergence curve
     fig, ax1 = plt.subplots()
 
-    ax1.plot(result.lb_list, label='LB')
-    ax1.plot(result.ub_list, label='UB')
+    ax1.plot(result.lb_list, label='Lower Bound')
+    ax1.plot(result.ub_list, label='Upper Bound')
     ax1.plot(result.obj_list, label='Incumbent')
     ax1.set_xlabel('Iteration')
     ax1.set_ylabel('Objective')
@@ -24,10 +24,11 @@ def draw_curve(result: BendersResult):
     # Draw Gap on the right axis
     ax2 = ax1.twinx()
     gap = [
-        (ub - lb) / abs(ub) if abs(ub) > 1e-4 else float('inf') for lb, ub in zip(result.lb_list, result.ub_list)
+        (obj - lb) / abs(obj) if abs(obj) > 1e-4 else float('inf')
+        for lb, obj in zip(result.lb_list, result.obj_list)
     ]
     ax2.plot(gap, 'k--', label='Gap')
-    ax2.set_ylabel('Gap (%)')
+    ax2.set_ylabel('Gap')
     ax2.tick_params(axis='y')
 
     ax2.set_ylim(0, 1)

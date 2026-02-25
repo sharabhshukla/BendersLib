@@ -39,6 +39,12 @@ A Benders decomposition variant usually require one or two features to work prop
   This requires the master problem solver to support callback functions for adding cuts during the
   branch-and-bound process.
 
+.. admonition:: Examples
+    :class: seealso
+
+    - See :doc:`../examples/solvers/index` for example code using different solvers with BendersLib.
+    - See :doc:`../examples/iis/index` for example code of computing IIS with different solvers.
+
 .. list-table:: Supported Solvers' Features
     :widths: auto
     :header-rows: 1
@@ -51,7 +57,7 @@ A Benders decomposition variant usually require one or two features to work prop
       - Farkas
       - IIS
       - BnC
-      - License [2]_
+      - License
     * - **COPT**
       - :class:`~.solvers.Copt`
       - `Doc <https://guide.coap.online/copt/en-doc/>`__
@@ -61,15 +67,15 @@ A Benders decomposition variant usually require one or two features to work prop
       - ✅
       - Commercial
     * - **CPLEX**
-      - :class:`~.solvers.Cplex` (Mathematical Programming)
+      - :class:`~.solvers.Cplex`
       - `Doc <https://www.ibm.com/docs/en/icos/22.1.2?topic=optimizers-cplex-python-api-reference-manual>`__
       - ✅
       - ✅
       - ✅
       - ✅
       - Commercial
-    * - **CPLEX**
-      - :class:`~.solvers.CplexCP` (Constraint Programming)
+    * - **CP Optimizer**
+      - :class:`~.solvers.CplexCP`
       - `Doc <https://ibmdecisionoptimization.github.io/docplex-doc/cp/docplex.cp.model.py.html>`__
       - ❌
       - ❌
@@ -84,24 +90,24 @@ A Benders decomposition variant usually require one or two features to work prop
       - ✅
       - ✅
       - Commercial
-    * - **OR-Tools** [6]_
-      - :class:`~.solvers.Ortools` (Constraint Programming)
+    * - **OR-Tools** [1]_
+      - :class:`~.solvers.Ortools`
       - `Doc <https://developers.google.com/optimization/cp>`__
       - ❌
       - ❌
-      - ✅ [7]_
+      - ✅
       - ❌
       - Open-source
     * - **SCIP**
       - :class:`~.solvers.Scip`
       - `Doc <https://pyscipopt.readthedocs.io>`__
-      - 🟨 [3]_
+      - 🟨 [2]_
       - ✅
       - ✅
-      -
+      - ✅
       - Open-source
-    * - **Pyomo** [1]_:
-      - :class:`~.solvers.Pyomo`
+    * - **Pyomo** [3]_:
+      - :class:`~.solvers.Pyomo` ``(m, solver='xxx')``
       - `Doc <https://pyomo.readthedocs.io>`__
       - \-
       - \-
@@ -109,69 +115,82 @@ A Benders decomposition variant usually require one or two features to work prop
       - \-
       - Open-source
     * - CBC
-      - :class:`~.solvers.Pyomo` (``'cbc'``)
+      - ``'cbc'``
       - `Doc <https://www.coin-or.org/Cbc/cbcuserguide.html>`__
       - ✅
       - ❌
       - ❌
-      -
+      - ❌
       - Open-source
     * - CPLEX
-      - :class:`~.solvers.Pyomo` (``'cplex'``, ``'cplex_direct'`` [4]_)
+      - ``'cplex'``, ``'cplex_direct'``
       - `Doc <https://www.ibm.com/docs/en/icos/22.1.2?topic=optimizers-users-manual-cplex>`__
       - ✅
       - ❌
-      - 🟥 [8]_
-      -
+      - 🟥 [4]_
+      - ❌
       - Commercial
     * - GLPK
-      - :class:`~.solvers.Pyomo` (``'glpk'``)
+      - ``'glpk'``
       - `Doc <https://www.gnu.org/software/glpk/>`__
       - ✅
       - ❌
       - ❌
-      -
+      - ❌
       - Open-source
     * - Gurobi
-      - :class:`~.solvers.Pyomo` (``'gurobi'``, ``'gurobi_direct'`` [4]_)
+      - ``'gurobi'``, ``'gurobi_direct'``
       - `Doc <https://docs.gurobi.com>`__
       - ✅
       - ❌
-      - 🟥 [8]_
-      -
+      - 🟥 [4]_
+      - ❌
       - Commercial
     * - HiGHS
-      - :class:`~.solvers.Pyomo` (``'highs'``)
+      - ``'highs'``
       - `Doc <https://highs.dev>`__
       - ✅
       - ❌
       - ❌
-      -
+      - ❌
       - Open-source
     * - MOSEK
-      - :class:`~.solvers.Pyomo` (``'mosek'``, ``'mosek_direct'`` [4]_)
+      - ``'mosek'``, ``'mosek_direct'``
       - `Doc <https://docs.mosek.com>`__
       - ✅
       - ❌
       - ❌
-      -
+      - ❌
       - Commercial
     * - SCIP
-      - :class:`~.solvers.Pyomo` (``'scip'``)
+      - ``'scip'``
       - `Doc <https://www.scipopt.org>`__
       - 🟥 [5]_
       - ❌
       - ❌
-      -
+      - ❌
       - Open-source
     * - Xpress
-      - :class:`~.solvers.Pyomo` (``'xpress'``, ``'xpress_direct'`` [4]_)
+      - ``'xpress'``, ``'xpress_direct'``
       - `Doc <https://www.fico.com/en/products/fico-xpress-optimization>`__
       - ✅
       - ❌
-      - 🟥 [8]_
-      -
+      - 🟥 [4]_
+      - ❌
       - Commercial
+
+.. [1] *Here we only use the CP-SAT solver provided by OR-Tools for Constraint Programming (CP).*
+.. [2] *SCIP may return incorrect dual values*
+       (`this discussion <https://stackoverflow.com/a/79562415/6729710>`_ *and*
+       `documentation <https://pyscipopt.readthedocs.io/en/latest/tutorials/constypes.html#constraint-information>`_;
+       `this issue <https://github.com/scipopt/PySCIPOpt/issues/228>`_).
+.. [3] *Pyomo is a modeling language. Supported solvers must be installed separately, see*
+       :ref:`solver-installation-table` *(by BendersLib),*
+       `installation instruction <https://pyomo.readthedocs.io/en/stable/getting_started/solvers.html>`_ *(by Pyomo),*
+       *and* `supported solvers <https://github.com/Pyomo/pyomo/tree/main/pyomo/solvers/plugins/solvers>`_.
+.. [4] *Pyomo supports IIS through a third-party module that requires file I/O.*
+       *We do not provide this feature in BendersLib.*
+.. [5] *All-zero dual values are returned when using SCIP in Pyomo.*
 
 .. Nonlinear Solvers: IPOPT, Minotaur, Baron, KNITRO
 .. CP Solvers: Xpress Kalis, python-constraint, Z3, via MiniZinc (https://docs.minizinc.dev/en/stable/solvers.html)
@@ -187,33 +206,13 @@ A Benders decomposition variant usually require one or two features to work prop
 .. Solver List by CBC:          https://github.com/coin-or/Cbc
 .. Solver List by AIMMS:        https://documentation.aimms.com/platform/solvers/solvers.html
 
-.. [1] *Pyomo is a modeling language. Supported solvers must be installed separately, see*
-       :ref:`solver-installation-table` *(by BendersLib),*
-       `installation instruction <https://pyomo.readthedocs.io/en/stable/getting_started/solvers.html>`_ *(by Pyomo),*
-       *and* `supported solvers <https://github.com/Pyomo/pyomo/tree/main/pyomo/solvers/plugins/solvers>`_.
-       *The above list of solvers is not exhaustive. BendersLib's Pyomo interface can also utilize other solvers supported by Pyomo.*
-.. [2] *Commercial solvers require valid licenses to use; ones above offer free academic licenses.*
-.. [3] *Partially supported, bound constraints (constraints with only one variable) are not allowed, due to a SCIP limitation.*
-       *See the*
-       `PySCIPOpt documentation <https://pyscipopt.readthedocs.io/en/latest/tutorials/constypes.html#constraint-information>`_
-       *and*
-       `this discussion <https://stackoverflow.com/a/79562415/6729710>`_.
-       *Violations can cause incorrect dual values, leading to incorrect Benders cuts and convergence problems.*
-.. [4] *"(Pyomo) Direct solver interfaces do not use any file io.*
-       *Rather, they interface directly with the python bindings for the specific solver."*
-       -- `Pyomo source code <https://github.com/Pyomo/pyomo/blob/e0fcc8183406aa5afa1977c2368bcbe9bbbbe9ba/pyomo/solvers/plugins/solvers/direct_or_persistent_solver.py#L26>`_.
-.. [5] *All-zero dual values are returned when using SCIP as a solver.*
-.. [6] *Here we only use the CP-SAT solver provided by OR-Tools for Constraint Programming (CP).*
-.. [7] *May not be irreducible, but always be sufficient.*
-.. [8] *Pyomo supports IIS through a third-party module that requires file I/O. We do not provide this feature in BendersLib.*
-
 These solvers can be categorized into two groups: Mathematical Programming solvers (most of the solvers supported)
 and Constraint Programming solvers (:class:`~.solvers.CplexCP` and :class:`~.solvers.Ortools`),
 which are two different paradigms for solving optimization problems.
 They have distinct approaches and are suited for different types of problems.
 A wise choice between the two can lead to more efficient problem-solving.
 
-.. list-table::
+.. list-table:: Mathematical Programming vs Constraint Programming
    :widths: 25 37 38
    :header-rows: 1
 
