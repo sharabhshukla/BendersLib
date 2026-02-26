@@ -111,7 +111,7 @@ A Benders decomposition variant usually require one or two features to work prop
       - `Doc <https://pyomo.readthedocs.io>`__
       - \-
       - \-
-      - \-
+      - [4]_
       - \-
       - Open-source
     * - CBC
@@ -136,7 +136,7 @@ A Benders decomposition variant usually require one or two features to work prop
       - ✅
       - ❌
       - ✅
-      -
+      - ❌
       - Commercial
     * - GLPK
       - ``'glpk'``
@@ -160,7 +160,7 @@ A Benders decomposition variant usually require one or two features to work prop
       - ✅
       - ✅
       - ✅
-      -
+      - ❌
       - Commercial
     * - HiGHS
       - ``'highs'``
@@ -200,7 +200,7 @@ A Benders decomposition variant usually require one or two features to work prop
       - ✅
       - ❌
       - ✅
-      -
+      - ❌
       - Commercial
 
 .. [1] *Here we only use the CP-SAT solver provided by OR-Tools for Constraint Programming (CP).*
@@ -213,6 +213,7 @@ A Benders decomposition variant usually require one or two features to work prop
        :ref:`solver-installation-table` *(by BendersLib),*
        `installation instruction <https://pyomo.readthedocs.io/en/stable/getting_started/solvers.html>`_ *(by Pyomo),*
        *and* `supported solvers <https://github.com/Pyomo/pyomo/tree/main/pyomo/solvers/plugins/solvers>`_.
+.. [4] *Using* `Minimal Intractable System (MIS) Finder <https://pyomo.readthedocs.io/en/stable/api/pyomo.contrib.iis.mis.html>`_.
 
 .. Nonlinear Solvers: IPOPT, Minotaur, Baron, KNITRO
 .. CP Solvers: Xpress Kalis, python-constraint, Z3, via MiniZinc (https://docs.minizinc.dev/en/stable/solvers.html)
