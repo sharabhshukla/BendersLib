@@ -124,7 +124,7 @@ L = LShaped.from_models(
 
 # L.params.multi_opti_cut = True
 # L.params.multi_feas_cut = True
-# This example works well with the branch-and-check method, try it!
+# This example works well with the Branch-and-check method, try it!
 # L.params.use_bnc = True
 L.params.parallel_sub = True
 

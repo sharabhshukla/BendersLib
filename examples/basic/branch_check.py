@@ -1,7 +1,7 @@
 # coding:utf-8
 
 """
-Branch-and-Check Method
+Branch-and-check Method
 =========================================
 """
 
@@ -37,7 +37,7 @@ def make_original_problem():
 
 
 # %%
-# Solve the problem using Branch-and-Check method:
+# Solve the problem using Branch-and-check method:
 
 model, complicating_vars = make_original_problem()
 BD = AnnotationBenders(

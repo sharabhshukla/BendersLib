@@ -283,10 +283,10 @@ and generate different cuts to obtain better lower bounds, which can accelerate 
 
 .. _enhance_branch_and_check:
 
-Branch-and-Check Method
+Branch-and-check Method
 ------------------------------
 
-The branch-and-check method [#]_ [#]_, also known as branch-and-Benders-cut method [#]_,
+The Branch-and-check method [#]_ [#]_, also known as Branch-and-Benders-cut method [#]_,
 integrates Benders decomposition into a branch-and-bound framework.
 Instead of repeatedly solving the master problem to optimality, it generates cuts at branch-and-bound nodes,
 avoiding the need to build a new tree at each iteration.

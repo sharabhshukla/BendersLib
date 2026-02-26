@@ -136,7 +136,7 @@ class BendersParams:
     # Branch-and-check method
 
     use_bnc: bool = False
-    """**[Branch-and-check]** Whether to use the branch-and-check (branch-and-Benders-cut) method. 
+    """**[Branch-and-check]** Whether to use the Branch-and-check (Branch-and-Benders-cut) method. 
     
     If ``True``, the Benders cut are added as lazy constraints during the branch-and-bound process of the master problem,
     instead of being added after solving the master problem to optimality.
@@ -147,7 +147,7 @@ class BendersParams:
     is equivalent to using :meth:`BendersSolver.bnc_solve()` directly.
     """
     bnc_frac_sol: bool = False
-    """**[Branch-and-check]** Whether to use fractional solutions to generate Benders cuts in the branch-and-check method.
+    """**[Branch-and-check]** Whether to use fractional solutions to generate Benders cuts in the Branch-and-check method.
     
     If ``True``, Benders cuts are generated from fractional solutions of the master problem.
     If ``False``, Benders cuts are generated only from integer feasible solutions of the master problem.

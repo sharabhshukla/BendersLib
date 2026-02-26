@@ -133,7 +133,7 @@ LBBD = LogicBasedBenders.from_models(
 )
 
 # LBBD.params.multi_opti_cut = True
-# This example works well with the branch-and-check method, try it!
+# This example works well with the Branch-and-check method, try it!
 LBBD.params.use_bnc = True
 
 LBBD.solve()

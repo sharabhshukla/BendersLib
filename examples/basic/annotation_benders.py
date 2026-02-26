@@ -57,7 +57,7 @@ AB = AnnotationBenders(model, solver=Gurobi, complicating_vars=complicating_vars
 # master_model, sub_model = AnnotationBenders.decompose(model, Gurobi, complicating_vars, solver_model=True)
 # AB = ClassicalBenders.from_models(master_model, Gurobi, sub_model, Gurobi, complicating_vars=complicating_vars)
 
-# This example works well with the branch-and-check method, try it!
+# This example works well with the Branch-and-check method, try it!
 # AB.params.use_bnc = True
 
 AB.solve()

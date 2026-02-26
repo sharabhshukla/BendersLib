@@ -137,7 +137,7 @@ L = IntegerLShaped.from_models(
     sub_solver=Gurobi,
     complicating_vars=complicating_vars,
 )
-# This example works well with the branch-and-check method, try it!
+# This example works well with the Branch-and-check method, try it!
 L.params.use_bnc = True
 # L.params.parallel_sub = True
 # L.params.multiple_feas_cut = True
@@ -158,7 +158,7 @@ L_IIS = IntegerLShaped.from_models(
     complicating_vars=complicating_vars,
     feasibility_cut=cut_generator,
 )
-# This example works well with the branch-and-check method, try it!
+# This example works well with the Branch-and-check method, try it!
 L_IIS.params.use_bnc = True
 # L_IIS.params.parallel_sub = True
 # L_IIS.params.multiple_feas_cut = True

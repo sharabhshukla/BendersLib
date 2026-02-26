@@ -1,7 +1,7 @@
 # coding:utf-8
 
 """
-Callback in Branch-and-Check Method
+Callback in Branch-and-check Method
 =========================================
 """
 
@@ -61,7 +61,7 @@ def on_opti_cut_generated(context: BendersContext):
 
 
 # %%
-# Solve the problem using Branch-and-Check method with the defined callback.
+# Solve the problem using Branch-and-check method with the defined callback.
 
 model, complicating_vars = make_original_problem()
 model_copy = model.copy()
@@ -81,7 +81,7 @@ BD.benders.bnc_solve()
 draw_curve(BD.result)
 
 # %%
-# Solve the problem using trivial Branch-and-Check method.
+# Solve the problem using trivial Branch-and-check method.
 
 BD = AnnotationBenders(
     model_copy,

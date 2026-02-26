@@ -40,7 +40,7 @@ class ProblemBase:
         self.status = CST.UNSOLVED
         """The status of the problem (see :class:`BendersConsts` for possible values)."""
 
-        # For branch-and-check
+        # For Branch-and-check
         self._using_bnc = False
         self.__handler = None
         self._callback_where = None
@@ -443,8 +443,8 @@ class MasterProblem(ProblemBase):
             return cut.name
 
         elif cut in self.cuts.values():
-            # Duplicate cut checking only applies to non branch-and-check mode,
-            # as in branch-and-check, the same cut may be added multiple times across different nodes.
+            # Duplicate cut checking only applies to non Branch-and-check mode,
+            # as in Branch-and-check, the same cut may be added multiple times across different nodes.
 
             # raise Exception(f"Duplicate cut detected: {cut}")
             BendersLogger.warning(f"Duplicate cut is ignored: {cut}")
@@ -1659,7 +1659,7 @@ class BendersSolver:
         if self.__trigger_callbacks_and_terminate(EVENTS.ON_ITERATION_END): return CST.TERMINATE
 
     def bnc_solve(self):
-        """Solve the problem using branch-and-check method.
+        """Solve the problem using Branch-and-check method.
 
         :ref:`branch-and-check <enhance_branch_and_check>`, or branch-and-Benders-cut, is a
         modern implementation of the Benders decomposition
@@ -1668,30 +1668,30 @@ class BendersSolver:
         it checks the feasibility and optimality of the current solution at each node of the branch-and-bound
         tree and adds cuts as needed.
 
-        The branch-and-check method is epically efficient when the subproblem is relatively easy to solve
+        The Branch-and-check method is epically efficient when the subproblem is relatively easy to solve
         (than the master problem) and the number of cuts needed is large, as it avoids solving the master
         problem multiple times. However, it requires the master problem solver to support callback functions
         for adding cuts during the branch-and-bound process, which is supported by only a subset of
         :doc:`solver interfaces <../manual/solvers>`.
 
-        When running branch-and-check, BendersLib does not check whether the cut generated has been
+        When running Branch-and-check, BendersLib does not check whether the cut generated has been
         already added to the master problem, as another node may encounter the same solution and
-        generate the same cut, which is not necessarily redundant in branch-and-check.
+        generate the same cut, which is not necessarily redundant in Branch-and-check.
         This differs from running the traditional Benders method using :meth:`~BendersSolver.solve()`,
         which warns users about duplicate cuts and skips adding them to the master problem.
 
-        The definition of the lower bound (and the gap) in branch-and-check is different from
+        The definition of the lower bound (and the gap) in Branch-and-check is different from
         the traditional Benders decomposition, as the master problem is not necessarily solved
         to optimality when cuts are added. Therefore, the master problem objective value at
         the current node may not be a valid lower bound for the original problem.
-        In branch-and-check, the lower bound is  obtained from the best bound of the master problem at the current node.
+        In Branch-and-check, the lower bound is  obtained from the best bound of the master problem at the current node.
         Therefore, users should be cautious when interpreting the results and statistics
-        in branch-and-check, and keep in mind that it is not directly comparable
+        in Branch-and-check, and keep in mind that it is not directly comparable
         to the traditional Benders decomposition. The latter is usually stronger.
 
         The :attr:`~BendersResult.runtime_master` also differs from the traditional Benders decomposition,
         as there is not a clear separation that can be used to record the time of solving the master problem.
-        In branch-and-check, :attr:`~BendersResult.runtime_master` simply equals the total
+        In Branch-and-check, :attr:`~BendersResult.runtime_master` simply equals the total
         runtime (:attr:`~BendersResult.runtime`) minus the time spent on solving
         the subproblem (:attr:`~BendersResult.runtime_sub`).
 
@@ -1702,7 +1702,7 @@ class BendersSolver:
 
             The method :meth:`~benderslib.BendersSolver.bnc_solve` is incompatible with
             Benders decomposition instances that have a purely continuous master problem.
-            This is because the branch-and-check method generates cuts on nodes of the
+            This is because the Branch-and-check method generates cuts on nodes of the
             branch-and-bound tree, which does not exist for Linear Programming problems.
 
         Example

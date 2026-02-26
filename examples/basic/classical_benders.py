@@ -86,7 +86,7 @@ BD = ClassicalBenders.from_models(master_model, Gurobi, sub_model, Gurobi, compl
 # sub_problem = SubProblem(solver_backend=Gurobi(sub_model))
 # BD = ClassicalBenders(master_problem, sub_problem, complicating_vars=complicating_vars)
 
-# This example works well with the branch-and-check method, try it!
+# This example works well with the Branch-and-check method, try it!
 # BD.params.use_bnc = True
 
 BD.solve()

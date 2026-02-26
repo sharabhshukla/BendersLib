@@ -64,11 +64,11 @@ LBBD = LogicBasedBenders(
     sub_problem=sub_solver,
     complicating_vars=complicating_vars,
     feasibility_cut=CombinatorialFCGen,
-    # Optimality cut is required for the branch-and-check method,
+    # Optimality cut is required for the Branch-and-check method,
     # as the subproblem can be feasible for some master node solutions.
     optimality_cut=CombinatorialOCGen,
 )
-# This example works well with the branch-and-check method, try it!
+# This example works well with the Branch-and-check method, try it!
 LBBD.params.use_bnc = True
 
 LBBD.solve()

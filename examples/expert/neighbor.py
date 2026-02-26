@@ -138,7 +138,7 @@ BD = AnnotationBenders(
 callback = TwoCuts()
 BD.benders.register_callback(callback)
 
-# This example works well with the branch-and-check method, try it!
+# This example works well with the Branch-and-check method, try it!
 # BD.params.use_bnc = True
 
 BD.solve()
@@ -154,7 +154,7 @@ BD = AnnotationBenders(
     benders=ClassicalBenders
 )
 
-# This example works well with the branch-and-check method, try it!
+# This example works well with the Branch-and-check method, try it!
 # BD.params.use_bnc = True
 
 BD.solve()

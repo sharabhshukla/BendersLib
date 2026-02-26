@@ -251,7 +251,7 @@ class CallbackBase(ABC):
 
         .. caution::
 
-           Not supported in the branch-and-check method.
+           Not supported in the Branch-and-check method.
 
         Parameters
         ---------------
@@ -277,7 +277,7 @@ class CallbackBase(ABC):
 
         .. caution::
 
-           Not supported in the branch-and-check method.
+           Not supported in the Branch-and-check method.
 
         Parameters
         ---------------

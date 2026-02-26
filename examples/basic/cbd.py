@@ -99,7 +99,7 @@ AB = CombinatorialBenders.from_models(
 #     benders=CombinatorialBenders
 # )
 
-# This example works well with the branch-and-check method, try it!
+# This example works well with the Branch-and-check method, try it!
 # AB.params.use_bnc = True
 
 AB.solve()

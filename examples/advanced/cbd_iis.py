@@ -87,7 +87,7 @@ AB = AnnotationBenders(
     feasibility_cut=cut_generator,
     benders=CombinatorialBenders,
 )
-# This example works well with the branch-and-check method, try it!
+# This example works well with the Branch-and-check method, try it!
 AB.params.use_bnc = True
 
 AB.solve()
@@ -101,7 +101,7 @@ AB_ = AnnotationBenders(
     complicating_vars=complicating_vars,
     benders=CombinatorialBenders,
 )
-# This example works well with the branch-and-check method, try it!
+# This example works well with the Branch-and-check method, try it!
 AB_.params.use_bnc = True
 
 AB_.solve()

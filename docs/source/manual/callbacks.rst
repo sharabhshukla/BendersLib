@@ -97,13 +97,13 @@ Benders decomposition algorithm and the specific points at which each callback e
 
 .. _branch-and-check-timeline:
 
-.. rubric:: Timeline of Branch-and-Check Callback Triggers
+.. rubric:: Timeline of Branch-and-check Callback Triggers
 
 The following pseudocode (:func:`~BendersSolver.bnc_solve`) illustrates the main stages of the
 :ref:`branch-and-check method <enhance_branch_and_check>` and the specific points at which
 each callback event is triggered.
 Note that the callback events :meth:`~CallbackBase.on_before_master_solve` and
-:meth:`~CallbackBase.on_after_master_solve` are not triggered in the branch-and-check method.
+:meth:`~CallbackBase.on_after_master_solve` are not triggered in the Branch-and-check method.
 
 .. parsed-literal::
 
