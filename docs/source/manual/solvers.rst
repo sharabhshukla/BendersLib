@@ -130,6 +130,14 @@ A Benders decomposition variant usually require one or two features to work prop
       - ✅
       - ❌
       - Commercial
+    * -
+      - ``'cplex_persistent'``
+      - `Doc <https://www.ibm.com/docs/en/icos/22.1.2?topic=optimizers-users-manual-cplex>`__
+      - ✅
+      - ❌
+      - ✅
+      -
+      - Commercial
     * - GLPK
       - ``'glpk'``
       - `Doc <https://www.gnu.org/software/glpk/>`__
@@ -145,6 +153,14 @@ A Benders decomposition variant usually require one or two features to work prop
       - ❌
       - ✅
       - ❌
+      - Commercial
+    * -
+      - ``'gurobi_persistent'``
+      - `Doc <https://docs.gurobi.com>`__
+      - ✅
+      - ✅
+      - ✅
+      -
       - Commercial
     * - HiGHS
       - ``'highs'``
@@ -165,7 +181,7 @@ A Benders decomposition variant usually require one or two features to work prop
     * - SCIP
       - ``'scip'``
       - `Doc <https://www.scipopt.org>`__
-      - 🟥 [2]_
+      - ❌ [2]_
       - ❌
       - ✅
       - ❌
@@ -177,6 +193,14 @@ A Benders decomposition variant usually require one or two features to work prop
       - ❌
       - ✅
       - ❌
+      - Commercial
+    * -
+      - ``'xpress_persisitent'``
+      - `Doc <https://www.fico.com/en/products/fico-xpress-optimization>`__
+      - ✅
+      - ❌
+      - ✅
+      -
       - Commercial
 
 .. [1] *Here we only use the CP-SAT solver provided by OR-Tools for Constraint Programming (CP).*

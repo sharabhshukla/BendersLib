@@ -9,6 +9,11 @@ PYOMO_OPTIONS:
     'LogToConsole': 0
     'InfUnbdInfo': 1
     'QCPDual': 1
+  gurobi_persistent:
+    'OutputFlag': 0
+    'LogToConsole': 0
+    'InfUnbdInfo': 1
+    'QCPDual': 1
   scip:
     'presolving/maxrounds': 0
     'separating/maxrounds': 0

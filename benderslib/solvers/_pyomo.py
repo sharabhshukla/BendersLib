@@ -4,7 +4,7 @@ import io
 import logging
 
 import pyomo.environ as pyo
-from pyomo.core import Var, Objective, Constraint, Suffix
+from pyomo.core import Var, Objective, Constraint
 from pyomo.core.expr.visitor import identify_variables
 from pyomo.repn import generate_standard_repn
 from pyomo.contrib.iis.mis import compute_infeasibility_explanation as mis
@@ -36,6 +36,7 @@ class Pyomo(SolverBase):
         super().__init__(model)
 
         self.__solver_name = solver.lower()
+        self.__is_persistent = self.__solver_name.endswith('_persistent')
         self.__solver_options = solver_options if solver_options is not None else {}
         self.solver_factory = self.__init_solver_factory()
 
@@ -63,12 +64,13 @@ class Pyomo(SolverBase):
         # If the model has no integer and binary variables, we can access dual values
         if len(self._bin_vars) + len(self._int_vars) == 0:
             if not hasattr(self.model, 'dual'):
-                self.model.dual = Suffix(direction=Suffix.IMPORT)
+                self.model.dual = pyo.Suffix(direction=pyo.Suffix.IMPORT)
+
+        # Persistent solvers
+        if self.__is_persistent:
+            self.solver_factory.set_instance(self.model)
 
     def __init_solver_factory(self) -> pyo.SolverFactory:
-        if '_persistent' in self.__solver_name:
-            raise NotImplementedError("BendersLib currently does not support Pyomo persistent solvers.")
-
         _options = self._options['PYOMO_OPTIONS'].get(self.__solver_name, {})
 
         # Prioritize user options
@@ -111,19 +113,36 @@ class Pyomo(SolverBase):
         obj = next(self.model.component_data_objects(Objective, active=True))
 
         for name, p in zip(estimators, prob):
-            self.model.add_component(name, Var(within=pyo.NonNegativeReals, initialize=lb))
+            var = Var(within=pyo.NonNegativeReals, initialize=lb)
+            self.model.add_component(name, var)
             obj.expr += p * self.model.find_component(name)
+
+            # Persistent solvers
+            if self.__is_persistent:
+                self.solver_factory.add_var(var)
+
+        # Persistent solvers
+        if self.__is_persistent:
+            self.solver_factory.set_objective(obj)
 
     def fix_vars(self, var_values: dict[str, float]) -> None:
         for var_name, var_value in var_values.items():
             var = self.model.find_component(var_name)
             var.fix(var_value)
 
+            # Persistent solvers
+            if self.__is_persistent:
+                self.solver_factory.update_var(var)
+
     def unfix_vars(self, vars: list[str]) -> None:
         for var_name in vars:
             var = self.model.find_component(var_name)
             # var.set_value(None)
             var.unfix()
+
+            # Persistent solvers
+            if self.__is_persistent:
+                self.solver_factory.update_var(var)
 
     def get_var_values(self, vars: list[str] | None = None) -> dict[str, float]:
         vars_to_get = vars or self._all_vars
@@ -157,16 +176,22 @@ class Pyomo(SolverBase):
         return rhs
 
     def get_dual_values(self) -> list[float]:
-        # if self.__solver_name == 'scip':
-        #     raise NotImplementedError("BendersLib cannot get correct dual values with Pyomo(solver='scip').")
+        if self.__solver_name == 'scip':
+            raise NotImplementedError("BendersLib cannot get correct dual values with Pyomo(solver='scip').")
 
-        # Dual values are only available from a subset of Pyomo supported solvers.
-        duals = [self.model.dual[c] for c in self.model.component_data_objects(Constraint, active=True)]
+        constraints = self.model.component_data_objects(pyo.Constraint, active=True)
+        duals = [self.model.dual[c] for c in constraints]
         return duals
 
     def get_extreme_ray(self) -> list[float]:
-        # Pyomo does not provide Farkas duals (extreme rays).
-        raise NotImplementedError("Farkas dual (for feasibility cuts) is not supported in the Pyomo interface yet.")
+        if self.__solver_name == 'gurobi_persistent':
+            constraints = self.model.component_data_objects(pyo.Constraint, active=True)
+            ray = [self.solver_factory.get_linear_constraint_attr(c, 'FarkasDual') for c in constraints]
+        else:
+            raise NotImplementedError(
+                "Farkas dual (for feasibility cuts) is only supported by the 'gurobi_persistent' solver in Pyomo.")
+
+        return ray
 
     def get_obj(self) -> float:
         obj = next(self.model.component_data_objects(Objective, active=True))
@@ -177,11 +202,18 @@ class Pyomo(SolverBase):
         expr = sum(coef * var for coef, var in zip(cut.coefs, vars))
 
         if cut.sense == CST.EQ:
-            self.model.add_component(name, Constraint(expr=expr == cut.rhs))
+            cons = Constraint(expr=expr == cut.rhs)
+            self.model.add_component(name, cons)
         elif cut.sense == CST.LE:
-            self.model.add_component(name, Constraint(expr=expr <= cut.rhs))
+            cons = Constraint(expr=expr <= cut.rhs)
+            self.model.add_component(name, cons)
         elif cut.sense == CST.GE:
-            self.model.add_component(name, Constraint(expr=expr >= cut.rhs))
+            cons = Constraint(expr=expr >= cut.rhs)
+            self.model.add_component(name, cons)
+
+        # Persistent solvers
+        if self.__is_persistent:
+            self.solver_factory.add_constraint(cons)
 
     def remove_cut(self, cut_name: str) -> None:
         self.model.del_component(cut_name)

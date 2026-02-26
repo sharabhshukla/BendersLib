@@ -12,7 +12,6 @@ Pyomo
 
 from benderslib import ClassicalBenders, MasterProblem, SubProblem
 from benderslib.solvers import Pyomo
-from benderslib.utils import draw_curve
 
 import pyomo.environ as pyo
 
@@ -27,6 +26,8 @@ def make_original_problem():
     model.obj = pyo.Objective(
         expr=2 * sum(model.y[i] for i in range(n_vars)) + 3 * sum(model.z[i] for i in range(n_vars)),
         sense=pyo.minimize)
+
+    # model.infeasible = pyo.Constraint(expr=model.z[1] >= 50)
 
     model.main_constr_yz = pyo.Constraint(
         expr=sum(model.y[i] for i in range(n_vars)) + sum(model.z[i] for i in range(n_vars)) <= 50 * n_vars)
@@ -48,7 +49,6 @@ def make_original_problem():
 
 
 if __name__ == '__main__':
-    original_model, complicating_vars = make_original_problem()
 
     solvers = [
         'cbc',
@@ -58,8 +58,13 @@ if __name__ == '__main__':
         'gurobi',
         'gurobi_direct',
         'highs',
-        'xpress',
-        'xpress_direct',
+
+        'cplex_persistent',
+        'gurobi_persistent',
+
+        # 'xpress',
+        # 'xpress_direct',
+        # 'xpress_persistent',
 
         # 'mosek',        # License expires in one month
         # 'mosek_direct', # License expires in one month
@@ -67,11 +72,20 @@ if __name__ == '__main__':
     ]
 
     for solver in solvers:
-        print(f"Solving with solver: {solver}")
+        print(f"Solver      : {solver}")
+        original_model, complicating_vars = make_original_problem()
+
+        # Pyomo
 
         solver_factory = pyo.SolverFactory(solver)
+
+        if 'persistent' in solver:
+            solver_factory.set_instance(original_model)
+
         result = solver_factory.solve(original_model)
-        print(result)
+        print(f"Pyomo   Obj.: {pyo.value(original_model.obj)}")
+
+        # Benders
 
         master = Pyomo.make_master_problem(original_model, complicating_vars)
         sub = Pyomo.make_sub_problem(original_model, complicating_vars)
@@ -80,9 +94,10 @@ if __name__ == '__main__':
         sub_problem = SubProblem(Pyomo(sub, solver=solver))
 
         BD = ClassicalBenders(master_problem, sub_problem, complicating_vars)
+        BD.params.log_to_console = False
         BD.solve()
 
-        draw_curve(BD.result)
+        print(f"Benders Obj.: {BD.result.obj}\n")
 
 # %%
 #
