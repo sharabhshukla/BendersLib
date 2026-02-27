@@ -126,6 +126,6 @@ print(f"Benders Decomposition    Obj: {L.result.obj:.4f}")
 #
 #     * Tutorial of the L-shaped method: :doc:`../../tutorials/lshaped`
 #     * Tutorial of the Generalized Benders Decomposition: :doc:`../../tutorials/gbd`
-#     * This example uses the following class: :class:`~benderslib.benders.GeneLShaped`
+#     * This example uses the following class: :class:`~benderslib.GeneLShaped`
 #
 # .. tags:: benders: generalized, benders: l-shaped, solver: gurobi, stochastic, branch-and-check, enhancement

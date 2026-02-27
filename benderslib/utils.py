@@ -10,8 +10,10 @@ import matplotlib.pyplot as plt
 
 
 def draw_curve(result: BendersResult):
+    plt.style.use('seaborn-v0_8')
+
     # Draw convergence curve
-    fig, ax1 = plt.subplots()
+    fig, ax1 = plt.subplots(dpi=600)
 
     ax1.plot(result.lb_list, label='Lower Bound')
     ax1.plot(result.ub_list, label='Upper Bound')
@@ -30,14 +32,15 @@ def draw_curve(result: BendersResult):
     ax2.plot(gap, 'k--', label='Gap')
     ax2.set_ylabel('Gap')
     ax2.tick_params(axis='y')
-
     ax2.set_ylim(0, 1)
+    ax2.grid(None)
 
     # To show the legend for the second axis
     lines, labels = ax1.get_legend_handles_labels()
     lines2, labels2 = ax2.get_legend_handles_labels()
     ax2.legend(lines + lines2, labels + labels2, loc='best')
 
+    plt.tight_layout()
     plt.show()
 
 

@@ -16,31 +16,27 @@ will help guide the design (:doc:`../manual/index`, :doc:`../api/index`) of the 
       - P\. Type
       - M.P. Type
       - S.P. Type
-    * - (Classical) Benders Decomposition [1]_
+    * - (Classical) Benders Decomposition [#]_
       - MILP
       - MILP
       - LP
-    * - Combinatorial Benders Decomposition [2]_
+    * - Combinatorial Benders Decomposition [#]_
       - MILP
       - MILP
       - Feasibility
-    * - Generalized Benders Decomposition [3]_
+    * - Generalized Benders Decomposition [#]_
       - NLP
       - NLP
       - Convex NLP
-    * - L-shaped Method [4]_
+    * - L-shaped Method [#]_
       - Stochastic LP
       - LP
       - LP
-    * - Integer L-shaped Method [5]_
+    * - Integer L-shaped Method [#]_
       - Stochastic MILP
       - MILP (binary)
       - MILP (binary)
-    * - Nested Benders Decomposition [6]_
-      - Stochastic LP
-      - LP
-      - LP
-    * - Logic-based Benders Decomposition [7]_
+    * - Logic-based Benders Decomposition [#]_
       - Any
       - Any
       - Any
@@ -55,7 +51,7 @@ A breif introduction of the components of these varaints is given below.
 
 
 * :doc:`classical` is essentially a Kelley's
-  :abbr:`cutting-plane method (methods iteratively refine a feasible set or objective function by linear inequalities)` [8]_
+  :abbr:`cutting-plane method (methods iteratively refine a feasible set or objective function by linear inequalities)` [#]_
   for solving MILPs. It works by splitting a problem into two parts: a master problem that handles
   the difficult (integer) decisions and a subproblem that deals with the consequences of those decisions.
   The master problem, an MILP, proposes a set of integer variables, and the subproblem, a much simpler LP,
@@ -76,10 +72,10 @@ A breif introduction of the components of these varaints is given below.
 
 .. seealso::
 
-   * A review of Benders Decomposition by Rahmaniani et al. [9]_.
-   * A review of Jacques Benders' life and work by Aardal et al. [10]_.
-   * A review of Integer Linear Programming that covers Benders Decomposition by Clautiaux and Ljubić [11]_.
-   * Useful practical guidelines for implementing (Logic-based) Benders Decomposition (Section 2.7) [12]_.
+   * A review of Benders Decomposition by Rahmaniani et al. [#]_.
+   * A review of Jacques Benders' life and work by Aardal et al. [#]_.
+   * A review of Integer Linear Programming that covers Benders Decomposition by Clautiaux and Ljubić [#]_.
+   * Useful practical guidelines for implementing (Logic-based) Benders Decomposition (Section 2.7) [#]_.
 
 
 Contents
@@ -90,24 +86,23 @@ Contents
 
    classical.rst
    cbd.rst
+   gbd.rst
    lshaped.rst
    ilshaped.rst
    lbbd.rst
-   gbd.rst
    enhance.rst
 
 References
 -------------
 
-.. [1] Benders, J. F. (1962). Partitioning procedures for solving mixed-variables programming problems. Numerische Mathematik, 4(1), 238–252. https://doi.org/10.1007/BF01386316
-.. [2] Codato, G., & Fischetti, M. (2006). Combinatorial Benders’ cuts for mixed-integer linear programming. Operations Research, 54(4), 756–766. https://doi.org/10.1287/opre.1060.0286
-.. [3] Geoffrion, A. M. (1972). Generalized Benders Decomposition. Journal of Optimization Theory and Applications, 10(4), 237–260. https://doi.org/10.1007/BF00934810
-.. [4] Van Slyke, R. M., & Wets, R. (1969). L-shaped linear programs with applications to optimal control and stochastic programming. SIAM Journal on Applied Mathematics, 17(4), 638–663. https://doi.org/10.1137/0117061
-.. [5] Laporte, G., & Louveaux, F. V. (1993). The integer L-shaped method for stochastic integer programs with complete recourse. Operations Research Letters, 13(3), 133–142. https://doi.org/10.1016/0167-6377(93)90002-X
-.. [6] Birge, J. R. (1985). Decomposition and partitioning methods for multistage stochastic linear programs. Operations Research, 33(5), 989–1007. https://doi.org/10.1287/opre.33.5.989
-.. [7] Hooker, J. N., & Ottosson, G. (2003). Logic-based Benders Decomposition. Mathematical Programming, 96(1), 33–60. https://doi.org/10.1007/s10107-003-0375-9
-.. [8] Kelley, Jr., J. E. (1960). The cutting-plane method for solving convex programs. Journal of the Society for Industrial and Applied Mathematics, 8(4), 703–712. https://doi.org/10.1137/0108053
-.. [9] Rahmaniani, R., Crainic, T. G., Gendreau, M., & Rei, W. (2017). The Benders Decomposition algorithm: A literature review. European Journal of Operational Research, 259(3), 801–817. https://doi.org/10.1016/j.ejor.2016.12.005
-.. [10] Aardal, K., Hurkens, C., & Lenstra, J. K. (2025). Jacques Benders and his decomposition algorithm. Operations Research Letters, 63, 107361. https://doi.org/10.1016/j.orl.2025.107361
-.. [11] Clautiaux, F., & Ljubić, I. (2025). Last fifty years of integer linear programming: A focus on recent practical advances. European Journal of Operational Research, 324(3), 707–731. https://doi.org/10.1016/j.ejor.2024.11.018
-.. [12] Hooker, J. (2024). Logic-Based Benders Decomposition: Theory and Applications. Springer International Publishing. https://doi.org/10.1007/978-3-031-45039-6
+.. [#] Benders, J. F. (1962). Partitioning procedures for solving mixed-variables programming problems. Numerische Mathematik, 4(1), 238–252. https://doi.org/10.1007/BF01386316
+.. [#] Codato, G., & Fischetti, M. (2006). Combinatorial Benders’ cuts for mixed-integer linear programming. Operations Research, 54(4), 756–766. https://doi.org/10.1287/opre.1060.0286
+.. [#] Geoffrion, A. M. (1972). Generalized Benders Decomposition. Journal of Optimization Theory and Applications, 10(4), 237–260. https://doi.org/10.1007/BF00934810
+.. [#] Van Slyke, R. M., & Wets, R. (1969). L-shaped linear programs with applications to optimal control and stochastic programming. SIAM Journal on Applied Mathematics, 17(4), 638–663. https://doi.org/10.1137/0117061
+.. [#] Laporte, G., & Louveaux, F. V. (1993). The integer L-shaped method for stochastic integer programs with complete recourse. Operations Research Letters, 13(3), 133–142. https://doi.org/10.1016/0167-6377(93)90002-X
+.. [#] Hooker, J. N., & Ottosson, G. (2003). Logic-based Benders Decomposition. Mathematical Programming, 96(1), 33–60. https://doi.org/10.1007/s10107-003-0375-9
+.. [#] Kelley, Jr., J. E. (1960). The cutting-plane method for solving convex programs. Journal of the Society for Industrial and Applied Mathematics, 8(4), 703–712. https://doi.org/10.1137/0108053
+.. [#] Rahmaniani, R., Crainic, T. G., Gendreau, M., & Rei, W. (2017). The Benders Decomposition algorithm: A literature review. European Journal of Operational Research, 259(3), 801–817. https://doi.org/10.1016/j.ejor.2016.12.005
+.. [#] Aardal, K., Hurkens, C., & Lenstra, J. K. (2025). Jacques Benders and his decomposition algorithm. Operations Research Letters, 63, 107361. https://doi.org/10.1016/j.orl.2025.107361
+.. [#] Clautiaux, F., & Ljubić, I. (2025). Last fifty years of integer linear programming: A focus on recent practical advances. European Journal of Operational Research, 324(3), 707–731. https://doi.org/10.1016/j.ejor.2024.11.018
+.. [#] Hooker, J. (2024). Logic-Based Benders Decomposition: Theory and Applications. Springer International Publishing. https://doi.org/10.1007/978-3-031-45039-6

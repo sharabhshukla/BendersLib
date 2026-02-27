@@ -59,7 +59,7 @@ def make_combination_problem():
 
 
 # %%
-# Classical Benders decomposition
+# Classical Benders decomposition.
 
 model, master_vars = make_original_problem()
 model.optimize()
@@ -76,7 +76,7 @@ BD.solve()
 draw_curve(BD.result)
 
 # %%
-# Combinatorial Benders decomposition
+# Combinatorial Benders decomposition.
 
 model, master_vars = make_combination_problem()
 model.optimize()

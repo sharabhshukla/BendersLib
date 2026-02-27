@@ -36,8 +36,9 @@ class _ScipConshdlr(Conshdlr):
 
     def conslock(self, constraint, locktype, nlockspos, nlocksneg):
         # Lock all master problem variables.
+        # DOC: https://www.scipopt.org/doc/html/CONS.php
         for var in self.solver._vars_map.values():
-            self.model.addVarLocks(var, nlocksneg, nlockspos)
+            self.model.addVarLocks(var, nlockspos + nlocksneg, nlockspos + nlocksneg)
 
 
 class Scip(SolverBase):

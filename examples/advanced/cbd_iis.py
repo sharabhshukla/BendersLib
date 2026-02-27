@@ -112,11 +112,9 @@ AB_.solve()
 print(f"Sol. Time (IIS vs Naive): {AB.result.runtime:.4f}, {AB_.result.runtime:.4f}")
 print(f"Num. Cuts (IIS vs Naive): {AB.result.n_cuts}, {AB_.result.n_cuts}")
 
-plt.bar(
-    ['IIS-based Cuts', 'Naive Cuts'],
-    [AB.result.n_cuts, AB_.result.n_cuts],
-    color=['blue', 'orange']
-)
+plt.style.use('seaborn-v0_8')
+plt.figure(dpi=600)
+plt.bar(['IIS-based Cuts', 'Naive Cuts'], [AB.result.n_cuts, AB_.result.n_cuts])
 plt.ylabel('Number of Benders Cuts Added')
 plt.title('Comparison of Benders Cuts Added')
 plt.show()
