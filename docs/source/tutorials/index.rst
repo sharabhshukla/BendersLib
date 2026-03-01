@@ -44,10 +44,12 @@ will help guide the design (:doc:`../manual/index`, :doc:`../api/index`) of the 
 *P.: Original problem, M.P.: Master problem, S.P.: Sub problem,
 MILP: Mixed-Integer Linear Programming, LP: Linear Programming, NLP: Non-Linear Programming.*
 
-A Benders Decomposition method is composed of a **master problem**, one or more **subproblems**, **Benders cuts**,
-and a **Benders algorithm** that orchestrates the solution process, to solve the original mathamatical programming problem.
-These components make one Benders method different from another, e.g., ones in :ref:`benders-variants`.
-A breif introduction of the components of these varaints is given below.
+A Benders Decomposition method is composed of a **master problem**, one or more
+**subproblems**, **Benders cuts**,
+and a **Benders algorithm** that orchestrates the solution process, to solve the
+original mathematical programming problem.
+These components make one Benders method different from another.
+A brief introduction of the components of these variants is given below.
 
 
 * :doc:`classical` is essentially a Kelley's
@@ -62,12 +64,43 @@ A breif introduction of the components of these varaints is given below.
 * :doc:`cbd`
   extends the cutting-plane approach to MILPs where the subproblem is itself a
   combinatorial problem, typically a MILP. Like the classical method, it divides the problem into a master problem
-  (**complicating variables are pure binary**) and a subproblem that assesses the consequences.
+  and a subproblem that assesses the consequences, based on pure binary complicating variables.
   The fundamental difference is that the subproblem is not a simple LP, meaning its solution does not provide
   the dual information used in classical Benders. Instead, cuts are generated through combinatorial arguments:
   *no-good cuts* are derived from proofs of subproblem infeasibility,
   while *combinatorial optimality cuts* are logical constraints that connect a specific set of master decisions
   to the resulting subproblem cost.
+
+* :doc:`gbd`
+  is an extension of the classical method to solve convex NLPs.
+  It partitions the problem based on variable type, where the master problem handles complicating variables
+  and the subproblem solves a convex NLP for fixed values of these variables.
+  The key is the use of nonlinear duality theory to generate cutting planes, known as *Lagrangian cuts*,
+  that approximate the subproblem's objective function.
+
+* :doc:`lshaped`
+  is a specialized version of Benders Decomposition for Stochastic Linear Programming problems.
+  The first-stage decisions (master problem) are made before uncertainty is resolved,
+  and the second-stage decisions (subproblem) adapt to the outcomes.
+  The method iteratively adds *optimality cuts* (for expected future costs) and *feasibility cuts*
+  (to handle scenarios where second-stage constraints cannot be met) to the master problem,
+  refining the first-stage decision until an optimal solution is found.
+  It can be seen as a specific application of :doc:`classical` to Stochastic Programming.
+
+* :doc:`ilshaped`
+  adapts the L-shaped method for stochastic programs where some decision variables in the second stage are integers.
+  This introduces non-convexity, so linear programming duality cannot be directly applied.
+  Instead, the integer L-shaped method can be seen as a combination of :doc:`lshaped` and :doc:`cbd`.
+  The cuts are derived from the structure of the integer subproblem, often using *no-good cuts* to exclude infeasible first-stage decisions
+  and *combinatorial optimality cuts* to capture the cost implications of specific first-stage decisions.
+
+* :doc:`lbbd`
+  is a framework that combines Benders Decomposition with logic-based methods (e.g., Constraint Programming).
+  It is highly flexible and can be applied to a wide range of optimization problems.
+  The master problem provides a partial assignment of variables, and the subproblem,
+  determines the consequences. Instead of relying on traditional duality, LBDD uses inference and combinatorial arguments
+  to generate cuts. For example, if a subproblem is infeasible, a *no-good cut* is generated to exclude that specific
+  assignment of master variables.
 
 
 .. seealso::
