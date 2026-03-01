@@ -19,20 +19,17 @@ and the necessary :doc:`Benders cuts <../api/cuts>` and :ref:`cut generators <cu
    sequenceDiagram
        actor User
        participant BendersLib
-       participant External Solver
+       participant Built-in Cut Generator
+       participant Solver Interface
 
-       User->>BendersLib: 1. Define master and subproblems
-       User->>BendersLib: 2. Create Benders object
-       BendersLib->>BendersLib: Initialize Benders object
+       User->>Solver Interface: 1. Define master & subproblems
+       User->>BendersLib: 2. Create BendersSolver instance
        User->>BendersLib: 3. Set parameters (optional)
        User->>BendersLib: 4. solve()
        loop Benders Iteration
-           BendersLib->>External Solver: Solve master problem
-           External Solver-->>BendersLib: Master problem solution
-           BendersLib->>External Solver: Solve subproblems
-           External Solver-->>BendersLib: Subproblem solutions
-           BendersLib->>BendersLib: Generate and add cuts
-           BendersLib->>BendersLib: Check convergence criteria
+           Solver Interface-->>BendersLib: Return master/sub solution
+           Built-in Cut Generator-->>BendersLib: Generate cuts
+           BendersLib->>BendersLib: Check convergence & add cuts
        end
        BendersLib-->>User: 5. Return solution
 
@@ -48,6 +45,7 @@ and generating the necessary optimality and feasibility cuts automatically.
 
     * See :ref:`Built-in Benders Methods <manual_builtin_benders>` for more details on using built-in Benders methods.
     * See :doc:`../tutorials/index` for the theory of the above Benders methods.
+    * Examples: :doc:`../examples/basic/index`.
 
 Advanced Usage
 ------------------------------------
@@ -66,32 +64,23 @@ as it allows the subproblem to be any type of optimization problem without a sta
    sequenceDiagram
        actor User
        participant BendersLib
-       participant Custom Solver
        participant Custom Cut Generator
-       participant External Solver
+       participant Custom Solver
+       participant Solver Interface
 
-       User->>BendersLib: 1. Define master problems
+       User->>Solver Interface: 1. Define master problem
        User->>Custom Solver: 2. Define custom subproblem solver
        User->>Custom Cut Generator: 3. Define custom cut generator
-       User->>BendersLib: 4. Create Benders object
-       BendersLib->>BendersLib: Initialize Benders object
-       Custom Solver-->>BendersLib: Register custom solver
-       Custom Cut Generator-->>BendersLib: Register custom cut generator
+       User->>BendersLib: 4. Create BendersSolver instance
        User->>BendersLib: 5. Set parameters (optional)
        User->>BendersLib: 6. solve()
        loop Benders Iteration
-           BendersLib->>External Solver: Solve master problem
-           External Solver-->>BendersLib: Master problem solution
-           BendersLib->>Custom Solver: Solve subproblems
-           Custom Solver-->>BendersLib: Subproblem solutions
-           BendersLib->>Custom Cut Generator: Generate cuts
-           Custom Cut Generator-->>BendersLib: Custom cuts
-           BendersLib->>BendersLib: Add cuts to master problem
-           BendersLib->>BendersLib: Check convergence criteria
+           Solver Interface-->>BendersLib: Return master solution
+           Custom Solver-->>BendersLib: Return sub solution
+           Custom Cut Generator-->>BendersLib: Generate cuts
+           BendersLib->>BendersLib: Check convergence & add cuts
        end
        BendersLib-->>User: 7. Return solution
-
-Key customization options include:
 
 - **Custom Subproblem Solver**:
   You are not limited to built-in solvers for the subproblems.
@@ -112,10 +101,46 @@ Key customization options include:
 
     * See :ref:`Subproblem Customization <manual_custom_sub>` for more details on creating custom subproblem solvers.
     * See :ref:`Benders Cut Customization <manual_custom_cut>` for more details on creating custom cuts and cut generators.
+    * Examples: :doc:`tag: custom-cut <../_tags/custom-cut>` and :doc:`tag: custom-subproblem <../_tags/custom-subproblem>`.
 
 Expert Usage
 ------------
 
 This section covers expert-level features for fine-tuning the Benders decomposition algorithm,
-including the use of :doc:`callbacks <callbacks>` for implementing custom acceleration strategies,
-such as warm starts, cut management, and dynamic algorithm configuration.
+including the use of :doc:`callbacks <callbacks>` for implementing custom
+:doc:`acceleration strategies <../tutorials/enhance>`,
+such as warm start, cut management, and cut selection.
+
+.. mermaid::
+   :caption: Expert Usage Workflow
+   :align: center
+
+   sequenceDiagram
+       actor User
+       participant BendersLib
+       participant Custom Callbacks
+       participant Solver Interface
+
+       User->>Solver Interface: 1. Define master & subproblems
+       User->>Custom Callbacks: 2. Define custom callbacks
+       User->>BendersLib: 3. Create BendersSolver instance
+       User->>BendersLib: 4. Set parameters (optional)
+       User->>BendersLib: 5. solve()
+       loop Benders Iteration
+           Solver Interface-->>BendersLib: Return master/sub solution
+           BendersLib-->>Custom Callbacks: Trigger callbacks during various events
+           BendersLib->>BendersLib: Check convergence & add cuts
+       end
+       BendersLib-->>User: 6. Return solution
+
+- **Custom Callbacks**:
+  Callbacks allow for the injection of custom logic at various stages of the Benders decomposition algorithm.
+  This is achieved by creating a class that inherits from :class:`CallbackBase` and implementing the desired methods.
+  Callbacks can be used to implement acceleration strategies such as warm-starting the subproblems,
+  managing the cut pool, or implementing custom termination criteria.
+
+.. seealso::
+
+    * See :doc:`callbacks` for more details on creating custom callbacks.
+    * See :doc:`../tutorials/enhance` for more details on acceleration strategies.
+    * Examples: :doc:`tag: callback <../_tags/callback>`.
