@@ -13,7 +13,7 @@ popular Mathematical Programming and Constraint Programming solvers.
 Its support for rapid prototyping and high extensibility are designed to meet the needs of
 both researchers and practitioners in Operations Research and related fields.
 
-.. list-table::
+.. list-table:: BendersLib Resources
    :widths: 25 75
 
    * - **Documentation**
@@ -30,7 +30,7 @@ both researchers and practitioners in Operations Research and related fields.
 Contributors
 --------------------------------
 
-BendersLib was created by **Peng-Hui Guo** (郭鹏辉, https://guo.ph),
+BendersLib was created by **Peng-Hui Guo** ("郭鹏辉" in Chinese, https://guo.ph),
 who holds a PhD in Management Science and Engineering
 from Nanjing University of Aeronautics and Astronautics (NUAA), China.
 

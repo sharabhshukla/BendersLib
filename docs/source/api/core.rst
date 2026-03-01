@@ -57,11 +57,3 @@ Benders Algorithm
 .. autoclass:: BendersSolver
    :inherited-members:
    :show-inheritance:
-
-.. _api-annotation:
-
-Annotation Benders Decomposition
---------------------------------------
-
-.. autoclass:: AnnotationBenders
-    :inherited-members:
