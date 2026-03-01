@@ -22,11 +22,8 @@ either to exclude the current solution or to refine the objective function in su
 This iterative cycle repeats until the objective values of the master problem and the subproblem converge,
 indicating that the optimal solution to the original problem has been found.
 
-.. seealso::
-
-    All :doc:`Benders decomposition variants <../tutorials/index>` share the same key components:
-    **master problem**, **subproblem**, **Benders cuts**, and the **iterative solving process**.
-
+All :doc:`Benders decomposition variants <../tutorials/index>` share the same key components:
+**master problem**, **subproblem**, **Benders cuts**, and the **iterative solving process**.
 The BendersLib is structured around these fundamental components,
 allowing users to define and customize most parts according to their specific problem requirements.
 The following diagram illustrates the relationships between the main components of BendersLib.
@@ -148,3 +145,13 @@ Detailed API for each component can be found in the :doc:`API reference <../api/
     * Benders methods: :class:`ClassicalBenders`, :class:`CombinatorialBenders`,
       :class:`LShaped`, :class:`IntegerLShaped`, :class:`LogicBasedBenders`, :class:`GeneralizedBenders`,
       :class:`GeneLShaped`
+
+* :doc:`callbacks`:
+  The callback system provides a mechanism for users to monitor and intervene in the Benders decomposition process.
+  It allows for the execution of custom code at various key moments, such as at the start and end of the process,
+  before and after solving the master and subproblems, and when cuts are generated or added.
+
+.. admonition:: Related classes
+    :class: seealso
+
+    * :class:`BendersContext`, :class:`CallbackBase`

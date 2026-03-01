@@ -158,7 +158,7 @@ class BendersParams:
     
     .. danger::
         
-        This feature is experimental supported only in
+        This feature is experimentally supported only in
         :class:`~benderslib.solvers.Copt`, 
         :class:`~benderslib.solvers.Cplex`, and 
         :class:`~benderslib.solvers.Gurobi`.
