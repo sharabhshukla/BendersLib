@@ -136,10 +136,6 @@ Consider one of these alternatives if BendersLib does not meet your requirements
 Contents
 ------------------------------------------------
 
-This manual provides a comprehensive guide to the concepts, features, and advanced usage of the framework.
-It serves as the bridge between the :doc:`../tutorials/index` and the detailed :doc:`../api/index`.
-For complete, runnable code, please see the :doc:`../examples/index`.
-
 .. toctree::
    :maxdepth: -1
 
