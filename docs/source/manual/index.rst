@@ -93,42 +93,42 @@ Consider one of these alternatives if BendersLib does not meet your requirements
       - Feature
       - Language
       - License
-    * - `SCIP <https://www.scipopt.org>`_
-      - A framework for constraint integer programming and branch-cut-and-price that supports Benders Decomposition [2]_.
-      - C/C++ *
-      - `Apache 2.0 <https://www.scipopt.org/index.php#license>`_
-    * - `GCG <https://gcg.or.rwth-aachen.de/>`_
-      - A generic decomposition solver for mixed-integer programs that has the capability of automatically Benders decomposition (part of the SCIP Optimization Suit).
-      - C/C++ *
-      - LGPL
-    * - `Coluna.jl <https://atoptima.github.io/Coluna.jl>`_
-      - A branch-and-price-and-cut framework that supports Benders Decomposition.
-      - Julia
-      - `MPL 2.0 <https://github.com/atoptima/Coluna.jl?tab=License-1-ov-file#readme>`__
-    * - `mpi-sppy <https://mpi-sppy.readthedocs.io/>`_
-      - A package for solving Stochastic Programming problems with L-shaped method and other decomposition algorithms.
-      - Python
-      - `BSD 3 Clause <https://github.com/Pyomo/mpi-sppy/blob/main/LICENSE.md>`_
-    * - `StochasticPrograms.jl <https://martinbiel.github.io/StochasticPrograms.jl>`_ [3]_
-      - A package for modeling and solving Stochastic Programming problems that supports the L-shaped method.
-      - Julia
-      - `MIT License <https://github.com/martinbiel/StochasticPrograms.jl/blob/master/LICENSE.md>`_
-    * - `SDDP.jl <https://sddp.dev/>`_ [4]_
-      - A package for solving Multistage Stochastic Programming using Stochastic Dual Dynamic Programming (nested Benders methods).
-      - Julia
-      - `MPL 2.0 <https://github.com/odow/SDDP.jl?tab=License-1-ov-file#readme>`__
-    * - `FortSP <http://dev.optirisk-systems.com/products/solver-systems/fortsp/>`_
-      - A solver for stochastic programming that supports L-shaped method and nested Benders decomposition.
-      - C
-      - Commercial
-    * - `CPLEX <https://www.ibm.com/docs/en/icos/22.1.1?topic=optimizers-users-manual-cplex>`_
-      - An optimization solver that supports annotated Benders decomposition [5]_.
-      - C/C++, Java, .NET
-      - Commercial
     * - `AIMMS <https://documentation.aimms.com/language-reference/optimization-modeling-components/automatic-benders-decomposition/index.html>`__
       - An optimization modeling system that supports automatic Benders decomposition.
       - AIMMS Language
       - Commercial
+    * - `Coluna.jl <https://atoptima.github.io/Coluna.jl>`_
+      - A branch-and-price-and-cut framework that supports Benders Decomposition.
+      - Julia
+      - `MPL 2.0 <https://github.com/atoptima/Coluna.jl?tab=License-1-ov-file#readme>`__
+    * - `CPLEX <https://www.ibm.com/docs/en/icos/22.1.1?topic=optimizers-users-manual-cplex>`_
+      - An optimization solver that supports annotated Benders decomposition [2]_.
+      - C/C++, Java, .NET
+      - Commercial
+    * - `FortSP <http://dev.optirisk-systems.com/products/solver-systems/fortsp/>`_
+      - A solver for stochastic programming that supports L-shaped method and nested Benders decomposition.
+      - C
+      - Commercial
+    * - `GCG <https://gcg.or.rwth-aachen.de/>`_
+      - A generic decomposition solver for mixed-integer programs that has the capability of automatically Benders decomposition (part of the SCIP Optimization Suit).
+      - C/C++ *
+      - LGPL
+    * - `mpi-sppy <https://mpi-sppy.readthedocs.io/>`_
+      - A package for solving Stochastic Programming problems with L-shaped method and other decomposition algorithms.
+      - Python
+      - `BSD 3 Clause <https://github.com/Pyomo/mpi-sppy/blob/main/LICENSE.md>`_
+    * - `SCIP <https://www.scipopt.org>`_
+      - A framework for constraint integer programming and branch-cut-and-price that supports Benders Decomposition [3]_.
+      - C/C++ *
+      - `Apache 2.0 <https://www.scipopt.org/index.php#license>`_
+    * - `SDDP.jl <https://sddp.dev/>`_ [4]_
+      - A package for solving Multistage Stochastic Programming using Stochastic Dual Dynamic Programming (nested Benders methods).
+      - Julia
+      - `MPL 2.0 <https://github.com/odow/SDDP.jl?tab=License-1-ov-file#readme>`__
+    * - `StochasticPrograms.jl <https://martinbiel.github.io/StochasticPrograms.jl>`_ [5]_
+      - A package for modeling and solving Stochastic Programming problems that supports the L-shaped method.
+      - Julia
+      - `MIT License <https://github.com/martinbiel/StochasticPrograms.jl/blob/master/LICENSE.md>`_
 
 *\* Note: SCIP has a Python interface namely* `PySCIPOpt <https://pyscipopt.readthedocs.io>`_;
 *GCG has a Python interface namely* `PyGCGOpt <https://scipopt.github.io/PyGCGOpt/>`_.
@@ -158,7 +158,7 @@ References
 ------------------------------------------------
 
 .. [1] Benders, J. F. (1962). Partitioning procedures for solving mixed-variables programming problems. Numerische Mathematik, 4(1), 238–252. https://doi.org/10.1007/BF01386316
-.. [2] Maher, S. J. (2021). Implementing the branch-and-cut approach for a general purpose Benders’ decomposition framework. European Journal of Operational Research, 290(2), 479–498. https://doi.org/10.1016/j.ejor.2020.08.037
-.. [3] Biel, M., & Johansson, M. (2022). Efficient Stochastic Programming in Julia. INFORMS Journal on Computing, 34(4), 1885–1902. https://doi.org/10.1287/ijoc.2022.1158
+.. [2] Bonami, P., Salvagnin, D., & Tramontani, A. (2020). Implementing Automatic Benders Decomposition in a Modern MIP Solver. In D. Bienstock & G. Zambelli (Eds.), Integer Programming and Combinatorial Optimization (pp. 78–90). Springer International Publishing. https://doi.org/10.1007/978-3-030-45771-6_7
+.. [3] Maher, S. J. (2021). Implementing the branch-and-cut approach for a general purpose Benders’ decomposition framework. European Journal of Operational Research, 290(2), 479–498. https://doi.org/10.1016/j.ejor.2020.08.037
 .. [4] Dowson, O., & Kapelevich, L. (2021). SDDP.jl: A Julia Package for Stochastic Dual Dynamic Programming. INFORMS Journal on Computing, 33(1), 27–33. https://doi.org/10.1287/ijoc.2020.0987
-.. [5] Bonami, P., Salvagnin, D., & Tramontani, A. (2020). Implementing Automatic Benders Decomposition in a Modern MIP Solver. In D. Bienstock & G. Zambelli (Eds.), Integer Programming and Combinatorial Optimization (pp. 78–90). Springer International Publishing. https://doi.org/10.1007/978-3-030-45771-6_7
+.. [5] Biel, M., & Johansson, M. (2022). Efficient Stochastic Programming in Julia. INFORMS Journal on Computing, 34(4), 1885–1902. https://doi.org/10.1287/ijoc.2022.1158
