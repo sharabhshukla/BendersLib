@@ -11,6 +11,7 @@ from pyomo.contrib.iis.mis import compute_infeasibility_explanation as mis
 
 from ..consts import BendersConsts as CST
 from ._base import SolverBase
+from ..errors import BendersNotImplementedError, MismatchedProbabilityError, BendersBackendError
 
 
 class Pyomo(SolverBase):
@@ -86,12 +87,12 @@ class Pyomo(SolverBase):
     def __sense_to_minimize(self):
         # BendersLib will automatically convert maximization problems to minimization problems
         if self._sense == CST.MAX:
-            raise NotImplementedError("BendersLib currently only supports minimization problems.")
+            raise BendersNotImplementedError("BendersLib currently only supports minimization problems.")
 
     def __bounds_to_constrs(self):
         if any([lb < 0 or ub < 0 for lb, ub in self._var_bounds.values()]):
             # From here, the default variable bounds become (0, +inf), despite that the Pyomo default is (-inf, +inf).
-            raise NotImplementedError("BendersLib currently only supports non-negative variable bounds.")
+            raise BendersNotImplementedError("BendersLib currently only supports non-negative variable bounds.")
 
         # BendersLib will automatically convert variable bounds to explicit constraints
         for var_name, (lb, ub) in self._var_bounds.items():
@@ -108,7 +109,7 @@ class Pyomo(SolverBase):
             prob = [1.0] * len(estimators)
 
         if len(prob) != len(estimators):
-            raise ValueError("Length of 'prob' must match length of 'estimators'.")
+            raise MismatchedProbabilityError("Length of <prob> must match length of <estimators>.")
 
         obj = next(self.model.component_data_objects(Objective, active=True))
 
@@ -172,12 +173,12 @@ class Pyomo(SolverBase):
             elif c.has_lb() and not c.has_ub():
                 rhs.append(pyo.value(c.lower))
             else:
-                raise ValueError(f"Constraint has both bounds ({c.lower, c.upper}). Cannot determine RHS.")
+                raise BendersBackendError(f"Constraint has both bounds ({c.lower, c.upper}). Cannot determine RHS.")
         return rhs
 
     def get_dual_values(self) -> list[float]:
         if self.__solver_name == 'scip':
-            raise NotImplementedError("BendersLib cannot get correct dual values with Pyomo(solver='scip').")
+            raise BendersBackendError("BendersLib cannot get correct dual values with Pyomo(solver='scip').")
 
         constraints = self.model.component_data_objects(pyo.Constraint, active=True)
         duals = [self.model.dual[c] for c in constraints]
@@ -188,7 +189,7 @@ class Pyomo(SolverBase):
             constraints = self.model.component_data_objects(pyo.Constraint, active=True)
             ray = [self.solver_factory.get_linear_constraint_attr(c, 'FarkasDual') for c in constraints]
         else:
-            raise NotImplementedError(
+            raise BendersBackendError(
                 "Farkas dual (for feasibility cuts) is only supported by the 'gurobi_persistent' solver in Pyomo.")
 
         return ray

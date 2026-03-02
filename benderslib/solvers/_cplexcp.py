@@ -2,6 +2,7 @@
 
 from ..consts import BendersConsts as CST
 from ._base import SolverCPBase
+from ..errors import BendersNotImplementedError
 
 from docplex.cp.model import CpoModel
 from docplex.cp.solution import CpoSolveResult
@@ -72,7 +73,7 @@ class CplexCP(SolverCPBase):
 
     def __sense_to_minimize(self):
         if not self._is_sat and self.model.is_maximization():
-            raise NotImplementedError("BendersLib currently only supports minimization problems.")
+            raise BendersNotImplementedError("BendersLib currently only supports minimization problems.")
 
     def __copy_model(self):
         self.model = self._original_model.clone()

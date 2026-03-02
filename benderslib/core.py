@@ -13,6 +13,7 @@ from .solvers import SolverBase
 from .logger import BendersLogger
 from .callback import BendersContext, CallbackBase, _CallbackEvents as EVENTS, _CallbackManager
 from .utils import normalize_cut
+from .errors import UnexpectedMasterStatusError, UnexpectedSubStatusError, UnsupportedCutError
 
 
 class ProblemBase:
@@ -446,7 +447,6 @@ class MasterProblem(ProblemBase):
             # Duplicate cut checking only applies to non Branch-and-check mode,
             # as in Branch-and-check, the same cut may be added multiple times across different nodes.
 
-            # raise Exception(f"Duplicate cut detected: {cut}")
             BendersLogger.warning(f"Duplicate cut is ignored: {cut}")
             return None
 
@@ -858,7 +858,7 @@ class SubProblems:
             self.status = CST.INFEASIBLE
         else:
             self.status = CST.UNKNOWN
-            raise RuntimeError("SubProblems status could not be determined.")
+            raise UnexpectedSubStatusError(stauts=[sub.status for sub in self.sub_problems])
 
     def solve(self) -> None:
         """Solve all subproblems and update the :attr:`status` attribute.
@@ -1299,7 +1299,7 @@ class BendersSolver:
         elif inspect.isclass(cut):
             return cut(master_problem, sub_problem, params)
         elif cut is not None:
-            raise ValueError("<cut> must be a <function> or a <class>.")
+            raise UnsupportedCutError("Cut must be a <function> or a <class>.", got=type(cut))
         return None
 
     @classmethod
@@ -1596,7 +1596,7 @@ class BendersSolver:
                 # Sub problem is neither infeasible nor optimal -> error
                 else:
                     self.result.status = CST.UNKNOWN
-                    raise ValueError(f"Subproblem returned an unexpected status: {self.sub_problem.status}.")
+                    raise UnexpectedSubStatusError(status=self.sub_problem.status)
 
             # Master problem is infeasible -> original problem is infeasible
             elif self.master_problem.status == CST.INFEASIBLE:
@@ -1611,7 +1611,7 @@ class BendersSolver:
             # Master problem is neither infeasible nor optimal -> error
             else:
                 self.result.status = CST.UNKNOWN
-                raise ValueError(f"Master problem returned an unexpected status: {self.master_problem.status}.")
+                raise UnexpectedMasterStatusError(status=self.master_problem.status)
 
             if self.__trigger_callbacks_and_terminate(EVENTS.ON_ITERATION_END): break
 
@@ -1654,7 +1654,7 @@ class BendersSolver:
 
         else:
             self.result.status = CST.UNKNOWN
-            raise ValueError(f"Subproblem returned an unexpected status: {self.sub_problem.status}.")
+            raise UnexpectedSubStatusError(status=self.sub_problem.status)
 
         if self.__trigger_callbacks_and_terminate(EVENTS.ON_ITERATION_END): return CST.TERMINATE
 

@@ -6,6 +6,7 @@ from ortools.sat.python import cp_model
 
 from ..consts import BendersConsts as CST
 from ._base import SolverCPBase
+from ..errors import BendersNotImplementedError
 
 
 class Ortools(SolverCPBase):
@@ -76,7 +77,7 @@ class Ortools(SolverCPBase):
 
     def __sense_to_minimize(self):
         if self.model.Proto().objective.scaling_factor == -1.0:
-            raise NotImplementedError("BendersLib currently only supports minimization problems.")
+            raise BendersNotImplementedError("BendersLib currently only supports minimization problems.")
 
     def __setup_model(self, solver_options: dict = None):
         if solver_options:

@@ -4,6 +4,7 @@ from pyscipopt import Model, Expr, SCIP_PARAMSETTING, Conshdlr, SCIP_RESULT, SCI
 
 from ..consts import BendersConsts as CST
 from ._base import SolverBase
+from ..errors import BendersNotImplementedError, MismatchedProbabilityError, BendersBackendError
 
 
 class _ScipConshdlr(Conshdlr):
@@ -97,7 +98,7 @@ class Scip(SolverBase):
 
     def __sense_to_minimize(self):
         if self.model.getObjectiveSense() == 'maximize':
-            raise NotImplementedError("BendersLib currently only supports minimization problems.")
+            raise BendersNotImplementedError("BendersLib currently only supports minimization problems.")
 
     def __bounds_to_constrs(self):
         # Workaround to fix wrong dual values when bound constraints are present
@@ -106,13 +107,13 @@ class Scip(SolverBase):
 
         # If there are variable bounds
         # if self._var_bounds:
-        #     raise NotImplementedError(
+        #     raise BendersBackendError(
         #         "BendersLib currently does not support variable bounds in SCIP, due to a SCIP limitation.")
 
         # If there are bound constraints
         # for cons in self.model.getConss(transformed=False):
         #     if len(self.model.getConsVars(cons)) == 1:
-        #         raise NotImplementedError(
+        #         raise BendersBackendError(
         #             "BendersLib currently does not support bound constraints in SCIP, due to a SCIP limitation.")
 
         # Define variable bounds as constraints
@@ -146,7 +147,7 @@ class Scip(SolverBase):
                 prob = [1 / len(estimators)] * len(estimators)
         else:
             if len(prob) != len(estimators):
-                raise ValueError("Length of 'prob' must match length of 'estimators'.")
+                raise MismatchedProbabilityError("Length of <prob> must match length of <estimators>.")
 
         for name, obj in zip(estimators, prob):
             self._vars_map[name] = self.model.addVar(name=name, vtype='C', lb=lb, obj=obj)
@@ -206,7 +207,7 @@ class Scip(SolverBase):
         duals = [self.model.getDualSolVal(c) for c in cons]
 
         if self.__SCIP_INVALID in duals:
-            raise ValueError("SCIP returned an invalid dual value with 1e+99.")
+            raise BendersBackendError("SCIP returned an invalid dual value with 1e+99.")
 
         return duals
 
@@ -215,7 +216,7 @@ class Scip(SolverBase):
         ray = [self.model.getDualfarkasLinear(c) for c in cons]
 
         if self.__SCIP_INVALID in ray:
-            raise ValueError("SCIP returned an invalid extreme ray with 1e+99.")
+            raise BendersBackendError("SCIP returned an invalid extreme ray with 1e+99.")
 
         # SCIP returns Farkas Dual with opposite sign to Gurobi
         ray = [-r for r in ray]
@@ -239,7 +240,6 @@ class Scip(SolverBase):
             self._cons_map[name] = self.model.addCons(lhs >= cut.rhs, name=name)
 
     def remove_cut(self, cut_name: str) -> None:
-        # raise NotImplementedError("Removing cuts is not supported by the SCIP interface yet.")
         self.model.freeTransform()
 
         cons = self._cons_map[cut_name]

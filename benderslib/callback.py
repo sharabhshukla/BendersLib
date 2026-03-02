@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Callable, Type
 
 from .consts import BendersConsts as CST
+from .errors import BendersCallbackError
 
 # Avoid circular imports
 if TYPE_CHECKING:
@@ -563,7 +564,7 @@ class _FuncWrapperCallback(CallbackBase):
         self._func = func
 
         if self._func.__name__ not in self.valid_events:
-            raise ValueError(f"Function name '{self._func.__name__}' should be one of: {self.valid_events}")
+            raise BendersCallbackError(f"Function name '{self._func.__name__}' should be one of: {self.valid_events}")
 
         if hasattr(self._func, '__name__'):
             setattr(self, self._func.__name__, self._func)

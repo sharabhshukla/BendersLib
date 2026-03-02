@@ -4,6 +4,7 @@ from coptpy import Model, LinExpr, COPT, CallbackBase
 
 from ..consts import BendersConsts as CST
 from ._base import SolverBase
+from ..errors import BendersNotImplementedError, MismatchedProbabilityError, BendersCallbackError, BendersBackendError
 
 
 class _CoptCallback(CallbackBase):
@@ -82,12 +83,12 @@ class Copt(SolverBase):
     def __sense_to_minimize(self):
         # BendersLib will automatically convert maximization problems to minimization problems
         if self.model.objsense == COPT.MAXIMIZE:
-            raise NotImplementedError("BendersLib currently only supports minimization problems.")
+            raise BendersNotImplementedError("BendersLib currently only supports minimization problems.")
             # self.model.setObjective(-self.model.getObjective(), sense=COPT.MINIMIZE)
 
     def __bounds_to_constrs(self):
         if any([lb < 0 or ub < 0 for lb, ub in self._var_bounds.values()]):
-            raise NotImplementedError("BendersLib currently only supports non-negative variable bounds.")
+            raise BendersNotImplementedError("BendersLib currently only supports non-negative variable bounds.")
 
         # BendersLib will automatically convert variable bounds to explicit constraints
         for var_name, (lb, ub) in self._var_bounds.items():
@@ -117,7 +118,7 @@ class Copt(SolverBase):
                 prob = [1 / len(estimators)] * len(estimators)
         else:
             if len(prob) != len(estimators):
-                raise ValueError("Length of 'prob' must match length of 'estimators'.")
+                raise MismatchedProbabilityError("Length of <prob> must match length of <estimators>.")
 
         for var_name, obj in zip(estimators, prob):
             self.model.addVar(lb=lb, vtype=COPT.CONTINUOUS, obj=obj, name=var_name)
@@ -158,7 +159,7 @@ class Copt(SolverBase):
             elif c.lb == c.ub:
                 rhs.append(c.lb)
             else:
-                raise ValueError(f"Constraint {c.getName()} has both bounds ({c.lb}, {c.ub}). Cannot determine RHS.")
+                raise BendersBackendError(f"Constraint has both bounds ({c.lb}, {c.ub}). Cannot determine RHS.")
         return rhs
 
     def get_dual_values(self) -> list[float]:
@@ -169,7 +170,7 @@ class Copt(SolverBase):
         has_nl_cons = not self.model.getAttr("Rows") == len(self.model.getConstrs())
 
         if has_nl_cons:
-            raise Exception("Unable to obtain FarkasDual from COPT model with nonlinear constraints.")
+            raise BendersBackendError("Unable to obtain FarkasDual from COPT model with nonlinear constraints.")
 
         else:
             has_nl_obj = (
@@ -234,7 +235,7 @@ class Copt(SolverBase):
             obj = self.__copt_cb.getInfo(COPT.cbinfo.RelaxSolObj)
 
         else:
-            raise Exception("Invalid callback where. Expected 'INCUMBENT' or 'NODE'.")
+            raise BendersCallbackError("Invalid callback where. Expected 'INCUMBENT' or 'NODE'.")
 
         return obj
 
@@ -251,7 +252,7 @@ class Copt(SolverBase):
         elif self._callback_where == CST.NODE:
             vals = {n: self.__copt_cb.getRelaxSol(self.model.getVarByName(n)) for n in vars}
         else:
-            raise Exception("Invalid callback where. Expected 'INCUMBENT' or 'NODE'.")
+            raise BendersCallbackError("Invalid callback where. Expected 'INCUMBENT' or 'NODE'.")
 
         return vals
 

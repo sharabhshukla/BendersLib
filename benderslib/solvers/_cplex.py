@@ -6,6 +6,7 @@ from cplex.callbacks import MIPInfoCallback, LazyConstraintCallback, IncumbentCa
 from ..consts import BendersConsts as CST
 from ._base import SolverBase
 from ..utils import is_all_integer
+from ..errors import BendersNotImplementedError, MismatchedProbabilityError, BendersCallbackError
 
 
 class Cplex(SolverBase):
@@ -64,11 +65,11 @@ class Cplex(SolverBase):
     def __sense_to_minimize(self):
         # BendersLib will automatically convert maximization problems to minimization problems
         if self._sense == CST.MAX:
-            raise NotImplementedError("BendersLib currently only supports minimization problems.")
+            raise BendersNotImplementedError("BendersLib currently only supports minimization problems.")
 
     def __bounds_to_constrs(self):
         if any([lb < 0 or ub < 0 for lb, ub in self._var_bounds.values()]):
-            raise NotImplementedError("BendersLib currently only supports non-negative variable bounds.")
+            raise BendersNotImplementedError("BendersLib currently only supports non-negative variable bounds.")
 
         # BendersLib will automatically convert variable bounds to explicit constraints
         for var_name, (lb, ub) in self._var_bounds.items():
@@ -118,7 +119,7 @@ class Cplex(SolverBase):
                 prob = [1 / len(estimators)] * len(estimators)
         else:
             if len(prob) != len(estimators):
-                raise ValueError("Length of 'prob' must match length of 'estimators'.")
+                raise MismatchedProbabilityError("Length of <prob> must match length of <estimators>.")
 
         self.model.variables.add(
             obj=prob,
@@ -230,7 +231,7 @@ class Cplex(SolverBase):
             # Set obj to +inf if the node solution is not integer feasible.
             obj = obj if is_int else float('inf')
         else:
-            raise Exception("Invalid callback where. Expected 'INCUMBENT' or 'NODE'.")
+            raise BendersCallbackError("Invalid callback where. Expected 'INCUMBENT' or 'NODE'.")
         return obj
 
     def _cb_get_bound(self):
