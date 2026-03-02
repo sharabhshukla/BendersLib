@@ -69,4 +69,4 @@ Contents
    benders.rst
    callbacks.rst
    functions.rst
-   exceptions.rst
+   errors.rst

@@ -1,9 +1,7 @@
-.. _exceptions:
-
-Exceptions
+Errors
 ==========
 
-.. automodule:: benderslib.exceptions
+.. automodule:: benderslib.errors
    :members:
 
 .. rubric:: Exception List
