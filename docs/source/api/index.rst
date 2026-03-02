@@ -68,4 +68,5 @@ Contents
    cuts.rst
    benders.rst
    callbacks.rst
+   functions.rst
    exceptions.rst

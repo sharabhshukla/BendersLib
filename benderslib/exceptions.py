@@ -1,6 +1,5 @@
 # coding:utf-8
 
-
 class BendersError(Exception):
     """Base class for exceptions in benderslib."""
 
@@ -28,6 +27,7 @@ class BendersMasterError(BendersError):
     """Exception raised for errors in the master problem."""
     code = "MP-000"
     description = "An error occurred in the master problem."
+    help_url = "https://benders.dev/docs/errors#MP-000"
 
 
 class BendersSubError(BendersError):

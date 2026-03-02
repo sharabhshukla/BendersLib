@@ -3,7 +3,7 @@
 from abc import ABC, abstractmethod
 
 from ..consts import BendersConsts as CST
-from ..utils import load_config
+from ..utils import _load_config
 
 
 class SolverBase(ABC):
@@ -43,7 +43,7 @@ class SolverBase(ABC):
             would impact convergence of Benders decomposition.
         """
 
-        self._options = load_config()
+        self._options = _load_config()
         """A dictionary of solver-specific options loaded from the configuration file."""
 
         # Attributes to be set in the subclass
