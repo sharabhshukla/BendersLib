@@ -24,18 +24,21 @@ Features
 
 BendersLib provides tutorials, built-in implementations, and
 code examples for various representative Benders decomposition
-variants, as listed below. Since BendersLib is designed to
-be extensible, allowing users to implement their own Benders cuts,
-subproblem solvers, and callback functions, the variants supported
-are not limited to the ones below.
+variants. Since BendersLib is designed to be extensible,
+allowing users to implement their own Benders cuts,
+subproblem solvers, and callback functions, the variants
+supported are not limited to the ones below.
 
-.. list-table:: Benders Decomposition Variants
+.. list-table:: Features of BendersLib
    :widths: auto
    :header-rows: 1
 
-   * - Variant
+   * - Feature
      - API
      - Example
+   * - **Benders Decomposition Variants**
+     -
+     -
    * - :doc:`tutorials/classical`
      - :class:`~benderslib.ClassicalBenders`
      - :doc:`Example <_tags/benders-classical>`
@@ -57,9 +60,21 @@ are not limited to the ones below.
    * - :doc:`tutorials/lbbd`
      - :class:`~benderslib.LogicBasedBenders`
      - :doc:`Example <_tags/benders-lbbd>`
-   * - Automatic Decomposition
+   * - **Other Features**
+     -
+     -
+   * - :ref:`Annotation Benders Decomposition <manual_decompose_solve>`
      - :class:`~benderslib.AnnotationBenders`
      - :doc:`Example <examples/basic/annotation_benders>`
+   * - :ref:`Custom Cut Generation <manual_custom_cut>`
+     - :class:`~benderslib.CutGenerator`
+     - :doc:`Example <_tags/custom-cut>`
+   * - :ref:`Custom Subproblem Solver <manual_custom_sub>`
+     - :class:`~benderslib.LogicBasedSubProblem`
+     - :doc:`Example <_tags/custom-subproblem>`
+   * - :doc:`Callback Functions </manual/callbacks>`
+     - :class:`~benderslib.CallbackBase`
+     - :doc:`Example <_tags/callback>`
 
 BendersLib works with a variety of solvers through its built-in interfaces.
 See :ref:`solver-table` for a comprehensive list of features
@@ -69,11 +84,10 @@ Mathematical Programming solvers (
 :class:`~.solvers.Cplex`,
 :class:`~.solvers.Gurobi`,
 :class:`~.solvers.Scip`,
-and :class:`~.solvers.Pyomo`
-) and Constraint Programming solvers (
-:class:`~.solvers.CplexCP` and
-:class:`~.solvers.Ortools`
-).
+and :class:`~.solvers.Pyomo`)
+and Constraint Programming solvers (
+:class:`~.solvers.CplexCP`
+and :class:`~.solvers.Ortools`).
 
 Quickstart
 -----------------------------------
