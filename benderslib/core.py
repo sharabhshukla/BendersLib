@@ -523,7 +523,7 @@ class LogicBasedSubProblem(ABC):
     """The abstract base class for the subproblem in the Logic-based Benders Decomposition.
 
     To implement a customized subproblem, at least :meth:`solve` required to be overridden,
-    as it will be called during the Benders solving process after :meth:`BendersSolver.solve` is invoked.
+    as it will be called during the Benders solving process after :meth:`~BendersSolver.solve` is invoked.
     Other methods and attributes can be added as needed, based on the specific implementation of :class:`CutGenerator`.
 
     Parameters
@@ -554,7 +554,7 @@ class LogicBasedSubProblem(ABC):
         self.complicating_var_values: dict[str, float | int] = {}
         """The values of complicating variables provided by the master problem.
         
-        After calling :meth:`BendersSolver.solve`, this attribute will be updated via :meth:`fix_vars`
+        After calling :meth:`~BendersSolver.solve`, this attribute will be updated via :meth:`fix_vars`
         after the master problem is solved. Therefore, users do not need to set it manually, 
         and can directly use it when implementing :meth:`solve`.
            
@@ -580,12 +580,12 @@ class LogicBasedSubProblem(ABC):
 
         This method is **required** to be implemented.
 
-        *   :attr:`status` is used in :meth:`SubProblems.solve` to indicate if the subproblem is
-            optimal (:attr:`BendersConsts.OPTIMAL`) or infeasible (:attr:`BendersConsts.INFEASIBLE`),
+        *   :attr:`status` is used in the :meth:`~SubProblems.solve` method to indicate if the subproblem
+            is optimal (:attr:`~BendersConsts.OPTIMAL`) or infeasible (:attr:`~BendersConsts.INFEASIBLE`),
             guiding whether to add optimality or feasibility cuts.
-        *   :attr:`obj` is used in :meth:`BendersSolver.solve` to compute the upper bound,
+        *   :attr:`obj` is used in the :meth:`~BendersSolver.solve` method to compute the upper bound,
             determining convergence.
-        *   :attr:`var_values` is used in :meth:`BendersSolver.solve` when saving the final solution.
+        *   :attr:`var_values` is used in the :meth:`~BendersSolver.solve` method when saving the final solution.
 
         .. caution::
             * It is safe to assume that :attr:`complicating_var_values` has been set.
@@ -655,7 +655,7 @@ class LogicBasedSubProblem(ABC):
         """Fix the values of specified variables in the model (do **not** override it).
 
         This method simply update :attr:`complicating_var_values`.
-        It ise used by :meth:`BendersSolver.solve`.
+        It is used by the :meth:`~BendersSolver.solve` method.
         """
         self.complicating_var_values = var_values
 
@@ -664,7 +664,7 @@ class LogicBasedSubProblem(ABC):
 
         It is used for saving the final solution.
         This method simply return :attr:`var_values`, which should be updated in :meth:`solve`.
-        It ise used by :meth:`BendersSolver.solve`.
+        It is used by the :meth:`~BendersSolver.solve` method.
         """
         if vars is None:
             return self.var_values
@@ -675,7 +675,7 @@ class LogicBasedSubProblem(ABC):
         """Get the objective value of the model after solving (do **not** override it).
 
         This method simply return :attr:`obj`, which should be updated in :meth:`solve`.
-        It ise used by :meth:`BendersSolver.solve`.
+        It is used by the :meth:`~BendersSolver.solve` method.
         """
         return self.obj
 
@@ -780,7 +780,7 @@ class SubProblems:
     def get_obj(self) -> float:
         """Get the :attr:`prob` weighted objective value of all subproblems.
 
-        It ise used by :meth:`BendersSolver.solve`.
+        It is used by the :meth:`~BendersSolver.solve` method.
 
         Returns
         ---------------
@@ -801,7 +801,7 @@ class SubProblems:
     def fix_vars(self, var_values: dict[str, float]) -> None:
         """Fix the values of specified variables in all subproblems.
 
-        It ise used by :meth:`BendersSolver.solve`.
+        It is used by the :meth:`~BendersSolver.solve` method.
 
         Parameters
         ---------------
@@ -822,7 +822,7 @@ class SubProblems:
     def get_var_values(self, vars: list[str] = None) -> dict[int, dict[str, float]]:
         """Get the current values of specified variables in all subproblems.
 
-        It ise used by :meth:`BendersSolver.solve`.
+        It is used by the :meth:`~BendersSolver.solve` method.
 
         Parameters
         ---------------
@@ -866,7 +866,7 @@ class SubProblems:
         If any subproblem is infeasible and :attr:`BendersParams.multi_feas_cut` is ``False``,
         the solving process will stop early.
 
-        It ise used by :meth:`BendersSolver.solve`.
+        It is used by the :meth:`~BendersSolver.solve` method.
         """
         if self.params.parallel_sub:
             return self.prl_solve()
@@ -884,7 +884,7 @@ class SubProblems:
         If any subproblem is infeasible and :attr:`BendersParams.multi_feas_cut` is ``False``,
         the solving process will stop early.
 
-        It ise used by :meth:`BendersSolver.solve`.
+        It is used by the :meth:`~BendersSolver.solve` method.
         """
         from concurrent.futures import ThreadPoolExecutor, as_completed
 
@@ -921,9 +921,9 @@ class Cut:
     rhs : float | int
         The right-hand side value of the cut.
     sense : str
-        The sense of the cut (:attr:`BendersConsts.LE`, :attr:`BendersConsts.GE`, or :attr:`BendersConsts.EQ`).
+        The sense of the cut (:attr:`~BendersConsts.LE`, :attr:`~BendersConsts.GE`, or :attr:`~BendersConsts.EQ`).
     ctype : str
-        It should be :attr:`BendersConsts.OPTIMALITY` or :attr:`BendersConsts.FEASIBILITY`.
+        It should be :attr:`~BendersConsts.OPTIMALITY` or :attr:`~BendersConsts.FEASIBILITY`.
     name : str
         The name for the cut.
 
@@ -965,12 +965,12 @@ class Cut:
         self.sense: str = sense
         """The sense of the cut.
 
-        It must be :attr:`BendersConsts.LE`, :attr:`BendersConsts.GE`, or :attr:`BendersConsts.EQ`.
+        It must be :attr:`~BendersConsts.LE`, :attr:`~BendersConsts.GE`, or :attr:`~BendersConsts.EQ`.
         """
         self.ctype: Union[CST.OPTIMAL, CST.FEASIBILITY] = ctype
         """The indicator of the cut type.
 
-        It should be either :attr:`BendersConsts.OPTIMALITY` or :attr:`BendersConsts.FEASIBILITY`.
+        It should be either :attr:`~BendersConsts.OPTIMALITY` or :attr:`~BendersConsts.FEASIBILITY`.
         """
         self.name: str = name
         """The name for the cut."""
@@ -1677,7 +1677,7 @@ class BendersSolver:
         When running Branch-and-check, BendersLib does not check whether the cut generated has been
         already added to the master problem, as another node may encounter the same solution and
         generate the same cut, which is not necessarily redundant in Branch-and-check.
-        This differs from running the traditional Benders method using :meth:`~BendersSolver.solve()`,
+        This differs from running the traditional Benders method using :meth:`~BendersSolver.solve`,
         which warns users about duplicate cuts and skips adding them to the master problem.
 
         The definition of the lower bound (and the gap) in Branch-and-check is different from
@@ -1696,7 +1696,7 @@ class BendersSolver:
         the subproblem (:attr:`~BendersResult.runtime_sub`).
 
         This method can also be used by setting :attr:`~BendersParams.use_bnc` to ``True``
-        and calling :meth:`~BendersSolver.solve()`, which will internally call this method.
+        and calling :meth:`~BendersSolver.solve`, which will internally call this method.
 
         .. caution::
 
