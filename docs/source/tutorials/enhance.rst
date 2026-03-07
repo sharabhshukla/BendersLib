@@ -117,6 +117,8 @@ By keeping the master problem lean, the overall performance of the algorithm can
 
 ------
 
+.. _enhance_parallel:
+
 Parallelization
 ------------------------------
 

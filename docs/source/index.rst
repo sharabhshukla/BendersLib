@@ -60,7 +60,7 @@ supported are not limited to the ones below.
    * - :doc:`tutorials/lbbd`
      - :class:`~benderslib.LogicBasedBenders`
      - :doc:`Example <_tags/benders-lbbd>`
-   * - **Other Features**
+   * - **Extensibility Features**
      -
      -
    * - :ref:`Annotation Benders Decomposition <manual_decompose_solve>`
@@ -75,6 +75,21 @@ supported are not limited to the ones below.
    * - :doc:`Callback Functions </manual/callbacks>`
      - :class:`~benderslib.CallbackBase`
      - :doc:`Example <_tags/callback>`
+   * - **Enhancement Options**
+     -
+     -
+   * - :ref:`Branch-and-check Method <enhance_branch_and_check>`
+     - :attr:`~benderslib.BendersParams.use_bnc`
+     - :doc:`Example <_tags/branch-and-check>`
+   * - :ref:`Parallel Subproblem Solving <enhance_parallel>`
+     - :attr:`~benderslib.BendersParams.parallel_sub`
+     - :doc:`Example <examples/basic/lshaped>`
+   * - Multi-cut Generation
+     - :attr:`~benderslib.BendersParams.multi_opti_cut`, :attr:`~benderslib.BendersParams.multi_feas_cut`
+     - :doc:`Example <examples/basic/lshaped>`
+   * - IIS-based Feasibility Cut Generation
+     - :attr:`~benderslib.BendersParams.use_iis_cut`
+     - :doc:`Example <examples/basic/bnc_cbd>`
 
 BendersLib works with a variety of solvers through its built-in interfaces.
 See :ref:`solver-table` for a comprehensive list of features
