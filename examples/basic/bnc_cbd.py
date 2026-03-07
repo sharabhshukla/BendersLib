@@ -8,7 +8,7 @@ Combinatorial Benders using Branch-and-check Method
 # %%
 # Prepare the problem for Benders decomposition.
 
-from benderslib import AnnotationBenders, CombinatorialBenders
+from benderslib import AnnotatedBenders, CombinatorialBenders
 from benderslib.solvers import Gurobi
 from gurobipy import Model, GRB
 
@@ -41,7 +41,7 @@ def make_original_problem():
 
 model, complicating_vars = make_original_problem()
 
-BD = AnnotationBenders(
+BD = AnnotatedBenders(
     model,
     solver=Gurobi,
     complicating_vars=complicating_vars,

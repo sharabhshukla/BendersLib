@@ -188,14 +188,14 @@ This attribute is an instance of the :class:`BendersResult` class.
 Automated Decomposition
 -------------------------------------------
 
-BendersLib provides an automated decomposition feature through the :class:`AnnotationBenders` class.
+BendersLib provides an automated decomposition feature through the :class:`AnnotatedBenders` class.
 This allows you to decompose a problem by simply providing the original model and specifying the complicating/master variables.
 BendersLib will then automatically create the master problem and subproblem.
 Here's how to use the automated decomposition feature.
 
 .. code-block:: python
 
-    from benderslib import AnnotationBenders, ClassicalBenders
+    from benderslib import AnnotatedBenders, ClassicalBenders
     from benderslib.solvers import Gurobi
     from gurobipy import Model, GRB
 
@@ -212,9 +212,9 @@ Here's how to use the automated decomposition feature.
         complicating_vars = [y.VarName]
         return model, complicating_vars
 
-    # Create an AnnotationBenders instance
+    # Create an AnnotatedBenders instance
     original_problem, complicating_vars = make_original_problem()
-    benders_solver = AnnotationBenders(
+    benders_solver = AnnotatedBenders(
         original_problem=original_problem,
         solver=Gurobi,
         benders=ClassicalBenders,
@@ -227,7 +227,7 @@ Here's how to use the automated decomposition feature.
     print(f"Solution: {benders_solver.result.solution}")
 
 
-In this example, :class:`AnnotationBenders` takes the complete optimization model,
+In this example, :class:`AnnotatedBenders` takes the complete optimization model,
 identifies the master-only and subproblem-only variables and constraints based on the provided ``complicating_vars``,
 and then constructs the master problem and subproblem.
 Finally, it uses the specified Benders method (:class:`ClassicalBenders` in this case) to solve the decomposed problem.
@@ -242,7 +242,7 @@ Finally, it uses the specified Benders method (:class:`ClassicalBenders` in this
 .. admonition:: Example
     :class: seealso
 
-    :ref:`manual_decompose_solve`, :doc:`../examples/basic/annotation_benders`, :doc:`../examples/api/decompose`,
+    :ref:`manual_decompose_solve`, :doc:`../examples/basic/annotated_benders`, :doc:`../examples/api/decompose`,
     :doc:`../examples/basic/cbd`
 
 Customization

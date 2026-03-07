@@ -6,7 +6,7 @@ from ..solvers import SolverBase
 from ..core import BendersParams, MasterProblem, SubProblem, BendersSolver
 
 
-class AnnotationBenders:
+class AnnotatedBenders:
     """The class to perform Benders decomposition using annotation-based approach.
 
     This class decomposes the original problem into a master problem and a subproblem
@@ -57,14 +57,14 @@ class AnnotationBenders:
     -------
     .. code-block:: python
 
-        from benderslib import AnnotationBenders, ClassicalBenders
+        from benderslib import AnnotatedBenders, ClassicalBenders
         from benderslib.solvers import Gurobi
 
         original_problem = ...  # Define or load your original problem here
         complicating_vars = [...]  # List of complicating variable names
         master_vars = [...]  # List of master variable names (usually a superset of complicating_vars)
 
-        benders_solver = AnnotationBenders(
+        benders_solver = AnnotatedBenders(
             original_problem=original_problem,
             solver=Gurobi,
             benders=ClassicalBenders,
@@ -149,13 +149,13 @@ class AnnotationBenders:
         --------
         .. code-block:: python
 
-            from benderslib import AnnotationBenders
+            from benderslib import AnnotatedBenders
             from benderslib.solvers import Gurobi
 
             original_problem = ...  # Define or load your original problem here
             master_vars = [...]  # List of master variable names (usually a superset of complicating_vars)
 
-            master, sub = AnnotationBenders.decompose(
+            master, sub = AnnotatedBenders.decompose(
                 original_problem=original_problem,
                 solver=Gurobi,
                 master_vars=master_vars,

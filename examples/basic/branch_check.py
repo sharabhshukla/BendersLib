@@ -8,7 +8,7 @@ Branch-and-check Method
 # %%
 # Prepare the problem for Benders decomposition.
 
-from benderslib import ClassicalBenders, AnnotationBenders
+from benderslib import ClassicalBenders, AnnotatedBenders
 from benderslib.solvers import Gurobi
 from benderslib.utils import draw_curve
 from gurobipy import Model, GRB
@@ -40,7 +40,7 @@ def make_original_problem():
 # Solve the problem using Branch-and-check method:
 
 model, complicating_vars = make_original_problem()
-BD = AnnotationBenders(
+BD = AnnotatedBenders(
     model,
     solver=Gurobi,
     complicating_vars=complicating_vars,
@@ -54,7 +54,7 @@ draw_curve(BD.result)
 # .. seealso::
 #
 #    - A brief introduction to :ref:`enhance_branch_and_check`.
-#    - Its classical implementation counterpart is :doc:`annotation_benders`.
+#    - Its classical implementation counterpart is :doc:`annotated_benders`.
 #      The acceleration is remarkable!!
 #
 # .. tags:: benders: classical, solver: gurobi, deterministic, enhancement, branch-and-check

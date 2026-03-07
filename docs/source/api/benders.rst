@@ -40,7 +40,7 @@ Benders Methods
     :show-inheritance:
     :exclude-members: master_problem, sub_problem, complicating_vars, optimality_cut, feasibility_cut, params, result
 
-.. autoclass:: AnnotationBenders
+.. autoclass:: AnnotatedBenders
     :inherited-members:
     :show-inheritance:
     :exclude-members: master_problem, sub_problem, complicating_vars, optimality_cut, feasibility_cut, params, result

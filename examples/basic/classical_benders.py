@@ -99,6 +99,6 @@ print(f"Benders Decomposition Obj: {BD.result.obj}")
 #
 #     * Tutorial of Classical Benders Decomposition: :doc:`../../tutorials/classical`
 #     * This example uses the following class: :class:`~benderslib.ClassicalBenders`
-#     * Automated decomposition based on complicating variables: :doc:`annotation_benders`
+#     * Automated decomposition based on complicating variables: :doc:`annotated_benders`
 #
 # .. tags:: benders: classical, solver: gurobi, deterministic, branch-and-check

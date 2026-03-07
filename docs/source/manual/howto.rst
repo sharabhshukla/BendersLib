@@ -17,7 +17,7 @@ For example, if you are using :class:`~.solvers.Gurobi`, you can access the Guro
 
 .. code-block:: python
 
-    from benderslib import AnnotationBenders, ClassicalBenders
+    from benderslib import AnnotatedBenders, ClassicalBenders
     from benderslib.solvers import Gurobi
     from gurobipy import Model, GRB
 
@@ -35,7 +35,7 @@ For example, if you are using :class:`~.solvers.Gurobi`, you can access the Guro
     complicating_vars = ["x"]
 
     # Create and solve using Benders decomposition
-    benders = AnnotationBenders(
+    benders = AnnotatedBenders(
         model,
         solver=Gurobi,
         complicating_vars=complicating_vars,
@@ -55,13 +55,13 @@ How to build master/sub problems from a monolithic model?
 --------------------------------------------------------------
 
 BendersLib offers two ways to decompose a monolithic optimization model into master and sub problems.
-You can either use the :meth:`AnnotationBenders.decompose` method,
+You can either use the :meth:`AnnotatedBenders.decompose` method,
 or the solver-specific methods like :meth:`~.SolverBase.make_master_problem` and :meth:`~.SolverBase.make_sub_problem`.
 The following example demonstrates both approaches.
 
 .. code-block:: python
 
-    from benderslib import AnnotationBenders, MasterProblem, SubProblem
+    from benderslib import AnnotatedBenders, MasterProblem, SubProblem
     from gurobipy import Model, GRB
 
     # Use other solver interfaces (e.g., Copt, etc) as needed
@@ -81,7 +81,7 @@ The following example demonstrates both approaches.
     master_vars = ["x"]
 
     # Approach 1:
-    master_problem, sub_problem = AnnotationBenders.decompose(
+    master_problem, sub_problem = AnnotatedBenders.decompose(
         original_problem=model,
         solver=Gurobi,
         master_vars=master_vars,
@@ -102,7 +102,7 @@ How to start from standard mathematical programming files?
 
 BendersLib can be used with models created from standard mathematical programming files (e.g., ``.mps``, ``.lp``).
 You can use the functions of the external solver to read the model file,
-and then use the :class:`AnnotationBenders` class or the :meth:`~.SolverBase.make_master_problem`
+and then use the :class:`AnnotatedBenders` class or the :meth:`~.SolverBase.make_master_problem`
 and :meth:`~.SolverBase.make_sub_problem` methods to perform the decomposition.
 The supported file formats depend on the underlying solver being used.
 The following example shows how to read a ``.lp`` file using Gurobi and then apply Benders decomposition.
@@ -111,7 +111,7 @@ The following example shows how to read a ``.lp`` file using Gurobi and then app
 
     from gurobipy import read
     from benderslib.solvers import Gurobi
-    from benderslib import AnnotationBenders, ClassicalBenders
+    from benderslib import AnnotatedBenders, ClassicalBenders
 
 
     # Read model from file
@@ -135,7 +135,7 @@ The following example shows how to read a ``.lp`` file using Gurobi and then app
     complicating_vars = ["x"]
 
     # Create and solve using Benders decomposition
-    benders = AnnotationBenders(
+    benders = AnnotatedBenders(
         model,
         solver=Gurobi,
         complicating_vars=complicating_vars,

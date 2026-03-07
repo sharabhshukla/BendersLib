@@ -290,9 +290,9 @@ and define all attributes defined in :class:`SolverBase`.
 While :class:`SolverBase` defines several abstract methods that you must implement,
 two methods, :meth:`~SolverBase.make_master_problem` and :meth:`~SolverBase.make_sub_problem`,
 have special considerations.
-These methods are essential for the :class:`AnnotationBenders` class,
+These methods are essential for the :class:`AnnotatedBenders` class,
 which automates the decomposition process.
-If you do not intend to use :class:`AnnotationBenders`,
+If you do not intend to use :class:`AnnotatedBenders`,
 you might not need to implement the full logic for these methods.
 However, for a solver interface to be considered for contribution to the official BendersLib repository,
 a complete and functional implementation of these methods is required to ensure full compatibility with all library features.

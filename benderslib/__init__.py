@@ -53,7 +53,7 @@ from .cuts import (
 )
 
 from .benders import (
-    AnnotationBenders,
+    AnnotatedBenders,
     ClassicalBenders,
     CombinatorialBenders,
     LShaped,
@@ -115,7 +115,7 @@ __all__ = [
     "GeneLShapedOCGen",
 
     # Benders methods
-    "AnnotationBenders",
+    "AnnotatedBenders",
     "ClassicalBenders",
     "CombinatorialBenders",
     "LShaped",

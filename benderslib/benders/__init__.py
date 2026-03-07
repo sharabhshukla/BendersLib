@@ -1,7 +1,6 @@
 # coding:utf-8
 
-from .annotation import AnnotationBenders
-
+from .annotated import AnnotatedBenders
 from .classical import ClassicalBenders
 from .combinatorial import CombinatorialBenders
 from .lshaped import LShaped
@@ -11,7 +10,7 @@ from .generalized import GeneralizedBenders
 from .glshaped import GeneLShaped
 
 __all__ = [
-    "AnnotationBenders",
+    "AnnotatedBenders",
     "ClassicalBenders",
     "CombinatorialBenders",
     "LShaped",

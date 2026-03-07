@@ -8,7 +8,7 @@ Cut from Master Solution Neighbor
 # %%
 # Prepare the problem for Benders decomposition.
 
-from benderslib import ClassicalBenders, AnnotationBenders, CallbackBase, ClassicalOC, CST
+from benderslib import ClassicalBenders, AnnotatedBenders, CallbackBase, ClassicalOC, CST
 from benderslib.solvers import Gurobi
 from benderslib.utils import draw_curve
 
@@ -128,7 +128,7 @@ class TwoCuts(CallbackBase):
 model, complicating_vars = make_original_problem()
 model_copy = model.copy()
 
-BD = AnnotationBenders(
+BD = AnnotatedBenders(
     model,
     solver=Gurobi,
     complicating_vars=complicating_vars,
@@ -147,7 +147,7 @@ draw_curve(BD.result)
 # %%
 # Run without the callback.
 
-BD = AnnotationBenders(
+BD = AnnotatedBenders(
     model_copy,
     solver=Gurobi,
     complicating_vars=complicating_vars,

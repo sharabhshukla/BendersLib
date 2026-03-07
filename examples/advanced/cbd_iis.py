@@ -11,7 +11,7 @@ with customized Benders cuts.
 # %%
 # Define the original problem.
 
-from benderslib import AnnotationBenders, CombinatorialBenders, NoGoodFC, MasterProblem, SubProblem
+from benderslib import AnnotatedBenders, CombinatorialBenders, NoGoodFC, MasterProblem, SubProblem
 from benderslib.solvers import Gurobi
 from gurobipy import Model, GRB
 import matplotlib.pyplot as plt
@@ -79,7 +79,7 @@ print(f"Original Problem Obj: {model.ObjVal}")
 # %%
 # Solve the problem using Combinatorial Benders Decomposition + IIS-based cuts.
 
-AB = AnnotationBenders(
+AB = AnnotatedBenders(
     model,
     solver=Gurobi,
     complicating_vars=complicating_vars,
@@ -95,7 +95,7 @@ AB.solve()
 # %%
 # Solve the problem using Combinatorial Benders Decomposition + Naive cuts.
 
-AB_ = AnnotationBenders(
+AB_ = AnnotatedBenders(
     model_copy,
     solver=Gurobi,
     complicating_vars=complicating_vars,
@@ -124,7 +124,7 @@ plt.show()
 # .. seealso::
 #
 #     * Tutorial of Combinatorial Benders Decomposition: :doc:`../../tutorials/cbd`
-#     * This example uses the following classes: :class:`~benderslib.AnnotationBenders`,
+#     * This example uses the following classes: :class:`~benderslib.AnnotatedBenders`,
 #       :class:`~benderslib.CombinatorialBenders`
 #
 # .. tags:: benders: combinatorial, solver: gurobi, deterministic, custom: cut, iis, branch-and-check

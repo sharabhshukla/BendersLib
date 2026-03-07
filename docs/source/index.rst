@@ -63,9 +63,9 @@ supported are not limited to the ones below.
    * - **Extensibility Features**
      -
      -
-   * - :ref:`Annotation Benders Decomposition <manual_decompose_solve>`
-     - :class:`~benderslib.AnnotationBenders`
-     - :doc:`Example <examples/basic/annotation_benders>`
+   * - :ref:`Annotated Benders Decomposition <manual_decompose_solve>`
+     - :class:`~benderslib.AnnotatedBenders`
+     - :doc:`Example <examples/basic/annotated_benders>`
    * - :ref:`Custom Cut Generation <manual_custom_cut>`
      - :class:`~benderslib.CutGenerator`
      - :doc:`Example <_tags/custom-cut>`
@@ -129,7 +129,7 @@ to Benders decomposition with only a few lines of code.
 
 .. code-block:: python
 
-    from benderslib import AnnotationBenders, ClassicalBenders
+    from benderslib import AnnotatedBenders, ClassicalBenders
     from benderslib.solvers import Gurobi
 
     from gurobipy import Model, GRB
@@ -147,7 +147,7 @@ to Benders decomposition with only a few lines of code.
     complicating_vars = ["x"]
 
     # Create and solve using Benders decomposition
-    benders = AnnotationBenders(
+    benders = AnnotatedBenders(
         model,
         solver=Gurobi,
         complicating_vars=complicating_vars,

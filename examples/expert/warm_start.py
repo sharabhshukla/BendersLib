@@ -8,7 +8,7 @@ Warm Start
 # %%
 # Prepare the problem for Benders decomposition.
 
-from benderslib import AnnotationBenders, ClassicalBenders, CallbackBase, CST
+from benderslib import AnnotatedBenders, ClassicalBenders, CallbackBase, CST
 from benderslib.utils import draw_curve
 from benderslib.solvers import Gurobi
 
@@ -78,7 +78,7 @@ class WarmStartCallback(CallbackBase):
 model, complicating_vars = make_original_problem()
 
 # Create the Benders decomposition solver
-AB = AnnotationBenders(model, solver=Gurobi, complicating_vars=complicating_vars, benders=ClassicalBenders)
+AB = AnnotatedBenders(model, solver=Gurobi, complicating_vars=complicating_vars, benders=ClassicalBenders)
 
 # Register the warm start callback
 warm_start_callback = WarmStartCallback()

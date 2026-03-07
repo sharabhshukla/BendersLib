@@ -221,14 +221,14 @@ formulate the master problem, subproblem, and Benders cuts.
 Therefore, these procedures can be automated, and users only need to provide the original problem
 and specify which variables are complicating variables.
 We implemented the method in :class:`~benderslib.ClassicalBenders`, and automated it in
-:class:`~benderslib.AnnotationBenders`.
+:class:`~benderslib.AnnotatedBenders`.
 
 .. seealso::
 
     * Rahmaniani et al. [#]_ and Aardal et al. [#]_ also provide the method's mathematical formulation.
     * BendersLib's implementation of optimality and feasibility cuts: :class:`ClassicalOC` and :class:`ClassicalFC`.
     * BendersLib's implementation of the Benders method: :class:`ClassicalBenders`.
-    * **Examples**: :doc:`../examples/basic/classical_benders` and :doc:`../examples/basic/annotation_benders`.
+    * **Examples**: :doc:`../examples/basic/classical_benders` and :doc:`../examples/basic/annotated_benders`.
 
 References
 ------------------------------

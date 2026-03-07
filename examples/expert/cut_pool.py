@@ -8,7 +8,7 @@ Cut Management
 # %%
 # Prepare the problem for Benders decomposition.
 
-from benderslib import ClassicalBenders, AnnotationBenders, CallbackBase
+from benderslib import ClassicalBenders, AnnotatedBenders, CallbackBase
 from benderslib.solvers import Gurobi
 from benderslib.utils import draw_curve
 
@@ -111,7 +111,7 @@ class CutPooling(CallbackBase):
 model, complicating_vars = make_original_problem()
 model_copy = model.copy()
 
-BD = AnnotationBenders(
+BD = AnnotatedBenders(
     model,
     solver=Gurobi,
     complicating_vars=complicating_vars,
@@ -133,7 +133,7 @@ draw_curve(BD.result)
 #
 # Run without the callback.
 
-BD_no_cm = AnnotationBenders(
+BD_no_cm = AnnotatedBenders(
     model_copy,
     solver=Gurobi,
     complicating_vars=complicating_vars,

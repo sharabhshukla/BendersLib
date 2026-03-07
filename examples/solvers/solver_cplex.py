@@ -9,7 +9,7 @@ CPLEX
 # %%
 # Using :class:`~benderslib.solvers.Cplex` as a solver backend.
 
-from benderslib import AnnotationBenders, ClassicalBenders
+from benderslib import AnnotatedBenders, ClassicalBenders
 from benderslib.solvers import Cplex
 from benderslib.utils import draw_curve
 
@@ -78,10 +78,10 @@ if __name__ == '__main__':
     model.solve()
     print("\n CPLEX Objective value:", model.solution.get_objective_value())
 
-    BD = AnnotationBenders(model, solver=Cplex, complicating_vars=complicating_vars, benders=ClassicalBenders)
+    BD = AnnotatedBenders(model, solver=Cplex, complicating_vars=complicating_vars, benders=ClassicalBenders)
     BD.solve()
 
-    BD = AnnotationBenders(model_copy, solver=Cplex, complicating_vars=complicating_vars, benders=ClassicalBenders)
+    BD = AnnotatedBenders(model_copy, solver=Cplex, complicating_vars=complicating_vars, benders=ClassicalBenders)
     BD.params.use_bnc = True
     BD.solve()
 

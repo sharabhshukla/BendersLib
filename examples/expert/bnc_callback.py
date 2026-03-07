@@ -8,7 +8,7 @@ Callback in Branch-and-check Method
 # %%
 # Prepare the problem for Benders decomposition.
 
-from benderslib import ClassicalBenders, AnnotationBenders, BendersContext, CST
+from benderslib import ClassicalBenders, AnnotatedBenders, BendersContext, CST
 from benderslib.solvers import Gurobi
 from benderslib.utils import draw_curve, is_all_integer
 
@@ -66,7 +66,7 @@ def on_opti_cut_generated(context: BendersContext):
 model, complicating_vars = make_original_problem()
 model_copy = model.copy()
 
-BD = AnnotationBenders(
+BD = AnnotatedBenders(
     model,
     solver=Gurobi,
     complicating_vars=complicating_vars,
@@ -83,7 +83,7 @@ draw_curve(BD.result)
 # %%
 # Solve the problem using trivial Branch-and-check method.
 
-BD = AnnotationBenders(
+BD = AnnotatedBenders(
     model_copy,
     solver=Gurobi,
     complicating_vars=complicating_vars,

@@ -10,7 +10,7 @@ Cut Normalization
 
 import math
 
-from benderslib import AnnotationBenders, ClassicalBenders, CallbackBase
+from benderslib import AnnotatedBenders, ClassicalBenders, CallbackBase
 from benderslib.solvers import Gurobi
 from benderslib.utils import draw_curve
 
@@ -83,7 +83,7 @@ class CutNormalization(CallbackBase):
 # Use the callback in the Benders decomposition process.
 
 model, complicating_vars = make_original_problem()
-BD = AnnotationBenders(
+BD = AnnotatedBenders(
     model,
     solver=Gurobi,
     complicating_vars=complicating_vars,

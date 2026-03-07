@@ -9,7 +9,7 @@ SCIP
 # %%
 # Using :class:`~benderslib.solvers.Scip` as a solver backend.
 
-from benderslib import ClassicalBenders, AnnotationBenders, CombinatorialBenders
+from benderslib import ClassicalBenders, AnnotatedBenders, CombinatorialBenders
 from benderslib.solvers import Scip
 from benderslib.utils import draw_curve
 
@@ -65,11 +65,11 @@ model, master_vars = make_original_problem()
 model.optimize()
 model.freeTransform()
 
-BD = AnnotationBenders(model, solver=Scip, complicating_vars=master_vars, benders=ClassicalBenders)
+BD = AnnotatedBenders(model, solver=Scip, complicating_vars=master_vars, benders=ClassicalBenders)
 BD.solve()
 
 model, master_vars = make_original_problem()
-BD = AnnotationBenders(model, solver=Scip, complicating_vars=master_vars, benders=ClassicalBenders)
+BD = AnnotatedBenders(model, solver=Scip, complicating_vars=master_vars, benders=ClassicalBenders)
 BD.params.use_bnc = True
 BD.solve()
 
@@ -82,12 +82,12 @@ model, master_vars = make_combination_problem()
 model.optimize()
 model.freeTransform()
 
-BD = AnnotationBenders(model, solver=Scip, complicating_vars=master_vars, benders=CombinatorialBenders)
+BD = AnnotatedBenders(model, solver=Scip, complicating_vars=master_vars, benders=CombinatorialBenders)
 BD.params.use_iis_cut = True
 BD.solve()
 
 model, master_vars = make_combination_problem()
-BD = AnnotationBenders(model, solver=Scip, complicating_vars=master_vars, benders=CombinatorialBenders)
+BD = AnnotatedBenders(model, solver=Scip, complicating_vars=master_vars, benders=CombinatorialBenders)
 BD.params.use_bnc = True
 BD.params.use_iis_cut = True
 BD.solve()

@@ -9,7 +9,7 @@ COPT
 # %%
 # Using :class:`~benderslib.solvers.Copt` as a solver backend.
 
-from benderslib import AnnotationBenders, ClassicalBenders
+from benderslib import AnnotatedBenders, ClassicalBenders
 from benderslib.solvers import Copt
 from benderslib.utils import draw_curve
 
@@ -38,10 +38,10 @@ if __name__ == '__main__':
     model_copy = model.clone()
     model.solve()
 
-    BD = AnnotationBenders(model, solver=Copt, complicating_vars=complicating_vars, benders=ClassicalBenders)
+    BD = AnnotatedBenders(model, solver=Copt, complicating_vars=complicating_vars, benders=ClassicalBenders)
     BD.solve()
 
-    BD = AnnotationBenders(model_copy, solver=Copt, complicating_vars=complicating_vars, benders=ClassicalBenders)
+    BD = AnnotatedBenders(model_copy, solver=Copt, complicating_vars=complicating_vars, benders=ClassicalBenders)
     BD.params.use_bnc = True
     BD.solve()
 

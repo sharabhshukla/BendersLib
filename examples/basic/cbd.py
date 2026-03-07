@@ -10,7 +10,7 @@ This method is suitable for problems where the complicating variables are binary
 
 # %%
 # Define the original problem.
-from benderslib import AnnotationBenders, CombinatorialBenders
+from benderslib import AnnotatedBenders, CombinatorialBenders
 from benderslib.solvers import Gurobi
 from benderslib.utils import draw_curve
 
@@ -74,7 +74,7 @@ print(f"Original Problem Obj: {model.ObjVal}")
 
 # Using .from_models() method
 # Decompose the original problem into master and subproblem
-master_model, sub_model = AnnotationBenders.decompose(
+master_model, sub_model = AnnotatedBenders.decompose(
     original_problem=model,
     solver=Gurobi,
     master_vars=complicating_vars,
@@ -92,7 +92,7 @@ AB = CombinatorialBenders.from_models(
 # Master and Sub models are required to be re-defined,
 # since they have been modified (by adding cuts) in the previous solve.
 # model, complicating_vars = make_original_problem(has_sub_objective=True)
-# AB = AnnotationBenders(
+# AB = AnnotatedBenders(
 #     original_problem=model,
 #     solver=Gurobi,
 #     complicating_vars=complicating_vars,
@@ -112,7 +112,7 @@ draw_curve(AB.result)
 # .. seealso::
 #
 #     * Tutorial of Combinatorial Benders Decomposition: :doc:`../../tutorials/cbd`
-#     * This example uses the following classes: :class:`~benderslib.AnnotationBenders`, :class:`~benderslib.CombinatorialBenders`
+#     * This example uses the following classes: :class:`~benderslib.AnnotatedBenders`, :class:`~benderslib.CombinatorialBenders`
 #     * Combinatorial Benders Decomposition with customized cut generator: :doc:`../advanced/cbd_iis`
 #
 # .. tags:: benders: combinatorial, solver: gurobi, deterministic, branch-and-check

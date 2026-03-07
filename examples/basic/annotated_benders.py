@@ -1,7 +1,7 @@
 # coding:utf-8
 
 """
-Annotation Benders Decomposition
+Annotated Benders Decomposition
 =======================================
 
 This example automatically decomposes a mixed-integer programming problem into a master problem
@@ -12,7 +12,7 @@ the classical Benders decomposition method.
 # %%
 # Define the original problem.
 
-from benderslib import AnnotationBenders, ClassicalBenders
+from benderslib import AnnotatedBenders, ClassicalBenders
 from benderslib.solvers import Gurobi
 from benderslib.utils import draw_curve
 
@@ -49,12 +49,12 @@ model.optimize()
 print(f"Original Problem Obj: {model.ObjVal}")
 
 # %%
-# Solve the problem using Annotation Benders Decomposition.
+# Solve the problem using Annotated Benders Decomposition.
 
-AB = AnnotationBenders(model, solver=Gurobi, complicating_vars=complicating_vars, benders=ClassicalBenders)
+AB = AnnotatedBenders(model, solver=Gurobi, complicating_vars=complicating_vars, benders=ClassicalBenders)
 
 # # Another way: Manually decompose the model and create ClassicalBenders instance
-# master_model, sub_model = AnnotationBenders.decompose(model, Gurobi, complicating_vars, solver_model=True)
+# master_model, sub_model = AnnotatedBenders.decompose(model, Gurobi, complicating_vars, solver_model=True)
 # AB = ClassicalBenders.from_models(master_model, Gurobi, sub_model, Gurobi, complicating_vars=complicating_vars)
 
 # This example works well with the Branch-and-check method, try it!
@@ -69,6 +69,6 @@ print(f"Benders Decomposition Obj: {AB.result.obj}")
 #
 # .. seealso::
 #
-#     This example uses the following classes: :class:`~benderslib.AnnotationBenders`, :class:`~benderslib.ClassicalBenders`
+#     This example uses the following classes: :class:`~benderslib.AnnotatedBenders`, :class:`~benderslib.ClassicalBenders`
 #
 # .. tags:: benders: classical, solver: gurobi, deterministic, branch-and-check

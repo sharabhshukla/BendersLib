@@ -149,7 +149,7 @@ Create a Master Problem from an Annotated Model
 
 Alternatively, you can create a master/sub problem by decomposing an existing model.
 This is useful when you have a complete model and want to apply Benders decomposition.
-The :class:`AnnotationBenders` class provides a static method :meth:`~AnnotationBenders.decompose`
+The :class:`AnnotatedBenders` class provides a static method :meth:`~AnnotatedBenders.decompose`
 that splits a model into a master problem and a subproblem based on a list of master variable names.
 Refer to :meth:`~SolverBase.make_master_problem` and :meth:`~SolverBase.make_sub_problem` for the logic
 of creating master and sub problems.
@@ -158,7 +158,7 @@ Here is an example of how to create a master/sub problem from an annotated model
 .. code-block:: python
 
     from gurobipy import Model, GRB
-    from benderslib import MasterProblem, SubProblem, AnnotationBenders
+    from benderslib import MasterProblem, SubProblem, AnnotatedBenders
     from benderslib.solvers import Gurobi
 
     # Create a model
@@ -174,7 +174,7 @@ Here is an example of how to create a master/sub problem from an annotated model
     complicating_vars = [v.VarName for v in y.values()]
 
     # Decompose the model
-    master_model, sub_model = AnnotationBenders.decompose(
+    master_model, sub_model = AnnotatedBenders.decompose(
         original_model,
         Gurobi,
         master_vars=complicating_vars,
@@ -188,7 +188,7 @@ Here is an example of how to create a master/sub problem from an annotated model
 .. admonition:: Example
     :class: seealso
 
-    :ref:`manual_decompose_solve`, :doc:`../examples/basic/annotation_benders`, :doc:`../examples/api/decompose`,
+    :ref:`manual_decompose_solve`, :doc:`../examples/basic/annotated_benders`, :doc:`../examples/api/decompose`,
     :doc:`../examples/basic/cbd`
 
 .. _manual_master_add_cut:

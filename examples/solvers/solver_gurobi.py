@@ -9,7 +9,7 @@ Gurobi
 # %%
 # Using :class:`~benderslib.solvers.Gurobi` as a solver backend.
 
-from benderslib import AnnotationBenders, ClassicalBenders
+from benderslib import AnnotatedBenders, ClassicalBenders
 from benderslib.solvers import Gurobi
 from benderslib.utils import draw_curve
 
@@ -39,10 +39,10 @@ if __name__ == '__main__':
     model_copy = model.copy()
     model.optimize()
 
-    BD = AnnotationBenders(model, solver=Gurobi, complicating_vars=complicating_vars, benders=ClassicalBenders)
+    BD = AnnotatedBenders(model, solver=Gurobi, complicating_vars=complicating_vars, benders=ClassicalBenders)
     BD.solve()
 
-    BD = AnnotationBenders(model_copy, solver=Gurobi, complicating_vars=complicating_vars, benders=ClassicalBenders)
+    BD = AnnotatedBenders(model_copy, solver=Gurobi, complicating_vars=complicating_vars, benders=ClassicalBenders)
     BD.params.use_bnc = True
     BD.solve()
 
