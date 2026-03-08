@@ -82,7 +82,7 @@ BD = AnnotatedBenders(model, solver=Gurobi, complicating_vars=complicating_vars,
 
 # Register the warm start callback
 warm_start_callback = WarmStartCallback()
-BD.register_callback(warm_start_callback)
+BD.register(warm_start_callback)
 BD.solve()
 
 draw_curve(BD.result)

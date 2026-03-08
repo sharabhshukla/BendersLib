@@ -191,8 +191,8 @@ demonstrates how to define and register both types of callbacks.
     )
 
     # Register the callback
-    benders.register_callback(MyCallback)
-    benders.register_callback(on_iteration_end)
+    benders.register(MyCallback)
+    benders.register(on_iteration_end)
 
     benders.solve()
 

@@ -71,7 +71,7 @@ BD = ClassicalBenders.from_models(
 
 # Register the callback
 save_cb = SaveSolutionsCallback()
-BD.register_callback(save_cb)
+BD.register(save_cb)
 
 # Solve the problem
 BD.solve()

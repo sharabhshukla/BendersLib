@@ -74,8 +74,8 @@ BD = ClassicalBenders.from_models(
 BD.params.log_to_console = False
 
 # Register the callback
-BD.register_callback(MyCallback)
-BD.register_callback(on_iteration_end)
+BD.register(MyCallback)
+BD.register(on_iteration_end)
 
 # Solve the problem
 BD.solve()

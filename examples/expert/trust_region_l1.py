@@ -137,7 +137,7 @@ BD = AnnotatedBenders(
 )
 
 trust_region_callback = TrustRegionCallback(15, 80)
-BD.register_callback(trust_region_callback)
+BD.register(trust_region_callback)
 
 BD.solve()
 draw_curve(BD.result)

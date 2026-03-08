@@ -86,7 +86,7 @@ model, complicating_vars = make_original_problem()
 BD = AnnotatedBenders(model, solver=Gurobi, complicating_vars=complicating_vars, benders=ClassicalBenders)
 
 # Register the callback
-BD.register_callback(EarlyStop(10))
+BD.register(EarlyStop(10))
 
 # This example works well with the Branch-and-check method, try it!
 # BD.params.use_bnc = True

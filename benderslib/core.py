@@ -1766,7 +1766,7 @@ class BendersSolver:
 
         if self.__trigger_callbacks_and_terminate(EVENTS.ON_BENDERS_END): return
 
-    def register_callback(self, callback: CallbackBase | Callable | Type[CallbackBase]) -> None:
+    def register(self, callback: CallbackBase | Callable | Type[CallbackBase]) -> None:
         """Register a user-defined callback to be called during the Benders solving process.
 
         Users can define custom callbacks by inheriting from :class:`CallbackBase` and
@@ -1801,8 +1801,8 @@ class BendersSolver:
                 print("Benders process finished!")
 
             BD = BendersSolver(...)
-            BD.register_callback(MyCallback())
-            BD.register_callback(on_benders_end)
+            BD.register(MyCallback())
+            BD.register(on_benders_end)
         """
 
         self._callback_manager.register(callback)

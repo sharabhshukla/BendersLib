@@ -56,7 +56,7 @@ class TestCallbackTermination(unittest.TestCase):
             complicating_vars=self.complicating_vars
         )
         benders.params.log_to_console = False
-        benders.register_callback(callback)
+        benders.register(callback)
         benders.solve()
         assert benders.result.status in [
             CST.TERMINATED,

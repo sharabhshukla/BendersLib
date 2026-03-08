@@ -75,7 +75,7 @@ BD = AnnotatedBenders(
 
 BD.params.bnc_frac_sol = True
 
-BD.register_callback(on_opti_cut_generated)
+BD.register(on_opti_cut_generated)
 BD.bnc_solve()
 
 draw_curve(BD.result)

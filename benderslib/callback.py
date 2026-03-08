@@ -57,7 +57,7 @@ class BendersContext:
         
         BD = BendersSolver(...)
         BD.params.bnc_frac_sol = True
-        BD.register_callback(on_opti_cut_generated)
+        BD.register(on_opti_cut_generated)
         BD.bnc_solve()
     """
 
@@ -82,7 +82,7 @@ class CallbackBase(ABC):
     Alternatively, users can define standalone functions with names matching
     the methods in :class:`CallbackBase` to serve as lightweight callbacks.
 
-    A callbacks are passed to Benders decomposition instances via :meth:`~BendersSolver.register_callback`.
+    A callbacks are passed to Benders decomposition instances via :meth:`~BendersSolver.register`.
     The callback can terminate the Benders process prematurely by returning
     the constant :attr:`~BendersConsts.TERMINATE`;
     If a callback returns :attr:`~BendersConsts.PROCEED` or does not return anything,
@@ -111,8 +111,8 @@ class CallbackBase(ABC):
             print("Benders process finished!")
 
         BD = BendersSolver(...)
-        BD.register_callback(MyCallback())
-        BD.register_callback(on_benders_end)
+        BD.register(MyCallback())
+        BD.register(on_benders_end)
     """
 
     def on_benders_start(self, context: BendersContext):
