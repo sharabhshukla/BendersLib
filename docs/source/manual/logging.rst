@@ -72,8 +72,12 @@ The second block provides a log of the algorithm's progress at different iterati
 
 - **Iter.**: The current iteration number.
 - **LB (Lower Bound)**: The best lower bound found so far, which is obtained from the master problem.
-- **UB (Upper Bound)**: The best upper bound found so far, derived from the subproblem solutions.
-- **Obj.**: The objective value of the best integer solution found (the incumbent).
+  The lower bound is typically non-decreasing across iterations as more cuts are added to the master problem.
+  However, certain techniques (e.g., trust region methods) may allow for temporary decreases in the lower bound.
+- **UB (Upper Bound)**: The objective value of the integer feasible solution found in the current iteration.
+  If no feasible solution is found in the current iteration, this will be the objective value of the integer
+  feasible solution found in the latest previous iteration.
+- **Obj.**: The objective value of the best integer feasible solution found (the incumbent).
 - **Gap (%)**: The relative gap between the upper and lower bounds, calculated as ``|UB - LB| / |UB|``.
 - **Runtime (s)**: The elapsed time in seconds.
 
