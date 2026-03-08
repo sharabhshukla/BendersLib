@@ -51,19 +51,19 @@ print(f"Original Problem Obj: {model.ObjVal}")
 # %%
 # Solve the problem using Annotated Benders Decomposition.
 
-AB = AnnotatedBenders(model, solver=Gurobi, complicating_vars=complicating_vars, benders=ClassicalBenders)
+BD = AnnotatedBenders(model, solver=Gurobi, complicating_vars=complicating_vars, benders=ClassicalBenders)
 
 # # Another way: Manually decompose the model and create ClassicalBenders instance
 # master_model, sub_model = AnnotatedBenders.decompose(model, Gurobi, complicating_vars, solver_model=True)
-# AB = ClassicalBenders.from_models(master_model, Gurobi, sub_model, Gurobi, complicating_vars=complicating_vars)
+# BD = ClassicalBenders.from_models(master_model, Gurobi, sub_model, Gurobi, complicating_vars=complicating_vars)
 
 # This example works well with the Branch-and-check method, try it!
-# AB.params.use_bnc = True
+# BD.params.use_bnc = True
 
-AB.solve()
+BD.solve()
 
-draw_curve(AB.result)
-print(f"Benders Decomposition Obj: {AB.result.obj}")
+draw_curve(BD.result)
+print(f"Benders Decomposition Obj: {BD.result.obj}")
 
 # %%
 #

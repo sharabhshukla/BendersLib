@@ -83,16 +83,16 @@ class EarlyStop(CallbackBase):
 model, complicating_vars = make_original_problem()
 
 # Create the Benders decomposition solver
-AB = AnnotatedBenders(model, solver=Gurobi, complicating_vars=complicating_vars, benders=ClassicalBenders)
+BD = AnnotatedBenders(model, solver=Gurobi, complicating_vars=complicating_vars, benders=ClassicalBenders)
 
 # Register the callback
-AB.benders.register_callback(EarlyStop(10))
+BD.register_callback(EarlyStop(10))
 
 # This example works well with the Branch-and-check method, try it!
-# AB.params.use_bnc = True
+# BD.params.use_bnc = True
 
-AB.solve()
-draw_curve(AB.result)
+BD.solve()
+draw_curve(BD.result)
 
 # %%
 # .. seealso::

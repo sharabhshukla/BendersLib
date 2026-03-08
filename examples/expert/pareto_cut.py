@@ -116,7 +116,7 @@ BD = AnnotatedBenders(
 )
 
 callback = ParetoCut()
-BD.benders.register_callback(callback)
+BD.register_callback(callback)
 
 BD.solve()
 draw_curve(BD.result)

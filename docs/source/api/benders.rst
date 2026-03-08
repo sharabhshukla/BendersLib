@@ -43,7 +43,8 @@ Benders Methods
 .. autoclass:: AnnotatedBenders
     :inherited-members:
     :show-inheritance:
-    :exclude-members: master_problem, sub_problem, complicating_vars, optimality_cut, feasibility_cut, params, result
+    :exclude-members: master_problem, sub_problem, complicating_vars, optimality_cut, feasibility_cut, params, result,
+                      from_models
 
 .. _cut_generators:
 

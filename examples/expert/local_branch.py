@@ -108,7 +108,7 @@ BD = AnnotatedBenders(
 )
 
 callback = LocalBranchingCallback(2, till_iter=120)
-BD.benders.register_callback(callback)
+BD.register_callback(callback)
 
 BD.solve()
 draw_curve(BD.result)

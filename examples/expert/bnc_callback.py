@@ -73,10 +73,10 @@ BD = AnnotatedBenders(
     benders=ClassicalBenders
 )
 
-BD.benders.params.bnc_frac_sol = True
+BD.params.bnc_frac_sol = True
 
-BD.benders.register_callback(on_opti_cut_generated)
-BD.benders.bnc_solve()
+BD.register_callback(on_opti_cut_generated)
+BD.bnc_solve()
 
 draw_curve(BD.result)
 
@@ -90,7 +90,7 @@ BD = AnnotatedBenders(
     benders=ClassicalBenders
 )
 
-BD.benders.bnc_solve()
+BD.bnc_solve()
 draw_curve(BD.result)
 
 # %%

@@ -91,7 +91,7 @@ BD = AnnotatedBenders(
 )
 
 # Comment out the normalization callback to see the difference in performance.
-BD.benders.register_callback(CutNormalization())
+BD.register_callback(CutNormalization())
 
 # This example works well with the Branch-and-check method, try it!
 # BD.params.use_bnc = True

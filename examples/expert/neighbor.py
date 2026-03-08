@@ -136,7 +136,7 @@ BD = AnnotatedBenders(
 )
 
 callback = TwoCuts()
-BD.benders.register_callback(callback)
+BD.register_callback(callback)
 
 # This example works well with the Branch-and-check method, try it!
 # BD.params.use_bnc = True

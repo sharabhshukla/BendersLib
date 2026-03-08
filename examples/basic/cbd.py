@@ -80,7 +80,7 @@ master_model, sub_model = AnnotatedBenders.decompose(
     master_vars=complicating_vars,
     solver_model=True
 )
-AB = CombinatorialBenders.from_models(
+BD = CombinatorialBenders.from_models(
     master_model=master_model,
     master_solver=Gurobi,
     sub_model=sub_model,
@@ -92,7 +92,7 @@ AB = CombinatorialBenders.from_models(
 # Master and Sub models are required to be re-defined,
 # since they have been modified (by adding cuts) in the previous solve.
 # model, complicating_vars = make_original_problem(has_sub_objective=True)
-# AB = AnnotatedBenders(
+# BD = AnnotatedBenders(
 #     original_problem=model,
 #     solver=Gurobi,
 #     complicating_vars=complicating_vars,
@@ -100,12 +100,12 @@ AB = CombinatorialBenders.from_models(
 # )
 
 # This example works well with the Branch-and-check method, try it!
-# AB.params.use_bnc = True
+# BD.params.use_bnc = True
 
-AB.solve()
+BD.solve()
 
-print(f"Benders Decomposition Obj: {AB.result.obj}")
-draw_curve(AB.result)
+print(f"Benders Decomposition Obj: {BD.result.obj}")
+draw_curve(BD.result)
 
 # %%
 #

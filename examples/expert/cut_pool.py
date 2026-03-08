@@ -119,7 +119,7 @@ BD = AnnotatedBenders(
 )
 
 callback = CutPooling(ratio=0.9, frequency=20)
-BD.benders.register_callback(callback)
+BD.register_callback(callback)
 
 BD.solve()
 draw_curve(BD.result)

@@ -46,8 +46,8 @@ BD = AnnotatedBenders(
     complicating_vars=complicating_vars,
     benders=ClassicalBenders
 )
-BD.benders.params.tol_rel = 0.05
-BD.benders.bnc_solve()
+BD.params.tol_rel = 0.05
+BD.bnc_solve()
 draw_curve(BD.result)
 
 # %%

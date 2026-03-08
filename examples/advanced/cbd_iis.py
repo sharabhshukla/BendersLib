@@ -79,7 +79,7 @@ print(f"Original Problem Obj: {model.ObjVal}")
 # %%
 # Solve the problem using Combinatorial Benders Decomposition + IIS-based cuts.
 
-AB = AnnotatedBenders(
+BD = AnnotatedBenders(
     model,
     solver=Gurobi,
     complicating_vars=complicating_vars,
@@ -88,33 +88,33 @@ AB = AnnotatedBenders(
     benders=CombinatorialBenders,
 )
 # This example works well with the Branch-and-check method, try it!
-AB.params.use_bnc = True
+BD.params.use_bnc = True
 
-AB.solve()
+BD.solve()
 
 # %%
 # Solve the problem using Combinatorial Benders Decomposition + Naive cuts.
 
-AB_ = AnnotatedBenders(
+BD_ = AnnotatedBenders(
     model_copy,
     solver=Gurobi,
     complicating_vars=complicating_vars,
     benders=CombinatorialBenders,
 )
 # This example works well with the Branch-and-check method, try it!
-AB_.params.use_bnc = True
+BD_.params.use_bnc = True
 
-AB_.solve()
+BD_.solve()
 
 # %%
 # Compare the results.
 
-print(f"Sol. Time (IIS vs Naive): {AB.result.runtime:.4f}, {AB_.result.runtime:.4f}")
-print(f"Num. Cuts (IIS vs Naive): {AB.result.n_cuts}, {AB_.result.n_cuts}")
+print(f"Sol. Time (IIS vs Naive): {BD.result.runtime:.4f}, {BD_.result.runtime:.4f}")
+print(f"Num. Cuts (IIS vs Naive): {BD.result.n_cuts}, {BD_.result.n_cuts}")
 
 plt.style.use('seaborn-v0_8')
 plt.figure(dpi=600)
-plt.bar(['IIS-based Cuts', 'Naive Cuts'], [AB.result.n_cuts, AB_.result.n_cuts])
+plt.bar(['IIS-based Cuts', 'Naive Cuts'], [BD.result.n_cuts, BD_.result.n_cuts])
 plt.ylabel('Number of Benders Cuts Added')
 plt.title('Comparison of Benders Cuts Added')
 plt.show()

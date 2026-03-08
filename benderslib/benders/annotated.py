@@ -6,7 +6,7 @@ from ..solvers import SolverBase
 from ..core import BendersParams, MasterProblem, SubProblem, BendersSolver
 
 
-class AnnotatedBenders:
+class AnnotatedBenders(BendersSolver):
     """The class to perform Benders decomposition using annotation-based approach.
 
     This class decomposes the original problem into a master problem and a subproblem
@@ -28,20 +28,26 @@ class AnnotatedBenders:
     solver: Type[SolverBase]
         The solver class to be used for solving the master and subproblems, e.g., :class:`~.solvers.Gurobi`.
         It should be compatible with the :attr:`original_problem`.
-    benders: Type[BendersSolver]
-        The Benders decomposition method to be applied, e.g., :class:`ClassicalBenders`.
     complicating_vars: list[str]
         A list of variable names that are considered complicating variables for the decomposition.
+        The complicating variables are those that are passed to the subproblem as known parameters.
     master_vars: list[str], optional
         A list of variable names to be included in the master problem.
+        The master variables are used to define the master problem and subproblem from the original problem.
         It is usually a superset of ``complicating_vars``.
         If not provided, it defaults to ``complicating_vars``.
+    benders: Type[BendersSolver], optional
+        The Benders decomposition method to be applied, e.g., :class:`ClassicalBenders`.
+        If not provided, the class :class:`BendersSolver` will be used with the optimality
+        and feasibility cut generators provided.
+        If provided, parameters ``optimality_cut`` and ``feasibility_cut`` will be ignored,
+        and the default cut generators of the chosen Benders method will be used.
     optimality_cut: Type[CutGenerator], optional
         The optimality cut generator to be used in the Benders decomposition.
-        If not provided, the default optimality cut generator of the chosen Benders method will be used.
+        If not provided, the default optimality cut generator of the chosen Benders method ``benders`` will be used.
     feasibility_cut: Type[CutGenerator], optional
         The feasibility cut generator to be used in the Benders decomposition.
-        If not provided, the default feasibility cut generator of the chosen Benders method will be used.
+        If not provided, the default feasibility cut generator of the chosen Benders method ``benders`` will be used.
     params: BendersParams, optional
         An instance of :class:`BendersParams` containing parameters for the Benders decomposition process.
         If not provided, default parameters will be used.
@@ -64,7 +70,7 @@ class AnnotatedBenders:
         complicating_vars = [...]  # List of complicating variable names
         master_vars = [...]  # List of master variable names (usually a superset of complicating_vars)
 
-        benders_solver = AnnotatedBenders(
+        BD = AnnotatedBenders(
             original_problem=original_problem,
             solver=Gurobi,
             benders=ClassicalBenders,
@@ -73,39 +79,43 @@ class AnnotatedBenders:
         )
     """
 
-    def __init__(
-            self,
+    def __new__(
+            cls,
             original_problem,
             solver: Type[SolverBase],
-            benders: Type[BendersSolver],
             complicating_vars: list[str],
             master_vars: list[str] = None,
+            benders: Type[BendersSolver] = None,
             optimality_cut=None,
             feasibility_cut=None,
             params: BendersParams | None = None,
     ):
         master_vars = master_vars if master_vars is not None else complicating_vars
-        master_problem, sub_problem = self.decompose(original_problem, solver, master_vars)
-
-        # Attributes
-        self.params = params if params is not None else BendersParams()
-        """The parameters that can be set by the user (see :class:`BendersParams`)."""
+        master_problem, sub_problem = cls.decompose(original_problem, solver, master_vars)
 
         benders_kwargs = {
             "master_problem": master_problem,
             "sub_problem": sub_problem,
             "complicating_vars": complicating_vars,
-            "params": self.params
+            "params": params
         }
-        if optimality_cut is not None:
-            benders_kwargs["optimality_cut"] = optimality_cut
-        if feasibility_cut is not None:
-            benders_kwargs["feasibility_cut"] = feasibility_cut
 
-        self.benders = benders(**benders_kwargs)
-        """The Benders decomposition instance initialized from the ``benders`` parameter."""
-        self.result = self.benders.result
-        """An instance of :class:`BendersResult` that stores the results and statistics."""
+        if benders is None:
+            benders = BendersSolver
+
+            if optimality_cut is not None:
+                benders_kwargs["optimality_cut"] = optimality_cut
+            if feasibility_cut is not None:
+                benders_kwargs["feasibility_cut"] = feasibility_cut
+
+        return benders(**benders_kwargs)
+
+    def __init__(self, *args, **kwargs):
+        # This is intentionally left empty. The actual initialization is handled by the __new__ method,
+        # which returns an instance of a different class (the one specified by the `benders` parameter).
+        # By having AnnotatedBenders inherit from BendersSolver, documentation tools can correctly
+        # identify and list the available methods.
+        pass
 
     @staticmethod
     def decompose(
@@ -169,10 +179,3 @@ class AnnotatedBenders:
             return master, sub
         else:
             return MasterProblem(solver(master)), SubProblem(solver(sub))
-
-    def solve(self):
-        """A wrapper method to solve the Benders decomposition instance.
-
-        See :meth:`~benderslib.BendersSolver.solve` for details.
-        """
-        self.benders.solve()
