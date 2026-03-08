@@ -4,11 +4,14 @@
 Pyomo IIS
 =======================================
 
+.. currentmodule:: benderslib.solvers
+
 """
 
 # %%
-# Using `Minimal Intractable System (MIS) Finder <https://pyomo.readthedocs.io/en/stable/api/pyomo.contrib.iis.mis.html>`_
-# to compute conflicting constraints.
+# Using :meth:`Pyomo.compute_iis` to compute conflicting variables. This method uses
+# `Minimal Intractable System (MIS) Finder <https://pyomo.readthedocs.io/en/stable/api/pyomo.contrib.iis.mis.html>`_
+# provided by Pyomo.
 
 from benderslib.solvers import Pyomo
 

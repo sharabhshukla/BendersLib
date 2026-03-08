@@ -4,10 +4,12 @@
 Gurobi IIS
 =======================================
 
+.. currentmodule:: benderslib.solvers
+
 """
 
 # %%
-# Using :meth:`~benderslib.solvers.Gurobi.compute_iis` to compute conflicting variables.
+# Using :meth:`Gurobi.compute_iis` to compute conflicting variables.
 
 
 from benderslib.solvers import Gurobi

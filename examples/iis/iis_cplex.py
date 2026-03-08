@@ -4,10 +4,12 @@
 CPLEX IIS
 =======================================
 
+.. currentmodule:: benderslib.solvers
+
 """
 
 # %%
-# Using :meth:`~benderslib.solvers.Cplex.compute_iis` to compute conflicting variables.
+# Using :meth:`Cplex.compute_iis` to compute conflicting variables.
 
 
 from benderslib.solvers import Cplex

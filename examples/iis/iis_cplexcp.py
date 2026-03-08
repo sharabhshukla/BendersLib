@@ -4,10 +4,12 @@
 CP Optimizer IIS
 =======================================
 
+.. currentmodule:: benderslib.solvers
+
 """
 
 # %%
-# Using :meth:`~benderslib.solvers.CplexCP.compute_iis` to compute conflicting variables.
+# Using :meth:`CplexCP.compute_iis` to compute conflicting variables.
 
 
 from benderslib.solvers import CplexCP

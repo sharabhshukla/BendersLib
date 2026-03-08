@@ -33,7 +33,7 @@ Mathematical Programming Solver Interfaces
 .. autoclass:: benderslib.solvers.Pyomo
    :inherited-members:
    :show-inheritance:
-   :exclude-members: compute_iis
+   :exclude-members:
 
 .. autoclass:: benderslib.solvers.Scip
    :inherited-members:

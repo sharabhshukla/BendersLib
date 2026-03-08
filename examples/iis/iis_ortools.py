@@ -4,10 +4,12 @@
 OR-Tools IIS
 =======================================
 
+.. currentmodule:: benderslib.solvers
+
 """
 
 # %%
-# Using :meth:`~benderslib.solvers.Ortools.compute_iis` to compute conflicting variables.
+# Using :meth:`Ortools.compute_iis` to compute conflicting variables.
 
 
 from benderslib.solvers import Ortools
