@@ -858,7 +858,7 @@ class SubProblems:
             self.status = CST.INFEASIBLE
         else:
             self.status = CST.UNKNOWN
-            raise UnexpectedSubStatusError(stauts=[sub.status for sub in self.sub_problems])
+            raise UnexpectedSubStatusError(status=[sub.status for sub in self.sub_problems])
 
     def solve(self) -> None:
         """Solve all subproblems and update the :attr:`status` attribute.
