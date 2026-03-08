@@ -81,5 +81,8 @@ BD.register(on_iteration_end)
 BD.solve()
 
 # %%
+# .. seealso::
+#
+#    - This example uses the :doc:`../../manual/callbacks` functionality.
 #
 # .. tags:: benders: classical, solver: gurobi, deterministic, callback

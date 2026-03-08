@@ -102,6 +102,7 @@ draw_curve(BD.result)
 # %%
 # .. seealso::
 #
+#    - This example uses the :doc:`../../manual/callbacks` functionality.
 #    - A brief introduction to :ref:`enhance_cut_normalization`.
 #
 # .. tags:: benders: classical, solver: gurobi, deterministic, callback, enhancement, branch-and-check

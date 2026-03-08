@@ -158,6 +158,7 @@ draw_curve(BD_no_tr.result)
 # %%
 # .. seealso::
 #
+#    - This example uses the :doc:`../../manual/callbacks` functionality.
 #    - A brief introduction to :ref:`enhance_trust_region`.
 #    - **Examples**: :doc:`trust_region_l1`, :doc:`trust_region_box`, :doc:`trust_region_bin`
 #

@@ -97,6 +97,7 @@ draw_curve(BD.result)
 # %%
 # .. seealso::
 #
+#    - This example uses the :doc:`../../manual/callbacks` functionality.
 #    - A brief introduction to :ref:`enhance_early_stop`.
 #
 # .. tags:: benders: classical, solver: gurobi, deterministic, callback, enhancement, branch-and-check

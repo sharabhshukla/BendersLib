@@ -82,5 +82,8 @@ for i, sol in enumerate(save_cb.feasible_solutions):
     print(f"Solution {i + 1}: {sol}")
 
 # %%
+# .. seealso::
+#
+#    - This example uses the :doc:`../../manual/callbacks` functionality.
 #
 # .. tags:: benders: classical, solver: gurobi, deterministic, callback

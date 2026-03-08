@@ -135,6 +135,7 @@ draw_curve(BD_no_tr.result)
 # %%
 # .. seealso::
 #
+#    - This example uses the :doc:`../../manual/callbacks` functionality.
 #    - A brief introduction to :ref:`enhance_local_branching`.
 #    - **Examples**: :doc:`trust_region_bin`
 #
