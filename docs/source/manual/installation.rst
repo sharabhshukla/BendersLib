@@ -39,7 +39,7 @@ Installing BendersLib
         pip install benderslib
 
         # Upgrade to the latest version
-        # pip install benderslib --upgrade
+        pip install benderslib --upgrade
 
 .. tab:: conda
 
@@ -48,7 +48,17 @@ Installing BendersLib
         conda install -c conda-forge benderslib
 
         # Upgrade to the latest version
-        # conda update -c conda-forge benderslib
+        conda update -c conda-forge benderslib
+
+.. tab:: uv
+
+    .. code-block:: bash
+
+        # Install from PyPI using uv
+        uv pip install benderslib
+
+        # Upgrade to the latest version
+        uv pip install --upgrade benderslib
 
 Verifying the Installation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
