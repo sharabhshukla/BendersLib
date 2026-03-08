@@ -1,5 +1,7 @@
 # coding:utf-8
 
+from itertools import zip_longest
+
 from ..consts import BendersConsts as CST
 from ..core import OptimalityCut, FeasibilityCut
 
@@ -53,8 +55,8 @@ class ClassicalOC(OptimalityCut):
     """
 
     def __init__(self, vars: list[str], var_coefs: dict, dual_values: list, rhs: list, estimator=CST.ESTIMATOR_NAME):
-        coefs = [sum(a * b for a, b in zip(dual_values, var_coefs)) for var, var_coefs in var_coefs.items()]
-        cut_rhs = sum(a * b for a, b in zip(dual_values, rhs))
+        coefs = [sum(a * b for a, b in zip_longest(dual_values, var_coefs)) for var, var_coefs in var_coefs.items()]
+        cut_rhs = sum(a * b for a, b in zip_longest(dual_values, rhs))
 
         super().__init__(vars=vars + [estimator], coefs=coefs + [1.0], rhs=cut_rhs, sense='>=', name="ClassicalOC")
 
@@ -108,8 +110,8 @@ class ClassicalFC(FeasibilityCut):
 
     def __init__(self, vars: list[str], var_coefs: dict, extreme_ray: list, rhs: list):
         extreme_ray = [-r for r in extreme_ray]
-        coefs = [sum(a * b for a, b in zip(extreme_ray, var_coefs)) for var, var_coefs in var_coefs.items()]
-        cut_rhs = sum(a * b for a, b in zip(extreme_ray, rhs))
+        coefs = [sum(a * b for a, b in zip_longest(extreme_ray, var_coefs)) for var, var_coefs in var_coefs.items()]
+        cut_rhs = sum(a * b for a, b in zip_longest(extreme_ray, rhs))
 
         # # Even slower when data is small
         # extreme_ray_v = -np.array(extreme_ray)
@@ -344,12 +346,12 @@ class LShapedOC(OptimalityCut):
             scenario_var_coefs = var_coefs_list[i]
 
             # Right-hand side
-            scenario_rhs = sum(d * r for d, r in zip(dual_values, rhs_values))
+            scenario_rhs = sum(d * r for d, r in zip_longest(dual_values, rhs_values))
             aggregated_rhs += prob * scenario_rhs
 
             # Complicating variable coefficients
             for var_name in vars:
-                coef_sum = sum(d * c for d, c in zip(dual_values, scenario_var_coefs[var_name]))
+                coef_sum = sum(d * c for d, c in zip_longest(dual_values, scenario_var_coefs[var_name]))
                 aggregated_x_coefs_dict[var_name] += prob * coef_sum
 
         final_aggregated_x_coefs = [aggregated_x_coefs_dict[var] for var in vars]
@@ -426,8 +428,8 @@ class GeneralizedOC(OptimalityCut):
             multipliers: list[float],
             estimator=CST.ESTIMATOR_NAME
     ):
-        coefs = [sum(a * b for a, b in zip(multipliers, var_coefs)) for var, var_coefs in var_coefs.items()]
-        cut_rhs = sum(a * var_values[var] for a, var in zip(coefs, var_coefs.keys())) + sub_obj
+        coefs = [sum(a * b for a, b in zip_longest(multipliers, var_coefs)) for var, var_coefs in var_coefs.items()]
+        cut_rhs = sum(a * var_values[var] for a, var in zip_longest(coefs, var_coefs.keys())) + sub_obj
 
         super().__init__(vars=vars + [estimator], coefs=coefs + [1.0], rhs=cut_rhs, sense=">=", name="GeneralizedOC")
 
@@ -591,10 +593,10 @@ class GeneLShapedOC(OptimalityCut):
             # Rewritten: eta + (lambda^T * T) * x >= f(x_bar) + (lambda^T * T) * x_bar
 
             # Calculate the coefficient for x variables: (lambda^T * T)
-            scenario_x_coefs = [sum(m * c for m, c in zip(multipliers, var_coefs[var])) for var in vars]
+            scenario_x_coefs = [sum(m * c for m, c in zip_longest(multipliers, var_coefs[var])) for var in vars]
 
             # Calculate the constant part for this scenario's cut: f(x_bar) + (lambda^T * T) * x_bar
-            scenario_rhs = sub_obj + sum(c * var_values[var] for c, var in zip(scenario_x_coefs, vars))
+            scenario_rhs = sub_obj + sum(c * var_values[var] for c, var in zip_longest(scenario_x_coefs, vars))
 
             # Aggregate the right-hand side, weighted by probability
             aggregated_rhs += prob * scenario_rhs
