@@ -16,15 +16,15 @@ which can be solved iteratively to find the optimal solution to the original pro
 
    xychart-beta
      title "Benders Decomposition Publications"
-     x-axis "Year" [2001, 2003, 2005, 2007, 2009, 2011, 2013, 2015, 2017, 2019, 2021, 2023, 2025]
+     x-axis "Year" 2000 --> 2025
      y-axis "Number of Papers"
-     bar [100, 150, 200, 300, 400, 550, 700, 950, 1200, 1600, 2000, 2500, 3000]
+     bar [8, 14, 9, 11, 16, 30, 29, 38, 47, 60, 44, 50, 66, 102, 86, 119, 147, 181, 201, 231, 229, 309, 273, 242, 295, 359]
 
-From 1962 to 2025, there are over tens of thousands of research articles on Benders Decomposition,
+*\*Interesting fact: In 2025, 359 papers using Benders decomposition were published, averaging nearly one per day.*
+
+From 1962 to 2025, there are many research articles on Benders Decomposition,
 covering a wide range of applications in various fields, including supply chain management,
-energy systems, transportation, finance, and many others.
-Despite its popularity (**1000 papers per year on average**, according to
-`Google Scholar <https://scholar.google.com/scholar?q=Benders+Decomposition>`_),
+energy systems, transportation, finance, and many others. Despite its popularity and wide applicability,
 there is no software library specializing in Benders Decomposition and its variants.
 This project aims to fill this gap by providing a user-friendly and extensible library for Benders Decomposition
 - **BendersLib**, which can be easily integrated with existing optimization solvers and frameworks.
