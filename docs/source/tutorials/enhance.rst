@@ -43,7 +43,8 @@ required to find a solution.
        C --> C3;
 
        C1 --> C1b(Global Valid Inequalities);
-       C1 --> C1a(Pareto-Optimal Cuts);
+       C1 --> C1a(Pareto-optimal Cuts);
+       C1 --> C1c(Multi-cut Generation);
        C2 --> C2b(Cut Normalization);
        C2 --> C2a(Trust Region);
        C3 --> C3a(Local Branching);
@@ -58,7 +59,7 @@ required to find a solution.
        class A root;
        class B,C mainBranch;
        class B1,B2,C1,C2,C3 midLevel;
-       class B1a,B1b,C3c,B2a,B2b,B2d,C1a,C1b,C2a,C2b,C3a,C3b leaf;
+       class B1a,B1b,C3c,B2a,B2b,B2d,C1a,C1b,C1c,C2a,C2b,C3a,C3b leaf;
 
 BendersLib is designed with a flexible and extensible architecture that facilitates the
 implementation of these acceleration strategies. The library's :doc:`callback system <../manual/callbacks>` allows
@@ -208,6 +209,31 @@ Comprehensive reviews on cut selection can be found in the literature review pap
 .. [#] Magnanti, T. L., & Wong, R. T. (1981). Accelerating Benders Decomposition: Algorithmic Enhancement and Model Selection Criteria. Operations Research, 29(3), 464–484. https://doi.org/10.1287/opre.29.3.464
 .. [#] Papadakos, N. (2008). Practical enhancements to the Magnanti–Wong method. Operations Research Letters, 36(4), 444–449. https://doi.org/10.1016/j.orl.2008.01.005
 .. [#] Kaltis, T., & Saharidis, G. K. D. (2026). Literature review on Benders cut selection and a multiple cut generation scheme. INFOR: Information Systems and Operational Research, 64(1), 244–270. https://doi.org/10.1080/03155986.2025.2540205
+
+------
+
+.. _enhance_multi_cut:
+
+Multi-cut Generation
+------------------------------
+
+For stochastic programming problems, multiple cuts can be generated from the subproblems
+at each iteration. This includes multiple optimality cuts  [#]_ from different subproblem solutions
+and multiple feasibility cuts from different sources of infeasibility. This approach,
+can accelerate convergence by providing more information to the master problem.
+However, it can also increase the size of the master problem and the computational burden per iteration.
+BendersLib supports this through the
+:attr:`~benderslib.BendersParams.multi_opti_cut` and
+:attr:`~benderslib.BendersParams.multi_feas_cut` parameters.
+
+.. admonition:: Example
+    :class: seealso
+
+    See the examples with tags :doc:`benders: l-shaped <../_tags/benders-l-shaped>`
+    and :doc:`benders: integer l-shaped <../_tags/benders-integer-l-shaped>`
+    for enabling multi-cut generation in BendersLib and for a performance comparison.
+
+.. [#] Birge, J. R., & Louveaux, F. V. (1988). A multicut algorithm for two-stage stochastic linear programs. European Journal of Operational Research, 34(3), 384–392. https://doi.org/10.1016/0377-2217(88)90159-2
 
 ------
 
