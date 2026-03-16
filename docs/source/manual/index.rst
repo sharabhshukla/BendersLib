@@ -84,6 +84,7 @@ Alternatives
 
 Several optimization solvers overlap with BendersLib's functionality.
 Consider one of these alternatives if BendersLib does not meet your requirements.
+Here we only present actively maintained ones, see our paper for a comprehensive comparison.
 
 .. list-table:: Optimization Solvers with Benders Decomposition Features
     :widths: 15 70 10 15
@@ -105,8 +106,12 @@ Consider one of these alternatives if BendersLib does not meet your requirements
       - An optimization solver that supports annotated Benders decomposition [2]_.
       - C/C++, Java, .NET
       - Commercial
+    * - `DECIS <https://www.gams.com/latest/docs/S_DECIS.html>`__
+      - A solver for stochastic programming that supports L-shaped method.
+      - GAMS Language
+      - Commercial
     * - `FortSP <http://dev.optirisk-systems.com/products/solver-systems/fortsp/>`_
-      - A solver for stochastic programming that supports L-shaped method and nested Benders decomposition.
+      - A solver for stochastic programming that supports (integer) L-shaped method and nested Benders decomposition.
       - C
       - Commercial
     * - `GCG <https://gcg.or.rwth-aachen.de/>`_
@@ -121,10 +126,18 @@ Consider one of these alternatives if BendersLib does not meet your requirements
       - A framework for constraint integer programming and branch-cut-and-price that supports Benders Decomposition [3]_.
       - C/C++ *
       - `Apache 2.0 <https://www.scipopt.org/index.php#license>`_
+    * - `SAS <https://go.documentation.sas.com/doc/en/pgmsascdc/v_072/casmopt/casmopt_benders_overview.htm>`__
+      - An analytics software suite that supports Benders decomposition.
+      - SAS Language
+      - Commercial
     * - `SDDP.jl <https://sddp.dev/>`_ [4]_
       - A package for solving Multistage Stochastic Programming using Stochastic Dual Dynamic Programming (nested Benders methods).
       - Julia
       - `MPL 2.0 <https://github.com/odow/SDDP.jl?tab=License-1-ov-file#readme>`__
+    * - `SMS++ <https://gitlab.com/smspp/smspp-project/-/blob/develop/doc/SMS%2B%2B%20File%20Format%20Manual/ffm.pdf>`__
+      - A modeling system for modeling complex block-structured mathematical models.
+      - C++
+      - `LGPL 3.0 <https://gitlab.com/smspp/smspp-project/-/blob/develop/LICENSE>`__
     * - `StochasticPrograms.jl <https://martinbiel.github.io/StochasticPrograms.jl>`_ [5]_
       - A package for modeling and solving Stochastic Programming problems that supports the L-shaped method.
       - Julia
