@@ -291,6 +291,7 @@ class Gurobi(SolverBase):
 
     @staticmethod
     def make_master_problem(original_model: Model, master_vars: list[str]) -> Model:
+        original_model.update()
         master = original_model.copy()
 
         # Remove non-master variables & remove them from objective (will be handled automatically)
@@ -320,6 +321,7 @@ class Gurobi(SolverBase):
 
     @staticmethod
     def make_sub_problem(original_model: Model, master_vars: list[str]) -> Model:
+        original_model.update()
         sub = original_model.copy()
 
         # Set master variables to continuous & remove them from objective
