@@ -84,7 +84,7 @@ supported are not limited to the ones below.
    * - :ref:`Parallel Subproblem Solving <enhance_parallel>`
      - :attr:`~benderslib.BendersParams.parallel_sub`
      - :doc:`Example <examples/basic/lshaped>`
-   * - Multi-cut Generation
+   * - :ref:`Multi-cut Generation <enhance_multi_cut>`
      - :attr:`~benderslib.BendersParams.multi_opti_cut`, :attr:`~benderslib.BendersParams.multi_feas_cut`
      - :doc:`Example <examples/basic/lshaped>`
    * - IIS-based Feasibility Cut Generation
