@@ -82,14 +82,20 @@ supported are not limited to the ones below.
      - :attr:`~benderslib.BendersParams.use_bnc`
      - :doc:`Example <_tags/branch-and-check>`
    * - :ref:`Parallel Subproblem Solving <enhance_parallel>`
-     - :attr:`~benderslib.BendersParams.parallel_sub`
+     - :attr:`~benderslib.BendersParams.parallel_sub`， :attr:`~benderslib.BendersParams.parallel_threads`
      - :doc:`Example <examples/basic/lshaped>`
    * - :ref:`Multi-cut Generation <enhance_multi_cut>`
      - :attr:`~benderslib.BendersParams.multi_opti_cut`, :attr:`~benderslib.BendersParams.multi_feas_cut`
      - :doc:`Example <examples/basic/lshaped>`
+   * - :ref:`Cut Normalization <enhance_cut_normalization>`
+     - :attr:`~benderslib.BendersParams.cut_normalize`, :attr:`~benderslib.BendersParams.cut_max_norm`
+     - :doc:`Example </examples/expert/normalize_cut>`
    * - IIS-based Feasibility Cut Generation
      - :attr:`~benderslib.BendersParams.use_iis_cut`
      - :doc:`Example <examples/basic/bnc_cbd>`
+   * - :doc:`Others <tutorials/enhance>`
+     -
+     -
 
 BendersLib works with a variety of solvers through its built-in interfaces.
 See :ref:`solver-table` for a comprehensive list of features
