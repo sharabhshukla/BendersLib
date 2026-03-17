@@ -1142,7 +1142,7 @@ class CutGenerator(ABC):
         """Generate a list of Benders cuts based on the current state of the master and subproblem(s) (**required** to be implemented).
 
         This method generates and returns a list of cuts (either :class:`OptimalityCut` or :class:`FeasibilityCut`)
-        with the information from :attr:`_master_problem` and :attr:`_sub_problem`, which are updated during
+        with the information from :attr:`master_problem` and :attr:`sub_problem`, which are updated during
         the Benders solving process.
 
         Example implementations can be found in the source code of :class:`ClassicalOCGen` and :class:`ClassicalFCGen`.
