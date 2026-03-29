@@ -1,6 +1,7 @@
 # coding:utf-8
 
-from dataclasses import dataclass, field
+import json
+from dataclasses import dataclass, field, asdict
 
 from .consts import BendersConsts as CST
 
@@ -58,19 +59,41 @@ class BendersResult:
     solution: dict = field(default_factory=dict)
     """Dictionary of variable names to their values in the best solution found."""
 
+    def save(self, filename: str) -> None:
+        """Save the result to a JSON file.
+
+        Parameters
+        -----------
+
+        filename : str
+            Path to the JSON file where the result will be saved.
+        """
+        with open(filename, 'w') as f:
+            data = asdict(self)
+            if self.solution:
+                is_nested = isinstance(next(iter(self.solution.values())), dict)
+                if is_nested:
+                    data['solution'] = {
+                        s: {k: v for k, v in sol.items() if v != 0.0}
+                        for s, sol in self.solution.items()
+                    }
+                else:
+                    data['solution'] = {k: v for k, v in self.solution.items() if v != 0.0}
+            json.dump(data, f, indent=4)
+
     def __str__(self):
         summary = (
             f"Benders Result:\n"
             f"  - {'Status:'.ljust(CST.LOG_NAME_WIDTH)}{self.status}\n"
-            f"  - {'Incumbent:'.ljust(CST.LOG_NAME_WIDTH)}{self.obj:.4f}\n"
-            f"  - {'Bound:'.ljust(CST.LOG_NAME_WIDTH)}{self.lb:.4f}\n"
-            f"  - {'Gap (abs.):'.ljust(CST.LOG_NAME_WIDTH)}{self.gap_abs:.4f}\n"
-            f"  - {'Gap (rel.):'.ljust(CST.LOG_NAME_WIDTH)}{self.gap:.2%}\n"
+            f"  - {'Incumbent:'.ljust(CST.LOG_NAME_WIDTH)}{self.obj:.10e}\n"
+            f"  - {'Bound:'.ljust(CST.LOG_NAME_WIDTH)}{self.lb:.10e}\n"
+            f"  - {'Gap (abs.):'.ljust(CST.LOG_NAME_WIDTH)}{self.gap_abs:.10f}\n"
+            f"  - {'Gap (rel.):'.ljust(CST.LOG_NAME_WIDTH)}{self.gap:.8%}\n"
             f"  - {'Solutions No.:'.ljust(CST.LOG_NAME_WIDTH)}{self.n_sol}\n"
             f"  - {'Iteration No.:'.ljust(CST.LOG_NAME_WIDTH)}{self.n_iter}\n"
             f"  - {'Cuts No.:'.ljust(CST.LOG_NAME_WIDTH)}{self.n_opt_cuts + self.n_feas_cuts}"
             f" [Optimality: {self.n_opt_cuts}, Feasibility: {self.n_feas_cuts}]\n"
-            f"  - {'Solve Time (sec.):'.ljust(CST.LOG_NAME_WIDTH)}{self.runtime:.2f}"
-            f" [Master: {self.runtime_master:.2f}, Sub: {self.runtime_sub:.2f}]"
+            f"  - {'Solve Time (sec.):'.ljust(CST.LOG_NAME_WIDTH)}{self.runtime:.4f}"
+            f" [Master: {self.runtime_master:.4f}, Sub: {self.runtime_sub:.4f}]"
         )
         return summary

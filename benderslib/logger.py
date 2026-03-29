@@ -15,12 +15,14 @@ class BendersLogger:
         self.result = benders.result
         self._is_setup = False
         self._last_log_iter = -1
+        self.logger = logging.getLogger("BendersLib")
 
     def setup(self):
         if self._is_setup:
             return
 
-        logger = logging.getLogger()
+        logger = self.logger
+        logger.propagate = False
 
         for handler in logger.handlers[:]:
             logger.removeHandler(handler)
@@ -48,24 +50,24 @@ class BendersLogger:
         self.setup()
 
         l = CST.LOG_ITER_WIDTH * 7
-        logging.info("=" * l)
-        logging.info(f"BendersLib (v{__version__}, {__license__}, {__url__}) Copyright {__copyright__}")
-        logging.info("-" * l)
+        self.logger.info("=" * l)
+        self.logger.info(f"BendersLib (v{__version__}, {__license__}, {__url__}) Copyright {__copyright__}")
+        self.logger.info("-" * l)
 
-        logging.info(self.benders)
-        logging.info(self.benders.master_problem)
-        logging.info(self.benders.sub_problem)
-        logging.info(self.benders.params)
+        self.logger.info(self.benders)
+        self.logger.info(self.benders.master_problem)
+        self.logger.info(self.benders.sub_problem)
+        self.logger.info(self.benders.params)
 
-        logging.info("-" * l)
-        logging.info(
+        self.logger.info("-" * l)
+        self.logger.info(
             f"{'Iter.':>{CST.LOG_ITER_WIDTH}}, "
             f"{'LB':>{CST.LOG_ITER_WIDTH}}, "
             f"{'UB':>{CST.LOG_ITER_WIDTH}}, "
             f"{'Obj.':>{CST.LOG_ITER_WIDTH}}, "
             f"{'Gap(%)':>{CST.LOG_ITER_WIDTH}}, "
             f"{'Runtime(s)':>{CST.LOG_ITER_WIDTH}}")
-        logging.info("-" * l)
+        self.logger.info("-" * l)
 
     def log_line(self, time_start, time_pre_log):
         self.setup()
@@ -73,7 +75,7 @@ class BendersLogger:
         current_time = time.perf_counter()
         if current_time - time_pre_log >= self.benders.params.log_freq_sec or time_pre_log == time_start:
             _time_pre_log = current_time
-            logging.info(
+            self.logger.info(
                 f"{self.result.n_iter:{CST.LOG_ITER_WIDTH}}, "
                 f"{self.result.lb:>{CST.LOG_ITER_WIDTH}.2f}, "
                 f"{self.result.ub:>{CST.LOG_ITER_WIDTH}.2f}, "
@@ -90,7 +92,7 @@ class BendersLogger:
         self.setup()
 
         if self._last_log_iter != self.result.n_iter:
-            logging.info(
+            self.logger.info(
                 f"{self.result.n_iter:{CST.LOG_ITER_WIDTH}}, "
                 f"{self.result.lb:>{CST.LOG_ITER_WIDTH}.2f}, "
                 f"{self.result.ub:>{CST.LOG_ITER_WIDTH}.2f}, "
@@ -100,13 +102,13 @@ class BendersLogger:
             )
 
         l = CST.LOG_ITER_WIDTH * 7
-        logging.info("-" * l)
-        logging.info(self.result)
-        logging.info("=" * l)
+        self.logger.info("-" * l)
+        self.logger.info(self.result)
+        self.logger.info("=" * l)
 
         params = self.benders.params
         if params.log_file:
-            logging.info(f"Log file (level: {params.log_level}) saved to: '{params.log_file}'")
+            self.logger.info(f"Log file (level: {params.log_level}) saved to: '{params.log_file}'")
 
     @staticmethod
     def warning(msg: str):

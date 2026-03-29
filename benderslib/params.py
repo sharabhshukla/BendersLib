@@ -33,7 +33,7 @@ class BendersParams:
 
     # Theta (estimator in master problem for subproblem's objective)
 
-    theta_lb: float = 0
+    theta_lb: float = 0.0
     """Lower bound for the theta variable in the master problem."""
 
     # Numerical
@@ -73,7 +73,7 @@ class BendersParams:
 
     tol_abs: float = 1e-6
     """Absolute tolerance for convergence, terminate when ``abs(UB - LB) <= tol_abs``."""
-    tol_rel: float = 1e-6
+    tol_rel: float = 1e-4
     """Relative tolerance for convergence, terminate when ``abs(UB - LB) / abs(UB) <= tol_rel``."""
     time_limit: float = float('Inf')
     """Time limit for the Benders algorithm in seconds."""

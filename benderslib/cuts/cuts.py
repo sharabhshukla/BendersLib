@@ -1,5 +1,6 @@
 # coding:utf-8
 
+import numpy as np
 from itertools import zip_longest
 
 from ..consts import BendersConsts as CST
@@ -336,25 +337,26 @@ class LShapedOC(OptimalityCut):
             estimator=CST.ESTIMATOR_NAME
     ):
 
-        aggregated_rhs = 0.0
-        aggregated_x_coefs_dict = {var: 0.0 for var in vars}
+        # Vectorized implementation
+        probs_v = np.array(probs)
+        duals_m = np.array(duals)
+        rhss_m = np.array(rhss)
 
-        for i in range(len(probs)):
-            prob = probs[i]
-            dual_values = duals[i]
-            rhs_values = rhss[i]
-            scenario_var_coefs = var_coefs_list[i]
+        # aggregated_rhs
+        scenario_rhss = np.sum(duals_m * rhss_m, axis=1)
+        aggregated_rhs = float(probs_v @ scenario_rhss)
 
-            # Right-hand side
-            scenario_rhs = sum(d * r for d, r in zip_longest(dual_values, rhs_values))
-            aggregated_rhs += prob * scenario_rhs
+        # aggregated_x_coefs
+        aggregated_x_coefs = np.zeros(len(vars))
+        for i, var in enumerate(vars):
+            # Create a matrix for var coefficients across all scenarios
+            var_coefs_m = np.array([var_coefs_list[j][var] for j in range(len(probs))])
+            # Calculate the dot product for each scenario
+            scenario_coef_sums = np.sum(duals_m * var_coefs_m, axis=1)
+            # Aggregate the weighted sum
+            aggregated_x_coefs[i] = probs_v @ scenario_coef_sums
 
-            # Complicating variable coefficients
-            for var_name in vars:
-                coef_sum = sum(d * c for d, c in zip_longest(dual_values, scenario_var_coefs[var_name]))
-                aggregated_x_coefs_dict[var_name] += prob * coef_sum
-
-        final_aggregated_x_coefs = [aggregated_x_coefs_dict[var] for var in vars]
+        final_aggregated_x_coefs = aggregated_x_coefs.tolist()
         final_vars = vars + [estimator]
         final_coefs = final_aggregated_x_coefs + [1.0]
         super().__init__(vars=final_vars, coefs=final_coefs, rhs=aggregated_rhs, sense='>=', name="LShapedOC")

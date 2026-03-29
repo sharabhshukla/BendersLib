@@ -115,15 +115,10 @@ class LShapedOCGen(CutGenerator):
         """
         complicating_vars = self.complicating_vars
 
-        all_probs = []
-        all_duals = []
-        all_rhss = []
-        all_var_coefs = []
-        for i, sub in enumerate(self.sub_problem):
-            all_probs.append(self.sub_problem.prob[i])
-            all_duals.append(sub.get_dual_values())
-            all_rhss.append(self.rhs[i])
-            all_var_coefs.append(self.var_coefs[i])
+        all_probs = [self.sub_problem.prob[i] for i in range(len(self.sub_problem))]
+        all_duals = [sub.get_dual_values() for sub in self.sub_problem]
+        all_rhss = [self.rhs[i] for i in range(len(self.sub_problem))]
+        all_var_coefs = [self.var_coefs[i] for i in range(len(self.sub_problem))]
 
         cut = LShapedOC(complicating_vars, all_probs, all_duals, all_rhss, all_var_coefs)
         return [cut]

@@ -2,9 +2,11 @@
 
 import itertools
 import time
+import copy
 from abc import ABC, abstractmethod
 from typing import Union, Iterable, Callable, Iterator, Type
 import inspect
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from .consts import BendersConsts as CST
 from .params import BendersParams
@@ -886,7 +888,6 @@ class SubProblems:
 
         It is used by the :meth:`~BendersSolver.solve` method.
         """
-        from concurrent.futures import ThreadPoolExecutor, as_completed
 
         threads = self.params.parallel_threads
         assert isinstance(threads, int) and (threads > 0 or threads == -1), \
@@ -1449,51 +1450,52 @@ class BendersSolver:
         self.result.n_sol += 1
         self.result.status = CST.FEASIBLE
 
-        # _new_lb_found = self.master_problem.get_obj() > self.result.lb
-        # The master problem objective is monotonously non-decreasing with cut being added
-        _new_lb_found = True
-        if _new_lb_found:
-            if self.master_problem._using_bnc:
-                self.result.lb = self.master_problem.solver._cb_get_bound()
-            else:
-                self.result.lb = self.master_problem.get_obj()
-        estimator_vals = self.master_problem.get_estimator_values()
+        # ------ Update Lower Bound ------
 
+        _new_lb_found = True
+        if self.master_problem._using_bnc:
+            self.result.lb = self.master_problem.solver._cb_get_bound()
+        else:
+            self.result.lb = self.master_problem.get_obj()
+
+        # ------ Update Upper Bound ------
+
+        estimator_vals = self.master_problem.get_estimator_values()
         if isinstance(self.sub_problem, SubProblem) or not self.params.multi_opti_cut:
             # Deterministic problem, or stochastic problem with a single estimator
             estimator = self.master_problem.estimators[0]
             theta = estimator_vals[estimator]
         else:
             # Stochastic problem with multiple estimators
-            theta = sum(
-                estimator_vals[self.master_problem.estimators[i]] * p
-                for i, p in enumerate(self.__prob)
-            )
+            ests = self.master_problem.estimators
+            theta = sum(estimator_vals[ests[i]] * p for i, p in enumerate(self.__prob))
 
-        if self.master_problem._using_bnc:
-            self.result.ub = self.master_problem.get_obj() - theta + self.sub_problem.get_obj()
-        else:
-            self.result.ub = self.result.lb - theta + self.sub_problem.get_obj()
+        self.result.ub = self.master_problem.get_obj() - theta + self.sub_problem.get_obj()
 
         _new_ub_found = self.result.ub < self.result.obj
         if _new_ub_found:
             self.result.obj = self.result.ub
             self.result.solution = self.sub_problem.get_var_values()
 
+        # ------ Update Gap ------
+
         self.result.gap_abs = abs(self.result.obj - self.result.lb)
-        if abs(self.result.ub) > self.params.tol_abs:
+        if abs(self.result.obj) > self.params.tol_abs:
             # Non-zero ub
             self.result.gap = self.result.gap_abs / abs(self.result.obj)
         else:
             # Zero ub
             self.result.gap = 0 if self.result.lb == 0 else float('Inf')
 
+        # ------ Update Results ------
+
         self.result.lb_list.append(self.result.lb)
         self.result.ub_list.append(self.result.ub)
         self.result.obj_list.append(self.result.obj)
         self.result.runtime = time.perf_counter() - time_start
 
-        # Callbacks for new bounds
+        # ------ Trigger Callbacks ------
+
         if _new_lb_found:
             if self.__trigger_callbacks_and_terminate(EVENTS.ON_NEW_LOWER_BOUND):
                 return CST.TERMINATE
@@ -1568,7 +1570,7 @@ class BendersSolver:
             if self.master_problem.status == CST.OPTIMAL:
                 # Master problem is optimal -> solve subproblem
                 var_values = self.master_problem.get_var_values(self.complicating_vars)
-                self._context.current_comp_vals = var_values
+                self._context.current_comp_vals = copy.deepcopy(var_values)
                 if self.__trigger_callbacks_and_terminate(EVENTS.ON_BEFORE_SUB_SOLVE): break
                 ts = time.perf_counter()
                 self.sub_problem.fix_vars(self._context.current_comp_vals)
@@ -1629,7 +1631,7 @@ class BendersSolver:
         if self.__trigger_callbacks_and_terminate(EVENTS.ON_ITERATION_START): return CST.TERMINATE
 
         var_values = master_problem.get_var_values(self.complicating_vars)
-        self._context.current_comp_vals = var_values
+        self._context.current_comp_vals = copy.deepcopy(var_values)
         if self.__trigger_callbacks_and_terminate(EVENTS.ON_BEFORE_SUB_SOLVE): return CST.TERMINATE
         ts = time.perf_counter()
         self.sub_problem.fix_vars(self._context.current_comp_vals)
@@ -1719,6 +1721,7 @@ class BendersSolver:
         """
 
         # Initialize
+        self.__time_start = time.perf_counter()
         self.__preprocess()
         if self.__trigger_callbacks_and_terminate(EVENTS.ON_MASTER_BUILD): return
         if self.__trigger_callbacks_and_terminate(EVENTS.ON_SUB_BUILD): return
@@ -1726,7 +1729,6 @@ class BendersSolver:
 
         self.result.status = CST.UNSOLVED
         self.result.n_iter = 0
-        self.__time_start = time.perf_counter()
         self._time_pre_log = self.__time_start
         self.__logger.log_title()
 
@@ -1828,3 +1830,14 @@ class BendersSolver:
             self.result.status = CST.TERMINATED
             return True
         return False
+
+    def save(self, filename: str) -> None:
+        """Save the statistics of the Benders decomposition process to a JSON file.
+
+        Parameters
+        ---------------
+
+        filename : str
+            Path to the JSON file where the result will be saved.
+        """
+        self.result.save(filename)
