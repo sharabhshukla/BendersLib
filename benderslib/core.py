@@ -1745,13 +1745,9 @@ class BendersSolver:
             # is exhausted and the callback is not triggered to terminate
             # the process. This suggests that the global optimum is found.
             # However, the LB and UB can be not met, which are updated here.
-
             self.result.status = CST.OPTIMAL
-
             self.master_problem._using_bnc = False
-            obj = self.master_problem.get_obj()
-
-            # To be more precise, we should obtain the bound from the solver's model.
+            obj = self.result.obj
             self.result.lb = obj
             self.result.ub = obj
             self.result.obj = obj

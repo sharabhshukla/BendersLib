@@ -34,7 +34,19 @@ class BendersParams:
     # Theta (estimator in master problem for subproblem's objective)
 
     theta_lb: float = 0.0
-    """Lower bound for the theta variable in the master problem."""
+    """Lower bound for the estimator variable in the master problem.
+    
+       The default value of ``0.0`` is suitable for subproblems with non-negative objective values.
+       For problems where the subproblem's objective value can be negative, you need to adjust this 
+       parameter to ensure the Benders algorithm converges correctly. 
+       
+       Ideally, this value should be
+       as large as possible while still being a valid lower bound for the subproblem's objective value,
+       to provide a tighter approximation in the master problem and potentially improve convergence.
+       For example, you can get a valid lower bound by solving the linear relaxation of the subproblem
+       if it contains integer variables. In stochastic programming, you can solve the subproblem of 
+       each scenario independently without fixing the complicating variables to get a valid lower bound.
+    """
 
     # Numerical
 

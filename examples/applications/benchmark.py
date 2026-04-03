@@ -1,7 +1,7 @@
 # coding:utf-8
 
 """
-Benchmarking
+Benchmark (Linear Recourse)
 =======================================================
 """
 
@@ -38,6 +38,10 @@ from _utils import SMPSReader, first_stage_model, second_stage_model, determinis
 #     - Fischetti, M., Ljubić, I., & Sinnl, M. (2017). Redesigning benders decomposition for
 #       large-scale facility location. Management Science, 63(7),
 #       2146–2162. https://doi.org/10.1287/mnsc.2016.2461
+#
+# .. warning::
+#
+#    This callback is only compatible with single-cut Benders methods.
 
 
 class InOut(CallbackBase):
@@ -120,7 +124,7 @@ class InOut(CallbackBase):
 
         # Add cuts to the master problem
         end_time = time.perf_counter()
-        print(f"Generated <{cut_added_num}> cuts in <{(end_time - time_start) / 1000:.2f}> seconds by InOut callback.")
+        print(f"Generated <{cut_added_num}> cuts in <{(end_time - time_start):.2f}> seconds by InOut callback.")
 
 
 # %%
@@ -190,7 +194,7 @@ def solve(smps_files, sample_nums, time_limit=3600, seed=1024):
 # - MSPLib-Library: https://github.com/bonnkleiford/MSPLib-Library
 # - RANDOMRHS 2013: https://users.wpi.edu/~atrapp/randomrhs_2013.htm
 
-def run_set_a():
+def run():
     _dir = './set1'
 
     smps_files = {
@@ -214,6 +218,6 @@ def run_set_a():
         1024,
         2048,
     ]
-    # solve(smps_files, sample_nums)
+    solve(smps_files, sample_nums)
     draw(smps_files, sample_nums)
     draw2(smps_files, sample_nums)

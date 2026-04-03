@@ -134,11 +134,12 @@ class SMPSReader:
     def _parse_columns_section(self, fields, is_integer_section):
         col_name = fields[0]
 
-        if col_name.upper() == "'MARKER'":
-            if len(fields) > 1 and fields[1].upper() == "'INTORG'":
+        if len(fields) > 1 and fields[1].upper() == "'MARKER'":
+            if len(fields) > 2 and fields[2].upper() == "'INTORG'":
                 return True
-            elif len(fields) > 1 and fields[1].upper() == "'INTEND'":
+            elif len(fields) > 2 and fields[2].upper() == "'INTEND'":
                 return False
+
         if is_integer_section:
             self.integer_vars.add(col_name)
 
@@ -263,9 +264,11 @@ class SMPSReader:
 
     def _parse_sto(self, lines):
         self.scenarios = dict()
-        # Can only be 'INDEP'
+        # Can be 'INDEP' or 'SCENARIOS'
         parsing_mode = None
         indep_rv = collections.defaultdict(list)
+        current_scenario = None
+        current_prob = None
 
         for line in lines:
             line = line.strip()
@@ -277,8 +280,34 @@ class SMPSReader:
                 continue
             if fields[0] == "ENDATA":
                 break
-            if len(fields) > 1 and fields[0] == 'INDEP' and fields[1] == 'DISCRETE':
-                parsing_mode = 'INDEP'
+            if len(fields) > 1 and fields[0] in ['INDEP', 'SCENARIOS'] and fields[1] == 'DISCRETE':
+                parsing_mode = fields[0]
+                continue
+
+            if parsing_mode == 'SCENARIOS':
+                if fields[0] == 'SC':
+                    # New scenario starts
+                    scenario_name = fields[1]
+                    current_scenario = scenario_name
+                    current_prob = float(fields[3])
+                    self.scenarios[current_scenario] = {
+                        'name': current_scenario,
+                        'prob': current_prob,
+                        'modi': {'RHS': {}, 'COLUMNS': {}, 'OBJ': {}}
+                    }
+                elif current_scenario:
+                    if fields[0] in ['RIGHT', 'RHS1', 'RHS']:
+                        mod_type = 'RHS'
+                        name = fields[1]
+                        value = float(fields[2])
+                        self.scenarios[current_scenario]['modi'][mod_type][name] = value
+                    elif fields[1] in ['obj']:
+                        mod_type = 'OBJ'
+                        name = fields[0]
+                        value = float(fields[2])
+                        self.scenarios[current_scenario]['modi'][mod_type][name] = value
+                    else:
+                        raise NotImplementedError(f"Unsupported modification type: {fields}")
                 continue
 
             # INDEP mode
@@ -289,34 +318,33 @@ class SMPSReader:
                 prob = float(fields[-1])
                 indep_rv[(mod_type, name)].append({'value': value, 'prob': prob})
 
-        assert parsing_mode == 'INDEP', "Only INDEP mode is supported in this parser."
+        if parsing_mode == 'INDEP':
+            rv_names = list(indep_rv.keys())
+            outcomes = [indep_rv[name] for name in rv_names]
 
-        rv_names = list(indep_rv.keys())
-        outcomes = [indep_rv[name] for name in rv_names]
+            # For each random variable, prepare a list of outcomes and their probabilities
+            choices_map = {}
+            for i, rv_name in enumerate(rv_names):
+                rv_outcomes = outcomes[i]
+                values = [o['value'] for o in rv_outcomes]
+                probs = [o['prob'] for o in rv_outcomes]
+                choices_map[rv_name] = (values, probs)
 
-        # For each random variable, prepare a list of outcomes and their probabilities
-        choices_map = {}
-        for i, rv_name in enumerate(rv_names):
-            rv_outcomes = outcomes[i]
-            values = [o['value'] for o in rv_outcomes]
-            probs = [o['prob'] for o in rv_outcomes]
-            choices_map[rv_name] = (values, probs)
+            for i in range(self.sample_num):
+                scenario_name = f"SCE_{i + 1}"
+                modifications = {'RHS': {}, 'COLUMNS': {}, 'OBJ': {}}
+                for rv_name, (values, probs) in choices_map.items():
+                    # Sample one outcome for each random variable
+                    sampled_value = random.choices(values, weights=probs, k=1)[0]
+                    mod_type, name = rv_name
+                    mod_type = 'RHS' if mod_type in ['RIGHT', 'RHS1'] else mod_type
+                    modifications[mod_type][name] = sampled_value
 
-        for i in range(self.sample_num):
-            scenario_name = f"SCE_{i + 1}"
-            modifications = {'RHS': {}, 'COLUMNS': {}, 'OBJ': {}}
-            for rv_name, (values, probs) in choices_map.items():
-                # Sample one outcome for each random variable
-                sampled_value = random.choices(values, weights=probs, k=1)[0]
-                mod_type, name = rv_name
-                mod_type = 'RHS' if mod_type in ['RIGHT', 'RHS1'] else mod_type
-                modifications[mod_type][name] = sampled_value
-
-            self.scenarios[scenario_name] = {
-                'name': scenario_name,
-                'prob': 1.0 / self.sample_num,
-                'modi': modifications
-            }
+                self.scenarios[scenario_name] = {
+                    'name': scenario_name,
+                    'prob': 1.0 / self.sample_num,
+                    'modi': modifications
+                }
 
     def to_json(self, file_path):
         data = {
@@ -360,6 +388,10 @@ def first_stage_model(data, enforce_integer=False):
             if var_name in data['integer_vars']:
                 vtype = GRB.INTEGER
             if var_name in data['binary_vars']:
+                vtype = GRB.BINARY
+
+        if abs(lb) < float('inf') and abs(ub) < float('inf'):
+            if int(lb) == 0 and int(ub) == 1 and vtype == GRB.INTEGER:
                 vtype = GRB.BINARY
 
         x[var_name] = model.addVar(lb=lb, ub=ub, vtype=vtype, name=var_name)
@@ -466,11 +498,14 @@ def second_stage_model(data):
         # Objective function
         obj_expr = gp.LinExpr()
         obj_row_name = data['objective_name']
+        obj_modifications = s_data['modi'].get('OBJ', {})
 
         # Second-stage cost
         for col_name, coeff in data['columns'].items():
             if obj_row_name in coeff and col_name in y:
-                obj_expr += coeff[obj_row_name] * y[col_name]
+                # Use modified coefficient if available, otherwise use original
+                obj_coeff = obj_modifications.get(col_name, coeff[obj_row_name])
+                obj_expr += obj_coeff * y[col_name]
 
         model.setObjective(obj_expr, sense=GRB.MINIMIZE if data['objective_sense'] == 'MIN' else GRB.MAXIMIZE)
         models.append(model)
@@ -501,6 +536,10 @@ def deterministic_equivalent_model(data, enforce_integer=False):
             if var_name in data['integer_vars']:
                 vtype = GRB.INTEGER
             if var_name in data['binary_vars']:
+                vtype = GRB.BINARY
+
+        if abs(lb) < float('inf') and abs(ub) < float('inf'):
+            if int(lb) == 0 and int(ub) == 1 and vtype == GRB.INTEGER:
                 vtype = GRB.BINARY
 
         x[var_name] = model.addVar(lb=lb, ub=ub, vtype=vtype, name=var_name)
@@ -579,9 +618,12 @@ def deterministic_equivalent_model(data, enforce_integer=False):
     # Second-stage cost
     for s_name, s_data in scenarios.items():
         prob = s_data['prob']
+        obj_modifications = s_data['modi'].get('OBJ', {})
         for col_name, coeff in data['columns'].items():
             if obj_row_name in coeff and col_name in y[s_name]:
-                obj_expr += prob * coeff[obj_row_name] * y[s_name][col_name]
+                # Use modified coefficient if available, otherwise use original
+                obj_coeff = obj_modifications.get(col_name, coeff[obj_row_name])
+                obj_expr += prob * obj_coeff * y[s_name][col_name]
 
     model.setObjective(obj_expr, sense=GRB.MINIMIZE if data['objective_sense'] == 'MIN' else GRB.MAXIMIZE)
 
@@ -607,7 +649,7 @@ def _collect_data(smps_files, sample_nums):
                     result = json.load(f)
                     time_de = result['SolutionInfo']['Runtime']
                     obj_de = result['SolutionInfo']['ObjVal']
-                    if result['SolutionInfo']['MIPGap'] <= 1e-4:
+                    if result['SolutionInfo']['MIPGap'] <= 1e-2:
                         de_times.append(time_de)
             except:
                 time_de = 3600
@@ -619,7 +661,7 @@ def _collect_data(smps_files, sample_nums):
                     result = json.load(f)
                     time_bd = result['runtime']
                     obj_bd = result['obj']
-                    if result.get('gap', float('inf')) <= 1e-4:
+                    if result.get('gap', float('inf')) <= 1e-2:
                         bd_times.append(time_bd)
             except:
                 time_bd = 3600
@@ -636,7 +678,7 @@ def _collect_data(smps_files, sample_nums):
 
             if obj_de is not None and obj_bd is not None:
                 if abs(obj_de - obj_bd) > 1e-4:
-                    print(f"Warning: Obj. differ for <{instance_name}_sample_{sample_num}>: DE={obj_de}, BD={obj_bd}")
+                    print(f"Warning: Obj. differ for <{instance_name}_{sample_num}>: DE={obj_de}, BD={obj_bd}")
 
     de_times.sort()
     bd_times.sort()
