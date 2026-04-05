@@ -12,6 +12,7 @@ import json
 import os
 import sys
 import time
+from itertools import product
 
 from benderslib import LShaped, CallbackBase, BendersContext, CST
 from benderslib.solvers import Gurobi
@@ -24,7 +25,7 @@ try:
 except NameError:
     sys.path.insert(0, os.path.abspath("."))
 
-from _utils import SMPSReader, first_stage_model, second_stage_model, deterministic_equivalent_model, draw, draw2
+from _utils import SMPSReader, first_stage_model, second_stage_model, deterministic_equivalent_model, draw, collect_data
 
 
 # %%
@@ -130,46 +131,46 @@ class InOut(CallbackBase):
 # %%
 # Solve the instances using different methods and save the results.
 
-def solve(smps_files, sample_nums, time_limit=3600, seed=1024):
-    for sample_num in sample_nums:
-        for instance_name, files in smps_files.items():
-            SMPS = SMPSReader(*files, sample_num=sample_num, seed=seed)
-            SMPS.parse()
-            SMPS.to_json('_temp.json')
-            with open("_temp.json", 'r') as f:
-                data = json.load(f)
+def solve(smps_files, instance_name, sample_num, time_limit, solve_methods, seed=1024):
+    SMPS = SMPSReader(*smps_files, sample_num=sample_num, seed=seed)
+    SMPS.parse()
+    SMPS.to_json('_temp.json')
+    with open("_temp.json", 'r') as f:
+        data = json.load(f)
 
-            # Solve using deterministic equivalent
-            model = deterministic_equivalent_model(data, enforce_integer=True)
-            model.setParam('TimeLimit', time_limit)
-            model.optimize()
-            model.write(f"./_sol/{instance_name}_de_{sample_num}.json")
+    # Solve using deterministic equivalent
+    if "de" in solve_methods:
+        model = deterministic_equivalent_model(data, enforce_integer=True)
+        model.setParam('TimeLimit', time_limit)
+        model.optimize()
+        model.write(f"./_sol/{instance_name}_de_{sample_num}.json")
 
-            # model.write("_temp.mps")
-            # from pyscipopt import Model
-            # scip = Model()
-            # scip.readProblem(filename="_temp.mps")
-            # scip.optimize()
-            # scip.writeStatisticsJson(f"./_sol/{instance_name}_de_{sample_num}.json")
+        # model.write("_temp.mps")
+        # from pyscipopt import Model
+        # scip = Model()
+        # scip.readProblem(filename="_temp.mps")
+        # scip.optimize()
+        # scip.writeStatisticsJson(f"./_sol/{instance_name}_de_{sample_num}.json")
 
-            # Solve using Benders decomposition
-            master_model, complicating_vars = first_stage_model(data, enforce_integer=True)
-            sub_models, probs = second_stage_model(data)
-            BD = LShaped.from_models(
-                master_model=master_model,
-                master_solver=Gurobi,
-                sub_model=sub_models,
-                sub_solver=Gurobi,
-                complicating_vars=complicating_vars,
-                prob=probs,
-            )
-            BD.register(InOut(lambda_=0.2, alpha=0.3, n=5, m=30))
-            BD.params.parallel_sub = True
-            BD.params.use_bnc = True
-            BD.params.time_limit = time_limit
-            BD.params.theta_lb = 0
-            BD.solve()
-            BD.save(f"./_sol/{instance_name}_bd_{sample_num}.json")
+    # Solve using Benders decomposition
+    if "bd" in solve_methods:
+        master_model, complicating_vars = first_stage_model(data, enforce_integer=True)
+        sub_models, probs = second_stage_model(data)
+        BD = LShaped.from_models(
+            master_model=master_model,
+            master_solver=Gurobi,
+            sub_model=sub_models,
+            sub_solver=Gurobi,
+            complicating_vars=complicating_vars,
+            prob=probs,
+        )
+        BD.register(InOut(lambda_=0.2, alpha=0.3, n=5, m=30))
+        BD.params.parallel_sub = True
+        BD.params.use_bnc = True
+        BD.params.time_limit = time_limit
+        BD.params.theta_lb = 0
+        BD.solve()
+        BD.save(f"./_sol/{instance_name}_bd_{sample_num}.json")
 
 
 # %%
@@ -194,7 +195,10 @@ def solve(smps_files, sample_nums, time_limit=3600, seed=1024):
 # - MSPLib-Library: https://github.com/bonnkleiford/MSPLib-Library
 # - RANDOMRHS 2013: https://users.wpi.edu/~atrapp/randomrhs_2013.htm
 
-def run():
+def run(solve_methods=None, draw_result=False, dry_run=True):
+    if solve_methods is None:
+        solve_methods = ["de", "bd"]
+
     _dir = './set1'
 
     smps_files = {
@@ -204,7 +208,7 @@ def run():
 
         # Source: https://pages.cs.wisc.edu/~swright/stochastic/sampling/
         "storm": (_dir + "/storm/storm.cor", _dir + "/storm/storm.tim", _dir + "/storm/storm.sto"),
-        "LandS": (_dir + "/lands/lands.cor", _dir + "/lands/lands.tim", _dir + "/lands/lands.sto"),
+        "lands": (_dir + "/lands/lands.cor", _dir + "/lands/lands.tim", _dir + "/lands/lands.sto"),
         "gbd": (_dir + "/gbd/gbd.cor", _dir + "/gbd/gbd.tim", _dir + "/gbd/gbd.sto"),
 
         # Note: *cargo* and *storm* were originated from the same problem, but the data is different.
@@ -218,6 +222,41 @@ def run():
         1024,
         2048,
     ]
-    solve(smps_files, sample_nums)
-    draw(smps_files, sample_nums)
-    draw2(smps_files, sample_nums)
+
+    ins_names = []
+    de_files = []
+    bd_files = []
+    ins_classes = []
+    s_nums = []
+
+    for (ins_class, smps_files), sample_num in product(smps_files.items(), sample_nums):
+        ins_name = f"{ins_class}"
+        de_file = f"./_sol/{ins_name}_de_{sample_num}.json"
+        bd_file = f"./_sol/{ins_name}_bd_{sample_num}.json"
+
+        ins_names.append(ins_name)
+        de_files.append(de_file)
+        bd_files.append(bd_file)
+        ins_classes.append(ins_class)
+        s_nums.append(sample_num)
+
+        if not dry_run:
+            solve(smps_files, ins_name, sample_num, time_limit=3600, solve_methods=solve_methods)
+
+    data_points = collect_data(
+        ins_names=ins_names,
+        de_files=de_files,
+        bd_files=bd_files,
+        ins_classes=ins_classes,
+        sample_nums=s_nums,
+    )
+
+    if draw_result:
+        draw(data_points)
+
+    return data_points
+
+
+if __name__ == "__main__":
+    ...
+    # run(solve_methods=[], draw_result=True)

@@ -11,15 +11,23 @@ import collections
 import random
 import json
 import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
 
-plt.rcParams['font.family'] = 'Arial'
-plt.rcParams.update({
-    'font.size': 9,
-    'axes.labelsize': 9,
-    'xtick.labelsize': 8,
-    'ytick.labelsize': 8,
-    'legend.fontsize': 8,
-})
+PLT_PARAM = {
+    "font.family": "Arial",
+
+    "font.size": 7,
+    "axes.titlesize": 7,
+
+    "ytick.major.size": 2,
+    "ytick.major.width": .5,
+    "ytick.labelsize": 7,
+
+    "xtick.major.size": 2,
+    "xtick.major.width": .5,
+    "xtick.labelsize": 7,
+}
+plt.rcParams.update(PLT_PARAM)
 
 import gurobipy as gp
 from gurobipy import GRB
@@ -34,7 +42,7 @@ from gurobipy import GRB
 
 class SMPSReader:
 
-    def __init__(self, cor_file_path=None, tim_file_path=None, sto_file_path=None, sample_num=100, seed=None):
+    def __init__(self, cor_file_path=None, tim_file_path=None, sto_file_path=None, sample_num=None, seed=None):
         if seed is not None:
             random.seed(seed)
 
@@ -633,172 +641,195 @@ def deterministic_equivalent_model(data, enforce_integer=False):
 # %%
 # Compare computation time of different solution methods.
 
-def _collect_data(smps_files, sample_nums):
-    # All data points, including ones that are not solved
+def collect_data(ins_names, de_files, bd_files, ins_classes, sample_nums):
     data_points = []
-    # Optimized data points, i.e., those with MIP gap <= 1e-4
-    de_times = []
-    bd_times = []
 
-    for sample_num in sample_nums:
-        for instance_name, files in smps_files.items():
-            time_de, time_bd = None, None
+    for ins_name, de_file, bd_file, ins_class, num in zip(ins_names, de_files, bd_files, ins_classes, sample_nums):
+        time_de, time_bd = 3600, 3600
+        obj_de, obj_bd = None, None
+        de_solved, bd_solved = False, False
 
-            try:
-                with open(f"./_sol/{instance_name}_de_{sample_num}.json", 'r') as f:
-                    result = json.load(f)
-                    time_de = result['SolutionInfo']['Runtime']
-                    obj_de = result['SolutionInfo']['ObjVal']
-                    if result['SolutionInfo']['MIPGap'] <= 1e-2:
-                        de_times.append(time_de)
-            except:
-                time_de = 3600
-                obj_de = None
-                print(f"Warning: Data for <{instance_name}_de_{sample_num}> not found.")
+        try:
+            with open(de_file, 'r') as f:
+                result = json.load(f)
+                time_de = result['SolutionInfo']['Runtime']
+                obj_de = result['SolutionInfo']['ObjVal']
+                if result['SolutionInfo']['MIPGap'] <= 1e-4:
+                    de_solved = True
+        except FileNotFoundError:
+            print(f"Warning: Data for < {de_file} > not found.")
 
-            try:
-                with open(f"./_sol/{instance_name}_bd_{sample_num}.json", 'r') as f:
-                    result = json.load(f)
-                    time_bd = result['runtime']
-                    obj_bd = result['obj']
-                    if result.get('gap', float('inf')) <= 1e-2:
-                        bd_times.append(time_bd)
-            except:
-                time_bd = 3600
-                obj_bd = None
-                print(f"Warning: Data for <{instance_name}_bd_{sample_num}> not found.")
+        try:
+            with open(bd_file, 'r') as f:
+                result = json.load(f)
+                time_bd = result['runtime']
+                obj_bd = result['obj']
+                if result.get('gap', float('inf')) <= 1e-4:
+                    bd_solved = True
+        except FileNotFoundError:
+            print(f"Warning: Data for < {bd_file} > not found.")
 
-            if time_de is not None and time_bd is not None:
-                data_points.append({
-                    'instance_name': instance_name,
-                    'sample_num': sample_num,
-                    'time_de': time_de,
-                    'time_bd': time_bd,
-                })
+        data_points.append({
+            'instance_name': ins_name,
+            'instance_class': ins_class,
+            'sample_num': num,
+            'time_de': time_de,
+            'time_bd': time_bd,
+            'de_solved': de_solved,
+            'bd_solved': bd_solved,
+        })
 
-            if obj_de is not None and obj_bd is not None:
-                if abs(obj_de - obj_bd) > 1e-4:
-                    print(f"Warning: Obj. differ for <{instance_name}_{sample_num}>: DE={obj_de}, BD={obj_bd}")
+        if obj_de is not None and obj_bd is not None:
+            if abs(obj_de - obj_bd) / abs(max(obj_de, obj_bd, 1e-6)) > 1e-4:
+                print(f"Warning: Obj. differ for <name={ins_name}, |S|={num}>: DE={obj_de}, BD={obj_bd}")
 
-    de_times.sort()
-    bd_times.sort()
-    return data_points, de_times, bd_times
+    return data_points
 
 
-def draw(smps_files, sample_nums):
-    data_points, _, _ = _collect_data(smps_files, sample_nums)
+def draw(all_data_points, titles=None):
+    num_data_sets = len(all_data_points)
+    fig, axes = plt.subplots(
+        2, num_data_sets,
+        figsize=(2.1 * num_data_sets, 4.3), dpi=300, sharey='row', )
+    fig.subplots_adjust(hspace=0, wspace=0)
 
-    plt.figure(figsize=(3.5, 3.5), dpi=300)
+    if num_data_sets == 1:
+        axes = [[axes[0]], [axes[1]]]
 
-    # Define markers for instances
-    instance_names = list(smps_files.keys())
-    markers = ['v', 'o', 'D', '^', 's', 'P', '*', 'X']
-    marker_map = {name: markers[i % len(markers)] for i, name in enumerate(instance_names)}
+    for i, data_points in enumerate(all_data_points):
+        if num_data_sets > 1:
+            ax1 = axes[0, i]
+            ax2 = axes[1, i]
+        else:
+            ax1 = axes[0][0]
+            ax2 = axes[1][0]
 
-    # Define colors for sample_nums
-    unique_sample_nums = sorted(list(set(p['sample_num'] for p in data_points)))
-    color_map = plt.get_cmap('Blues')  # Darker for larger values
-    norm = plt.Normalize(vmin=min(unique_sample_nums), vmax=max(unique_sample_nums))
+        # Style ax1
+        ax1.grid(alpha=0.3, ls='--', zorder=0)
+        ax1.spines['top'].set_visible(False)
+        ax1.spines['right'].set_visible(False)
+        ax1.spines['bottom'].set_visible(False)
+        # ax1.tick_params(axis='x', which='both', bottom=True, top=False, labelbottom=False)
+        if i > 0:
+            ax1.spines['left'].set_visible(False)
+            ax1.tick_params(axis='y', which='both', left=False, right=False)
 
-    # Plot data points
-    for point in data_points:
-        plt.scatter(
-            point['time_de'],
-            point['time_bd'],
-            color=color_map(norm(point['sample_num'])),
-            marker=marker_map[point['instance_name']],
-            s=80,
-            alpha=0.8,
-            edgecolors='black',
-            linewidths=0.5
-        )
+        # Subplot 1: Scatter plot
+        unique_classes = sorted(list(set(p['instance_class'] for p in data_points)))
+        markers = ['+', 'x', '1', '2', '3', '4']
+        marker_map = {name: markers[i % len(markers)] for i, name in enumerate(unique_classes)}
 
-    # Instance legend
-    from matplotlib.lines import Line2D
-    legend_elements_instance = [
-        Line2D([0], [0], marker=marker_map[name], color='w', label=name,
-               markerfacecolor='grey', markersize=8)
-        for name in instance_names
-    ]
-    legend1 = plt.legend(handles=legend_elements_instance, title="Instances", loc="upper left", frameon=False, ncol=2)
-    plt.gca().add_artist(legend1)
+        _nums = [p.get('sample_num', 0) for p in data_points]
+        colors = ['k' if n is None or n <= 500 else 'C0' for n in _nums]
 
-    # Sample number legend
-    legend_elements_sample = [
-        Line2D([0], [0], marker='s', color=color_map(norm(sn)), label=f'{sn}',
-               markerfacecolor=color_map(norm(sn)), markersize=8)
-        for sn in unique_sample_nums
-    ]
-    plt.legend(handles=legend_elements_sample, title="Samples", loc="lower right", frameon=False, ncol=2)
+        for i_point, point in enumerate(data_points):
+            ax1.scatter(
+                point['time_de'],
+                point['time_bd'],
+                c=colors[i_point],
+                marker=marker_map[point['instance_class']],
+                s=20,
+                alpha=0.8,
+                linewidths=0.5
+            )
 
-    # Draw the y=x reference line
-    min_val, max_val = 1e-3, 1e4
-    plt.plot([min_val, max_val], [min_val, max_val], '--', color='gray', label='y=x', lw=0.8, zorder=0)
+        if set(unique_classes) != {None}:
+            legend_elements_instance = [
+                Line2D([0], [0], marker=marker_map[name], color='k', label=name,
+                       markersize=5, linestyle='None', markeredgewidth=0.5)
+                for name in unique_classes
+            ]
+            legend1 = ax1.legend(handles=legend_elements_instance, loc="upper left", frameon=False,
+                                 ncol=1, labelspacing=0.2, handletextpad=0.2, borderpad=0.2,
+                                 )
+            ax1.add_artist(legend1)
 
-    # Figure settings
-    plt.xlim(min_val, max_val)
-    plt.ylim(min_val, max_val)
-    plt.xscale('log')
-    plt.yscale('log')
-    plt.xlabel("Deterministic Equivalent (s)")
-    plt.ylabel("Benders Decomposition (s)")
-    # plt.grid(True, which="both", ls="--", linewidth=0.5)
+        if i == 0:
+            legend_elements_sample = [
+                Line2D([0], [0], marker='s', color='gray', label='|S|<1025',
+                       markersize=5, linestyle='None'),
+                Line2D([0], [0], marker='s', color='C0', label='|S|>1025',
+                       markersize=5, linestyle='None')
+            ]
+            ax1.legend(handles=legend_elements_sample, loc="lower right", frameon=False, ncol=1,
+                       labelspacing=0.2, handletextpad=0.2, borderpad=0.2)
+
+        min_val, max_val = 0.1, 10000
+        ax1.plot([min_val, max_val], [min_val, max_val], '--', color='gray', label='y=x', lw=0.5, zorder=0)
+        ax1.fill_between([min_val, max_val], [min_val, max_val], min_val, color='#f2f2f2', zorder=-1)
+
+        ax1.set_xlim(min_val, max_val)
+        ax1.set_ylim(min_val, max_val)
+        ax1.set_xscale('log')
+        ax1.set_yscale('log')
+        ax1.set_xlabel("Monolithic Model (s)")
+        if i == 0:
+            ax1.set_ylabel("Benders Decomposition (s)")
+        if titles and i < len(titles):
+            ax1.set_title(titles[i], y=1.0, pad=6)
+
+        # Style ax2
+        ax2.grid(alpha=0.3, ls='--', zorder=0)
+        ax2.spines['top'].set_visible(False)
+        ax2.spines['right'].set_visible(False)
+        if i > 0:
+            ax2.spines['left'].set_visible(False)
+            ax2.tick_params(axis='y', which='both', left=False, right=False)
+
+        # Subplot 2: Performance profile
+        de_times = sorted([p['time_de'] for p in data_points if p['de_solved']])
+        bd_times = sorted([p['time_bd'] for p in data_points if p['bd_solved']])
+
+        de_solved_num = len(de_times)
+        bd_solved_num = len(bd_times)
+        total_instances = len(data_points)
+
+        if len(de_times) > 0:
+            y_values = [i / total_instances for i in range(1, len(de_times) + 1)]
+            if de_solved_num < total_instances:
+                de_times += [3600] * (total_instances - de_solved_num)
+                y_values += [y_values[-1]] * (total_instances - de_solved_num)
+            ax2.plot(de_times, y_values, color='k', lw=0.7, linestyle='--', label='Monolithic')
+            ax2.annotate(f'{de_solved_num}',
+                         xy=(de_times[-1] * 1.2, y_values[-1]),
+                         fontsize=7, horizontalalignment='left', verticalalignment='center', color='k')
+
+        if len(bd_times) > 0:
+            y_values = [i / total_instances for i in range(1, len(bd_times) + 1)]
+            if bd_solved_num < total_instances:
+                bd_times += [3600] * (total_instances - bd_solved_num)
+                y_values += [y_values[-1]] * (total_instances - bd_solved_num)
+            ax2.plot(bd_times, y_values, color='C0', lw=1, linestyle='-', label='Benders')
+            ax2.annotate(f'{bd_solved_num}',
+                         xy=(bd_times[-1] * 1.2, y_values[-1]),
+                         fontsize=7, horizontalalignment='left', verticalalignment='center', color='C0')
+
+        all_de_times = [p['time_de'] for p in data_points]
+        all_bd_times = [p['time_bd'] for p in data_points]
+        # ax2.annotate(
+        #     f"Benders Avg.: {sum(all_de_times) / total_instances:.0f} s",
+        #     xy=(30, 0.01), fontsize=8, horizontalalignment='left', verticalalignment='bottom', color='k')
+        # ax2.annotate(
+        #     f"Monolithic Avg.: {sum(all_bd_times) / total_instances:.0f} s",
+        #     xy=(30, 0.11), fontsize=8, horizontalalignment='left', verticalalignment='bottom', color='C0')
+
+        if titles and i < len(titles):
+            print(f"--- {titles[i]} ---")
+        else:
+            print(f"--- Data Set {i + 1} ---")
+        print(f"Deterministic Equivalent Solved No.: {de_solved_num}, in {sum(all_de_times) / 60:.2f} minutes")
+        print(f"Benders Decomposition Solved No.   : {bd_solved_num}, in {sum(all_bd_times) / 60:.2f} minutes")
+
+        ax2.set_ylim(0, 1.1)
+        ax2.set_xlim(min_val, max_val)
+        ax2.set_xscale('log')
+        ax2.set_xlabel("Time (s)")
+        if i == 0:
+            ax2.set_ylabel("Fraction of Instances Solved")
+
+        if i == 0:
+            leg = ax2.legend(frameon=False, loc="upper left")
+            leg.get_frame().set_linewidth(0.0)
+
     plt.tight_layout()
-    # plt.savefig("seta_figure1.pdf", bbox_inches='tight', pad_inches=0.01)
-    plt.show()
-
-
-def draw2(smps_files, sample_nums):
-    _, de_times, bd_times = _collect_data(smps_files, sample_nums)
-
-    de_solved_num = len(de_times)
-    bd_solved_num = len(bd_times)
-    total_instances = len(smps_files) * len(sample_nums)
-
-    plt.figure(figsize=(3.5, 3.5), dpi=300)
-
-    # Plot Benders decomposition
-    y_values = [i / total_instances for i in range(1, len(bd_times) + 1)]
-    if bd_solved_num < total_instances:
-        # Extend the curve to the right
-        bd_times += [3600] * (total_instances - bd_solved_num)
-        y_values += [y_values[-1]] * (total_instances - bd_solved_num)
-    plt.plot(bd_times, y_values, color='C0', linestyle='-', label='Benders Decomposition')
-    plt.annotate(f'{bd_solved_num}',
-                 xy=(bd_times[-1] * 1.2, y_values[-1]),
-                 fontsize=8, horizontalalignment='left', verticalalignment='center', color='C0')
-
-    # Plot deterministic equivalent
-    y_values = [i / total_instances for i in range(1, len(de_times) + 1)]
-    if de_solved_num < total_instances:
-        # Extend the curve to the right
-        de_times += [3600] * (total_instances - de_solved_num)
-        y_values += [y_values[-1]] * (total_instances - de_solved_num)
-    plt.plot(de_times, y_values, color='k', lw=0.8, linestyle='--', label='Deterministic Equivalent')
-    plt.annotate(f'{de_solved_num}',
-                 xy=(de_times[-1] * 1.2, y_values[-1]),
-                 fontsize=8, horizontalalignment='left', verticalalignment='center', color='k')
-
-    # Solved instances & total time
-    print(f"Deterministic Equivalent: {de_solved_num}, in {sum(de_times) / 60:.2f} minutes")
-    print(f"Benders Decomposition:    {bd_solved_num}, in {sum(bd_times) / 60:.2f} minutes")
-    plt.annotate(
-        f"DE Avg.: {sum(de_times) / total_instances:.2f} s",
-        xy=(10, 0.04),
-        fontsize=8, horizontalalignment='left', verticalalignment='bottom', color='k')
-    plt.annotate(
-        f"BD Avg.: {sum(bd_times) / total_instances:.2f} s",
-        xy=(10, 0.1),
-        fontsize=8, horizontalalignment='left', verticalalignment='bottom', color='C0')
-
-    # Figure settings
-    plt.ylim(0, 1.1)
-    plt.xlim(1e-3, 1e4)
-    plt.xscale('log')
-    plt.xlabel("Time (s)")
-    plt.ylabel("Fraction of Solved Instances")
-    plt.legend(frameon=False, loc="upper left")
-    # plt.grid(True, which="both", ls="--", linewidth=0.5)
-    plt.tight_layout()
-    # plt.savefig("seta_figure2.pdf", bbox_inches='tight', pad_inches=0.01)
-    plt.show()
+    plt.savefig('figure.pdf', bbox_inches='tight', pad_inches=0.05)

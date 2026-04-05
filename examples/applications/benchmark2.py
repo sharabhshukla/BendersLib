@@ -23,7 +23,7 @@ try:
 except NameError:
     sys.path.insert(0, os.path.abspath("."))
 
-from _utils import SMPSReader, first_stage_model, second_stage_model, deterministic_equivalent_model, draw, draw2
+from _utils import SMPSReader, first_stage_model, second_stage_model, deterministic_equivalent_model, collect_data, draw
 
 
 # %%
@@ -177,55 +177,55 @@ class InOut(CallbackBase):
 # %%
 # Solve the instances using different methods and save the results.
 
-def solve(smps_files, sample_nums, time_limit):
-    for sample_num in sample_nums:
-        for instance_name, files in smps_files.items():
-            SMPS = SMPSReader(*files, sample_num=sample_num)
-            SMPS.parse()
-            SMPS.to_json('_temp.json')
-            with open("_temp.json", 'r') as f:
-                data = json.load(f)
+def solve(smps_files, instance_name, time_limit, solve_methods):
+    SMPS = SMPSReader(*smps_files)
+    SMPS.parse()
+    SMPS.to_json('_temp.json')
+    with open("_temp.json", 'r') as f:
+        data = json.load(f)
 
-            # Solve using deterministic equivalent
-            model = deterministic_equivalent_model(data)
-            model.setParam('TimeLimit', time_limit)
-            model.optimize()
-            model.write(f"./_sol/{instance_name}_de_{sample_num}.json")
+    # Solve using deterministic equivalent
+    if "de" in solve_methods:
+        model = deterministic_equivalent_model(data)
+        model.setParam('TimeLimit', time_limit)
+        model.optimize()
+        model.write(f"./_sol/{instance_name}_de.json")
 
-            # model.write("_temp.mps")
-            # from pyscipopt import Model
-            # scip = Model()
-            # scip.readProblem(filename="_temp.mps")
-            # scip.optimize()
-            # scip.writeStatisticsJson(f"./_sol/{instance_name}_de_{sample_num}.json")
+        # model.write("_temp.mps")
+        # from pyscipopt import Model
+        # scip = Model()
+        # scip.readProblem(filename="_temp.mps")
+        # scip.optimize()
+        # scip.writeStatisticsJson(f"./_sol/{instance_name}_de.json")
 
-            # Solve using Benders decomposition
-            master_model, complicating_vars = first_stage_model(data)
-            sub_models, probs = second_stage_model(data)
-            BD = IntegerLShaped.from_models(
-                master_model=master_model,
-                master_solver=Gurobi,
-                sub_model=sub_models,
-                sub_solver=Gurobi,
-                complicating_vars=complicating_vars,
-                prob=probs,
-            )
+    # Solve using Benders decomposition
+    if "bd" in solve_methods:
+        master_model, complicating_vars = first_stage_model(data)
+        sub_models, probs = second_stage_model(data)
+        BD = IntegerLShaped.from_models(
+            master_model=master_model,
+            master_solver=Gurobi,
+            sub_model=sub_models,
+            sub_solver=Gurobi,
+            complicating_vars=complicating_vars,
+            prob=probs,
+        )
 
-            if "sslp" in instance_name:
-                # The SSLP instances have negative objective values,
-                # so we need to set a negative value to `theta_lb`.
-                # A stronger `theta_lb` is provided in the callback.
-                BD.params.theta_lb = -1e3
-                BD.register(InOut(lambda_=0.2, alpha=0.3, delta=0.2, n=5, m=100, integer=True))
+        if "sslp" in instance_name:
+            # The SSLP instances have negative objective values,
+            # so we need to set a negative value to `theta_lb`.
+            # A stronger `theta_lb` is provided in the callback.
+            BD.params.theta_lb = -1e3
+            BD.register(InOut(lambda_=0.2, alpha=0.3, delta=0.2, n=5, m=100, integer=True))
 
-            if "smkp" in instance_name:
-                BD.register(InOut(lambda_=0.2, alpha=0.3, delta=0.2, n=5, m=100))
+        if "smkp" in instance_name:
+            BD.register(InOut(lambda_=0.2, alpha=0.3, delta=0.2, n=5, m=100))
 
-            BD.params.parallel_sub = True
-            BD.params.use_bnc = True
-            BD.params.time_limit = time_limit
-            BD.solve()
-            BD.save(f"./_sol/{instance_name}_bd_{sample_num}.json")
+        BD.params.parallel_sub = True
+        BD.params.use_bnc = True
+        BD.params.time_limit = time_limit
+        BD.solve()
+        BD.save(f"./_sol/{instance_name}_bd.json")
 
 
 # %%
@@ -249,52 +249,88 @@ def solve(smps_files, sample_nums, time_limit):
 # - RANDOMRHS 2013: https://users.wpi.edu/~atrapp/randomrhs_2013.htm
 
 
-def run():
+def run(solve_methods=None, draw_result=False, dry_run=True):
+    if solve_methods is None:
+        solve_methods = ["de", "bd"]
+
     _dir = './set2'
 
     smps_files = {
         # Source: https://www2.isye.gatech.edu/~sahmed/siplib/
 
-        "sslp1": (_dir + "/sslp/sslp_15_45_5.cor",
-                  _dir + "/sslp/sslp_15_45_5.tim",
-                  _dir + "/sslp/sslp_15_45_5.sto"),
-        "sslp2": (_dir + "/sslp/sslp_15_45_10.cor",
-                  _dir + "/sslp/sslp_15_45_10.tim",
-                  _dir + "/sslp/sslp_15_45_10.sto"),
-        "sslp3": (_dir + "/sslp/sslp_15_45_15.cor",
-                  _dir + "/sslp/sslp_15_45_15.tim",
-                  _dir + "/sslp/sslp_15_45_15.sto"),
-        "sslp4": (_dir + "/sslp/sslp_5_25_50.cor",
-                  _dir + "/sslp/sslp_5_25_50.tim",
-                  _dir + "/sslp/sslp_5_25_50.sto"),
-        "sslp5": (_dir + "/sslp/sslp_5_25_100.cor",
-                  _dir + "/sslp/sslp_5_25_100.tim",
-                  _dir + "/sslp/sslp_5_25_100.sto"),
+        "sslp_1": (_dir + "/sslp/sslp_15_45_5.cor",
+                   _dir + "/sslp/sslp_15_45_5.tim",
+                   _dir + "/sslp/sslp_15_45_5.sto"),
+        "sslp_2": (_dir + "/sslp/sslp_15_45_10.cor",
+                   _dir + "/sslp/sslp_15_45_10.tim",
+                   _dir + "/sslp/sslp_15_45_10.sto"),
+        "sslp_3": (_dir + "/sslp/sslp_15_45_15.cor",
+                   _dir + "/sslp/sslp_15_45_15.tim",
+                   _dir + "/sslp/sslp_15_45_15.sto"),
+        "sslp_4": (_dir + "/sslp/sslp_5_25_50.cor",
+                   _dir + "/sslp/sslp_5_25_50.tim",
+                   _dir + "/sslp/sslp_5_25_50.sto"),
+        "sslp_5": (_dir + "/sslp/sslp_5_25_100.cor",
+                   _dir + "/sslp/sslp_5_25_100.tim",
+                   _dir + "/sslp/sslp_5_25_100.sto"),
         # Deterministic equivalent out of memory
-        "sslp6": (_dir + "/sslp/sslp_10_50_100.cor",
-                  _dir + "/sslp/sslp_10_50_100.tim",
-                  _dir + "/sslp/sslp_10_50_100.sto"),
-        "sslp7": (_dir + "/sslp/sslp_10_50_500.cor",
-                  _dir + "/sslp/sslp_10_50_500.tim",
-                  _dir + "/sslp/sslp_10_50_500.sto"),
-        "sslp8": (_dir + "/sslp/sslp_10_50_1000.cor",
-                  _dir + "/sslp/sslp_10_50_1000.tim",
-                  _dir + "/sslp/sslp_10_50_1000.sto"),
-        "sslp9": (_dir + "/sslp/sslp_10_50_2000.cor",
-                  _dir + "/sslp/sslp_10_50_2000.tim",
-                  _dir + "/sslp/sslp_10_50_2000.sto"),
+        "sslp_6": (_dir + "/sslp/sslp_10_50_100.cor",
+                   _dir + "/sslp/sslp_10_50_100.tim",
+                   _dir + "/sslp/sslp_10_50_100.sto"),
+        "sslp_7": (_dir + "/sslp/sslp_10_50_500.cor",
+                   _dir + "/sslp/sslp_10_50_500.tim",
+                   _dir + "/sslp/sslp_10_50_500.sto"),
+        "sslp_8": (_dir + "/sslp/sslp_10_50_1000.cor",
+                   _dir + "/sslp/sslp_10_50_1000.tim",
+                   _dir + "/sslp/sslp_10_50_1000.sto"),
+        "sslp_9": (_dir + "/sslp/sslp_10_50_2000.cor",
+                   _dir + "/sslp/sslp_10_50_2000.tim",
+                   _dir + "/sslp/sslp_10_50_2000.sto"),
     }
 
-    smps_files = {
+    smps_files.update({
         # Source: https://www2.isye.gatech.edu/~sahmed/siplib/
 
-        f"smkp{i}": (_dir + f"/smkp/smkp_{i}.cor",
-                     _dir + f"/smkp/smkp_{i}.tim",
-                     _dir + f"/smkp/smkp_{i}.sto")
+        f"smkp_{i}": (_dir + f"/smkp/smkp_{i}.cor",
+                      _dir + f"/smkp/smkp_{i}.tim",
+                      _dir + f"/smkp/smkp_{i}.sto")
         for i in range(1, 31)
-    }
+    })
 
-    sample_nums = [0]
-    solve(smps_files, sample_nums, time_limit=3600)
-    draw(smps_files, sample_nums)
-    draw2(smps_files, sample_nums)
+    ins_names = []
+    de_files = []
+    bd_files = []
+    ins_classes = []
+    s_nums = []
+
+    for ins_name, smps_files_ in smps_files.items():
+        ins_name = ins_name
+        de_file = f"./_sol/{ins_name}_de.json"
+        bd_file = f"./_sol/{ins_name}_bd.json"
+
+        ins_names.append(ins_name)
+        de_files.append(de_file)
+        bd_files.append(bd_file)
+        ins_classes.append(ins_name.split("_")[0])
+        s_nums.append(int(smps_files_[0].split("_")[-1].split(".")[0]))
+
+        if not dry_run:
+            solve(smps_files_, ins_name, time_limit=3600, solve_methods=solve_methods)
+
+    data_points = collect_data(
+        ins_names=ins_names,
+        de_files=de_files,
+        bd_files=bd_files,
+        ins_classes=ins_classes,
+        sample_nums=s_nums,
+    )
+
+    if draw_result:
+        draw(data_points)
+
+    return data_points
+
+
+if __name__ == "__main__":
+    ...
+    # run(draw_result=True)

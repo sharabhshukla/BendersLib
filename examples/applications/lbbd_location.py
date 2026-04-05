@@ -1,14 +1,13 @@
 # coding:utf-8
 
 """
-Facility Location
+Benchmark (Facility Location)
 =======================================================
 
-This example implements the Capacity- and Distance-Constrained
-Plant Location Problem as described by Fazel-Zarandi and Beck.
-The problem is solved with an integer programming model and Logic-based Benders Decomposition, respectively.
-When using Logic-based Benders Decomposition,
-we demonstrate how to define a custom subproblem solver and a custom cut generator.
+This example implements the Capacity- and Distance-Constrained Plant Location Problem. The problem
+is solved with an integer programming model and Logic-based Benders Decomposition, respectively.
+When using Logic-based Benders Decomposition, we demonstrate how to define a custom subproblem
+solver and a custom cut generator.
 
 .. seealso::
 
@@ -18,77 +17,98 @@ we demonstrate how to define a custom subproblem solver and a custom cut generat
 """
 
 # %%
-# Integer Programming
-# ---------------------------
-
-# %%
 # Import necessary packages.
 
+import json
+import os
+import sys
 import random
-from gurobipy import Model, GRB, quicksum
 from itertools import product
-from benderslib import LogicBasedBenders, MasterProblem, CST, Cut, CombinatorialOCGen
+
+from benderslib import LogicBasedBenders, MasterProblem, CST, Cut, CombinatorialOCGen, LogicBasedSubProblem
 from benderslib.solvers import Gurobi
+
+from gurobipy import Model, GRB, quicksum
+from ortools.sat.python import cp_model
+
+try:
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+except NameError:
+    sys.path.insert(0, os.path.abspath("."))
+
+from _utils import draw, collect_data
 
 
 # %%
 # Define the function to generate problem instance data.
+#
+# .. seealso::
+#
+#    See "Problem Set II" in Fazel-Zarandi and Beck (2012) for the instance generation procedure.
 
-def generate_problem_data(num_clients, num_facilities, max_vehicles_per_facility, random_seed=None):
+def generate_instance_data(
+        num_clients, num_facilities, correlated, truck_distance_limit, truck_usage_cost, random_seed=None):
     if random_seed is not None:
         random.seed(random_seed)
 
     # Sets
-    client_indices = range(num_clients)
-    facility_indices = range(num_facilities)
-    vehicle_indices = range(1, max_vehicles_per_facility + 1)
+    client_indices = list(range(num_clients))
+    facility_indices = list(range(num_facilities))
+    max_vehicles_per_facility = num_clients // 4
+    vehicle_indices = list(range(1, max_vehicles_per_facility + 1))
 
-    # Parameters: objective
-    facility_opening_costs = {j: random.randint(1000, 2000) for j in facility_indices}
-    vehicle_use_cost = 150
-    assignment_costs = {(i, j): random.randint(10, 50) for i, j in product(client_indices, facility_indices)}
-    # Parameters: constraints
-    max_vehicle_distance = 100
-    _min_dis = max_vehicle_distance // 4
-    _max_dis = max_vehicle_distance // 2
-    travel_distances = {(i, j): random.randint(_min_dis, _max_dis) for i, j in
-                        product(client_indices, facility_indices)}
-    facility_capacities = {j: random.randint(30, 60) for j in facility_indices}
+    # Parameters
+    facility_capacities = {
+        j: random.randint(50, 200) for j in facility_indices}
+    facility_opening_costs = {
+        j: facility_capacities[j] * (10 + random.randint(1, 5)) for j in facility_indices}
+    travel_distances = {
+        f"{i},{j}": random.randint(10, 60) for i, j in product(client_indices, facility_indices)}
+
+    if correlated:
+        assignment_costs = {f"{i},{j}": int(
+            (travel_distances[f"{i},{j}"] - 10) / (60 - 10) * (90 - 10) + 10 + random.randint(-5, 5))
+            for i, j in product(client_indices, facility_indices)}
+    else:
+        assignment_costs = {
+            f"{i},{j}": random.randint(5, 95) for i, j in product(client_indices, facility_indices)}
+
+    # This is set by us.
     client_demands = {i: random.randint(5, 15) for i in client_indices}
 
-    problem_data = {
+    instance_data = {
         # Sets
         "client_indices": client_indices,
         "facility_indices": facility_indices,
         "vehicle_indices": vehicle_indices,
         # Parameters: objective
         "facility_opening_costs": facility_opening_costs,
-        "vehicle_use_cost": vehicle_use_cost,
+        "vehicle_use_cost": truck_usage_cost,
         "assignment_costs": assignment_costs,
         # parameters: constraints
         "max_vehicles_per_facility": max_vehicles_per_facility,
-        "max_vehicle_distance": max_vehicle_distance,
+        "max_vehicle_distance": truck_distance_limit,
         "travel_distances": travel_distances,
         "facility_capacities": facility_capacities,
         "client_demands": client_demands,
     }
-    return problem_data
+    return instance_data
 
 
 # %%
 # Define the function to solve the **integer programming** formulation.
 
-def solve_ip(problem_data, enable_reinforcement=True):
-    I = problem_data["client_indices"]
-    J = problem_data["facility_indices"]
-    K = problem_data["vehicle_indices"]
-    facility_opening_costs = problem_data["facility_opening_costs"]
-    vehicle_use_cost = problem_data["vehicle_use_cost"]
-    assignment_costs = problem_data["assignment_costs"]
-    max_vehicle_distance = problem_data["max_vehicle_distance"]
-    travel_distances = problem_data["travel_distances"]
-    facility_capacities = problem_data["facility_capacities"]
-    client_demands = problem_data["client_demands"]
+def deterministic_equivalent_model(instance_data, enable_reinforcement=True):
+    I = instance_data["client_indices"]
+    J = instance_data["facility_indices"]
+    K = instance_data["vehicle_indices"]
+    facility_opening_costs = instance_data["facility_opening_costs"]
+    vehicle_use_cost = instance_data["vehicle_use_cost"]
+    assignment_costs = instance_data["assignment_costs"]
+    max_vehicle_distance = instance_data["max_vehicle_distance"]
+    travel_distances = instance_data["travel_distances"]
+    facility_capacities = instance_data["facility_capacities"]
+    client_demands = instance_data["client_demands"]
 
     # Create a Gurobi model
     model = Model("IP")
@@ -104,7 +124,7 @@ def solve_ip(problem_data, enable_reinforcement=True):
 
     # (2) The total distance traveled by a vehicle cannot exceed its limit.
     model.addConstrs(
-        (quicksum(travel_distances[i, j] * x[i, j, k] for i in I) <= max_vehicle_distance * z[j, k]
+        (quicksum(travel_distances[f"{i},{j}"] * x[i, j, k] for i in I) <= max_vehicle_distance * z[j, k]
          for j in J for k in K))
 
     # (3) The total demand served by a facility cannot exceed its capacity.
@@ -132,52 +152,27 @@ def solve_ip(problem_data, enable_reinforcement=True):
     objective = (
             quicksum(facility_opening_costs[j] * p[j] for j in J) +
             vehicle_use_cost * quicksum(z[j, k] for j in J for k in K) +
-            quicksum(assignment_costs[i, j] * x[i, j, k] for i in I for j in J for k in K)
+            quicksum(assignment_costs[f"{i},{j}"] * x[i, j, k] for i in I for j in J for k in K)
     )
     model.setObjective(objective, GRB.MINIMIZE)
 
-    model.optimize()
+    return model
 
-    if model.Status == GRB.OPTIMAL:
-        print(f"\nOptimal solution found with objective value: {model.ObjVal:.2f}\n")
-    else:
-        print(f"Optimization finished with status: {model.Status}\n")
-
-
-# %%
-# Generate problem data and solve the integer programming formulation.
-
-instance_data = generate_problem_data(
-    num_clients=10,
-    num_facilities=4,
-    max_vehicles_per_facility=4,
-    random_seed=1
-)
-solve_ip(instance_data)
-
-
-# %%
-# Logic-based Benders Decomposition
-# -------------------------------------------
-
-# %%
-# Master Problem
-# ^^^^^^^^^^^^^^^^^^
 
 # %%
 # Define the **master problem** for Logic-based Benders decomposition.
 
-def make_master_problem(problem_data, sub_relaxation=True):
-    I = problem_data["client_indices"]
-    J = problem_data["facility_indices"]
-    facility_opening_costs = problem_data["facility_opening_costs"]
-    vehicle_use_cost = problem_data["vehicle_use_cost"]
-    assignment_costs = problem_data["assignment_costs"]
-    max_vehicle_distance = problem_data["max_vehicle_distance"]
-    travel_distances = problem_data["travel_distances"]
-    facility_capacities = problem_data["facility_capacities"]
-    client_demands = problem_data["client_demands"]
-    k_bar = problem_data["max_vehicles_per_facility"]
+def make_master_problem(instance_data, sub_relaxation=True):
+    I = instance_data["client_indices"]
+    J = instance_data["facility_indices"]
+    facility_opening_costs = instance_data["facility_opening_costs"]
+    vehicle_use_cost = instance_data["vehicle_use_cost"]
+    assignment_costs = instance_data["assignment_costs"]
+    max_vehicle_distance = instance_data["max_vehicle_distance"]
+    travel_distances = instance_data["travel_distances"]
+    facility_capacities = instance_data["facility_capacities"]
+    client_demands = instance_data["client_demands"]
+    k_bar = instance_data["max_vehicles_per_facility"]
 
     # Create a Gurobi model
     master_model = Model("MP")
@@ -196,12 +191,13 @@ def make_master_problem(problem_data, sub_relaxation=True):
         (quicksum(client_demands[i] * x[i, j] for i in I) <= facility_capacities[j] * p[j] for j in J))
 
     # (12) Upper bound on a single client's travel distance.
-    master_model.addConstrs((travel_distances[i, j] * x[i, j] <= max_vehicle_distance for i, j in product(I, J)))
+    master_model.addConstrs(
+        (travel_distances[f"{i},{j}"] * x[i, j] <= max_vehicle_distance for i, j in product(I, J)))
 
     if sub_relaxation:
         # (13) Relaxation of the subproblem (lower bound on number of vehicles).
         master_model.addConstrs(
-            (V[j] * max_vehicle_distance >= quicksum(travel_distances[i, j] * x[i, j] for i in I) for j in J))
+            (V[j] * max_vehicle_distance >= quicksum(travel_distances[f"{i},{j}"] * x[i, j] for i in I) for j in J))
 
     # (15) Customers can only be allocated to open facilities.
     master_model.addConstrs((x[i, j] <= p[j] for i, j in product(I, J)))
@@ -209,7 +205,7 @@ def make_master_problem(problem_data, sub_relaxation=True):
     # Objective
     objective = (
             quicksum(facility_opening_costs[j] * p[j] for j in J) +
-            quicksum(assignment_costs[i, j] * x[i, j] for i, j in product(I, J)) +
+            quicksum(assignment_costs[f"{i},{j}"] * x[i, j] for i, j in product(I, J)) +
             vehicle_use_cost * quicksum(V[j] for j in J)
     )
     master_model.setObjective(objective, GRB.MINIMIZE)
@@ -232,60 +228,58 @@ def make_master_problem(problem_data, sub_relaxation=True):
 #      In J. M. Velásquez-Bermúdez, M. Khakifirooz, & M. Fathi (Eds.), Large Scale Optimization
 #      in Supply Chains and Smart Manufacturing: Theory and Applications (pp. 1–26).
 #      Springer International Publishing. https://doi.org/10.1007/978-3-030-22788-3_1
-
-
-# %%
-# Subproblem
-# ^^^^^^^^^^^^^^^^^^
-
-# %%
+#
 # Define the **subproblem** solver for Logic-based Benders decomposition.
-#
-# .. note::
-#
-#    In this example, the subproblem checks for feasibility. Benders feasibility cuts will be generated
-#    when the subproblem is infeasible (any facility is infeasible). When all the facilities are feasible,
-#    the optimum is reached.
+# In this example, the subproblem checks for feasibility. Benders feasibility cuts will be generated
+# when the subproblem is infeasible (any facility is infeasible). When all the facilities are feasible,
+# the optimum is reached.
 
-def subproblem_solver(complicating_var_values):
-    I = instance_data["client_indices"]
-    J = instance_data["facility_indices"]
-    vehicle_max_distance = instance_data["max_vehicle_distance"]
-    travel_distances = instance_data["travel_distances"]
-    k_bar = instance_data["max_vehicles_per_facility"]
+class SubProblemSolver(LogicBasedSubProblem):
+    def __init__(self, complicating_vars, instance_data):
+        super().__init__(complicating_vars)
 
-    # Retrieve master problem solution
-    facility_vehicle_num = {j: int(complicating_var_values[f"V[{j}]"]) for j in J}
-    facility_clients = {j: [] for j in J}
-    for i, j in product(I, J):
-        if complicating_var_values[f"x[{i},{j}]"] > 0.5:
-            facility_clients[j].append(i)
+        self.instance_data = instance_data
 
-    # Determine the number of vehicles required for each facility
-    facility_vehicle_num_req = {j: k_bar for j in J}
-    for j in J:
-        capacity = vehicle_max_distance
-        items = [travel_distances[i, j] for i in facility_clients[j]]
-        bin_num_ffd = _bin_packing_ffd(capacity, items)
-        if bin_num_ffd > facility_vehicle_num[j]:
-            bin_num_exact = _bin_packing_exact(capacity, items)
-            if bin_num_exact > facility_vehicle_num[j]:
-                facility_vehicle_num_req[j] = bin_num_exact
+    def solve(self):
+        I = self.instance_data["client_indices"]
+        J = self.instance_data["facility_indices"]
+        vehicle_max_distance = self.instance_data["max_vehicle_distance"]
+        travel_distances = self.instance_data["travel_distances"]
+        k_bar = self.instance_data["max_vehicles_per_facility"]
+
+        # Retrieve master problem solution
+        facility_vehicle_num = {j: int(self.complicating_var_values[f"V[{j}]"]) for j in J}
+        facility_clients = {j: [] for j in J}
+        for i, j in product(I, J):
+            if self.complicating_var_values[f"x[{i},{j}]"] > 0.5:
+                facility_clients[j].append(i)
+
+        # Determine the number of vehicles required for each facility
+        facility_vehicle_num_req = {j: k_bar for j in J}
+        for j in J:
+            capacity = vehicle_max_distance
+            items = [travel_distances[f"{i},{j}"] for i in facility_clients[j]]
+
+            bin_num_ffd = _bin_packing_ffd(capacity, items)
+            if bin_num_ffd > facility_vehicle_num[j]:
+                bin_num_exact = _bin_packing_cp(capacity, items)
+                if bin_num_exact > facility_vehicle_num[j]:
+                    facility_vehicle_num_req[j] = bin_num_exact
+                else:
+                    facility_vehicle_num_req[j] = facility_vehicle_num[j]
             else:
                 facility_vehicle_num_req[j] = facility_vehicle_num[j]
-        else:
-            facility_vehicle_num_req[j] = facility_vehicle_num[j]
 
-    # Check feasibility
-    for j in J:
-        if facility_vehicle_num_req[j] > facility_vehicle_num[j]:
-            # ``facility_vehicle_num_req`` can be retrieved in the cut generator via ``sub_problem.var_values``
-            return CST.INFEASIBLE, None, facility_vehicle_num_req
-    return CST.OPTIMAL, 0, facility_vehicle_num_req
+            if facility_vehicle_num_req[j] > facility_vehicle_num[j]:
+                # ``facility_vehicle_num_req`` can be retrieved in the cut generator via ``sub_problem.var_values``
+                self.status, self.obj, self.var_values = CST.INFEASIBLE, None, facility_vehicle_num_req
+                return
+        self.status, self.obj, self.var_values = CST.OPTIMAL, 0, facility_vehicle_num_req
+        return
 
 
 # %%
-# The ``subproblem_solver`` relies on solving bin packing problems to check feasibility.
+# The ``SubProblemSolver`` relies on solving bin packing problems to check feasibility.
 #
 # .. note::
 #
@@ -294,7 +288,7 @@ def subproblem_solver(complicating_var_values):
 #    the capacity of any bin.
 
 def _bin_packing_ffd(capacity: float | int, items: list[float | int]):
-    """A simple bin packing solver using first-fit decreasing (FFD) algorithm."""
+    # A bin packing solver using first-fit decreasing (FFD) heuristic.
     bins = []
 
     for item in sorted(items, reverse=True):
@@ -310,48 +304,57 @@ def _bin_packing_ffd(capacity: float | int, items: list[float | int]):
     return len(bins)
 
 
-def _bin_packing_exact(capacity: float | int, items: list[float | int]):
-    """An exact bin packing solver using Gurobi."""
-    model = Model("BinPacking")
-    model.Params.OutputFlag = 0
-    model.Params.LogToConsole = 0
+def _bin_packing_cp(capacity: float | int, items: list[float | int]):
+    # An exact bin packing solver using OR-Tools CP-SAT.
+    model = cp_model.CpModel()
 
     n_items = len(items)
     max_bins = n_items
 
     # Variables
-    y = model.addVars(max_bins, vtype=GRB.BINARY, name="y")
-    x = model.addVars(n_items, max_bins, vtype=GRB.BINARY, name="x")
+    # x[i, j] is 1 if item i is packed in bin j
+    x = {}
+    for i in range(n_items):
+        for j in range(max_bins):
+            x[i, j] = model.NewBoolVar(f"x_{i}_{j}")
+
+    # y[j] is 1 if bin j is used
+    y = [model.NewBoolVar(f"y_{j}") for j in range(max_bins)]
 
     # Constraints
-    model.addConstrs((quicksum(x[i, j] for j in range(max_bins)) == 1 for i in range(n_items)))
-    model.addConstrs(
-        (quicksum(items[i] * x[i, j] for i in range(n_items)) <= capacity * y[j] for j in range(max_bins))
-    )
+    # Each item must be placed in exactly one bin
+    for i in range(n_items):
+        model.AddExactlyOne(x[i, j] for j in range(max_bins))
+
+    # The amount packed in each bin cannot exceed its capacity
+    for j in range(max_bins):
+        model.Add(sum(items[i] * x[i, j] for i in range(n_items)) <= capacity * y[j])
+
     # Symmetry-breaking
-    model.addConstrs((y[j] >= y[j + 1] for j in range(max_bins - 1)))
+    for j in range(max_bins - 1):
+        model.Add(y[j] >= y[j + 1])
 
-    # Objective
-    model.setObjective(quicksum(y[j] for j in range(max_bins)), GRB.MINIMIZE)
+    # Objective: minimize the number of used bins
+    model.Minimize(sum(y))
 
-    model.optimize()
-    used_bins = sum(1 for j in range(max_bins) if y[j].X > 0.5)
-    return used_bins
+    # Solve
+    solver = cp_model.CpSolver()
+    status = solver.Solve(model)
 
+    if status == cp_model.OPTIMAL or status == cp_model.FEASIBLE:
+        return solver.ObjectiveValue()
+    return max_bins
 
-# %%
-# Cut Generator
-# ^^^^^^^^^^^^^^^^^^^^^^^
 
 # %%
 # Define the **feasibility cut generator** for Logic-based Benders decomposition.
 
+
 def feasibility_cut_generator(master_problem, sub_problem):
-    I = instance_data["client_indices"]
-    J = instance_data["facility_indices"]
+    I = master_problem._instance_data["client_indices"]
+    J = master_problem._instance_data["facility_indices"]
 
     # Retrieve decision variable values
-    # The following lines have been used in ``subproblem_solver``, to avoid redundancy, use a class-based subproblem.
     facility_vehicle_num = {j: int(sub_problem.complicating_var_values[f"V[{j}]"]) for j in J}
     facility_clients = {j: [] for j in J}
     for i, j in product(I, J):
@@ -376,49 +379,126 @@ def feasibility_cut_generator(master_problem, sub_problem):
                 name=f"FC",
             )
             cuts.append(cut)
+            return cuts
 
-    return cuts
-
-
-# %%
-# Solving
-# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 # %%
-# Initialize a Logic-based Benders decomposition instance and solve it.
+# Solve the instances using different methods and save the results.
 
-master_model, complicating_vars = make_master_problem(instance_data)
-LBBD = LogicBasedBenders(
-    master_problem=MasterProblem(Gurobi(master_model)),
-    sub_problem=subproblem_solver,
-    complicating_vars=complicating_vars,
-    feasibility_cut=feasibility_cut_generator,
-    # Optimality cut is required for the Branch-and-check method,
-    # as the subproblem can be feasible for some master node solutions.
-    optimality_cut=CombinatorialOCGen,
-)
-# This example works well with the Branch-and-check method, try it!
-LBBD.params.use_bnc = True
+def solve(meta_data, time_limit, solve_methods):
+    num_clients, num_facilities, correlated, truck_distance_limit, truck_usage_cost, random_seed = meta_data
+    instance_data = generate_instance_data(
+        num_clients=num_clients,
+        num_facilities=num_facilities,
+        correlated=correlated,
+        truck_distance_limit=truck_distance_limit,
+        truck_usage_cost=truck_usage_cost,
+        random_seed=random_seed
+    )
+    instance_name = (f"loc_{num_clients}_{num_facilities}_{correlated}_"
+                     f"{truck_distance_limit}_{truck_usage_cost}_{random_seed}")
 
-LBBD.solve()
+    # Save the instance data to a JSON file
+    filename = f"_temp.json"
+    with open(filename, "w") as f:
+        json.dump(instance_data, f, indent=4)
 
-# %%
-# Now, remove the subproblem relaxation from the master problem and solve again.
+    # Load the instance data from the JSON file
+    with open(filename, "r") as f:
+        instance_data = json.load(
+            f, object_hook=lambda d: {int(k) if k.isdigit() else k: v for k, v in d.items()})
 
-master_model_no_relax, complicating_vars = make_master_problem(instance_data, sub_relaxation=False)
-LBBD_no_relax = LogicBasedBenders(
-    master_problem=MasterProblem(Gurobi(master_model_no_relax)),
-    sub_problem=subproblem_solver,
-    complicating_vars=complicating_vars,
-    feasibility_cut=feasibility_cut_generator,
-    # Optimality cut is required for the Branch-and-check method,
-    # as the subproblem can be feasible for some master node solutions.
-    optimality_cut=CombinatorialOCGen,
-)
-# This example works well with the Branch-and-check method, try it!
-LBBD.params.use_bnc = True
+    # Solve using deterministic equivalent
+    if "de" in solve_methods:
+        model = deterministic_equivalent_model(instance_data)
+        model.setParam('TimeLimit', time_limit)
+        model.optimize()
+        model.write(f"./_sol/{instance_name}_de.json")
 
-LBBD_no_relax.solve()
+    # Solve using Logic-based Benders Decomposition
+    if "bd" in solve_methods:
+        master_model, complicating_vars = make_master_problem(instance_data)
+        master_problem = MasterProblem(Gurobi(master_model))
+        master_problem._instance_data = instance_data
+        subproblem_solver = SubProblemSolver(complicating_vars, instance_data)
+        BD = LogicBasedBenders(
+            master_problem=master_problem,
+            sub_problem=subproblem_solver,
+            complicating_vars=complicating_vars,
+            feasibility_cut=feasibility_cut_generator,
+            # Optimality cut is required for the Branch-and-check method,
+            # as the subproblem can be feasible for some master node solutions.
+            optimality_cut=CombinatorialOCGen,
+        )
+        BD.params.use_bnc = True
+        BD.solve()
+        BD.save(f"./_sol/{instance_name}_bd.json")
+
+
+def run(solve_methods=None, draw_result=False, dry_run=True):
+    if solve_methods is None:
+        solve_methods = ["de", "bd"]
+
+    problem_sizes = [
+        (20, 10),
+        (30, 15),
+        (40, 20),
+    ]
+    truck_params = [
+        (50, 50),
+        (50, 100),
+        (70, 100),
+        (70, 150),
+        (100, 150),
+        (100, 300)
+    ]
+    correlated_conditions = [True, False]
+    random_seeds = range(0, 1)
+
+    ins_names = []
+    de_files = []
+    bd_files = []
+    ins_classes = []
+    sample_nums = []
+
+    for (num_clients, num_facilities), (
+            truck_distance_limit, truck_usage_cost), correlated, random_seed in product(
+        problem_sizes, truck_params, correlated_conditions, random_seeds):
+        meta_data = (
+            num_clients, num_facilities, correlated, truck_distance_limit, truck_usage_cost, random_seed)
+
+        ins_name = f"loc_{meta_data[0]}_{meta_data[1]}_{meta_data[2]}_{meta_data[3]}_{meta_data[4]}_{meta_data[5]}"
+        de_file = f"./_sol/{ins_name}_de.json"
+        bd_file = f"./_sol/{ins_name}_bd.json"
+        ins_class = "loc"
+        sample_num = None
+
+        ins_names.append(ins_name)
+        de_files.append(de_file)
+        bd_files.append(bd_file)
+        ins_classes.append(ins_class)
+        sample_nums.append(sample_num)
+
+        if not dry_run:
+            solve(tuple(meta_data), time_limit=3600, solve_methods=solve_methods)
+
+    data_points = collect_data(
+        ins_names=ins_names,
+        de_files=de_files,
+        bd_files=bd_files,
+        ins_classes=ins_classes,
+        sample_nums=sample_nums,
+    )
+
+    if draw_result:
+        draw([data_points], titles=['LBBD'])
+
+    return data_points
+
+
+if __name__ == "__main__":
+    ...
+    # run(draw_result=True)
 
 # %%
 #
