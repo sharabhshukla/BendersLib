@@ -75,7 +75,7 @@ sphinx_gallery_conf = {
         '../../examples/basic',
         '../../examples/advanced',
         '../../examples/expert',
-        '../../examples/applications',
+        '../../examples/benchmarks',
 
         '*',
 

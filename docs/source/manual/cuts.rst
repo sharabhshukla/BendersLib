@@ -287,7 +287,7 @@ It is equivalent to the earlier class-based example.
 .. admonition:: Example
     :class: seealso
 
-    :doc:`../examples/advanced/ilshaped_iis`, :doc:`../examples/advanced/lbbd`, :doc:`../examples/applications/lbbd_location`
+    :doc:`../examples/advanced/ilshaped_iis`, :doc:`../examples/advanced/lbbd`, :doc:`../examples/benchmarks/lbbd_location`
 
 ====
 

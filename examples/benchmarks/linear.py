@@ -260,3 +260,12 @@ def run(solve_methods=None, draw_result=False, dry_run=True):
 if __name__ == "__main__":
     ...
     # run(solve_methods=[], draw_result=True)
+
+# %%
+#
+# .. seealso::
+#
+#     * Tutorial of the Logic-based Benders Decomposition: :doc:`../../tutorials/lshaped`
+#     * This example uses the following class: :class:`~benderslib.LShaped`
+#
+# .. tags:: benders: l-shaped, solver: gurobi, stochastic, branch-and-check, callback, enhancement

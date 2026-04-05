@@ -154,7 +154,7 @@ allowing users to seamlessly integrate them for solving subproblems within the B
 .. admonition:: Example
     :class: seealso
 
-    This example (:doc:`../examples/applications/lbbd_location`) demonstrates how to
+    This example (:doc:`../examples/benchmarks/lbbd_location`) demonstrates how to
     implement :ref:`customized subproblem solvers <manual_custom_sub>`
     within the :doc:`lbbd` framework using BendersLib.
 

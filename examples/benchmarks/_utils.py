@@ -4,7 +4,7 @@
 _utils
 =======================================================
 
-This file contains utility functions for :doc:`benchmark`.
+This file contains utility functions for :doc:`../benchmarks/index`.
 """
 
 import collections

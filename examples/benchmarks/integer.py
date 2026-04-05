@@ -334,3 +334,12 @@ def run(solve_methods=None, draw_result=False, dry_run=True):
 if __name__ == "__main__":
     ...
     # run(draw_result=True)
+
+# %%
+#
+# .. seealso::
+#
+#     * Tutorial of the Logic-based Benders Decomposition: :doc:`../../tutorials/ilshaped`
+#     * This example uses the following class: :class:`~benderslib.IntegerLShaped`
+#
+# .. tags:: benders: integer l-shaped, solver: gurobi, stochastic, branch-and-check, callback, enhancement

@@ -386,7 +386,7 @@ a class-based approach is recommended.
 .. admonition:: Example
     :class: seealso
 
-    - See :doc:`../examples/applications/lbbd_location` for how to implement a custom subproblem solver
+    - See :doc:`../examples/benchmarks/lbbd_location` for how to implement a custom subproblem solver
       with a function, using logic-based Benders decomposition.
 
 Multiple Custom Subproblems (class-based)

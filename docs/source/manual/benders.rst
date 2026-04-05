@@ -297,7 +297,7 @@ Here is a code snippet showing how to set up a :class:`LogicBasedBenders` instan
       :ref:`Custom Cut (Generator) <manual_custom_cut>` and :ref:`Custom Subproblem(s) <manual_custom_sub>`.
     - The class :class:`LogicBasedBenders` for logic-based Benders decomposition.
     - **Executable Examples** (logic-based Benders decomposition):
-      :doc:`../examples/advanced/lbbd_sp`, :doc:`../examples/advanced/lbbd_lshaped`, and :doc:`../examples/applications/lbbd_location`.
+      :doc:`../examples/advanced/lbbd_sp`, :doc:`../examples/advanced/lbbd_lshaped`, and :doc:`../examples/benchmarks/lbbd_location`.
 
 ====
 

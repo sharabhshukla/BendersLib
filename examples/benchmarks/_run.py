@@ -15,8 +15,8 @@ try:
 except NameError:
     sys.path.insert(0, os.path.abspath("."))
 
-from benchmark import run as run1
-from benchmark2 import run as run2
+from linear import run as run1
+from integer import run as run2
 from lbbd_location import run as run3
 from _utils import draw
 
