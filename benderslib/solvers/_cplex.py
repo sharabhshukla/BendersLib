@@ -1,4 +1,6 @@
 # coding:utf-8
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2021-2026 Peng-Hui Guo <m@guo.ph>
 
 from cplex import Cplex as CplexModel, infinity as CPLEX_INFINITY, SparsePair
 from cplex.callbacks import MIPInfoCallback, LazyConstraintCallback, IncumbentCallback

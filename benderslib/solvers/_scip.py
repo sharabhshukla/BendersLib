@@ -1,4 +1,6 @@
 # coding:utf-8
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2021-2026 Peng-Hui Guo <m@guo.ph>
 
 from pyscipopt import Model, Expr, SCIP_PARAMSETTING, Conshdlr, SCIP_RESULT, SCIP_PROPTIMING, SCIP_PRESOLTIMING
 
