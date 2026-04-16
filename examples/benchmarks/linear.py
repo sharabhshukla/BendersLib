@@ -6,7 +6,7 @@ Benchmark (Linear Recourse)
 """
 
 # %%
-# Utility functions are available in :doc:`_utils`.
+# Import necessary packages.
 
 import json
 import os
@@ -25,7 +25,8 @@ try:
 except NameError:
     sys.path.insert(0, os.path.abspath("."))
 
-from _utils import SMPSReader, first_stage_model, second_stage_model, deterministic_equivalent_model, draw, collect_data
+from _utils import SMPSReader, first_stage_model, second_stage_model, deterministic_equivalent_model, draw, \
+    collect_data, limit_memory
 
 
 # %%
@@ -131,11 +132,13 @@ class InOut(CallbackBase):
 # %%
 # Solve the instances using different methods and save the results.
 
+@limit_memory(limit_gb=14.5)
 def solve(smps_files, instance_name, sample_num, time_limit, solve_methods, seed=1024):
     SMPS = SMPSReader(*smps_files, sample_num=sample_num, seed=seed)
     SMPS.parse()
-    SMPS.to_json('_temp.json')
-    with open("_temp.json", 'r') as f:
+    ins_file = f"./_ins/{instance_name}_{sample_num}.json"
+    SMPS.to_json(ins_file)
+    with open(ins_file, 'r') as f:
         data = json.load(f)
 
     # Solve using deterministic equivalent
@@ -174,7 +177,7 @@ def solve(smps_files, instance_name, sample_num, time_limit, solve_methods, seed
 
 
 # %%
-# .. rubric:: Set A Instances
+# .. rubric:: Set 1 Instances
 #
 # - *cargo*, *phone*: https://www4.uwsp.edu/math/afelt/slptestset/download.html
 # - *lands*, *storm*, *gbd*: https://pages.cs.wisc.edu/~swright/stochastic/sampling/
@@ -203,10 +206,12 @@ def run(solve_methods=None, draw_result=False, dry_run=True):
 
     smps_files = {
         # Source: https://www4.uwsp.edu/math/afelt/slptestset/download.html
+
         "cargo": (_dir + "/cargo/4node.cor.base", _dir + "/cargo/4node.tim", _dir + "/cargo/4node.sto.32768"),
         "phone": (_dir + "/phone/phone.cor", _dir + "/phone/phone.tim", _dir + "/phone/phone.sto"),
 
         # Source: https://pages.cs.wisc.edu/~swright/stochastic/sampling/
+
         "storm": (_dir + "/storm/storm.cor", _dir + "/storm/storm.tim", _dir + "/storm/storm.sto"),
         "lands": (_dir + "/lands/lands.cor", _dir + "/lands/lands.tim", _dir + "/lands/lands.sto"),
         "gbd": (_dir + "/gbd/gbd.cor", _dir + "/gbd/gbd.tim", _dir + "/gbd/gbd.sto"),
@@ -220,7 +225,6 @@ def run(solve_methods=None, draw_result=False, dry_run=True):
         256,
         512,
         1024,
-        2048,
     ]
 
     ins_names = []

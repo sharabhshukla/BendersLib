@@ -6,7 +6,7 @@ Benchmark (Integer Recourse)
 """
 
 # %%
-# Utility functions are available in :doc:`_utils`.
+# Import necessary packages.
 
 import json
 import os
@@ -23,7 +23,8 @@ try:
 except NameError:
     sys.path.insert(0, os.path.abspath("."))
 
-from _utils import SMPSReader, first_stage_model, second_stage_model, deterministic_equivalent_model, collect_data, draw
+from _utils import SMPSReader, first_stage_model, second_stage_model, deterministic_equivalent_model, collect_data, \
+    draw, limit_memory
 
 
 # %%
@@ -177,11 +178,13 @@ class InOut(CallbackBase):
 # %%
 # Solve the instances using different methods and save the results.
 
+@limit_memory(limit_gb=14.5)
 def solve(smps_files, instance_name, time_limit, solve_methods):
     SMPS = SMPSReader(*smps_files)
     SMPS.parse()
-    SMPS.to_json('_temp.json')
-    with open("_temp.json", 'r') as f:
+    ins_file = f"./_ins/{instance_name}.json"
+    SMPS.to_json(ins_file)
+    with open(ins_file, 'r') as f:
         data = json.load(f)
 
     # Solve using deterministic equivalent
@@ -229,7 +232,7 @@ def solve(smps_files, instance_name, time_limit, solve_methods):
 
 
 # %%
-# .. rubric:: Set B Instances
+# .. rubric:: Set 2 Instances
 #
 # - *SSLP*, *SMKP*: https://www2.isye.gatech.edu/~sahmed/siplib/
 #
@@ -273,7 +276,6 @@ def run(solve_methods=None, draw_result=False, dry_run=True):
         "sslp_5": (_dir + "/sslp/sslp_5_25_100.cor",
                    _dir + "/sslp/sslp_5_25_100.tim",
                    _dir + "/sslp/sslp_5_25_100.sto"),
-        # Deterministic equivalent out of memory
         "sslp_6": (_dir + "/sslp/sslp_10_50_100.cor",
                    _dir + "/sslp/sslp_10_50_100.tim",
                    _dir + "/sslp/sslp_10_50_100.sto"),

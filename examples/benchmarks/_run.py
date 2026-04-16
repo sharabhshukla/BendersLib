@@ -22,25 +22,27 @@ from _utils import draw
 
 # %%
 # Solve the benchmark problems using BendersLib.
+# Easy instances are solved first.
 
+# run3(solve_methods=['bd'], dry_run=False)
 # run1(solve_methods=['bd'], dry_run=False)
 # run2(solve_methods=['bd'], dry_run=False)
-# run3(solve_methods=['bd'], dry_run=False)
 
 # %%
-# Solve the benchmark problems using the monolithic model.
+# Solve the benchmark problems using the monolithic models.
+# Easy instances are solved first.
 
 # run1(solve_methods=['de'], dry_run=False)
-# run2(solve_methods=['de'], dry_run=False)
 # run3(solve_methods=['de'], dry_run=False)
+# run2(solve_methods=['de'], dry_run=False)
 
 # %%
 # Collect the data and draw the results.
 
-# data1 = run1(dry_run=True)
-# data2 = run2(dry_run=True)
-# data3 = run3(dry_run=True)
+# res1 = run1(dry_run=True)
+# res2 = run2(dry_run=True)
+# res3 = run3(dry_run=True)
 # draw(
-#     [data1, data2, data3],
+#     [res1, res2, res3],
 #     ['Linear Subproblems', 'Integer Subproblems', 'Custom Solver and Cut']
 # )

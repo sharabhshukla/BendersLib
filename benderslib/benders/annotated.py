@@ -103,10 +103,11 @@ class AnnotatedBenders(BendersSolver):
         if benders is None:
             benders = BendersSolver
 
-            if optimality_cut is not None:
-                benders_kwargs["optimality_cut"] = optimality_cut
-            if feasibility_cut is not None:
-                benders_kwargs["feasibility_cut"] = feasibility_cut
+        if optimality_cut is not None:
+            benders_kwargs["optimality_cut"] = optimality_cut
+
+        if feasibility_cut is not None:
+            benders_kwargs["feasibility_cut"] = feasibility_cut
 
         return benders(**benders_kwargs)
 

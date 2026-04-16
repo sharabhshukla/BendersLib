@@ -36,7 +36,7 @@ try:
 except NameError:
     sys.path.insert(0, os.path.abspath("."))
 
-from _utils import draw, collect_data
+from _utils import draw, collect_data, limit_memory
 
 
 # %%
@@ -385,6 +385,7 @@ def feasibility_cut_generator(master_problem, sub_problem):
 # %%
 # Solve the instances using different methods and save the results.
 
+@limit_memory(limit_gb=14.5)
 def solve(meta_data, time_limit, solve_methods):
     num_clients, num_facilities, correlated, truck_distance_limit, truck_usage_cost, random_seed = meta_data
     instance_data = generate_instance_data(
@@ -399,12 +400,12 @@ def solve(meta_data, time_limit, solve_methods):
                      f"{truck_distance_limit}_{truck_usage_cost}_{random_seed}")
 
     # Save the instance data to a JSON file
-    filename = f"_temp.json"
-    with open(filename, "w") as f:
+    ins_file = f"./_ins/{instance_name}.json"
+    with open(ins_file, "w") as f:
         json.dump(instance_data, f, indent=4)
 
     # Load the instance data from the JSON file
-    with open(filename, "r") as f:
+    with open(ins_file, "r") as f:
         instance_data = json.load(
             f, object_hook=lambda d: {int(k) if k.isdigit() else k: v for k, v in d.items()})
 
@@ -452,7 +453,10 @@ def run(solve_methods=None, draw_result=False, dry_run=True):
         (100, 150),
         (100, 300)
     ]
-    correlated_conditions = [True, False]
+    correlated_conditions = [
+        True,
+        False
+    ]
     random_seeds = range(0, 1)
 
     ins_names = []
