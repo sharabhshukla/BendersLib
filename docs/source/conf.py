@@ -193,8 +193,10 @@ html_theme_options = {
 }
 
 # sphinx-sitemap
-html_baseurl = "https://benders.dev/"
+html_baseurl = "https://benders.dev/en/develop/"
 sitemap_show_lastmod = True
+sitemap_url_scheme = "{link}"
+
 
 # html_theme = "shibuya"
 # html_baseurl = "https://benders.dev/en/latest/"
