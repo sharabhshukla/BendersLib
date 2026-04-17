@@ -37,6 +37,7 @@ extensions = [
     'sphinx_inline_tabs',
     'sphinx_tags',
     'sphinx_contributors',
+    'sphinx_sitemap',
 ]
 
 # sphinx_tags configuration
@@ -190,6 +191,10 @@ html_theme_options = {
                     "Do not trust the results without further validation.",
     "sidebar_hide_name": True,
 }
+
+# sphinx-sitemap
+html_baseurl = "https://benders.dev/"
+sitemap_show_lastmod = True
 
 # html_theme = "shibuya"
 # html_baseurl = "https://benders.dev/en/latest/"

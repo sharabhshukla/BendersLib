@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "benderslib"
-version = "0.5.0.post2"
+version = "0.5.0.post3"
 description = "A Benders Decomposition Library in Python"
 readme = "README.md"
 license = { file = "LICENSE" }
@@ -59,6 +59,7 @@ doc = [
     "sphinx_inline_tabs>=2025.12.21.14",
     "sphinx-tags>=0.4.0",
     "sphinx_contributors>=0.2.7",
+    "sphinx-sitemap>=2.9.0",
     "matplotlib>=3.10.5",
 ]
 copt = ["coptpy>=8.0.2"]
