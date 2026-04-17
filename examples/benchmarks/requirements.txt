@@ -1,3 +1,4 @@
+benderslib==0.5.0
 sphinx-gallery==0.19.0
 pytest==8.4.2
 coptpy==8.0.2

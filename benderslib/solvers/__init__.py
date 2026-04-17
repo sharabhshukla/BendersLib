@@ -60,12 +60,12 @@ except ImportError:
 try:
     from ._scip import Scip
 except ImportError:
-    Scip = _create_placeholder_solver("SCIP", "Install it via 'pip install pyscipopt'.")
+    Scip = _create_placeholder_solver("Scip", "Install it via 'pip install pyscipopt'.")
 
 try:
     from ._cplex import Cplex
 except ImportError:
-    CPLEX = _create_placeholder_solver("CPLEX", "Install it via 'pip install cplex'.")
+    Cplex = _create_placeholder_solver("Cplex", "Install it via 'pip install cplex'.")
 
 try:
     from ._ortools import Ortools
@@ -75,7 +75,7 @@ except ImportError:
 try:
     from ._cplexcp import CplexCP
 except ImportError:
-    CplexCP = _create_placeholder_solver("CPLEX (CP)", "Install it via 'pip install docplex'.")
+    CplexCP = _create_placeholder_solver("CplexCP", "Install it via 'pip install docplex'.")
 
 __all__ = [
     "SolverBase",
