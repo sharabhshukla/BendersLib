@@ -1,48 +1,20 @@
-# BendersLib: a Benders decomposition library
-```
- ____                       __                        __           __        
-/\  _`\                    /\ \                      /\ \       __/\ \       
-\ \ \L\ \     __    ___    \_\ \     __   _ __   ____\ \ \     /\_\ \ \____  
- \ \  _ <'  /'__`\/' _ `\  /'_` \  /'__`\/\`'__\/',__\\ \ \  __\/\ \ \ '__`\ 
-  \ \ \L\ \/\  __//\ \/\ \/\ \L\ \/\  __/\ \ \//\__, `\\ \ \L\ \\ \ \ \ \L\ \
-   \ \____/\ \____\ \_\ \_\ \___,_\ \____\\ \_\\/\____/ \ \____/ \ \_\ \_,__/
-    \/___/  \/____/\/_/\/_/\/__,_ /\/____/ \/_/ \/___/   \/___/   \/_/\/___/ 
-```
+# BendersLib: A Benders Decomposition Library in Python
 
-BendersLib is a Benders decomposition library written in Python.
+**BendersLib** ([benders.dev](https://benders.dev)) is a Python library that supports a range of Benders decomposition variants, including **Classical Benders Decomposition**, **Combinatorial Benders Decomposition**, **L-shaped Method**, **Integer L-shaped Method**, **Generalized Benders Decomposition**, and **Logic-based Benders Decomposition**. While BendersLib provides built-in implementations of these methods, it is designed to be extensible. Users can implement custom Benders decomposition methods by customizing **subproblem solvers** and **cut generators**, and defining **callback functions** for enhancement strategies. BendersLib is solver agnostic and has built-in interfaces for popular Mathematical Programming and Constraint Programming solvers. Its support for rapid prototyping and high extensibility are designed to meet the needs of both researchers and practitioners in Operations Research and related fields.
 
-Supported Benders decomposition variants:
+## Documentation
 
-- Classical Benders decomposition
-- Combinatorial Benders decomposition
-- Generalized Benders decomposition
-- Logic-based Benders decomposition
+- BendersLib's documentation is available at [https://benders.dev](https://benders.dev).
 
----
+## License
 
-## 1. Classical Benders decomposition
+- BendersLib's source code is licensed under the [Apache-2.0 License](LICENSE).
 
-Classical Benders decomposition (BD) solves mixed-integer linear programming (MILP) with linear mixed-integer master problem and linear continues sub problem.
+## References
 
-## 2. Combinatorial Benders decomposition
-
-Combinatorial Benders decomposition (CBD) can handle 0-1 integer master problem and feasibility checking subproblem (a programming with objective function be set to 0).
-
-## 3. Generalized Benders decomposition
-
-Generalized Benders decomposition (GBD) solves nonlinear programming for which the subproblem is a convex program.
-
-## 4. Logic-based Benders decomposition
-
-Logic-based Benders decomposition (LBBD) can be used for problems which can be decomposed into any type of master and sub problems.
-
----
-
-## Reference
-
-1. Benders, J.F., 1962. Partitioning procedures for solving mixed-variables programming problems. Numer. Math. 4, 238–252. https://doi.org/10.1007/BF01386316
-2. Codato, G., Fischetti, M., 2006. Combinatorial Benders’ Cuts for Mixed-Integer Linear Programming. Operations Research 54, 756–766. https://doi.org/10.1287/opre.1060.0286
-3. Geoffrion, A.M., 1972. Generalized Benders decomposition. J Optim Theory Appl 10, 237–260. https://doi.org/10.1007/BF00934810
-4. Hooker, J.N., Ottosson, G., 2003. Logic-based Benders decomposition. Math. Program., Ser. A 96, 33–60. https://doi.org/10.1007/s10107-003-0375-9
-5. Rahmaniani, R., Crainic, T.G., Gendreau, M., Rei, W., 2017. The Benders decomposition algorithm: A literature review. European Journal of Operational Research 259, 801–817. https://doi.org/10.1016/j.ejor.2016.12.005
-
+1. Benders, J. F. (1962). Partitioning procedures for solving mixed-variables programming problems. Numerische Mathematik, 4(1), 238–252. https://doi.org/10.1007/BF01386316
+2. Codato, G., & Fischetti, M. (2006). Combinatorial Benders’ cuts for mixed-integer linear programming. Operations Research, 54(4), 756–766. https://doi.org/10.1287/opre.1060.0286
+3. Geoffrion, A. M. (1972). Generalized Benders Decomposition. Journal of Optimization Theory and Applications, 10(4), 237–260. https://doi.org/10.1007/BF00934810
+4. Van Slyke, R. M., & Wets, R. (1969). L-shaped linear programs with applications to optimal control and stochastic programming. SIAM Journal on Applied Mathematics, 17(4), 638–663. https://doi.org/10.1137/0117061
+5. Laporte, G., & Louveaux, F. V. (1993). The integer L-shaped method for stochastic integer programs with complete recourse. Operations Research Letters, 13(3), 133–142. https://doi.org/10.1016/0167-6377(93)90002-X
+6. Hooker, J. N., & Ottosson, G. (2003). Logic-based Benders Decomposition. Mathematical Programming, 96(1), 33–60. https://doi.org/10.1007/s10107-003-0375-9

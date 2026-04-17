@@ -18,8 +18,8 @@ today_year = __import__('datetime').datetime.now().year
 
 project = 'BendersLib'
 author = 'Peng-Hui Guo'
-release = '0.0.1'
-copyright = f'2025-{today_year} {author} (Latest update: {today_date})'
+release = '0.5.0'
+copyright = f'2021-{today_year} {author} (Latest update: {today_date})'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -70,7 +70,8 @@ sphinx_gallery_conf = {
     'gallery_dirs': ['examples'],
     # 'download_all_examples': False,
     'capture_repr': ('__repr__', '__str__', '_repr_html_'),
-    'filename_pattern': r'\.py',
+    # 'filename_pattern': r'\.py',
+    'filename_pattern': r'no_script_to_run',
     'ignore_pattern': r'^_.*',
     'subsection_order': ExplicitOrder([
         '../../examples/basic',

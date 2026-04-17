@@ -6,7 +6,7 @@ PySCIPOpt==6.0.0
 numpy==2.3.3
 cplex==22.1.2.0
 pyomo==6.9.5
-gurobipy==13.0.1
+gurobipy==12.0.0
 docplex==2.31.254
 ortools==9.15.6755
 matplotlib==3.10.5

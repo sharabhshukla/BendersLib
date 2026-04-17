@@ -13,7 +13,7 @@ Here's a breakdown of what each section means.
 .. code-block:: text
 
     ====================================================================================
-    BendersLib (v0.1.0, GPL-3.0, https://benders.dev) Copyright 2025-2026 Peng-Hui Guo
+    BendersLib (v0.5.0, Apache-2.0, https://benders.dev) (C) 2021-2026 Peng-Hui Guo
     ------------------------------------------------------------------------------------
     Benders Decomposition:
      - Method:                  ClassicalBenders

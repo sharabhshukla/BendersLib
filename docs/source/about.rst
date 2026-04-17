@@ -46,14 +46,14 @@ from Nanjing University of Aeronautics and Astronautics (NUAA), China.
 Citing BendersLib
 --------------------------------
 
-    Guo, PH (2025). *BendersLib: An Extensible Benders Decomposition Library in Python*. Retrieved from https://github.com/phguo/BendersLib
+    Guo, PH (2026). *BendersLib: A Benders Decomposition Library in Python*. Retrieved from https://github.com/phguo/BendersLib
 
 .. code-block:: bibtex
 
-    @misc{Guo2025,
+    @misc{Guo2026,
       author = {Guo, Peng-Hui},
-      title = {BendersLib: An Extensible Benders Decomposition Library in Python},
-      year = {2025},
+      title = {BendersLib: A Benders Decomposition Library in Python},
+      year = {2026},
       publisher = {GitHub},
       journal = {GitHub repository},
       howpublished = {\\url{https://github.com/phguo/BendersLib}}
@@ -63,6 +63,13 @@ Citing BendersLib
 
 *We update this list regularly. If you have a paper citing
 BendersLib and would like it listed here, please let us know!*
+
+------
+
+License
+-----------------------------------
+
+BendersLib is licensed under the `Apache-2.0 License <https://github.com/phguo/BendersLib/blob/main/LICENSE>`__.
 
 ------
 

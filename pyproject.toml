@@ -6,19 +6,77 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "benderslib"
-version = "0.0.1"
-description = "An Extensible Benders Decomposition Library in Python"
+version = "0.5.0.post1"
+description = "A Benders Decomposition Library in Python"
 readme = "README.md"
-license = { text = "GPL-3.0" }
+license = { file = "LICENSE" }
 authors = [
     { name = "Peng-Hui Guo", email = "m@guo.ph" },
 ]
-
+requires-python = ">=3.10"  # BendersLib was developed with Python 3.12
+keywords = ["benders decomposition", "optimization", "mathematical programming", "operations research"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3.15",
+    "License :: OSI Approved :: Apache Software License",
+    "Natural Language :: English",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Education",
+    "Intended Audience :: Developers",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "Operating System :: OS Independent",
+]
 dependencies = [
-    #    "numpy>=1.20",
-    #    "pandas",
+    "numpy>=2.0.0",
+    "PyYAML>=6.0.0",
 ]
 
 [project.urls]
 Homepage = "https://benders.dev"
 Repository = "https://github.com/phguo/benderslib"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["benderslib*"]
+exclude = ["docs*", "examples*", "tests*"]
+
+[project.optional-dependencies]
+test = [
+    "pytest>=8.4.2",
+]
+doc = [
+    "sphinx>=8.2.3",
+    "furo>=2025.9.25",
+    "sphinx-copybutton>=0.5.2",
+    "sphinx-gallery>=0.19.0",
+    "sphinxcontrib-mermaid>=1.0.0",
+    "sphinx_inline_tabs>=2025.12.21.14",
+    "sphinx-tags>=0.4.0",
+    "sphinx_contributors>=0.2.7",
+    "matplotlib>=3.10.5",
+]
+copt = ["coptpy>=8.0.2"]
+cplex = ["cplex>=22.1.2", "docplex>=2.31.254"]
+gurobi = ["gurobipy>=12.0.0"]
+ortools = ["ortools>=9.15.6755"]
+pyomo = ["pyomo>=6.9.5"]
+scip = ["pyscipopt>=6.0.0"]
+all-solvers = [
+    "benderslib[pyomo]",
+    "benderslib[gurobi]",
+    "benderslib[cplex]",
+    "benderslib[copt]",
+    "benderslib[scip]",
+    "benderslib[ortools]",
+]
+dev = [
+    "benderslib[test,doc,all-solvers]",
+    "build",
+    "twine",
+]

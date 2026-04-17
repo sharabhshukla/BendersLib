@@ -2,12 +2,12 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (c) 2021-2026 Peng-Hui Guo <m@guo.ph>
 
-__version__ = "0.1.0"
+__version__ = "0.5.0"
 __author__ = "Peng-Hui Guo"
 __email__ = "m@guo.ph"
-__license__ = "GPL-3.0"
+__license__ = "Apache-2.0"
 __url__ = "https://benders.dev"
-__copyright__ = "2025-2026 Peng-Hui Guo"
+__copyright__ = "2021-2026 Peng-Hui Guo"
 
 from .consts import BendersConsts
 from .consts import BendersConsts as CST

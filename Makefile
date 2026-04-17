@@ -1,4 +1,5 @@
 publish:
-	pip install twine
-	python setup.py sdist bdist_wheel
-	twine upload dist/*
+	rm -rf build/ dist/ *.egg-info
+	pip install build twine
+	python -m build
+	twine upload dist/* --verbose

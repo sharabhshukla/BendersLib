@@ -168,7 +168,7 @@ The output will be similar to the following, showing the Benders decomposition p
 .. code-block:: console
 
     ====================================================================================
-    BendersLib (v0.1.0, GPL-3.0, https://benders.dev) by Peng-Hui Guo (Copyright 2025)
+    BendersLib (v0.5.0, Apache-2.0, https://benders.dev) (C) 2021-2026 Peng-Hui Guo
     ------------------------------------------------------------------------------------
     Benders Decomposition:
      - Method:                  ClassicalBenders
@@ -209,14 +209,14 @@ Citing BendersLib
 
 If you use BendersLib in your research, please cite it as follows.
 
-    Guo, PH (2025). *BendersLib: An Extensible Benders Decomposition Library in Python*. Retrieved from https://github.com/phguo/BendersLib
+    Guo, PH (2026). *BendersLib: A Benders Decomposition Library in Python*. Retrieved from https://github.com/phguo/BendersLib
 
 .. code-block:: bibtex
 
-    @misc{Guo2025,
+    @misc{Guo2026,
       author = {Guo, Peng-Hui},
-      title = {BendersLib: An Extensible Benders Decomposition Library in Python},
-      year = {2025},
+      title = {BendersLib: A Benders Decomposition Library in Python},
+      year = {2026},
       publisher = {GitHub},
       journal = {GitHub repository},
       howpublished = {\\url{https://github.com/phguo/BendersLib}}
@@ -225,7 +225,7 @@ If you use BendersLib in your research, please cite it as follows.
 License
 -----------------------------------
 
-BendersLib is licensed under the `GPL-3.0 License <https://github.com/phguo/BendersLib/blob/main/LICENSE>`__.
+BendersLib is licensed under the `Apache-2.0 License <https://github.com/phguo/BendersLib/blob/main/LICENSE>`__.
 
 Contents
 -----------------------------------
