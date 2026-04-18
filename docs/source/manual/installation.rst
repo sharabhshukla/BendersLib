@@ -78,6 +78,28 @@ If you see the version number printed without any errors, the installation was s
 Installing Solvers
 ------------------------------------
 
+.. tab:: specific
+
+    .. code-block:: bash
+
+        # Install only needed solvers
+
+        pip install "benderslib[copt]"
+        pip install "benderslib[cplex]"
+        pip install "benderslib[cplexcp]"
+        pip install "benderslib[gurobi]"
+        pip install "benderslib[ortools]"
+        pip install "benderslib[pyomo]"
+        pip install "benderslib[scip]"
+
+.. tab:: all
+
+    .. code-block:: bash
+
+        # Install all supported solvers
+
+        pip install "benderslib[all-solvers]"
+
 .. attention::
 
    BendersLib will **NOT** install any solver to your environment automatically.

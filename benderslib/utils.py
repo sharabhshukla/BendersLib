@@ -6,8 +6,6 @@ import os
 import yaml
 import math
 
-import matplotlib.pyplot as plt
-
 
 def draw_curve(result: 'BendersResult') -> None:
     """Draw the convergence curve of the Benders algorithm.
@@ -38,6 +36,11 @@ def draw_curve(result: 'BendersResult') -> None:
 
         draw_curve(BD.result)
     """
+
+    try:
+        import matplotlib.pyplot as plt
+    except ImportError:
+        raise ImportError("matplotlib is not installed. Please install it with: pip install benderslib[plot]")
 
     plt.style.use('seaborn-v0_8')
 

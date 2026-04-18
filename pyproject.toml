@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "benderslib"
-version = "0.5.0.post3"
+version = "0.5.0.post4"
 description = "A Benders Decomposition Library in Python"
 readme = "README.md"
 license = { file = "LICENSE" }
@@ -23,7 +23,6 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
-    "Programming Language :: Python :: 3.15",
     "License :: OSI Approved :: Apache Software License",
     "Natural Language :: English",
     "Intended Audience :: Science/Research",
@@ -46,10 +45,11 @@ where = ["."]
 include = ["benderslib*"]
 exclude = ["docs*", "examples*", "tests*"]
 
+[tool.setuptools]
+package-data = { "benderslib" = ["**"] }
+
 [project.optional-dependencies]
-test = [
-    "pytest>=8.4.2",
-]
+plot = ["matplotlib>=3.10.5"]
 doc = [
     "sphinx>=8.2.3",
     "furo>=2025.9.25",
@@ -60,21 +60,32 @@ doc = [
     "sphinx-tags>=0.4.0",
     "sphinx_contributors>=0.2.7",
     "sphinx-sitemap>=2.9.0",
-    "matplotlib>=3.10.5",
+    "benderslib[plot]",
 ]
 copt = ["coptpy>=8.0.2"]
-cplex = ["cplex>=22.1.2", "docplex>=2.31.254"]
-gurobi = ["gurobipy>=12.0.0"]
+cplex = ["cplex>=22.1.2"]
+cplexcp = ["docplex>=2.31.254"]
+gurobi = [
+    "gurobipy>=12.0.0",
+    "gurobipy[matrixapi]",
+]
 ortools = ["ortools>=9.15.6755"]
 pyomo = ["pyomo>=6.9.5"]
 scip = ["pyscipopt>=6.0.0"]
 all-solvers = [
-    "benderslib[pyomo]",
-    "benderslib[gurobi]",
-    "benderslib[cplex]",
     "benderslib[copt]",
-    "benderslib[scip]",
+    "benderslib[cplex]",
+    "benderslib[cplexcp]",
+    "benderslib[gurobi]",
     "benderslib[ortools]",
+    "benderslib[pyomo]",
+    "benderslib[scip]",
+]
+test = [
+    "pytest>=8.4.2",
+    "pytest-cov>=7.0.0",
+    "tox>=3.28.0",
+    "tox-conda>=0.10.2",
 ]
 dev = [
     "benderslib[test,doc,all-solvers]",

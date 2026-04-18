@@ -11,8 +11,7 @@ We welcome any feedback. Please report any issues
 or suggestions on our `GitHub Issues page <https://github.com/phguo/BendersLib/issues>`_.
 We also welcome contributions to the library.
 
-Features
-~~~~~~~~~~~~~
+.. rubric:: Features
 
 *   **Benders Decomposition Variants**:
     :doc:`Classical Benders Decomposition <tutorials/classical>`,
