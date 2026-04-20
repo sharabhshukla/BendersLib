@@ -26,8 +26,7 @@ div.sphx-glr-download a:hover {
 }
 
 /*Hide thumbnails under examples*/
-/*.sphx-glr-thumbnails*/
-/*{*/
+/*.sphx-glr-thumbnails {*/
 /*    display: none;*/
 /*}*/
 
@@ -164,7 +163,7 @@ h2::before {
 /*}*/
 
 /* Make furo sidebar logo smaller */
-.sidebar-logo {
-    max-width: 155px;
-    height: auto;
-}
+/*.sidebar-logo {*/
+/*    max-width: 155px;*/
+/*    height: auto;*/
+/*}*/

@@ -1,6 +1,17 @@
 Release Notes
 ===================================
 
+.. note::
+
+    This project uses `Semantic Versioning <https://semver.org/>`_ for version numbering:
+
+    - The version number is in the format of ``MAJOR.MINOR.PATCH``. An increment in the ``MAJOR``
+      version indicates incompatible API changes, an increment in the ``MINOR`` version indicates
+      added functionality in a backward-compatible manner, and an increment in the ``PATCH`` version
+      indicates backward-compatible bug fixes.
+    - **Major version zero (0.y.z) is for initial development. Anything may change at any time.
+      The public API should not be considered stable.**
+
 Version 0.5.0 (Beta) - 2026-04-17
 -------------------------------------
 

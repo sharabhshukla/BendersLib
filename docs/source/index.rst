@@ -1,6 +1,5 @@
 .. image:: _static/benderslib.png
    :align: center
-   :height: 250px
 
 ------
 
@@ -118,7 +117,7 @@ Install BendersLib and a solver of your choice (e.g., Gurobi) using pip.
 .. code-block:: bash
 
     pip install benderslib
-    pip install gurobipy
+    pip install "benderslib[gurobi]"
 
 Test whether the installation is successful.
 
@@ -225,7 +224,7 @@ If you use BendersLib in your research, please cite it as follows.
 License
 -----------------------------------
 
-BendersLib is licensed under the `Apache-2.0 License <https://github.com/phguo/BendersLib/blob/main/LICENSE>`__.
+BendersLib is licensed under the `Apache-2.0 License <https://github.com/phguo/BendersLib?tab=Apache-2.0-1-ov-file>`__.
 
 Contents
 -----------------------------------
@@ -238,7 +237,7 @@ Contents
    manual/index.rst
    api/index.rst
    examples/index.rst
-   release.rst
+   releases.rst
    about.rst
 
 .. toctree::
@@ -247,7 +246,7 @@ Contents
    :hidden:
 
    Benders.dev <https://benders.dev>
-   BendersLib @GitHub <https://github.com/phguo/BendersLib>
-   BendersLib @PyPI <https://pypi.org/project/BendersLib/>
+   BendersLib@GitHub <https://github.com/phguo/BendersLib>
+   BendersLib@PyPI <https://pypi.org/project/BendersLib/>
    Getting Help <https://github.com/phguo/BendersLib/issues?q=is%3Aissue>
    Author <https://guo.ph>
