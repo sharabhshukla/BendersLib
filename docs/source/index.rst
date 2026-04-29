@@ -208,17 +208,18 @@ Citing BendersLib
 
 If you use BendersLib in your research, please cite it as follows.
 
-    Guo, PH (2026). *BendersLib: A Benders Decomposition Library in Python*. Retrieved from https://github.com/phguo/BendersLib
+    Guo, P. (2026). BendersLib: A Benders Decomposition Library in Python (Version 0.5.0) [Computer software]. https://github.com/phguo/BendersLib
 
 .. code-block:: bibtex
 
-    @misc{Guo2026,
-      author = {Guo, Peng-Hui},
-      title = {BendersLib: A Benders Decomposition Library in Python},
-      year = {2026},
-      publisher = {GitHub},
-      journal = {GitHub repository},
-      howpublished = {\\url{https://github.com/phguo/BendersLib}}
+    @software{GuoBendersLib2026,
+        author = {Guo, Penghui},
+        license = {Apache-2.0},
+        month = apr,
+        title = {{BendersLib: A Benders Decomposition Library in Python}},
+        url = {https://github.com/phguo/BendersLib},
+        version = {0.5.0},
+        year = {2026}
     }
 
 License
