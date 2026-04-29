@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+title: 'BendersLib: A Benders Decomposition Library in Python'
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Penghui
+    family-names: Guo
+    email: m@guo.ph
+    orcid: 'https://orcid.org/0000-0003-3435-6761'
+identifiers:
+  - type: url
+    value: 'https://github.com/phguo/BendersLib'
+version: 0.5.0
+date-released: 2026-4-17
+repository-code: 'https://github.com/phguo/BendersLib'
+url: 'https://benders.dev'
+license: Apache-2.0
