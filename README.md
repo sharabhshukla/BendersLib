@@ -1,14 +1,113 @@
+<img src="https://raw.githubusercontent.com/phguo/BendersLib/397a53a490f2bbee0cccb3af39d4ee4e9d567301/docs/source/_static/benderslib_v.png" alt="benderslib.png" width="250"/>
+
 # BendersLib: A Benders Decomposition Library in Python
 
 **BendersLib** ([benders.dev](https://benders.dev)) is a Python library that supports a range of Benders decomposition variants, including **Classical Benders Decomposition**, **Combinatorial Benders Decomposition**, **L-shaped Method**, **Integer L-shaped Method**, **Generalized Benders Decomposition**, and **Logic-based Benders Decomposition**. While BendersLib provides built-in implementations of these methods, it is designed to be extensible. Users can implement custom Benders decomposition methods by customizing **subproblem solvers** and **cut generators**, and defining **callback functions** for enhancement strategies. BendersLib is solver agnostic and has built-in interfaces for popular Mathematical Programming and Constraint Programming solvers. Its support for rapid prototyping and high extensibility are designed to meet the needs of both researchers and practitioners in Operations Research and related fields.
 
-## Documentation
+## Links
 
 - BendersLib's documentation is available at [https://benders.dev](https://benders.dev).
+- BendersLib's source code is available at [https://github.com/phguo/benderslib](https://github.com/phguo/benderslib).
+- BendersLib is distributed on PyPI at [https://pypi.org/project/benderslib/](https://pypi.org/project/benderslib/).
+
+## Quick Start
+
+Install BendersLib and a solver of your choice (e.g., Gurobi) using pip.
+
+```bash
+pip install benderslib
+pip install "benderslib[gurobi]"
+```
+
+Test whether the installation is successful.
+
+```python
+import benderslib as bd
+
+print(bd.__url__)
+
+# Should output "https://benders.dev"
+```
+
+BendersLib enables switching from a standard Mathematical Programming model
+to Benders decomposition with only a few lines of code.
+
+```python
+from benderslib import AnnotatedBenders, ClassicalBenders
+from benderslib.solvers import Gurobi
+
+from gurobipy import Model, GRB
+
+# Create a standard Gurobi model
+model = Model()
+x = model.addVar(name="x", vtype=GRB.INTEGER)
+y = model.addVar(name="y", vtype=GRB.CONTINUOUS)
+model.addConstr(x + y >= 15)
+model.addConstr(2 * x + 5 * y >= 30)
+model.setObjective(3 * x + 4 * y)
+model.update()
+
+# Complicating variable
+complicating_vars = ["x"]
+
+# Create and solve using Benders decomposition
+benders = AnnotatedBenders(
+    model,
+    solver=Gurobi,
+    complicating_vars=complicating_vars,
+    benders=ClassicalBenders
+)
+benders.solve()
+print(f"Objective: {benders.result.obj}")
+print(f"Solution: {benders.result.solution}")
+```
+
+The output will be similar to the following, showing the Benders decomposition process and results.
+
+```console
+====================================================================================
+BendersLib (v0.5.0, Apache-2.0, https://benders.dev) (C) 2021-2026 Peng-Hui Guo
+------------------------------------------------------------------------------------
+Benders Decomposition:
+ - Method:                  ClassicalBenders
+ - Complicating Var. No.:   1 [Integer: 1, Binary: 0, Continuous: 0]
+ - Optimality Cut:          ClassicalOCGen
+ - Feasibility Cut:         ClassicalFCGen
+Master Problem:
+ - Variable No.:            2 [Integer: 1, Binary: 0]
+ - Constraint No.:          0
+ - Solver:                  Gurobi
+Sub Problem:
+ - Variable No.:            1 [Integer: 0, Binary: 0]
+ - Constraint No.:          2
+ - Solver:                  Gurobi
+Benders Parameters:
+ - All default
+------------------------------------------------------------------------------------
+       Iter.,           LB,           UB,         Obj.,       Gap(%),   Runtime(s)
+------------------------------------------------------------------------------------
+           1,         0.00,        60.00,        60.00,       100.00,         0.00
+------------------------------------------------------------------------------------
+Benders Result:
+  - Status:                  OPTIMAL
+  - Incumbent:               45.0000
+  - Bound:                   45.0000
+  - Gap (abs.):              0.0000
+  - Gap (rel.):              0.00%
+  - Solutions No.:           2
+  - Iteration No.:           2
+  - Cuts No.:                1 [Optimality: 1, Feasibility: 0]
+  - Solve Time (sec.):       0.01 [Master: 0.01, Sub: 0.00]
+====================================================================================
+Objective: 45.0
+Solution: {'x': 15.0, 'y': 0.0}
+```
+
+
 
 ## License
 
-- BendersLib's source code is licensed under the [Apache-2.0 License](LICENSE).
+- BendersLib's source code is licensed under the [Apache-2.0 License](https://github.com/phguo/BendersLib?tab=Apache-2.0-1-ov-file).
 
 ## References
 
