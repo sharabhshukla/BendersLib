@@ -39,6 +39,7 @@ extensions = [
     'sphinx_tags',
     'sphinx_contributors',
     'sphinx_sitemap',
+    # 'sphinx_ai_assistant',
 ]
 
 # sphinx_tags configuration
@@ -178,17 +179,17 @@ html_theme_options = {
         "color-api-name": another_blue,
         "color-highlighted-background": "yellow",
     },
-    "dark_css_variables": {
-        "color-sidebar-link-text--top-level": navy_blue,
-        "color-toc-item-text--active": navy_blue,
-        "color-link": navy_blue,
-        "color-link--visited": "var(--color-link)",
-        "color-link--hover": "var(--color-link)",
-        "color-brand-primary": navy_blue,
-        "color-brand-content": navy_blue,
-        "color-api-name": another_blue,
-        "color-highlighted-background": "yellow",
-    },
+    # "dark_css_variables": {
+    #     "color-sidebar-link-text--top-level": navy_blue,
+    #     "color-toc-item-text--active": navy_blue,
+    #     "color-link": navy_blue,
+    #     "color-link--visited": "var(--color-link)",
+    #     "color-link--hover": "var(--color-link)",
+    #     "color-brand-primary": navy_blue,
+    #     "color-brand-content": navy_blue,
+    #     "color-api-name": another_blue,
+    #     "color-highlighted-background": "yellow",
+    # },
     "announcement": "This is a "
                     "<em><a href=\"https://en.wikipedia.org/wiki/Software_release_life_cycle#Beta\">Beta release</a></em>. "
                     "The API is subject to change, and bugs may be present. "
