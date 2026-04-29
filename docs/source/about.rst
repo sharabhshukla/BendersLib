@@ -56,7 +56,7 @@ Citing BendersLib
         month = apr,
         title = {{BendersLib: A Benders Decomposition Library in Python}},
         url = {https://github.com/phguo/BendersLib},
-        version = {0.5.0},
+        version = {0.5.1},
         year = {2026}
     }
 

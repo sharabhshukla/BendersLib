@@ -167,7 +167,7 @@ The output will be similar to the following, showing the Benders decomposition p
 .. code-block:: console
 
     ====================================================================================
-    BendersLib (v0.5.0, Apache-2.0, https://benders.dev) (C) 2021-2026 Peng-Hui Guo
+    BendersLib (v0.5.1, Apache-2.0, https://benders.dev) (C) 2021-2026 Peng-Hui Guo
     ------------------------------------------------------------------------------------
     Benders Decomposition:
      - Method:                  ClassicalBenders
@@ -208,7 +208,7 @@ Citing BendersLib
 
 If you use BendersLib in your research, please cite it as follows.
 
-    Guo, P. (2026). BendersLib: A Benders Decomposition Library in Python (Version 0.5.0) [Computer software]. https://github.com/phguo/BendersLib
+    Guo, P. (2026). BendersLib: A Benders Decomposition Library in Python (Version 0.5.1) [Computer software]. https://github.com/phguo/BendersLib
 
 .. code-block:: bibtex
 
@@ -218,7 +218,7 @@ If you use BendersLib in your research, please cite it as follows.
         month = apr,
         title = {{BendersLib: A Benders Decomposition Library in Python}},
         url = {https://github.com/phguo/BendersLib},
-        version = {0.5.0},
+        version = {0.5.1},
         year = {2026}
     }
 

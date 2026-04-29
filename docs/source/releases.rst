@@ -9,8 +9,28 @@ Release Notes
       version indicates incompatible API changes, an increment in the ``MINOR`` version indicates
       added functionality in a backward-compatible manner, and an increment in the ``PATCH`` version
       indicates backward-compatible bug fixes.
-    - **Major version zero (0.y.z) is for initial development. Anything may change at any time.
-      The public API should not be considered stable.**
+    - **Major version zero (0.y.z) is for beta releases. Anything may change at any time.
+      The public API should not be considered stable till version 1.y.z.**
+
+Version 0.5.1 (Beta) - 2026-04-29
+-------------------------------------
+
+.. rubric:: Added
+
+*   Add a GitHub Actions workflow for automatic releases on PyPI.
+*   Add a ``CITATION.cff`` file for citation metadata.
+*   [docs] Add ``.readthedocs.yaml`` for Read the Docs integration.
+*   [docs] Add sitemap using ``sphinx_sitemap``.
+
+.. rubric:: Changed
+
+*   Make ``matplotlib`` an optional dependency.
+*   Update the dependencies for benchmarking.
+*   [docs] Update the logos in the documentation.
+
+.. rubric:: Fixed
+
+*   Fix a bug caused by inconsistent placeholder solver names.
 
 Version 0.5.0 (Beta) - 2026-04-17
 -------------------------------------
@@ -22,7 +42,7 @@ We welcome any feedback. Please report any issues
 or suggestions on our `GitHub Issues page <https://github.com/phguo/BendersLib/issues>`_.
 We also welcome contributions to the library.
 
-.. rubric:: Features
+.. rubric:: Added
 
 *   **Benders Decomposition Variants**:
     :doc:`Classical Benders Decomposition <tutorials/classical>`,
