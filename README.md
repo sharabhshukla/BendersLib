@@ -1,4 +1,4 @@
-<img src="https://raw.githubusercontent.com/phguo/BendersLib/397a53a490f2bbee0cccb3af39d4ee4e9d567301/docs/source/_static/benderslib_v.png" alt="benderslib.png" width="250"/>
+![benderslib.png](https://raw.githubusercontent.com/phguo/BendersLib/397a53a490f2bbee0cccb3af39d4ee4e9d567301/docs/source/_static/benderslib.png)
 
 # BendersLib: A Benders Decomposition Library in Python
 
@@ -64,7 +64,7 @@ print(f"Solution: {benders.result.solution}")
 
 The output will be similar to the following, showing the Benders decomposition process and results.
 
-```console
+```
 ====================================================================================
 BendersLib (v0.5.0, Apache-2.0, https://benders.dev) (C) 2021-2026 Peng-Hui Guo
 ------------------------------------------------------------------------------------
@@ -102,8 +102,6 @@ Benders Result:
 Objective: 45.0
 Solution: {'x': 15.0, 'y': 0.0}
 ```
-
-
 
 ## License
 
