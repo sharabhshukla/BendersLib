@@ -20,7 +20,7 @@ class BendersConsts:
     """
 
     # Ensure immutability
-    __slot__ = ()
+    __slots__ = ()
 
     # BendersLib/Solver status
     UNSOLVED = 'UNSOLVED'

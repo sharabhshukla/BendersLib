@@ -228,7 +228,7 @@ class SolverBase(ABC):
 
         Returns
         ---------------
-        lst[float]
+        list[float]
             A list representing the extreme ray.
 
         Example
@@ -434,7 +434,7 @@ class SolverBase(ABC):
 
                 original_model = ...
                 # It is a static method, which can be called without initializing an instance
-                master_model = Gurobi.make_master_problem(original_model, ['x1', 'x2'])
+                sub_model = Gurobi.make_sub_problem(original_model, ['x1', 'x2'])
         """
         ...
 
