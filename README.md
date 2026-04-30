@@ -20,6 +20,7 @@ Install BendersLib and a solver of your choice (e.g., Gurobi) using pip.
 pip install "benderslib[gurobi]"
 
 python -c "import benderslib as bd; print(bd.__url__)"
+
 # Should output "https://benders.dev"
 ```
 
