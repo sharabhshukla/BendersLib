@@ -82,7 +82,7 @@ class UnexpectedMasterStatusError(BendersMasterError):
 
 
 class MismatchedProbabilityError(BendersMasterError):
-    """Exception raised when te number of estimator variables does not match the number of scenarios."""
+    """Exception raised when the number of estimator variables does not match the number of scenarios."""
     code = 3002
     description = "The number of estimator variables does not match the number of scenarios."
 

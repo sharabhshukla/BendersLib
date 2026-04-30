@@ -245,7 +245,7 @@ class ProblemBase:
         Returns
         ---------------
 
-        lst[float]
+        list[float]
             A list representing the extreme ray.
 
         Example
@@ -1672,7 +1672,7 @@ class BendersSolver:
         it checks the feasibility and optimality of the current solution at each node of the branch-and-bound
         tree and adds cuts as needed.
 
-        The Branch-and-check method is epically efficient when the subproblem is relatively easy to solve
+        The Branch-and-check method is especially efficient when the subproblem is relatively easy to solve
         (than the master problem) and the number of cuts needed is large, as it avoids solving the master
         problem multiple times. However, it requires the master problem solver to support callback functions
         for adding cuts during the branch-and-bound process, which is supported by only a subset of
