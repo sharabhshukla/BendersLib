@@ -15,7 +15,6 @@ Development Workflow
 
 This project uses the
 `Gitflow workflow <https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow>`_
-(or `git-flow <https://nvie.com/posts/a-successful-git-branching-model/>`_, not decided yet)
 for development. If you'd like to contribute, please follow these steps.
 
 The primary branches are as follows.
