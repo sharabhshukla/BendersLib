@@ -56,14 +56,15 @@ if __name__ == '__main__':
         # 'cbc',
         # 'cplex',
         # 'cplex_direct',
+        # 'glpk',
 
-        'glpk',
         'gurobi',
         'gurobi_direct',
-        'highs',
 
-        'cplex_persistent',
-        'gurobi_persistent',
+        # 'highs',
+
+        # 'cplex_persistent',
+        # 'gurobi_persistent',
 
         # 'xpress',
         # 'xpress_direct',

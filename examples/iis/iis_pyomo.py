@@ -40,12 +40,13 @@ solvers = [
     # 'cbc',
     # 'cplex',
     # 'cplex_direct',
+    # 'glpk',
 
-    'glpk',
     'gurobi',
     'gurobi_direct',
+
     # 'highs',
-    'scip',
+    # 'scip',
 
     # 'xpress',
     # 'xpress_direct',
