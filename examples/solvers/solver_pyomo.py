@@ -53,7 +53,7 @@ def make_original_problem():
 if __name__ == '__main__':
 
     solvers = [
-        'cbc',
+        # 'cbc',
         'cplex',
         'cplex_direct',
         'glpk',
