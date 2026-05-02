@@ -74,6 +74,7 @@ def draw_curve(result: 'BendersResult') -> None:
 
     plt.tight_layout()
     plt.show()
+    plt.close(fig)
 
 
 def _load_config(section: str = None, file='config.yaml') -> dict:

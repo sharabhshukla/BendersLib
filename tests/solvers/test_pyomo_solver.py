@@ -21,8 +21,9 @@ solvers = [
     'gurobi',
     'gurobi_direct',
     'highs',
-    'xpress',
-    'xpress_direct',
+
+    # 'xpress',
+    # 'xpress_direct',
 
     # 'mosek',        # License expires in one month
     # 'mosek_direct', # License expires in one month
