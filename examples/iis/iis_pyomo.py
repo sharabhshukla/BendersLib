@@ -38,8 +38,9 @@ def make_sub_problem():
 
 solvers = [
     # 'cbc',
-    'cplex',
-    'cplex_direct',
+    # 'cplex',
+    # 'cplex_direct',
+
     'glpk',
     'gurobi',
     'gurobi_direct',

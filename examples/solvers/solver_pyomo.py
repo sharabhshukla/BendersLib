@@ -54,8 +54,9 @@ if __name__ == '__main__':
 
     solvers = [
         # 'cbc',
-        'cplex',
-        'cplex_direct',
+        # 'cplex',
+        # 'cplex_direct',
+
         'glpk',
         'gurobi',
         'gurobi_direct',
