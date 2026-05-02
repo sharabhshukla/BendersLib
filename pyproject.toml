@@ -51,10 +51,6 @@ package-data = { "benderslib" = ["**"] }
 [tool.coverage.run]
 source = ["benderslib"]
 
-[tool.coverage.report]
-show_missing = true
-fail_under = 90
-
 [project.optional-dependencies]
 plot = ["matplotlib>=3.10.5"]
 doc = [

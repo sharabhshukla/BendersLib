@@ -32,32 +32,9 @@ jobs:
         run: |
           pytest --cov=benderslib --cov-report=xml
 
-      - name: Upload coverage reports to artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-report-${{ matrix.python-version }}
-          path: coverage.xml
-          retention-days: 1
-
-  upload-coverage:
-    runs-on: ubuntu-latest
-    needs: test
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Download all coverage reports
-        uses: actions/download-artifact@v4
-        with:
-          pattern: coverage-report-*
-          path: coverage-reports
-          merge-multiple: true
-
-      - name: Upload merged coverage to Codecov
+      - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          directory: ./coverage-reports/
           fail_ci_if_error: true
           verbose: true
