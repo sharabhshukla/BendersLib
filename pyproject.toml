@@ -65,25 +65,16 @@ doc = [
     "sphinx-sitemap>=2.9.0",
     "benderslib[plot]",
 ]
-copt = ["coptpy>=8.0.2"]
+
+copt = ["coptpy>=8.0.2; python_version<='3.13'"]
 cplex = ["cplex>=22.1.2"]
 cplexcp = ["docplex>=2.31.254"]
-gurobi = [
-    "gurobipy>=12.0.0",
-    "gurobipy[matrixapi]",
-]
+gurobi = ["gurobipy[matrixapi]>=12.0.0"]
 ortools = ["ortools>=9.15.6755"]
 pyomo = ["pyomo>=6.9.5"]
 scip = ["pyscipopt>=6.0.0"]
-all-solvers = [
-    "benderslib[copt]",
-    "benderslib[cplex]",
-    "benderslib[cplexcp]",
-    "benderslib[gurobi]",
-    "benderslib[ortools]",
-    "benderslib[pyomo]",
-    "benderslib[scip]",
-]
+all-solvers = ["benderslib[copt,cplex,cplexcp,gurobi,ortools,pyomo,scip]"]
+
 test = [
     "pytest>=8.4.2",
     "pytest-cov>=7.0.0",

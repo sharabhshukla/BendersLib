@@ -18,8 +18,13 @@ from benderslib.utils import draw_curve
 import inspect
 from pathlib import Path
 
-from coptpy import COPT
-import coptpy
+try:
+    from coptpy import COPT
+    import coptpy
+
+    copt_available = True
+except ImportError:
+    copt_available = False
 
 
 def make_original_problem():
@@ -36,18 +41,19 @@ def make_original_problem():
 
 
 if __name__ == '__main__':
-    model, complicating_vars = make_original_problem()
-    model_copy = model.clone()
-    model.solve()
+    if copt_available:
+        model, complicating_vars = make_original_problem()
+        model_copy = model.clone()
+        model.solve()
 
-    BD = AnnotatedBenders(model, solver=Copt, complicating_vars=complicating_vars, benders=ClassicalBenders)
-    BD.solve()
+        BD = AnnotatedBenders(model, solver=Copt, complicating_vars=complicating_vars, benders=ClassicalBenders)
+        BD.solve()
 
-    BD = AnnotatedBenders(model_copy, solver=Copt, complicating_vars=complicating_vars, benders=ClassicalBenders)
-    BD.params.use_bnc = True
-    BD.solve()
+        BD = AnnotatedBenders(model_copy, solver=Copt, complicating_vars=complicating_vars, benders=ClassicalBenders)
+        BD.params.use_bnc = True
+        BD.solve()
 
-    draw_curve(BD.result)
+        draw_curve(BD.result)
 
 # %%
 #

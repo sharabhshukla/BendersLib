@@ -16,8 +16,13 @@ Copt IIS
 
 from benderslib.solvers import Copt
 
-import coptpy as cp
-from coptpy import COPT
+try:
+    import coptpy as cp
+    from coptpy import COPT
+
+    copt_available = True
+except ImportError:
+    copt_available = False
 
 
 def make_sub_problem():
@@ -35,16 +40,17 @@ def make_sub_problem():
 
 
 if __name__ == '__main__':
-    sub = make_sub_problem()
+    if copt_available:
+        sub = make_sub_problem()
 
-    # For simplicity, we directly use the Copt solver interface from BendersLib.
-    # Typically, this should be wrapped in the SubProblem class like SubProblem(Copt(...)).
-    sub_problem_solver = Copt(sub)
+        # For simplicity, we directly use the Copt solver interface from BendersLib.
+        # Typically, this should be wrapped in the SubProblem class like SubProblem(Copt(...)).
+        sub_problem_solver = Copt(sub)
 
-    sub_problem_solver.solve()
-    print("Optimization status :", sub_problem_solver.status)
-    iis_vars = sub_problem_solver.compute_iis()
-    print("Variables in the IIS:", iis_vars)
+        sub_problem_solver.solve()
+        print("Optimization status :", sub_problem_solver.status)
+        iis_vars = sub_problem_solver.compute_iis()
+        print("Variables in the IIS:", iis_vars)
 
 # %%
 #
