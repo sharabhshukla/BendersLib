@@ -1,7 +1,7 @@
 # pyproject.toml
 
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools>=69.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -9,7 +9,7 @@ name = "benderslib"
 version = "0.5.1"
 description = "A Benders Decomposition Library in Python"
 readme = "README.md"
-license = { file = "LICENSE" }
+license = "Apache-2.0"
 authors = [
     { name = "Peng-Hui Guo", email = "m@guo.ph" },
 ]
@@ -23,7 +23,6 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
-    "License :: OSI Approved :: Apache Software License",
     "Natural Language :: English",
     "Intended Audience :: Science/Research",
     "Intended Audience :: Education",
@@ -46,7 +45,7 @@ include = ["benderslib*"]
 exclude = ["docs*", "examples*", "tests*"]
 
 [tool.setuptools]
-package-data = { "benderslib" = ["**"] }
+package-data = { "benderslib" = ["config.yaml"] }
 
 [tool.coverage.run]
 source = ["benderslib"]
@@ -65,7 +64,6 @@ doc = [
     "sphinx-sitemap>=2.9.0",
     "benderslib[plot]",
 ]
-
 copt = ["coptpy>=8.0.2; python_version<='3.13'"]
 cplex = ["cplex>=22.1.2"]
 cplexcp = ["docplex>=2.31.254"]
@@ -74,12 +72,10 @@ ortools = ["ortools>=9.15.6755"]
 pyomo = ["pyomo>=6.9.5"]
 scip = ["pyscipopt>=6.0.0"]
 all-solvers = ["benderslib[copt,cplex,cplexcp,gurobi,ortools,pyomo,scip]"]
-
 test = [
     "pytest>=8.4.2",
     "pytest-cov>=7.0.0",
     "tox>=3.28.0",
-    "tox-conda>=0.10.2",
 ]
 dev = [
     "benderslib[test,doc,all-solvers]",
