@@ -21,6 +21,9 @@
 
 ## Quick Start
 
+> [!NOTE]
+> More examples are available at https://benders.dev/examples.
+
 Install BendersLib and a solver of your choice (e.g., Gurobi) using pip.
 
 ```bash
