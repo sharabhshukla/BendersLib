@@ -35,7 +35,7 @@ to meet the needs of both researchers and practitioners in Operations Research a
 
 ## Quick Start
 
-> [!NOTE]
+> **NOTE:**
 > More examples are available at https://benders.dev/examples.
 
 Install BendersLib and a solver of your choice (e.g., Gurobi) using pip.
