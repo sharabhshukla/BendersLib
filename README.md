@@ -1,5 +1,3 @@
-![benderslib.png](https://raw.githubusercontent.com/phguo/BendersLib/397a53a490f2bbee0cccb3af39d4ee4e9d567301/docs/source/_static/benderslib.png)
-
 [![Repo Status](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![PyPI version](https://img.shields.io/pypi/v/benderslib.svg)](https://pypi.org/project/benderslib/)
 [![PyPI downloads](https://img.shields.io/pypi/dm/benderslib.svg)](https://pypi.org/project/benderslib/)
@@ -7,9 +5,9 @@
 [![tests](https://github.com/phguo/BendersLib/actions/workflows/codecov.yml/badge.svg)](https://github.com/phguo/BendersLib/actions/workflows/codecov.yml)
 [![codecov](https://codecov.io/gh/phguo/BendersLib/branch/develop/graph/badge.svg)](https://codecov.io/gh/phguo/BendersLib)
 
----
-
 # BendersLib: A Benders Decomposition Library in Python
+
+![benderslib.png](https://raw.githubusercontent.com/phguo/BendersLib/397a53a490f2bbee0cccb3af39d4ee4e9d567301/docs/source/_static/benderslib.png)
 
 **BendersLib** (https://benders.dev) is a Python library that supports a range of Benders decomposition 
 variants, including 
