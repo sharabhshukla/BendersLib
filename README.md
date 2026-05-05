@@ -1,4 +1,4 @@
-[![GitHub last commit](https://img.shields.io/github/last-commit/phguo/benderslib)](https://github.com/phguo/BendersLib/commits/develop/)
+[![GitHub last commit](https://img.shields.io/github/last-commit/phguo/benderslib)](https://github.com/phguo/BendersLib/commits/)
 [![tests](https://github.com/phguo/BendersLib/actions/workflows/codecov.yml/badge.svg)](https://github.com/phguo/BendersLib/actions/workflows/codecov.yml)
 [![codecov](https://codecov.io/gh/phguo/BendersLib/branch/develop/graph/badge.svg)](https://codecov.io/gh/phguo/BendersLib)
 [![PyPI version](https://img.shields.io/pypi/v/benderslib.svg)](https://pypi.org/project/benderslib/)
