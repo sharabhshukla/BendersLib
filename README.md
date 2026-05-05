@@ -1,9 +1,9 @@
-[![Repo Status](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
+[![GitHub last commit](https://img.shields.io/github/last-commit/phguo/benderslib)](https://github.com/phguo/BendersLib/commits/develop/)
+[![tests](https://github.com/phguo/BendersLib/actions/workflows/codecov.yml/badge.svg)](https://github.com/phguo/BendersLib/actions/workflows/codecov.yml)
+[![codecov](https://codecov.io/gh/phguo/BendersLib/branch/develop/graph/badge.svg)](https://codecov.io/gh/phguo/BendersLib)
 [![PyPI version](https://img.shields.io/pypi/v/benderslib.svg)](https://pypi.org/project/benderslib/)
 [![PyPI downloads](https://img.shields.io/pypi/dm/benderslib.svg)](https://pypi.org/project/benderslib/)
 [![Documentation Status](https://readthedocs.org/projects/benderslib/badge/?version=latest)](https://benders.dev)
-[![tests](https://github.com/phguo/BendersLib/actions/workflows/codecov.yml/badge.svg)](https://github.com/phguo/BendersLib/actions/workflows/codecov.yml)
-[![codecov](https://codecov.io/gh/phguo/BendersLib/branch/develop/graph/badge.svg)](https://codecov.io/gh/phguo/BendersLib)
 
 # BendersLib: A Benders Decomposition Library in Python
 
