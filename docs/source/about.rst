@@ -33,6 +33,11 @@ Contributors
 BendersLib was created by **Peng-Hui Guo** ("郭鹏辉" in Chinese, https://guo.ph),
 who holds a PhD in Management Science and Engineering
 from Nanjing University of Aeronautics and Astronautics (NUAA), China.
+Before developing BendersLib, Peng-Hui Guo had published research papers
+on Benders decomposition in journals such as *Naval Research Logistics*,
+*IISE Transactions*, and *European Journal of Operational Research*. His PhD thesis, titled
+*"Optimal Preparation and Distribution of Humanitarian Supplies by Stochastic Programming and Decomposition Algorithms"*,
+applied Benders decomposition to humanitarian logistics and supply chain management.
 
 *Contributions to BendersLib are welcome! If you would like to contribute, please visit*
 :doc:`manual/contribution` *for more information.*
