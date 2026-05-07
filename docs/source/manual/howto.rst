@@ -3,7 +3,14 @@ How-To Guides
 
 .. currentmodule:: benderslib
 
+.. contents::
+   :local:
+   :depth: 1
+   :class: this-will-duplicate-information-and-it-is-still-useful-here
+
 *To be added (common issues will be summarized here)...*
+
+------
 
 How to access to attributes not listed in the API reference?
 --------------------------------------------------------------
