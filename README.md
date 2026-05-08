@@ -1,13 +1,14 @@
+![benderslib.png](https://raw.githubusercontent.com/phguo/BendersLib/397a53a490f2bbee0cccb3af39d4ee4e9d567301/docs/source/_static/benderslib.png)
+
 [![GitHub last commit](https://img.shields.io/github/last-commit/phguo/benderslib)](https://github.com/phguo/BendersLib/commits/)
 [![tests](https://github.com/phguo/BendersLib/actions/workflows/codecov.yml/badge.svg)](https://github.com/phguo/BendersLib/actions/workflows/codecov.yml)
 [![codecov](https://codecov.io/gh/phguo/BendersLib/branch/develop/graph/badge.svg)](https://codecov.io/gh/phguo/BendersLib)
 [![PyPI version](https://img.shields.io/pypi/v/benderslib.svg)](https://pypi.org/project/benderslib/)
 [![PyPI downloads](https://img.shields.io/pypi/dm/benderslib.svg)](https://pypi.org/project/benderslib/)
 [![Documentation Status](https://readthedocs.org/projects/benderslib/badge/?version=latest)](https://benders.dev)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/benderslib)
 
 # BendersLib: A Benders Decomposition Library in Python
-
-![benderslib.png](https://raw.githubusercontent.com/phguo/BendersLib/397a53a490f2bbee0cccb3af39d4ee4e9d567301/docs/source/_static/benderslib.png)
 
 **BendersLib** (https://benders.dev) is a Python library that supports a range of Benders decomposition 
 variants, including 
@@ -35,16 +36,17 @@ to meet the needs of both researchers and practitioners in Operations Research a
 
 ## Quick Start
 
-> **NOTE:**
 > More examples are available at https://benders.dev/examples.
 
 Install BendersLib and a solver of your choice (e.g., Gurobi) using pip.
 
 ```bash
+python --version
+# Should be Python 3.10 to 3.14
+
 pip install "benderslib[gurobi]"
 
 python -c "import benderslib as bd; print(bd.__url__)"
-
 # Should output "https://benders.dev"
 ```
 
