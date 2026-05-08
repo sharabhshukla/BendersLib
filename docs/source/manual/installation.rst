@@ -32,23 +32,21 @@ for BendersLib before installing it.
 Installing BendersLib
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+.. caution::
+
+    BendersLib requires Python 3.10 or higher.
+
 .. tab:: pip
 
     .. code-block:: bash
+
+        python --version
+        # Should be Python 3.10 or higher
 
         pip install benderslib
 
         # Upgrade to the latest version
         pip install benderslib --upgrade
-
-.. tab:: conda
-
-    .. code-block:: bash
-
-        conda install -c conda-forge benderslib
-
-        # Upgrade to the latest version
-        conda update -c conda-forge benderslib
 
 .. tab:: uv
 

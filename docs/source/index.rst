@@ -116,7 +116,9 @@ Install BendersLib and a solver of your choice (e.g., Gurobi) using pip.
 
 .. code-block:: bash
 
-    pip install benderslib
+    python --version
+    # Should be Python 3.10 or higher
+
     pip install "benderslib[gurobi]"
 
 Test whether the installation is successful.

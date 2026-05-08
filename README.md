@@ -42,7 +42,7 @@ Install BendersLib and a solver of your choice (e.g., Gurobi) using pip.
 
 ```bash
 python --version
-# Should be Python 3.10 to 3.14
+# Should be Python 3.10 or higher
 
 pip install "benderslib[gurobi]"
 
