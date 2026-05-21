@@ -153,7 +153,7 @@ sphinx_gallery_conf = {
 #     ],
 #     "show_toc_level": -1,
 #     "navigation_with_keys": True,
-#     # "announcement": "✨ We've just released v1.0.0dev ✨",
+#     # "announcement": "We've just released v1.0.0dev",
 #     # "secondary_sidebar_items": ["page-toc", "sg_download_links", "sg_launcher_links"],
 #
 # }
@@ -214,17 +214,17 @@ sitemap_show_lastmod = True
 sitemap_url_scheme = "{link}"
 
 # html_theme = "shibuya"
-# html_baseurl = "https://benders.dev/en/latest/"
+# # html_baseurl = "https://benders.dev/"
 # # html_logo = '_static/benderslib.png'
 # html_favicon = '_static/icon.ico'
 # html_copy_source = True
 # html_theme_options = {
 #     "accent_color": "indigo",
-#     # "accent_color": "blue",
-#     # "announcement": "This is a Beta release, the API may change in future and there might be bugs.",
+#     "announcement": "This is a "
+#                     "<a href=\"https://en.wikipedia.org/wiki/Software_release_life_cycle#Beta\">Beta release</a>. "
+#                     "The API is subject to change, and bugs may be present. "
+#                     "Do not trust the results without further validation.",
 #     "github_url": "https://github.com/phguo/BendersLib",
-#     # "discussion_url": "https://github.com/phguo/BendersLib/discussions",
-#
 #     "show_ai_links": True,
 #     "open_in_chatgpt": True,
 #     "open_in_claude": True,
