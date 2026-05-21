@@ -1,13 +1,5 @@
 ![benderslib.png](https://raw.githubusercontent.com/phguo/BendersLib/397a53a490f2bbee0cccb3af39d4ee4e9d567301/docs/source/_static/benderslib.png)
 
-[![GitHub last commit](https://img.shields.io/github/last-commit/phguo/benderslib)](https://github.com/phguo/BendersLib/commits/)
-[![tests](https://github.com/phguo/BendersLib/actions/workflows/codecov.yml/badge.svg)](https://github.com/phguo/BendersLib/actions/workflows/codecov.yml)
-[![codecov](https://codecov.io/gh/phguo/BendersLib/branch/develop/graph/badge.svg)](https://codecov.io/gh/phguo/BendersLib)
-[![PyPI version](https://img.shields.io/pypi/v/benderslib.svg)](https://pypi.org/project/benderslib/)
-[![PyPI downloads](https://img.shields.io/pypi/dm/benderslib.svg)](https://pypi.org/project/benderslib/)
-[![Documentation Status](https://readthedocs.org/projects/benderslib/badge/?version=latest)](https://benders.dev)
-![PyPI - Python Version](https://img.shields.io/pypi/pyversions/benderslib)
-
 # BendersLib: A Benders Decomposition Library in Python
 
 **BendersLib** (https://benders.dev) is a Python library that supports a range of Benders decomposition 
@@ -26,17 +18,13 @@ agnostic and has built-in interfaces for popular Mathematical Programming and Co
 Programming solvers. Its support for rapid prototyping and high extensibility are designed 
 to meet the needs of both researchers and practitioners in Operations Research and related fields.
 
-## Links
-
-| Resource      | Link                                                                           |
-|---------------|--------------------------------------------------------------------------------|
-| Documentation | [https://benders.dev](https://benders.dev)                                     |
-| Source Code   | [https://github.com/phguo/benderslib](https://github.com/phguo/benderslib)     |
-| PyPI          | [https://pypi.org/project/benderslib/](https://pypi.org/project/benderslib/)   |
+[![GitHub last commit](https://img.shields.io/github/last-commit/phguo/benderslib)](https://github.com/phguo/BendersLib)
+[![codecov](https://codecov.io/gh/phguo/BendersLib/branch/develop/graph/badge.svg)](https://codecov.io/gh/phguo/BendersLib)
+[![PyPI version](https://img.shields.io/pypi/v/benderslib.svg)](https://pypi.org/project/benderslib/)
+[![Documentation Status](https://readthedocs.org/projects/benderslib/badge/?version=latest)](https://benders.dev)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/benderslib)
 
 ## Quick Start
-
-> More examples are available at https://benders.dev/examples.
 
 Install BendersLib and a solver of your choice (e.g., Gurobi) using pip.
 
@@ -124,9 +112,11 @@ Objective: 45.0
 Solution: {'x': 15.0, 'y': 0.0}
 ```
 
+More examples are available at https://benders.dev/examples.
+
 ## License
 
-BendersLib's source code is licensed under the [Apache-2.0 License](https://github.com/phguo/BendersLib?tab=Apache-2.0-1-ov-file).
+BendersLib's source code is licensed under the [Apache-2.0 License](https://github.com/phguo/BendersLib/blob/develop/LICENSE).
 
 ## References
 
