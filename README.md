@@ -1,4 +1,17 @@
-![benderslib.png](https://raw.githubusercontent.com/phguo/BendersLib/397a53a490f2bbee0cccb3af39d4ee4e9d567301/docs/source/_static/benderslib.png)
+<div align="center">
+
+![BendersLib Logo](https://raw.githubusercontent.com/phguo/BendersLib/397a53a490f2bbee0cccb3af39d4ee4e9d567301/docs/source/_static/benderslib.png)
+
+[![GitHub Commits](https://img.shields.io/github/last-commit/phguo/benderslib?style=flat-square&logo=github)](https://github.com/phguo/BendersLib)
+[![Codecov](https://img.shields.io/codecov/c/github/phguo/benderslib?style=flat-square&logo=codecov)](https://codecov.io/gh/phguo/BendersLib)
+[![Read the Docs](https://img.shields.io/readthedocs/benderslib?style=flat-square&logo=readthedocs)](https://benders.dev)
+[![PyPI](https://img.shields.io/pypi/v/benderslib.svg?style=flat-square&logo=pypi)](https://pypi.org/project/benderslib/)
+
+[![Python Versions](https://img.shields.io/pypi/pyversions/benderslib?style=flat-square&logo=python)](https://pypi.org/project/benderslib/)
+
+</div>
+
+---
 
 # BendersLib: A Benders Decomposition Library in Python
 
@@ -10,19 +23,16 @@ variants, including
 **L-shaped Method** [<sup>[4]</sup>](#4), 
 **Integer L-shaped Method** [<sup>[5]</sup>](#5), 
 and **Logic-based Benders Decomposition** [<sup>[6]</sup>](#6). 
+
 While BendersLib provides built-in implementations of 
 these methods, it is designed to be extensible. Users can implement custom Benders 
 decomposition methods by customizing **subproblem solvers** and **cut generators**, 
-and defining **callback functions** for enhancement strategies. BendersLib is solver 
+and defining **callback functions** for enhancement strategies. 
+
+BendersLib is solver 
 agnostic and has built-in interfaces for popular Mathematical Programming and Constraint 
 Programming solvers. Its support for rapid prototyping and high extensibility are designed 
 to meet the needs of both researchers and practitioners in Operations Research and related fields.
-
-[![GitHub last commit](https://img.shields.io/github/last-commit/phguo/benderslib)](https://github.com/phguo/BendersLib)
-[![codecov](https://codecov.io/gh/phguo/BendersLib/branch/develop/graph/badge.svg)](https://codecov.io/gh/phguo/BendersLib)
-[![PyPI version](https://img.shields.io/pypi/v/benderslib.svg)](https://pypi.org/project/benderslib/)
-[![Documentation Status](https://readthedocs.org/projects/benderslib/badge/?version=latest)](https://benders.dev)
-![PyPI - Python Version](https://img.shields.io/pypi/pyversions/benderslib)
 
 ## Quick Start
 

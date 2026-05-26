@@ -33,6 +33,7 @@ Contributors
 BendersLib was created by **Peng-Hui Guo** ("郭鹏辉" in Chinese, https://guo.ph),
 who holds a PhD in Management Science and Engineering
 from Nanjing University of Aeronautics and Astronautics (NUAA), China.
+
 Before developing BendersLib, Peng-Hui Guo had published research papers
 on Benders decomposition in journals such as *Naval Research Logistics*,
 *IISE Transactions*, and *European Journal of Operational Research*. His PhD thesis, titled
@@ -86,11 +87,11 @@ Logo
 .. rubric:: Logo (horizontal)
 
 .. image:: _static/benderslib.png
-   :align: left
+   :align: center
 
 .. rubric:: Logo (vertical)
 
 .. image:: _static/benderslib_v.png
-   :align: left
+   :align: center
    :height: 350px
    :width: 350px
