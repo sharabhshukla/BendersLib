@@ -25,7 +25,10 @@ from benderslib import LShaped, CallbackBase, BendersContext, CST
 from benderslib.solvers import Copt
 from benderslib import LShapedOCGen
 
-from coptpy import LinExpr
+try:
+    from coptpy import LinExpr
+except ImportError:
+    print("COPT Python API is not installed.")
 
 try:
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))

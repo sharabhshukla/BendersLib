@@ -10,8 +10,12 @@ This file contains utility functions for :doc:`../benchmarks/index`.
 """
 
 import json
-import coptpy as cp
-from coptpy import COPT, LinExpr
+
+try:
+    import coptpy as cp
+    from coptpy import COPT, LinExpr
+except ImportError:
+    print("COPT Python API is not installed.")
 
 
 def _new_copt_model(name=None):

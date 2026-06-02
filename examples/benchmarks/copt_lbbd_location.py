@@ -32,7 +32,10 @@ from _utils import draw, collect_data, limit_memory, bark
 from _copt_utils import save_copt_result, _new_copt_model
 from lbbd_location import feasibility_cut_generator, generate_instance_data, SubProblemSolver
 
-from coptpy import COPT, LinExpr
+try:
+    from coptpy import COPT, LinExpr
+except ImportError:
+    print("COPT Python API is not installed.")
 
 
 def quicksum(terms):
