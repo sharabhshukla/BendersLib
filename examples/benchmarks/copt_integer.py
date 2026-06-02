@@ -3,8 +3,13 @@
 # Copyright (c) 2021-2026 Peng-Hui Guo <m@guo.ph>
 
 """
-Integer Recourse (Gurobi)
+Integer Recourse (COPT)
 =======================================================
+
+.. seealso::
+
+    See :doc:`integer` for the problem description, dataset, and algorithm details.
+    This file is the COPT equivalent of that example, which uses Gurobi.
 """
 
 # %%
@@ -16,34 +21,28 @@ import sys
 import time
 
 from benderslib import CallbackBase, BendersContext, CST, IntegerLShaped, LShapedOCGen, SubProblems
-from benderslib.solvers import Gurobi
+from benderslib.solvers import Copt
 
-from gurobipy import LinExpr
+from coptpy import LinExpr
 
 try:
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 except NameError:
     sys.path.insert(0, os.path.abspath("."))
 
-from _utils import SMPSReader, first_stage_model, second_stage_model, deterministic_equivalent_model, collect_data, \
-    draw, limit_memory
+from _utils import SMPSReader, draw, collect_data, limit_memory, bark
+from _copt_utils import first_stage_model, second_stage_model, deterministic_equivalent_model, save_copt_result
+
+
+def _cut_expr(model, cut):
+    expr = LinExpr()
+    for var_name, coef in zip(cut.vars, cut.coefs):
+        expr.addTerm(model.getVarByName(var_name), coef)
+    return expr
 
 
 # %%
 # Define a callback for the in-out stabilization.
-#
-# .. seealso::
-#
-#     - Fischetti, M., Ljubić, I., & Sinnl, M. (2016). Benders decomposition without separability:
-#       A computational study for capacitated facility location problems. European Journal of
-#       Operational Research, 253(3), 557–569. https://doi.org/10.1016/j.ejor.2016.03.002
-#     - Fischetti, M., Ljubić, I., & Sinnl, M. (2017). Redesigning benders decomposition for
-#       large-scale facility location. Management Science, 63(7),
-#       2146–2162. https://doi.org/10.1287/mnsc.2016.2461
-#
-# .. warning::
-#
-#    This callback is only compatible with single-cut Benders methods.
 
 class InOut(CallbackBase):
 
@@ -69,15 +68,20 @@ class InOut(CallbackBase):
         # Initialize required attributes for the callback.
 
         if self.sub_linear is None:
-            sub_models = [p.model.relax() for p in context.sub_problem]
-            self.sub_linear = SubProblems([Gurobi(s) for s in sub_models])
+            sub_models = []
+            for p in context.sub_problem:
+                m = p.model.clone()
+                m.setVarType(m.getVars(), 'C')
+                sub_models.append(m)
+
+            self.sub_linear = SubProblems([Copt(s) for s in sub_models])
             self.sub_linear.complicating_vars = context.master_problem.complicating_vars
 
             # Set theta_lb based on linear relaxation of the subproblems
             theta_lb = 0
-            for sub in self.sub_linear:
-                sub.model.optimize()
-                theta_lb += sub.model.ObjVal
+            for sub in context.sub_problem:
+                sub.model.solve()
+                theta_lb += sub.model.objval
 
             theta_lb = theta_lb / len(sub_models)
             # Add a small margin to avoid numerical issues
@@ -85,18 +89,19 @@ class InOut(CallbackBase):
             context.benders.params.theta_lb = theta_lb
             est = context.master_problem.estimators[0]
             var = context.master_problem.model.getVarByName(est)
-            var.setAttr("LB", theta_lb)
+            var.lb = theta_lb
             print(f"InOut callback: set <params.theta_lb> to < {theta_lb:.2f} >.")
 
         if self.master_linear is None:
             if self.integer:
-                self.master_linear = context.master_problem.model.copy()
+                self.master_linear = context.master_problem.model.clone()
             else:
-                self.master_linear = context.master_problem.model.relax()
+                self.master_linear = context.master_problem.model.clone()
+                self.master_linear.setVarType(self.master_linear.getVars(), 'C')
 
         if self.core is None:
-            self.master_linear.optimize()
-            self.core = {v: self.master_linear.getVarByName(v).X for v in context.master_problem.complicating_vars}
+            self.master_linear.solve()
+            self.core = {v: self.master_linear.getVarByName(v).x for v in context.master_problem.complicating_vars}
 
         if self.cut_generator is None:
             self.cut_generator = LShapedOCGen(context.master_problem, self.sub_linear, context.benders.params)
@@ -104,15 +109,13 @@ class InOut(CallbackBase):
         self._add_stabilization_cuts(context, m=self.m)
 
     def on_opti_cut_generated(self, context: BendersContext):
-        if context.benders.result.gap < 0.005:
-            return
-
         t_ = time.perf_counter()
 
         self.sub_linear.fix_vars(context.current_comp_vals)
         self.sub_linear.prl_solve()
         cut = self.cut_generator.generate()[0]
-        context.current_opti_cuts.append(cut)
+        if not cut in context.master_problem.optimality_cuts:
+            context.current_opti_cuts.append(cut)
 
         self.classical_cut_time += time.perf_counter() - t_
 
@@ -138,18 +141,22 @@ class InOut(CallbackBase):
             # Update points
             point = dict()
             for var_name in self.core:
-                x = self.master_linear.getVarByName(var_name).X
+                x = self.master_linear.getVarByName(var_name).x
                 self.core[var_name] = self.alpha * x + (1 - self.alpha) * self.core[var_name]
                 point[var_name] = lambda_ * x + (1 - lambda_) * self.core[var_name] + delta_
 
             # Generate cuts
+            # The complicating variables are binary, i.e, x \in [0, 1] and integer.
+            # COPT will raise an error if attempting to fix x \in [0, 1] to a value
+            # greater than 1 (like 1.00001), so we must cap the point values at 1.
+            point = {var_name: min(round(val, 1), 1) for var_name, val in point.items()}
+
             self.sub_linear.fix_vars(point)
             self.sub_linear.prl_solve()
             cut = self.cut_generator.generate()[0]
 
             # Add cuts
-            vars = [self.master_linear.getVarByName(var_name) for var_name in cut.vars]
-            expr = LinExpr(cut.coefs, vars)
+            expr = _cut_expr(self.master_linear, cut)
             # LShapedOCGen returns only >= cuts.
             assert cut.sense == CST.GE
             cons = self.master_linear.addConstr(expr >= cut.rhs)
@@ -157,9 +164,9 @@ class InOut(CallbackBase):
             cuts.append(cut)
 
             # Check lower bound improvement
-            self.master_linear.optimize()
-            if self.master_linear.ObjVal > current_obj + 1e-6:
-                current_obj = self.master_linear.ObjVal
+            self.master_linear.solve()
+            if self.master_linear.objval > current_obj + 1e-6:
+                current_obj = self.master_linear.objval
                 self.lb_not_improved_iter_num = 0
             else:
                 self.lb_not_improved_iter_num += 1
@@ -167,7 +174,7 @@ class InOut(CallbackBase):
         # Add cut without positive slack to the master problem
         cut_added_num = 0
         for cons, cut in zip(constrs, cuts):
-            if cons.Slack <= 0 and not cut in context.master_problem.optimality_cuts:
+            if cons.Slack <= float('inf') and not cut in context.master_problem.optimality_cuts:
                 context.master_problem.add_cut(cut)
                 cut_added_num += 1
             else:
@@ -179,12 +186,22 @@ class InOut(CallbackBase):
 
 # %%
 # Solve the instances using different methods and save the results.
+#
+# .. note::
+#
+#     There are several implementation differences to :doc:`integer` for better performance:
+#
+#     - The estimator's lower bound is computed using the subproblem, rather than its linear relaxation.
+#     - Classical cuts are added even when the gap is less than 0.005 in the callback.
+#     - Values of complicating variables are processed by ``min(round(val, 1), 1)`` in the callback.
+#     - Do not require the constraint slack to be negative to add the cut.
+#     - The branch-and-check option is turned off for instances *sslp*.
 
 @limit_memory(limit_gb=14.5)
 def solve(smps_files, instance_name, time_limit, solve_methods):
     SMPS = SMPSReader(*smps_files)
     SMPS.parse()
-    ins_file = f"./_ins/{instance_name}.json"
+    ins_file = f"./_copt_ins/{instance_name}.json"
     SMPS.to_json(ins_file)
     with open(ins_file, 'r') as f:
         data = json.load(f)
@@ -193,15 +210,9 @@ def solve(smps_files, instance_name, time_limit, solve_methods):
     if "de" in solve_methods:
         model = deterministic_equivalent_model(data)
         model.setParam('TimeLimit', time_limit)
-        model.optimize()
-        model.write(f"./_sol/{instance_name}_de.json")
-
-        # model.write("_temp.mps")
-        # from pyscipopt import Model
-        # scip = Model()
-        # scip.readProblem(filename="_temp.mps")
-        # scip.optimize()
-        # scip.writeStatisticsJson(f"./_sol/{instance_name}_de.json")
+        model.solve()
+        save_copt_result(model, f"./_copt_sol/{instance_name}_de.json")
+        bark(f"{instance_name}", f"Solved using 'de' and COPT.")
 
     # Solve using Benders decomposition
     if "bd" in solve_methods:
@@ -209,9 +220,9 @@ def solve(smps_files, instance_name, time_limit, solve_methods):
         sub_models, probs = second_stage_model(data)
         BD = IntegerLShaped.from_models(
             master_model=master_model,
-            master_solver=Gurobi,
+            master_solver=Copt,
             sub_model=sub_models,
-            sub_solver=Gurobi,
+            sub_solver=Copt,
             complicating_vars=complicating_vars,
             prob=probs,
         )
@@ -224,35 +235,19 @@ def solve(smps_files, instance_name, time_limit, solve_methods):
             BD.register(InOut(lambda_=0.2, alpha=0.3, delta=0.2, n=5, m=100, integer=True))
 
         if "smkp" in instance_name:
+            BD.params.use_bnc = True
             BD.register(InOut(lambda_=0.2, alpha=0.3, delta=0.2, n=5, m=100))
 
         BD.params.parallel_sub = True
-        BD.params.use_bnc = True
+        # BD.params.use_bnc = True
         BD.params.time_limit = time_limit
         BD.solve()
-        BD.save(f"./_sol/{instance_name}_bd.json")
+        BD.save(f"./_copt_sol/{instance_name}_bd.json")
+        bark(f"{instance_name}", f"Solved using 'bd' and COPT.")
 
 
 # %%
 # .. rubric:: Set 2 Instances
-#
-# - *SSLP*, *SMKP*: https://www2.isye.gatech.edu/~sahmed/siplib/
-#
-# We selected these instances based on these criteria:
-#
-# - They are two-stage stochastic programming instances.
-# - They have binary complicating variables and (mixed) integer recourse, such that combinatorial cuts can be used.
-#
-# Other stochastic programming instance collections:
-#
-# - SPS Resources: https://www.stoprog.org/resources
-# - splib: https://github.com/vitaut-archive/splib
-# - SIPLIB: https://www2.isye.gatech.edu/~sahmed/siplib/ (the source of the instances used in this example)
-# - POSTS: https://users.iems.northwestern.edu/~jrbirge/html/dholmes/post.html
-# - List of Optimization Problem Libraries: https://github.com/ekhoda/optimization_problem_libraries
-# - MSPLib-Library: https://github.com/bonnkleiford/MSPLib-Library
-# - RANDOMRHS 2013: https://users.wpi.edu/~atrapp/randomrhs_2013.htm
-
 
 def run(solve_methods=None, draw_result=False, dry_run=True):
     if solve_methods is None:
@@ -309,8 +304,8 @@ def run(solve_methods=None, draw_result=False, dry_run=True):
 
     for ins_name, smps_files_ in smps_files.items():
         ins_name = ins_name
-        de_file = f"./_sol/{ins_name}_de.json"
-        bd_file = f"./_sol/{ins_name}_bd.json"
+        de_file = f"./_copt_sol/{ins_name}_de.json"
+        bd_file = f"./_copt_sol/{ins_name}_bd.json"
 
         ins_names.append(ins_name)
         de_files.append(de_file)
@@ -337,7 +332,7 @@ def run(solve_methods=None, draw_result=False, dry_run=True):
 
 if __name__ == "__main__":
     ...
-    # run(draw_result=True)
+    # run(solve_methods=['bd'], draw_result=False, dry_run=False)
 
 # %%
 #
@@ -345,5 +340,6 @@ if __name__ == "__main__":
 #
 #     * Tutorial of the Logic-based Benders Decomposition: :doc:`../../tutorials/ilshaped`
 #     * This example uses the following class: :class:`~benderslib.IntegerLShaped`
+#     * Same instances using Gurobi as backend: :doc:`integer`
 #
-# .. tags:: benders: integer l-shaped, solver: gurobi, stochastic, branch-and-check, callback, enhancement
+# .. tags:: benders: integer l-shaped, solver: copt, stochastic, branch-and-check, callback, enhancement

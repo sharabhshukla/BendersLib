@@ -3,8 +3,13 @@
 # Copyright (c) 2021-2026 Peng-Hui Guo <m@guo.ph>
 
 """
-Linear Recourse (Gurobi)
+Linear Recourse (COPT)
 =======================================================
+
+.. seealso::
+
+    See :doc:`linear` for the problem description, dataset, and algorithm details.
+    This file is the COPT equivalent of that example, which uses Gurobi.
 """
 
 # %%
@@ -17,35 +22,29 @@ import time
 from itertools import product
 
 from benderslib import LShaped, CallbackBase, BendersContext, CST
-from benderslib.solvers import Gurobi
+from benderslib.solvers import Copt
 from benderslib import LShapedOCGen
 
-from gurobipy import LinExpr
+from coptpy import LinExpr
 
 try:
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 except NameError:
     sys.path.insert(0, os.path.abspath("."))
 
-from _utils import SMPSReader, first_stage_model, second_stage_model, deterministic_equivalent_model, draw, \
-    collect_data, limit_memory
+from _utils import SMPSReader, draw, collect_data, limit_memory, bark
+from _copt_utils import first_stage_model, second_stage_model, deterministic_equivalent_model, save_copt_result
+
+
+def _cut_expr(model, cut):
+    expr = LinExpr()
+    for var_name, coef in zip(cut.vars, cut.coefs):
+        expr.addTerm(model.getVarByName(var_name), coef)
+    return expr
 
 
 # %%
 # Define a callback for the in-out stabilization.
-#
-# .. seealso::
-#
-#     - Fischetti, M., Ljubić, I., & Sinnl, M. (2016). Benders decomposition without separability:
-#       A computational study for capacitated facility location problems. European Journal of
-#       Operational Research, 253(3), 557–569. https://doi.org/10.1016/j.ejor.2016.03.002
-#     - Fischetti, M., Ljubić, I., & Sinnl, M. (2017). Redesigning benders decomposition for
-#       large-scale facility location. Management Science, 63(7),
-#       2146–2162. https://doi.org/10.1287/mnsc.2016.2461
-#
-# .. warning::
-#
-#    This callback is only compatible with single-cut Benders methods.
 
 
 class InOut(CallbackBase):
@@ -64,12 +63,13 @@ class InOut(CallbackBase):
         time_start = time.perf_counter()
         if self.master_linear is None:
             # Initialize the linear relaxation of the master problem.
-            self.master_linear = context.master_problem.model.relax()
+            self.master_linear = context.master_problem.model.clone()
+            self.master_linear.setVarType(self.master_linear.getVars(), 'C')
 
         if self.core is None:
             # Initialize the core point
-            self.master_linear.optimize()
-            self.core = {v: self.master_linear.getVarByName(v).X for v in context.master_problem.complicating_vars}
+            self.master_linear.solve()
+            self.core = {v: self.master_linear.getVarByName(v).x for v in context.master_problem.complicating_vars}
 
         if self.cut_generator is None:
             # Initialize the cut generator.
@@ -90,7 +90,7 @@ class InOut(CallbackBase):
             # Update points
             point = dict()
             for var_name in self.core:
-                x = self.master_linear.getVarByName(var_name).X
+                x = self.master_linear.getVarByName(var_name).x
                 self.core[var_name] = self.alpha * x + (1 - self.alpha) * self.core[var_name]
                 point[var_name] = lambda_ * x + (1 - lambda_) * self.core[var_name]
 
@@ -100,21 +100,17 @@ class InOut(CallbackBase):
             cut = self.cut_generator.generate()[0]
 
             # Add cuts
-            expr = LinExpr(cut.coefs, [self.master_linear.getVarByName(var_name) for var_name in cut.vars])
-            if cut.sense == CST.LE:
-                cons = self.master_linear.addConstr(expr <= cut.rhs)
-            elif cut.sense == CST.GE:
-                cons = self.master_linear.addConstr(expr >= cut.rhs)
-            else:
-                assert cut.sense == CST.EQ
-                cons = self.master_linear.addConstr(expr == cut.rhs)
+            expr = _cut_expr(self.master_linear, cut)
+            # LShapedOCGen returns only >= cuts.
+            assert cut.sense == CST.GE
+            cons = self.master_linear.addConstr(expr >= cut.rhs)
             constrs.append(cons)
             cuts.append(cut)
 
             # Check lower bound improvement
-            self.master_linear.optimize()
-            if self.master_linear.ObjVal > current_obj + 1e-4:
-                current_obj = self.master_linear.ObjVal
+            self.master_linear.solve()
+            if self.master_linear.objval > current_obj + 1e-4:
+                current_obj = self.master_linear.objval
                 self.lb_not_improved_iter_num = 0
             else:
                 self.lb_not_improved_iter_num += 1
@@ -122,7 +118,7 @@ class InOut(CallbackBase):
         # Detect constraint with positive slack
         cut_added_num = 0
         for cons, cut in zip(constrs, cuts):
-            if cons.Slack < 0:
+            if cons.Slack < float('inf') and not cut in context.master_problem.optimality_cuts:
                 context.master_problem.add_cut(cut)
                 cut_added_num += 1
 
@@ -133,12 +129,19 @@ class InOut(CallbackBase):
 
 # %%
 # Solve the instances using different methods and save the results.
+#
+# .. note::
+#
+#     There are several implementation differences to :doc:`linear` for better performance:
+#
+#     - The branch-and-check option is turned off.
+#     - Do not require the constraint slack to be negative to add the cut.
 
 @limit_memory(limit_gb=14.5)
 def solve(smps_files, instance_name, sample_num, time_limit, solve_methods, seed=1024):
     SMPS = SMPSReader(*smps_files, sample_num=sample_num, seed=seed)
     SMPS.parse()
-    ins_file = f"./_ins/{instance_name}_{sample_num}.json"
+    ins_file = f"./_copt_ins/{instance_name}_{sample_num}.json"
     SMPS.to_json(ins_file)
     with open(ins_file, 'r') as f:
         data = json.load(f)
@@ -147,15 +150,9 @@ def solve(smps_files, instance_name, sample_num, time_limit, solve_methods, seed
     if "de" in solve_methods:
         model = deterministic_equivalent_model(data, enforce_integer=True)
         model.setParam('TimeLimit', time_limit)
-        model.optimize()
-        model.write(f"./_sol/{instance_name}_de_{sample_num}.json")
-
-        # model.write("_temp.mps")
-        # from pyscipopt import Model
-        # scip = Model()
-        # scip.readProblem(filename="_temp.mps")
-        # scip.optimize()
-        # scip.writeStatisticsJson(f"./_sol/{instance_name}_de_{sample_num}.json")
+        model.solve()
+        save_copt_result(model, f"./_copt_sol/{instance_name}_de_{sample_num}.json")
+        bark(f"{instance_name}_{sample_num}", f"Solved using 'de' and COPT.")
 
     # Solve using Benders decomposition
     if "bd" in solve_methods:
@@ -163,42 +160,24 @@ def solve(smps_files, instance_name, sample_num, time_limit, solve_methods, seed
         sub_models, probs = second_stage_model(data)
         BD = LShaped.from_models(
             master_model=master_model,
-            master_solver=Gurobi,
+            master_solver=Copt,
             sub_model=sub_models,
-            sub_solver=Gurobi,
+            sub_solver=Copt,
             complicating_vars=complicating_vars,
             prob=probs,
         )
         BD.register(InOut(lambda_=0.2, alpha=0.3, n=5, m=30))
         BD.params.parallel_sub = True
-        BD.params.use_bnc = True
+        # BD.params.use_bnc = True
         BD.params.time_limit = time_limit
         BD.params.theta_lb = 0
         BD.solve()
-        BD.save(f"./_sol/{instance_name}_bd_{sample_num}.json")
+        BD.save(f"./_copt_sol/{instance_name}_bd_{sample_num}.json")
+        bark(f"{instance_name}_{sample_num}", f"Solved using 'bd' and COPT.")
 
 
 # %%
 # .. rubric:: Set 1 Instances
-#
-# - *cargo*, *phone*: https://www4.uwsp.edu/math/afelt/slptestset/download.html
-# - *lands*, *storm*, *gbd*: https://pages.cs.wisc.edu/~swright/stochastic/sampling/
-#
-# We selected these instances based on these criteria:
-#
-# - They are two-stage stochastic programming instances.
-# - They have pure continuous and linear recourse, such that duality based cuts can be used.
-# - Their SMPS ``.sto`` files are defined in the ``INDEP`` mode, allowing resampling scenarios.
-#
-# Other stochastic programming instance collections:
-#
-# - SPS Resources: https://www.stoprog.org/resources
-# - splib: https://github.com/vitaut-archive/splib
-# - SIPLIB: https://www2.isye.gatech.edu/~sahmed/siplib/
-# - POSTS: https://users.iems.northwestern.edu/~jrbirge/html/dholmes/post.html
-# - List of Optimization Problem Libraries: https://github.com/ekhoda/optimization_problem_libraries
-# - MSPLib-Library: https://github.com/bonnkleiford/MSPLib-Library
-# - RANDOMRHS 2013: https://users.wpi.edu/~atrapp/randomrhs_2013.htm
 
 def run(solve_methods=None, draw_result=False, dry_run=True):
     if solve_methods is None:
@@ -214,9 +193,9 @@ def run(solve_methods=None, draw_result=False, dry_run=True):
 
         # Source: https://pages.cs.wisc.edu/~swright/stochastic/sampling/
 
-        "storm": (_dir + "/storm/storm.cor", _dir + "/storm/storm.tim", _dir + "/storm/storm.sto"),
         "lands": (_dir + "/lands/lands.cor", _dir + "/lands/lands.tim", _dir + "/lands/lands.sto"),
         "gbd": (_dir + "/gbd/gbd.cor", _dir + "/gbd/gbd.tim", _dir + "/gbd/gbd.sto"),
+        "storm": (_dir + "/storm/storm.cor", _dir + "/storm/storm.tim", _dir + "/storm/storm.sto"),
 
         # Note: *cargo* and *storm* were originated from the same problem, but the data is different.
     }
@@ -237,8 +216,8 @@ def run(solve_methods=None, draw_result=False, dry_run=True):
 
     for (ins_class, smps_files), sample_num in product(smps_files.items(), sample_nums):
         ins_name = f"{ins_class}"
-        de_file = f"./_sol/{ins_name}_de_{sample_num}.json"
-        bd_file = f"./_sol/{ins_name}_bd_{sample_num}.json"
+        de_file = f"./_copt_sol/{ins_name}_de_{sample_num}.json"
+        bd_file = f"./_copt_sol/{ins_name}_bd_{sample_num}.json"
 
         ins_names.append(ins_name)
         de_files.append(de_file)
@@ -265,7 +244,7 @@ def run(solve_methods=None, draw_result=False, dry_run=True):
 
 if __name__ == "__main__":
     ...
-    # run(solve_methods=[], draw_result=True)
+    # run(solve_methods=['bd'], draw_result=False, dry_run=False)
 
 # %%
 #
@@ -273,5 +252,6 @@ if __name__ == "__main__":
 #
 #     * Tutorial of the Logic-based Benders Decomposition: :doc:`../../tutorials/lshaped`
 #     * This example uses the following class: :class:`~benderslib.LShaped`
+#     * Same instances using Gurobi as backend: :doc:`linear`
 #
-# .. tags:: benders: l-shaped, solver: gurobi, stochastic, branch-and-check, callback, enhancement
+# .. tags:: benders: l-shaped, solver: copt, stochastic, branch-and-check, callback, enhancement

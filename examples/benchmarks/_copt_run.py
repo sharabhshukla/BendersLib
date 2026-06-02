@@ -17,9 +17,9 @@ try:
 except NameError:
     sys.path.insert(0, os.path.abspath("."))
 
-from linear import run as run1
-from integer import run as run2
-from lbbd_location import run as run3
+from copt_linear import run as run1
+from copt_integer import run as run2
+from copt_lbbd_location import run as run3
 from _utils import draw
 
 # %%
@@ -47,5 +47,5 @@ from _utils import draw
 # draw(
 #     [res1, res2, res3],
 #     ['Linear Subproblems', 'Integer Subproblems', 'Custom Solver and Cut'],
-#     figure_name="gurobi"
+#     figure_name="copt"
 # )
