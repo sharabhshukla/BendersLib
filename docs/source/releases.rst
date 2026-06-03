@@ -15,9 +15,13 @@ Release Notes
 Version 0.6.0 (Beta) - Forthcoming
 ------------------------------------
 
-.. rubric:: Changed
+**Added**
 
-*   Remove ``PyYAML>=6.0.0`` dependency by replacing ``config.yaml`` with ``config.py`` (`#9 <https://github.com/phguo/BendersLib/pull/9>`_).
+-   Add COPT benchmarks (`#15 <https://github.com/phguo/BendersLib/pull/15>`_).
+
+**Changed**
+
+-   Remove ``PyYAML>=6.0.0`` dependency by replacing ``config.yaml`` with ``config.py`` (`#9 <https://github.com/phguo/BendersLib/pull/9>`_).
 
 Version 0.5.1 (Beta) - 2026-04-29
 -------------------------------------
