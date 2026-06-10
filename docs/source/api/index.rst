@@ -30,7 +30,7 @@ The inheritance relationships are also shown in their respective sections.
     BendersContext -- "uses" --> MasterProblem
     BendersContext -- "uses" --> SubProblem
 
-In the above diagram, the classes are categorized into fiv groups based on their roles in
+In the above diagram, the classes are categorized into five groups based on their roles in
 the Benders decomposition process.
 
 - **Master Problem**:
