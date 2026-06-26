@@ -9,10 +9,12 @@ Home
 **BendersLib** (https://benders.dev) is a Python library that supports a range of Benders decomposition variants,
 including :doc:`tutorials/classical`, :doc:`tutorials/cbd`, :doc:`tutorials/lshaped`, :doc:`tutorials/ilshaped`,
 :doc:`tutorials/gbd`, and :doc:`tutorials/lbbd`.
+
 While BendersLib provides :doc:`built-in implementations of these methods <api/benders>`,
 it is designed to be extensible. Users can implement custom Benders decomposition methods by
 customizing :ref:`subproblem solvers <manual_custom_sub>` and :ref:`cut generators <manual_custom_cut>`,
 and defining :doc:`callback functions <manual/callbacks>` for :doc:`enhancement strategies <tutorials/enhance>`.
+
 BendersLib is solver agnostic and has :doc:`built-in interfaces <manual/solvers>` for
 popular Mathematical Programming and Constraint Programming solvers.
 Its support for rapid prototyping and high extensibility are designed to meet the needs of
@@ -72,7 +74,7 @@ supported are not limited to the ones below.
      - :class:`~benderslib.LogicBasedSubProblem`
      - :doc:`Example <_tags/custom-subproblem>`
    * - :doc:`Callback Functions </manual/callbacks>`
-     - :class:`~benderslib.CallbackBase`
+     - :class:`~benderslib.CallbackBase`, :class:`~benderslib.BendersContext`
      - :doc:`Example <_tags/callback>`
    * - **Enhancement Options**
      -
@@ -226,4 +228,3 @@ Contents
    BendersLib@GitHub <https://github.com/phguo/BendersLib>
    BendersLib@PyPI <https://pypi.org/project/BendersLib/>
    Getting Help <https://github.com/phguo/BendersLib/issues?q=is%3Aissue>
-   Author <https://guo.ph>
