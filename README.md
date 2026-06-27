@@ -33,6 +33,12 @@ agnostic and has built-in interfaces for popular Mathematical Programming and Co
 Programming solvers. Its support for rapid prototyping and high extensibility are designed 
 to meet the needs of both researchers and practitioners in Operations Research and related fields.
 
+See the [documentation](https://benders.dev) for
+[tutorials](https://benders.dev/tutorials), 
+[manual](https://benders.dev/manual), 
+[API reference](https://benders.dev/api), 
+and [examples](https://benders.dev/examples).
+
 ## Quick Start
 
 Install BendersLib and a solver of your choice (e.g., Gurobi) using pip.
