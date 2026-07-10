@@ -4,6 +4,7 @@
 
 [![GitHub Commits](https://img.shields.io/github/last-commit/phguo/benderslib?style=flat-square&logo=github)](https://github.com/phguo/BendersLib)
 [![Codecov](https://img.shields.io/codecov/c/github/phguo/benderslib?style=flat-square&logo=codecov)](https://codecov.io/gh/phguo/BendersLib)
+[![Pepy Downloads](https://img.shields.io/pepy/dt/benderslib?style=flat-square)](https://pepy.tech/projects/benderslib)
 [![PyPI](https://img.shields.io/pypi/v/benderslib.svg?style=flat-square&logo=pypi)](https://pypi.org/project/benderslib/)
 [![Python Versions](https://img.shields.io/python/required-version-toml?tomlFilePath=https%3A%2F%2Fraw.githubusercontent.com%2Fphguo%2FBendersLib%2Frefs%2Fheads%2Fdevelop%2Fpyproject.toml&style=flat-square&logo=python)](https://www.python.org/downloads/)
 [![Read the Docs](https://img.shields.io/readthedocs/benderslib?style=flat-square&logo=readthedocs)](https://benders.dev)
