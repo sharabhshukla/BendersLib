@@ -38,6 +38,26 @@ class AnnotatedBenders(BendersSolver):
         The master variables are used to define the master problem and subproblem from the original problem.
         It is usually a superset of ``complicating_vars``.
         If not provided, it defaults to ``complicating_vars``.
+    sub_solver: Type[SolverBase], optional
+        A *different* solver class to be used for the **subproblem** only, e.g.,
+        :class:`~.solvers.Jaxipm` when ``solver`` is :class:`~.solvers.Gurobi`.
+
+        This lets you model the *overall* problem (and its master problem) in whichever
+        general-purpose tool you already use -- :class:`~.solvers.Gurobi`, :class:`~.solvers.Copt`,
+        :class:`~.solvers.Scip`, or :class:`~.solvers.Pyomo` -- while indicating that the
+        subproblem specifically should be solved by a different backend. The subproblem model
+        is converted from ``solver``'s format via the cross-backend model exchange
+        (:meth:`~benderslib.solvers.SolverBase.to_structured` /
+        :meth:`~benderslib.solvers.SolverBase.from_structured`). If not provided (default),
+        the subproblem uses ``solver`` as well.
+
+        .. note::
+            ``solver`` must implement :meth:`~benderslib.solvers.SolverBase.to_structured`,
+            and ``sub_solver`` must implement :meth:`~benderslib.solvers.SolverBase.from_structured`.
+    master_solver: Type[SolverBase], optional
+        The symmetric counterpart of ``sub_solver``: a *different* solver class to be used for
+        the **master problem** only. Rarely needed, but available for completeness (e.g. to pair
+        a MIP master modeled in one backend with a master solved by another).
     benders: Type[BendersSolver], optional
         The Benders decomposition method to be applied, e.g., :class:`ClassicalBenders`.
         If not provided, the class :class:`BendersSolver` will be used with the optimality
@@ -79,6 +99,23 @@ class AnnotatedBenders(BendersSolver):
             complicating_vars=complicating_vars,
             master_vars=master_vars
         )
+
+    Example: hybrid solving (Gurobi master + Jaxipm GPU subproblem)
+    -------
+    .. code-block:: python
+
+        from benderslib import AnnotatedBenders, ClassicalBenders
+        from benderslib.solvers import Gurobi, Jaxipm
+
+        # Model the overall problem (and its master) in Gurobi as usual; indicate that the
+        # subproblem specifically should be solved by Jaxipm on the GPU.
+        BD = AnnotatedBenders(
+            original_problem,
+            solver=Gurobi,          # overall problem / master problem: Gurobi
+            sub_solver=Jaxipm,      # subproblem: jaxipm (GPU interior-point)
+            benders=ClassicalBenders,
+            complicating_vars=["x"],
+        )
     """
 
     def __new__(
@@ -87,13 +124,17 @@ class AnnotatedBenders(BendersSolver):
             solver: Type[SolverBase],
             complicating_vars: list[str],
             master_vars: list[str] = None,
+            sub_solver: Type[SolverBase] = None,
+            master_solver: Type[SolverBase] = None,
             benders: Type[BendersSolver] = None,
             optimality_cut=None,
             feasibility_cut=None,
             params: BendersParams | None = None,
     ):
         master_vars = master_vars if master_vars is not None else complicating_vars
-        master_problem, sub_problem = cls.decompose(original_problem, solver, master_vars)
+        master_problem, sub_problem = cls.decompose(
+            original_problem, solver, master_vars, sub_solver=sub_solver, master_solver=master_solver
+        )
 
         benders_kwargs = {
             "master_problem": master_problem,
@@ -125,7 +166,9 @@ class AnnotatedBenders(BendersSolver):
             original_problem,
             solver: Type[SolverBase],
             master_vars: list[str],
-            solver_model=False
+            solver_model=False,
+            sub_solver: Type[SolverBase] = None,
+            master_solver: Type[SolverBase] = None,
     ) -> tuple:
         """Decomposes the original problem into a master problem and a subproblem.
 
@@ -152,6 +195,12 @@ class AnnotatedBenders(BendersSolver):
         solver_model: bool, optional
             If ``True``, return the master and subproblem in the solver-specific format;
             If ``False``, return instances of :class:`MasterProblem` and :class:`SubProblem`.
+        sub_solver: Type[SolverBase], optional
+            A different solver class to be used for the subproblem only (see :class:`AnnotatedBenders`).
+            The subproblem model is converted from ``solver``'s format via the cross-backend
+            model exchange.
+        master_solver: Type[SolverBase], optional
+            A different solver class to be used for the master problem only (see :class:`AnnotatedBenders`).
 
         Returns
         -------
@@ -178,7 +227,19 @@ class AnnotatedBenders(BendersSolver):
         master = solver.make_master_problem(original_problem, master_vars)
         sub = solver.make_sub_problem(original_problem, master_vars)
 
+        master_wrapper_cls = solver
+        if master_solver is not None and master_solver is not solver:
+            # Cross-backend model exchange: rebuild the master in master_solver's format.
+            master = master_solver.from_structured(solver(master).to_structured())
+            master_wrapper_cls = master_solver
+
+        sub_wrapper_cls = solver
+        if sub_solver is not None and sub_solver is not solver:
+            # Cross-backend model exchange: rebuild the subproblem in sub_solver's format.
+            sub = sub_solver.from_structured(solver(sub).to_structured())
+            sub_wrapper_cls = sub_solver
+
         if solver_model:
             return master, sub
         else:
-            return MasterProblem(solver(master)), SubProblem(solver(sub))
+            return MasterProblem(master_wrapper_cls(master)), SubProblem(sub_wrapper_cls(sub))

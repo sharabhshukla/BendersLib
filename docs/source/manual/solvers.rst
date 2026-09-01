@@ -90,6 +90,14 @@ A Benders decomposition variant usually require one or two features to work prop
       - ✅
       - ✅
       - Commercial
+    * - **jaxipm** [5]_
+      - :class:`~.solvers.Jaxipm`
+      - `Doc <https://github.com/johnviljoen/jaxipm>`__
+      - ✅
+      - ✅ [6]_
+      - ❌
+      - ❌
+      - Open-source
     * - **OR-Tools** [1]_
       - :class:`~.solvers.Ortools`
       - `Doc <https://developers.google.com/optimization/cp>`__
@@ -214,6 +222,11 @@ A Benders decomposition variant usually require one or two features to work prop
        `installation instruction <https://pyomo.readthedocs.io/en/stable/getting_started/solvers.html>`_ *(by Pyomo),*
        *and* `supported solvers <https://github.com/Pyomo/pyomo/tree/main/pyomo/solvers/plugins/solvers>`_.
 .. [4] *Using* `Minimal Intractable System (MIS) Finder <https://pyomo.readthedocs.io/en/stable/api/pyomo.contrib.iis.mis.html>`_.
+.. [5] *A GPU-batched interior-point (NLP) solver, only usable for continuous "nice LP" subproblems*
+       *(never as a master problem backend). Requires an NVIDIA GPU (Turing/compute capability 7.5+),*
+       *CUDA 13, and Python 3.12+, on Linux x86-64. See* :class:`~.solvers.Jaxipm`.
+.. [6] *jaxipm does not expose a Farkas certificate directly; it is derived from an auxiliary*
+       *elastic phase-1 LP, see* :meth:`~.solvers.Jaxipm.get_extreme_ray`.
 
 .. Nonlinear Solvers: IPOPT, Minotaur, Baron, KNITRO
 .. CP Solvers: Xpress Kalis, python-constraint, Z3, via MiniZinc (https://docs.minizinc.dev/en/stable/solvers.html)
@@ -332,6 +345,7 @@ which internally utilize the solver interfaces to interact with the optimization
             Pyomo
             Scip
             Cplex
+            Jaxipm
         end
 
         subgraph "Constraint Programming"
@@ -344,6 +358,7 @@ which internally utilize the solver interfaces to interact with the optimization
         Pyomo -- inherits --> SolverBase
         Scip -- inherits --> SolverBase
         Cplex -- inherits --> SolverBase
+        Jaxipm -- inherits --> SolverBase
         Ortools -- inherits --> SolverCPBase
         CplexCP -- inherits --> SolverCPBase
 

@@ -328,6 +328,83 @@ class SolverBase(ABC):
         status_str = solver_status_map.get(raw_status, 'UNKNOWN')
         self.status = getattr(CST, status_str, CST.UNKNOWN)
 
+    def to_structured(self) -> dict:
+        """Serialize the model into a solver-agnostic structured representation.
+
+        This enables **cross-backend model exchange**: a model built in one solver's
+        native format can be rebuilt in another solver's format via :meth:`from_structured`.
+        This is what lets a "nice LP" subproblem, modeled in a general-purpose backend
+        such as :class:`~.solvers.Gurobi`, :class:`~.solvers.Copt`, :class:`~.solvers.Scip`,
+        or :class:`~.solvers.Pyomo`, be handed off to :class:`~.solvers.Jaxipm` for GPU
+        interior-point solving — while the *overall* problem (and its master problem) stay
+        in whichever of those tools you already use::
+
+            from benderslib.solvers import Gurobi, Jaxipm
+
+            sub_model = Gurobi.make_sub_problem(original_model, master_vars)
+            sub = Jaxipm.from_structured(Gurobi(sub_model).to_structured())
+
+        The structured representation is a dictionary with the following layout:
+
+        .. code-block:: python
+
+            {
+                "sense": "min",
+                "vars": [
+                    {"name": "x", "lb": 0.0, "ub": 100.0, "vtype": "I", "obj": 1.0},
+                    ...
+                ],
+                "constraints": [
+                    {"name": "c1", "sense": "G", "rhs": 15.0, "coefs": {"x": 1.0, "y": 1.0}},
+                    ...
+                ],
+            }
+
+        where ``vtype`` is ``"I"`` (integer, including binary) or ``"C"`` (continuous),
+        the ``sense`` of a constraint is ``"L"``, ``"G"``, or ``"E"``, and
+        an ``ub`` of :obj:`float('inf')` denotes an unbounded variable.
+
+        Returns
+        ---------------
+        dict
+            The solver-agnostic structured representation of the model.
+
+        See Also
+        ---------------
+        from_structured
+            The inverse operation, implemented by receiving backends.
+        """
+        raise BendersNotImplementedError(
+            f"The {self.__class__.__name__} backend does not implement to_structured(), "
+            "so it cannot be used as the source of a cross-backend model exchange.",
+            func="to_structured",
+        )
+
+    @classmethod
+    def from_structured(cls, structured: dict):
+        """Build a native model in this backend's format from a structured representation.
+
+        This is the receiving end of BendersLib's cross-backend model exchange
+        (see :meth:`to_structured`). :class:`~.solvers.Jaxipm` implements this method, so
+        it can be used as a drop-in GPU LP backend for subproblems built in any backend
+        that implements :meth:`to_structured`.
+
+        Parameters
+        ---------------
+        structured : dict
+            The solver-agnostic structured representation produced by :meth:`to_structured`.
+
+        Returns
+        ---------------
+        object
+            A model instance in this backend's native format.
+        """
+        raise BendersNotImplementedError(
+            f"The {cls.__name__} backend does not implement from_structured(), "
+            "so it cannot be used as the target of a cross-backend model exchange.",
+            func="from_structured",
+        )
+
     def compute_iis(self) -> set[str]:
         """Compute the Irreducible Infeasible Subsystem (IIS) of the model if it is infeasible.
 

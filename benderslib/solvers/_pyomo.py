@@ -200,6 +200,48 @@ class Pyomo(SolverBase):
         obj = next(self.model.component_data_objects(Objective, active=True))
         return pyo.value(obj.expr)
 
+    def to_structured(self) -> dict:
+        """Serialize the Pyomo model into a solver-agnostic structured representation.
+
+        See :meth:`~benderslib.solvers.SolverBase.to_structured` for the format. This makes
+        ``Pyomo`` usable as the **source** of a cross-backend model exchange, e.g. to hand a
+        "nice LP" subproblem off to :class:`~benderslib.solvers.Jaxipm` for GPU solving
+        (regardless of which backend Pyomo itself is configured to use).
+        """
+        obj = next(self.model.component_data_objects(Objective, active=True))
+        obj_repn = generate_standard_repn(obj.expr)
+        obj_coefs = {var.name: coef for var, coef in zip(obj_repn.linear_vars, obj_repn.linear_coefs)}
+
+        vars_ = []
+        for v in self.model.component_data_objects(Var):
+            lb = v.lb if v.lb is not None else -float('inf')
+            ub = v.ub if v.ub is not None else float('inf')
+            vars_.append({
+                'name': v.name,
+                'lb': float(lb),
+                'ub': float(ub),
+                'vtype': 'C' if v.is_continuous() else 'I',
+                'obj': float(obj_coefs.get(v.name, 0.0)),
+            })
+
+        cons_ = []
+        for c in self.model.component_data_objects(Constraint, active=True):
+            repn = generate_standard_repn(c.body)
+            coefs = {var.name: coef for var, coef in zip(repn.linear_vars, repn.linear_coefs)}
+
+            if c.equality:
+                sense, rhs = 'E', pyo.value(c.lower)
+            elif c.has_ub() and not c.has_lb():
+                sense, rhs = 'L', pyo.value(c.upper)
+            elif c.has_lb() and not c.has_ub():
+                sense, rhs = 'G', pyo.value(c.lower)
+            else:
+                raise BendersBackendError(f"Constraint has both bounds ({c.lower, c.upper}). Cannot determine sense.")
+
+            cons_.append({'name': c.name, 'sense': sense, 'rhs': float(rhs), 'coefs': coefs})
+
+        return {'sense': 'min', 'vars': vars_, 'constraints': cons_}
+
     def add_cut(self, cut, name=None) -> None:
         vars = [self.model.find_component(v) for v in cut.vars]
         expr = sum(coef * var for coef, var in zip(cut.coefs, vars))

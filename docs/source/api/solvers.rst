@@ -45,6 +45,11 @@ Mathematical Programming Solver Interfaces
    :show-inheritance:
    :exclude-members:
 
+.. autoclass:: benderslib.solvers.Jaxipm
+   :inherited-members:
+   :show-inheritance:
+   :exclude-members:
+
 Constraint Programming Solver Interfaces
 ---------------------------------------------
 

@@ -13,13 +13,11 @@ license = "Apache-2.0"
 authors = [
     { name = "Peng-Hui Guo", email = "m@guo.ph" },
 ]
-requires-python = ">=3.10"  # BendersLib was developed with Python 3.12
+requires-python = ">=3.12"  # BendersLib was developed with Python 3.12
 keywords = ["benders decomposition", "optimization", "mathematical programming", "operations research"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
@@ -67,10 +65,11 @@ copt = ["coptpy>=8.0.2; python_version<='3.13'"]
 cplex = ["cplex>=22.1.2"]
 cplexcp = ["docplex>=2.31.254"]
 gurobi = ["gurobipy[matrixapi]>=12.0.0"]
+jaxipm = ["jaxipm>=0.0.1; sys_platform == 'linux' and python_version >= '3.12'"]
 ortools = ["ortools>=9.15.6755"]
 pyomo = ["pyomo>=6.9.5"]
 scip = ["pyscipopt>=6.0.0"]
-all-solvers = ["benderslib[copt,cplex,cplexcp,gurobi,ortools,pyomo,scip]"]
+all-solvers = ["benderslib[copt,cplex,cplexcp,gurobi,jaxipm,ortools,pyomo,scip]"]
 test = [
     "pytest>=8.4.2",
     "pytest-cov>=7.0.0",

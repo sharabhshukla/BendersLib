@@ -228,6 +228,43 @@ class Scip(SolverBase):
         obj = self.model.getObjVal()
         return obj
 
+    def to_structured(self) -> dict:
+        """Serialize the SCIP model into a solver-agnostic structured representation.
+
+        See :meth:`~benderslib.solvers.SolverBase.to_structured` for the format. This makes
+        ``Scip`` usable as the **source** of a cross-backend model exchange, e.g. to hand a
+        "nice LP" subproblem off to :class:`~benderslib.solvers.Jaxipm` for GPU solving.
+        """
+        vars_ = []
+        for var_name, var in self._vars_map.items():
+            ub = var.getUbGlobal()
+            vars_.append({
+                'name': var_name,
+                'lb': float(var.getLbGlobal()),
+                'ub': float(ub) if ub < self.__SCIP_VAR_UB else float('inf'),
+                'vtype': 'C' if var.vtype() == 'CONTINUOUS' else 'I',
+                'obj': float(var.getObj()),
+            })
+
+        cons_ = []
+        for cons_name, cons in self._cons_map.items():
+            coefs = self.model.getValsLinear(cons)
+            lhs = self.model.getLhs(cons)
+            rhs = self.model.getRhs(cons)
+
+            if lhs <= -self.__SCIP_VAR_UB:
+                sense, value = 'L', rhs
+            elif rhs >= self.__SCIP_VAR_UB:
+                sense, value = 'G', lhs
+            elif lhs == rhs:
+                sense, value = 'E', lhs
+            else:
+                raise BendersBackendError(f"Constraint has both bounds ({lhs}, {rhs}). Cannot determine sense.")
+
+            cons_.append({'name': cons_name, 'sense': sense, 'rhs': float(value), 'coefs': dict(coefs)})
+
+        return {'sense': 'min', 'vars': vars_, 'constraints': cons_}
+
     def add_cut(self, cut, name=None) -> None:
         lhs = sum(coef * self._vars_map[var] for var, coef in zip(cut.vars, cut.coefs))
 

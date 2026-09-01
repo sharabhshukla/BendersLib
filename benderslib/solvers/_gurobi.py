@@ -174,6 +174,39 @@ class Gurobi(SolverBase):
     def get_obj(self) -> float:
         return self.model.ObjVal
 
+    def to_structured(self) -> dict:
+        """Serialize the Gurobi model into a solver-agnostic structured representation.
+
+        See :meth:`~benderslib.solvers.SolverBase.to_structured` for the format. This makes
+        ``Gurobi`` usable as the **source** of a cross-backend model exchange, e.g. to hand a
+        "nice LP" subproblem off to :class:`~benderslib.solvers.Jaxipm` for GPU solving.
+        """
+        _sense_map = {'<': 'L', '>': 'G', '=': 'E'}
+
+        vars_ = []
+        for v in self.model.getVars():
+            ub = v.UB
+            vars_.append({
+                'name': v.VarName,
+                'lb': float(v.LB),
+                'ub': float(ub) if ub < GRB.INFINITY else float('inf'),
+                'vtype': 'C' if v.VType == GRB.CONTINUOUS else 'I',
+                'obj': float(v.Obj),
+            })
+
+        cons_ = []
+        for c in self.model.getConstrs():
+            row = self.model.getRow(c)
+            coefs = {row.getVar(i).VarName: row.getCoeff(i) for i in range(row.size())}
+            cons_.append({
+                'name': c.ConstrName,
+                'sense': _sense_map[c.Sense],
+                'rhs': float(c.RHS),
+                'coefs': coefs,
+            })
+
+        return {'sense': 'min', 'vars': vars_, 'constraints': cons_}
+
     def add_cut(self, cut, name=None) -> None:
         lhs = sum(coef * self.model.getVarByName(var) for var, coef in zip(cut.vars, cut.coefs))
 

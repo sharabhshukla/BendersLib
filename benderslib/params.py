@@ -125,11 +125,29 @@ class BendersParams:
     """
     parallel_threads: int = -1
     """**[L-shaped method]** Number of threads to use for parallel subproblem solving.
-    
-    This parameter is used when :attr:`~BendersParams.parallel_sub` is ``True``. 
-    If set to a positive integer, it specifies the number of threads to use for 
-    parallel subproblem solving. If set to ``-1``, BendersLib will determine 
+
+    This parameter is used when :attr:`~BendersParams.parallel_sub` is ``True``.
+    If set to a positive integer, it specifies the number of threads to use for
+    parallel subproblem solving. If set to ``-1``, BendersLib will determine
     the number of threads to use based on the available CPU cores.
+    """
+    batch_sub: bool = False
+    """**[L-shaped method]** Whether to dispatch all LP subproblems together via the solver
+    backend's ``batch_solve`` classmethod, instead of solving them one at a time.
+
+    If ``True``, and every subproblem in a :class:`~benderslib.SubProblems` instance uses the
+    *same* solver backend class and that class implements ``batch_solve`` (e.g.,
+    :class:`~benderslib.solvers.Jaxipm`, whose ``batch_solve`` fuses all scenario LPs into a
+    single GPU interior-point solve via JAX ``vmap``), the whole batch is solved together.
+    If ``False`` (default), or if the backend has no ``batch_solve``, subproblems are solved
+    sequentially or via CPU threads (:attr:`~BendersParams.parallel_sub`) as usual.
+
+    .. note::
+        This is opt-in because true GPU batching requires all subproblems in the batch to
+        share the same variable/constraint structure (only right-hand-side data may differ
+        across scenarios) — the standard "fixed recourse" assumption in two-stage stochastic
+        programming. A backend's ``batch_solve`` is expected to fall back to sequential
+        solving on its own if this precondition is not met.
     """
 
     # Combinatorial Benders

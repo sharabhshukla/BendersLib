@@ -77,6 +77,15 @@ try:
 except ImportError:  # pragma: no cover
     CplexCP = _create_placeholder_solver("CplexCP", "Install it via 'pip install docplex'.")
 
+try:
+    from ._jaxipm import Jaxipm
+except ImportError:  # pragma: no cover
+    Jaxipm = _create_placeholder_solver(
+        "Jaxipm",
+        "jaxipm requires an NVIDIA GPU (Turing/compute capability 7.5+), CUDA 13, and Python "
+        "3.12+, on Linux x86-64. Install it via 'pip install benderslib[jaxipm]'."
+    )
+
 __all__ = [
     "SolverBase",
     "SolverCPBase",
@@ -87,4 +96,5 @@ __all__ = [
     "Cplex",
     "Ortools",
     "CplexCP",
+    "Jaxipm",
 ]

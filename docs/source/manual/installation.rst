@@ -86,6 +86,7 @@ Installing Solvers
         pip install "benderslib[cplex]"
         pip install "benderslib[cplexcp]"
         pip install "benderslib[gurobi]"
+        pip install "benderslib[jaxipm]"
         pip install "benderslib[ortools]"
         pip install "benderslib[pyomo]"
         pip install "benderslib[scip]"
@@ -132,6 +133,10 @@ Please refer to :ref:`solver-table` for solver features and license requirements
       - ``pip install gurobipy``
       - ``conda install gurobi::gurobi``
       - `Install <https://support.gurobi.com/hc/en-us/articles/360044290292-How-do-I-install-Gurobi-for-Python>`__
+    * - **jaxipm** [3]_
+      - ``pip install jaxipm``
+      - N/A
+      - `Install <https://github.com/johnviljoen/jaxipm#installation>`__
     * - **OR-Tools**
       - ``pip install ortools``
       - N/A
@@ -181,6 +186,7 @@ Please refer to :ref:`solver-table` for solver features and license requirements
 .. [2]  *Pyomo is a modeling language. Supported solvers must be installed separately, see*
         `installation instruction <https://pyomo.readthedocs.io/en/stable/getting_started/solvers.html>`_ *(by Pyomo)*
         *and* `supported solvers <https://github.com/Pyomo/pyomo/tree/main/pyomo/solvers/plugins/solvers>`_.
+.. [3]  *Requires an NVIDIA GPU (Turing/compute capability 7.5+), CUDA 13, and Python 3.12+, on Linux x86-64.*
 
 Troubleshooting
 ------------------------------------

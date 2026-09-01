@@ -196,6 +196,42 @@ class Copt(SolverBase):
     def get_obj(self) -> float:
         return self.model.objval
 
+    def to_structured(self) -> dict:
+        """Serialize the COPT model into a solver-agnostic structured representation.
+
+        See :meth:`~benderslib.solvers.SolverBase.to_structured` for the format. This makes
+        ``Copt`` usable as the **source** of a cross-backend model exchange, e.g. to hand a
+        "nice LP" subproblem off to :class:`~benderslib.solvers.Jaxipm` for GPU solving.
+        """
+        variables = self.model.getVars()
+        vars_ = []
+        for v in variables:
+            ub = v.getInfo(COPT.Info.UB)
+            vars_.append({
+                'name': v.getName(),
+                'lb': float(v.getInfo(COPT.Info.LB)),
+                'ub': float(ub) if ub < COPT.INFINITY else float('inf'),
+                'vtype': 'C' if v.getType() == COPT.CONTINUOUS else 'I',
+                'obj': float(v.getInfo(COPT.Info.Obj)),
+            })
+
+        cons_ = []
+        for c in self.model.getConstrs():
+            expr = self.model.getRow(c)
+            coefs = {expr.getVar(i).getName(): expr.getCoeff(i) for i in range(expr.getSize())}
+            if c.ub == COPT.INFINITY:
+                sense, rhs = 'G', c.lb
+            elif c.lb == -COPT.INFINITY:
+                sense, rhs = 'L', c.ub
+            elif c.lb == c.ub:
+                sense, rhs = 'E', c.lb
+            else:
+                raise BendersBackendError(f"Constraint has both bounds ({c.lb}, {c.ub}). Cannot determine sense.")
+
+            cons_.append({'name': c.getName(), 'sense': sense, 'rhs': float(rhs), 'coefs': coefs})
+
+        return {'sense': 'min', 'vars': vars_, 'constraints': cons_}
+
     def add_cut(self, cut, name=None) -> None:
         lhs = LinExpr()
         for var, coef in zip(cut.vars, cut.coefs):

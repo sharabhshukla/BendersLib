@@ -51,6 +51,10 @@ config = {
         'preprocessing.presolve': 0,  # Parameters for obtaining Farkas certificate
         'lpmethod': 2,  # Parameters for obtaining Farkas certificate
     },
+    'JAXIPM_OPTIONS': {
+        # Overrides applied on top of jaxipm.default_params(). Keys must match
+        # entries in jaxipm's IPOPT-style parameter dict (see jaxipm/params.json).
+    },
     'STATUS_CODES': {
         'COPT': {
             1: 'OPTIMAL',
@@ -75,6 +79,15 @@ config = {
             2: 'OPTIMAL',
             3: 'INFEASIBLE',
             5: 'UNBOUNDED',
+        },
+        'JAXIPM': {
+            # jaxipm.solver.TerminationCode values.
+            0: 'UNKNOWN',  # CONTINUE (should not be observed after the solve loop exits)
+            1: 'OPTIMAL',  # CONVERGED
+            2: 'TIMEOUT',  # MAX_ITER_EXCEEDED
+            3: 'ERROR',  # TINY_STEP_BREAK (numerical stall)
+            4: 'INFEASIBLE',  # RESTORATION_FAILURE (feasibility restoration could not find a feasible point)
+            5: 'OPTIMAL',  # ACCEPTABLE_POINT (converged to IPOPT's looser "acceptable" tolerance)
         },
         'ORTOOLS': {
             4: 'OPTIMAL',
