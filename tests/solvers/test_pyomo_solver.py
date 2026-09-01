@@ -10,7 +10,10 @@ try:
     from benderslib.solvers import Pyomo
 
     pyomo_available = True
-except ImportError:
+except Exception:
+    # Some Pyomo releases ship a solver plugin that crashes with a NameError if cuopt is
+    # already imported in the same process (a known Pyomo bug, unrelated to BendersLib);
+    # treat as unavailable rather than letting collection of this whole file fail.
     pyomo_available = False
 
 solvers = [

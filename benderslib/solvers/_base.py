@@ -314,6 +314,79 @@ class SolverBase(ABC):
         """
         ...
 
+    def to_structured(self) -> dict:
+        """Serialize the model into a solver-agnostic structured representation.
+
+        This enables **cross-backend model exchange**: a model built in one solver's
+        native format can be rebuilt in another solver's format via
+        :meth:`from_structured`. It is the foundation of BendersLib's recommended
+        *hybrid* solving pattern, where a CPU MIP backend (e.g., :class:`~.solvers.Scip`)
+        solves the master problem while a GPU backend (e.g., :class:`~.solvers.Cuopt`)
+        solves the (batched) subproblems.
+
+        The structured representation is a dictionary with the following layout:
+
+        .. code-block:: python
+
+            {
+                "sense": "min",
+                "vars": [
+                    {"name": "x", "lb": 0.0, "ub": 100.0, "vtype": "I", "obj": 1.0},
+                    ...
+                ],
+                "constraints": [
+                    {"name": "c1", "sense": "G", "rhs": 15.0, "coefs": {"x": 1.0, "y": 1.0}},
+                    ...
+                ],
+            }
+
+        where ``vtype`` is ``"I"`` (integer) or ``"C"`` (continuous),
+        ``sense`` of constraints is ``"L"``, ``"G"``, or ``"E"``, and
+        an ``ub`` of :obj:`float('inf')` denotes an unbounded variable.
+
+        Returns
+        ---------------
+        dict
+            The solver-agnostic structured representation of the model.
+
+        See Also
+        ---------------
+        from_structured
+            The inverse operation, implemented by receiving backends.
+        """
+        raise BendersNotImplementedError(
+            f"The {self.__class__.__name__} backend does not implement to_structured(), "
+            "so it cannot be used as the source of a cross-backend model exchange.",
+            func="to_structured",
+        )
+
+    @classmethod
+    def from_structured(cls, structured: dict):
+        """Build a native model in this backend's format from a structured representation.
+
+        This is the receiving end of BendersLib's cross-backend model exchange
+        (see :meth:`to_structured`). Backends that implement this method can be used
+        as a ``master_solver`` in :class:`~benderslib.AnnotatedBenders`, enabling the
+        recommended hybrid pattern (e.g., a :class:`~.solvers.Scip` master MILP paired
+        with :class:`~.solvers.Cuopt` batched GPU subproblems).
+
+        Parameters
+        ---------------
+        structured : dict
+            The solver-agnostic structured representation produced by
+            :meth:`to_structured`.
+
+        Returns
+        ---------------
+        object
+            A model instance in this backend's native format.
+        """
+        raise BendersNotImplementedError(
+            f"The {cls.__name__} backend does not implement from_structured(), "
+            "so it cannot be used as a master_solver for cross-backend model exchange.",
+            func="from_structured",
+        )
+
     def _update_status(self, solver_name: str, raw_status: int | str) -> None:
         """Update the status attribute based on the backer solver's raw status code.
 

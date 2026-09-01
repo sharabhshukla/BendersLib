@@ -128,15 +128,35 @@ Objective: 45.0
 Solution: {'x': 15.0, 'y': 0.0}
 ```
 
-### GPU-Accelerated Solving with NVIDIA cuOpt
+### GPU-Accelerated Solving with NVIDIA cuOpt (Hybrid: CPU Master + GPU Subproblems)
 
 BendersLib supports GPU-accelerated solving using [NVIDIA cuOpt](https://github.com/NVIDIA/cuopt) for LP and MILP problems.
+
+#### Recommended architecture
+
+In Benders decomposition, the **master MILP is small and re-solved every iteration**, while the
+**subproblem LPs dominate the solve count** (e.g., one per scenario). cuOpt's strength is fast
+LP solving on the GPU — not repeatedly solving tiny MIPs, where its fixed per-solve cost
+(presolve, early heuristics, post-solve reconstruction) dwarfs the actual branch-and-bound time.
+
+BendersLib therefore ships with first-class support for a **hybrid** pattern, which is the
+recommended (and default-documented) way of using cuOpt:
+
+- **Master problem (MILP)**: a CPU MIP backend — SCIP via `pyscipopt` — re-solved quickly each iteration.
+- **Subproblems (LPs)**: cuOpt on the GPU, with all scenario LPs dispatched **together** in a
+  single batch (`BendersParams.batch_sub`) via cuOpt's `BatchSolve`.
+
+Master and subproblems each take their own solver backend, so the two can be mixed freely.
+In our benchmarks (50-scenario L-shaped method), this hybrid pattern reduced the solve time
+by **~8.5x** (367s → 43s) and the master-problem time by **~1000x** (329s → 0.3s) compared to a
+pure-cuOpt run, with identical results.
 
 #### Requirements
 - **OS**: Linux or Windows Subsystem for Linux (WSL2)
 - **GPU**: NVIDIA GPU with Volta architecture or newer (Compute Capability ≥ 7.0)
 - **CUDA**: CUDA 12.x or 13.x
 - **Python**: Python ≥ 3.11
+- **SCIP** (for the recommended hybrid master): `pip install "benderslib[scip]"`
 
 #### Installation
 
@@ -144,21 +164,22 @@ To install in an external project directly from this branch:
 
 ```bash
 # Using pip directly
-pip install "benderslib[cuopt] @ git+https://github.com/sharabhshukla/BendersLib.git@cuda-cuopt-cu13"
+pip install "benderslib[cuopt,scip] @ git+https://github.com/sharabhshukla/BendersLib.git@cuda-cuopt-cu13"
 ```
 
 Or add to your `requirements.txt`:
 ```text
-benderslib[cuopt] @ git+https://github.com/sharabhshukla/BendersLib.git@cuda-cuopt-cu13
+benderslib[cuopt,scip] @ git+https://github.com/sharabhshukla/BendersLib.git@cuda-cuopt-cu13
 ```
 
-*(Once merged and released to PyPI, standard `pip install "benderslib[cuopt]"` will be supported).*
+*(Once merged and released to PyPI, standard `pip install "benderslib[cuopt,scip]"` will be supported).*
 
-#### Quick Example with cuOpt
+#### Quick Example: single problem, `master_solver` API
 
 ```python
 from benderslib import AnnotatedBenders, ClassicalBenders
-from benderslib.solvers import Cuopt
+from benderslib.solvers import Cuopt, Scip
+
 from cuopt.linear_programming.problem import Problem, CONTINUOUS, INTEGER, MINIMIZE
 
 # Build problem with native cuOpt Python API
@@ -170,10 +191,11 @@ problem.addConstraint(x + y >= 15.0, name="c1")
 problem.addConstraint(2.0 * x + 5.0 * y >= 30.0, name="c2")
 problem.setObjective(3.0 * x + 4.0 * y, sense=MINIMIZE)
 
-# Solve with BendersLib on GPU
+# Hybrid solving: subproblems on cuOpt (GPU), master MILP on SCIP (CPU)
 benders = AnnotatedBenders(
     problem,
-    solver=Cuopt,
+    solver=Cuopt,            # subproblem backend: cuOpt on GPU
+    master_solver=Scip,      # master backend: SCIP on CPU (recommended)
     complicating_vars=["x"],
     benders=ClassicalBenders
 )
@@ -182,6 +204,61 @@ benders.solve()
 print(f"Objective: {benders.result.obj}")
 print(f"Solution: {benders.result.solution}")
 ```
+
+#### Quick Example: stochastic program, batched GPU subproblems
+
+```python
+from benderslib import LShaped, MasterProblem, SubProblem, SubProblems
+from benderslib.solvers import Cuopt, Scip
+
+# Master problem (MILP) — SCIP backend, built with pyscipopt
+master_model = ...                        # pyscipopt.Model with integer capacity decisions
+master_problem = MasterProblem(Scip(master_model))
+
+# Scenario subproblems (LPs) — cuOpt backend, built with cuOpt's Problem
+sub_problems = SubProblems(
+    [SubProblem(Cuopt(cuopt_lp_model)) for ...],   # one LP per scenario
+    prob=scenario_probabilities,
+)
+
+L = LShaped(
+    master_problem=master_problem,
+    sub_problem=sub_problems,
+    complicating_vars=["cap_0", "cap_1", "cap_2", "cap_3"],
+)
+L.params.batch_sub = True          # dispatch all scenario LPs to cuOpt in one batch
+L.params.multi_optim_cut = True
+L.solve()
+```
+
+> **Note:** cuOpt's `BatchSolve` API is deprecated upstream by NVIDIA and may be removed in a future
+> cuOpt release; only the subproblem side of the hybrid pattern depends on it
+> (see `BendersParams.batch_sub`). The master backend is unaffected.
+
+#### Model in any framework, batch-solve on the GPU
+
+The hybrid pattern generalizes beyond cuOpt-native models: **any backend that implements
+`to_structured()`** (Gurobi, COPT, Pyomo, SCIP) **can supply subproblems that get converted
+and solved as a single GPU batch via cuOpt**, using `SubProblems.from_models`:
+
+```python
+from benderslib import SubProblems
+from benderslib.solvers import Gurobi, Cuopt
+
+scenario_models = [...]  # one gurobipy.Model per scenario, built however you like
+
+sub_problems = SubProblems.from_models(
+    scenario_models,
+    solver=Gurobi,          # the format the models are built in
+    batch_solver=Cuopt,     # convert + solve all scenario LPs on the GPU in one batch
+    prob=scenario_probabilities,
+)  # params.batch_sub is set to True automatically
+```
+
+The same idea is available for the single-subproblem workflow via `AnnotatedBenders(sub_solver=...)`,
+symmetric to `master_solver=...`. This is powered by a generic cross-backend model exchange
+(`SolverBase.to_structured()` / `SolverBase.from_structured()`) — see the
+[API reference](https://benders.dev/api) for details.
 
 More examples are available at https://benders.dev/examples.
 

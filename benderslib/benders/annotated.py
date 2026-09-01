@@ -38,6 +38,33 @@ class AnnotatedBenders(BendersSolver):
         The master variables are used to define the master problem and subproblem from the original problem.
         It is usually a superset of ``complicating_vars``.
         If not provided, it defaults to ``complicating_vars``.
+    master_solver: Type[SolverBase], optional
+        A *different* solver class to be used for the **master problem** only, e.g.,
+        :class:`~.solvers.Scip` when ``solver`` is :class:`~.solvers.Cuopt`.
+
+        This enables the recommended **hybrid solving** pattern: the master problem is
+        converted from ``solver``'s format via the cross-backend model exchange
+        (:meth:`~benderslib.solvers.SolverBase.to_structured` /
+        :meth:`~benderslib.solvers.SolverBase.from_structured`) and solved by a CPU MIP
+        backend, while the subproblems stay on ``solver`` (e.g., batched on the GPU by
+        cuOpt). If not provided (default), the master uses ``solver`` as well.
+
+        .. note::
+            ``master_solver`` must implement :meth:`~benderslib.solvers.SolverBase.from_structured`.
+    sub_solver: Type[SolverBase], optional
+        A *different* solver class to be used for the **subproblem** only, e.g.,
+        :class:`~.solvers.Cuopt` when ``solver`` is :class:`~.solvers.Gurobi`.
+
+        This is the symmetric counterpart of ``master_solver``: it lets you model the
+        *original problem* in whichever framework you prefer (Gurobi, COPT, Pyomo, SCIP, ...)
+        and still solve the subproblem on a GPU backend such as cuOpt, via the same
+        cross-backend model exchange. Note that GPU **batching** only pays off with multiple
+        subproblems (see :meth:`~benderslib.SubProblems.from_models` for that case);
+        for the single-subproblem workflow here, it simply lets the subproblem use a
+        different backend than the master.
+
+        .. note::
+            ``sub_solver`` must implement :meth:`~benderslib.solvers.SolverBase.from_structured`.
     benders: Type[BendersSolver], optional
         The Benders decomposition method to be applied, e.g., :class:`ClassicalBenders`.
         If not provided, the class :class:`BendersSolver` will be used with the optimality
@@ -79,6 +106,21 @@ class AnnotatedBenders(BendersSolver):
             complicating_vars=complicating_vars,
             master_vars=master_vars
         )
+
+    Example: hybrid GPU solving (CPU master + cuOpt GPU subproblems)
+    -------
+    .. code-block:: python
+
+        from benderslib import AnnotatedBenders, ClassicalBenders
+        from benderslib.solvers import Cuopt, Scip
+
+        BD = AnnotatedBenders(
+            cuopt_problem,
+            solver=Cuopt,          # subproblems: cuOpt (GPU)
+            master_solver=Scip,    # master MILP: SCIP (CPU) — recommended
+            benders=ClassicalBenders,
+            complicating_vars=["x"],
+        )
     """
 
     def __new__(
@@ -87,13 +129,17 @@ class AnnotatedBenders(BendersSolver):
             solver: Type[SolverBase],
             complicating_vars: list[str],
             master_vars: list[str] = None,
+            master_solver: Type[SolverBase] = None,
+            sub_solver: Type[SolverBase] = None,
             benders: Type[BendersSolver] = None,
             optimality_cut=None,
             feasibility_cut=None,
             params: BendersParams | None = None,
     ):
         master_vars = master_vars if master_vars is not None else complicating_vars
-        master_problem, sub_problem = cls.decompose(original_problem, solver, master_vars)
+        master_problem, sub_problem = cls.decompose(
+            original_problem, solver, master_vars, master_solver=master_solver, sub_solver=sub_solver
+        )
 
         benders_kwargs = {
             "master_problem": master_problem,
@@ -125,7 +171,9 @@ class AnnotatedBenders(BendersSolver):
             original_problem,
             solver: Type[SolverBase],
             master_vars: list[str],
-            solver_model=False
+            solver_model=False,
+            master_solver: Type[SolverBase] = None,
+            sub_solver: Type[SolverBase] = None
     ) -> tuple:
         """Decomposes the original problem into a master problem and a subproblem.
 
@@ -152,6 +200,14 @@ class AnnotatedBenders(BendersSolver):
         solver_model: bool, optional
             If ``True``, return the master and subproblem in the solver-specific format;
             If ``False``, return instances of :class:`MasterProblem` and :class:`SubProblem`.
+        master_solver: Type[SolverBase], optional
+            A different solver class to be used for the master problem only
+            (see :class:`AnnotatedBenders`). The master model is converted from
+            ``solver``'s format via the cross-backend model exchange.
+        sub_solver: Type[SolverBase], optional
+            A different solver class to be used for the subproblem only
+            (see :class:`AnnotatedBenders`). The subproblem model is converted from
+            ``solver``'s format via the cross-backend model exchange.
 
         Returns
         -------
@@ -178,7 +234,19 @@ class AnnotatedBenders(BendersSolver):
         master = solver.make_master_problem(original_problem, master_vars)
         sub = solver.make_sub_problem(original_problem, master_vars)
 
+        master_wrapper_cls = solver
+        if master_solver is not None and master_solver is not solver:
+            # Cross-backend model exchange: rebuild the master in master_solver's format
+            master = master_solver.from_structured(solver(master).to_structured())
+            master_wrapper_cls = master_solver
+
+        sub_wrapper_cls = solver
+        if sub_solver is not None and sub_solver is not solver:
+            # Cross-backend model exchange: rebuild the subproblem in sub_solver's format
+            sub = sub_solver.from_structured(solver(sub).to_structured())
+            sub_wrapper_cls = sub_solver
+
         if solver_model:
             return master, sub
         else:
-            return MasterProblem(solver(master)), SubProblem(solver(sub))
+            return MasterProblem(master_wrapper_cls(master)), SubProblem(sub_wrapper_cls(sub))

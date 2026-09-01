@@ -2,7 +2,16 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (c) 2021-2026 Peng-Hui Guo <m@guo.ph>
 
-from pyscipopt import Model, Expr, SCIP_PARAMSETTING, Conshdlr, SCIP_RESULT, SCIP_PROPTIMING, SCIP_PRESOLTIMING
+from pyscipopt import (
+    Model,
+    Expr,
+    quicksum,
+    SCIP_PARAMSETTING,
+    Conshdlr,
+    SCIP_RESULT,
+    SCIP_PROPTIMING,
+    SCIP_PRESOLTIMING,
+)
 
 from ..consts import BendersConsts as CST
 from ._base import SolverBase
@@ -228,6 +237,50 @@ class Scip(SolverBase):
         obj = self.model.getObjVal()
         return obj
 
+    def to_structured(self) -> dict:
+        """Serialize the SCIP model into a solver-agnostic structured representation.
+
+        See :meth:`~benderslib.solvers.SolverBase.to_structured` for the format.
+        This makes ``Scip`` usable as the **source** of a cross-backend model exchange,
+        e.g., to batch-solve subproblems built in SCIP via a GPU backend such as
+        :class:`~benderslib.solvers.Cuopt` (see :meth:`~benderslib.SubProblems.from_models`).
+        """
+        obj_expr = self.model.getObjective()
+        obj_coefs = {}
+        for term, coef in obj_expr.terms.items():
+            if len(term) == 1:
+                obj_coefs[term[0].name] = float(coef)
+
+        vars_ = []
+        for name, var in self._vars_map.items():
+            ub = var.getUbGlobal()
+            vars_.append({
+                'name': name,
+                'lb': float(var.getLbGlobal()),
+                'ub': float(ub) if ub < self.__SCIP_VAR_UB else float('inf'),
+                'vtype': 'I' if var.vtype() in ('INTEGER', 'BINARY') else 'C',
+                'obj': obj_coefs.get(name, 0.0),
+            })
+
+        cons_ = []
+        for cons in self.model.getConss(transformed=False):
+            lhs = self.model.getLhs(cons)
+            rhs_val = self.model.getRhs(cons)
+            if lhs <= -self.__SCIP_VAR_UB:
+                sense, rhs = 'L', rhs_val
+            elif rhs_val >= self.__SCIP_VAR_UB:
+                sense, rhs = 'G', lhs
+            elif lhs == rhs_val:
+                sense, rhs = 'E', lhs
+            else:
+                raise BendersBackendError(
+                    f"Constraint {cons.name} has both bounds ({lhs}, {rhs_val}). Cannot determine sense/RHS.")
+
+            coefs = {v_name: float(coef) for v_name, coef in self.model.getValsLinear(cons).items()}
+            cons_.append({'name': cons.name, 'sense': sense, 'rhs': float(rhs), 'coefs': coefs})
+
+        return {'sense': 'min', 'vars': vars_, 'constraints': cons_}
+
     def add_cut(self, cut, name=None) -> None:
         lhs = sum(coef * self._vars_map[var] for var, coef in zip(cut.vars, cut.coefs))
 
@@ -314,6 +367,53 @@ class Scip(SolverBase):
             vars.add(var.name)
 
         return vars
+
+    @classmethod
+    def from_structured(cls, structured: dict) -> Model:
+        """Build a pyscipopt ``Model`` from a solver-agnostic structured representation.
+
+        See :meth:`~benderslib.solvers.SolverBase.from_structured`. This makes ``Scip``
+        usable as a ``master_solver`` in :class:`~benderslib.AnnotatedBenders`, which is
+        the recommended way to solve the master MILP when the subproblems are handled by
+        a GPU backend such as :class:`~benderslib.solvers.Cuopt` (hybrid solving).
+
+        Parameters
+        ---------------
+        structured : dict
+            The structured representation produced by
+            :meth:`~benderslib.solvers.SolverBase.to_structured`.
+
+        Returns
+        ---------------
+        pyscipopt.Model
+            A native pyscipopt model equivalent to the source model.
+        """
+        model = Model(structured.get('name', 'StructuredProblem'))
+
+        var_map = {}
+        for v in structured.get('vars', []):
+            ub = v.get('ub', float('inf'))
+            var_map[v['name']] = model.addVar(
+                name=v['name'],
+                vtype='INTEGER' if v.get('vtype', 'C') == 'I' else 'CONTINUOUS',
+                lb=v.get('lb', 0.0),
+                ub=None if ub is None or ub == float('inf') else ub,
+                obj=float(v.get('obj', 0.0)),
+            )
+
+        for c in structured.get('constraints', []):
+            expr = quicksum(coef * var_map[name] for name, coef in c['coefs'].items())
+            rhs = float(c['rhs'])
+            sense = c.get('sense', 'G')
+            if sense == 'L':
+                model.addCons(expr <= rhs, name=c.get('name', ''))
+            elif sense == 'E':
+                model.addCons(expr == rhs, name=c.get('name', ''))
+            else:
+                model.addCons(expr >= rhs, name=c.get('name', ''))
+
+        # SCIP's default objective sense is minimize, matching BendersLib's convention
+        return model
 
     @staticmethod
     def make_master_problem(original_model: Model, master_vars: list[str]) -> Model:

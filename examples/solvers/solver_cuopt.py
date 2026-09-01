@@ -3,13 +3,19 @@
 # Copyright (c) 2021-2026 Peng-Hui Guo <m@guo.ph>
 
 """
-NVIDIA cuOpt
+NVIDIA cuOpt (Hybrid: CPU Master + GPU Subproblems)
 =======================================
 
 """
 
 # %%
-# Using :class:`~benderslib.solvers.Cuopt` as a solver backend on GPU.
+# Using :class:`~benderslib.solvers.Cuopt` as a **subproblem** backend on GPU, paired
+# with a CPU MIP backend (SCIP) for the master problem via the ``master_solver``
+# parameter of :class:`~benderslib.AnnotatedBenders`.
+#
+# This is BendersLib's recommended way of using cuOpt: the master MILP is re-solved
+# every Benders iteration and is best handled by a CPU MIP solver, while cuOpt's
+# strength — fast LP solving on the GPU — is used for the subproblems.
 
 from benderslib import AnnotatedBenders, ClassicalBenders
 from benderslib.solvers import Cuopt
@@ -20,6 +26,12 @@ try:
     cuopt_available = True
 except ImportError:
     cuopt_available = False
+
+try:
+    from benderslib.solvers import Scip
+    scip_available = True
+except ImportError:
+    scip_available = False
 
 
 def make_original_problem():
@@ -52,6 +64,7 @@ if __name__ == '__main__':
         BD = AnnotatedBenders(
             problem,
             solver=Cuopt,
+            master_solver=Scip if scip_available else None,  # Recommended: CPU master (SCIP)
             complicating_vars=complicating_vars,
             benders=ClassicalBenders
         )

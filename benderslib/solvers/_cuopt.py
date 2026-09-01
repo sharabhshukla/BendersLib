@@ -4,6 +4,7 @@
 
 import math
 import copy
+import warnings
 from cuopt.linear_programming.problem import (
     Problem,
     LinearExpression,
@@ -82,6 +83,33 @@ class Cuopt(SolverBase):
         infeasible, :meth:`get_extreme_ray` solves an auxiliary elastic (phase-1)
         LP that minimizes the total constraint violation, and derives the ray from
         its optimal dual values. This yields valid Benders feasibility cuts.
+
+    .. admonition:: Recommended usage: hybrid solving (CPU master + GPU batched subs)
+        :class: note
+
+        cuOpt's strengths in Benders decomposition are **fast batched LP solving on the
+        GPU** (see :attr:`~benderslib.BendersParams.batch_sub`), not repeatedly solving
+        the small master MILP. Each cuOpt MIP solve pays a large fixed cost
+        (presolve, early heuristics, and post-solve reconstruction) that dwarfs the
+        actual branch-and-bound time on master-sized models.
+
+        The recommended pattern is therefore to pair cuOpt **subproblems** with a CPU
+        MIP **master** backend such as :class:`~benderslib.solvers.Scip`::
+
+            from benderslib import LShaped, MasterProblem, SubProblem, SubProblems
+            from benderslib.solvers import Cuopt, Scip
+
+            L = LShaped(
+                master_problem=MasterProblem(Scip(scip_master_model)),
+                sub_problem=SubProblems([SubProblem(Cuopt(cuopt_sub_model)) for ...]),
+                complicating_vars=[...],
+            )
+            L.params.batch_sub = True  # dispatch all scenario LPs to cuOpt in one batch
+
+        For single-problem workflows, :class:`~benderslib.AnnotatedBenders` supports this
+        directly via its ``master_solver`` parameter. In our benchmarks this hybrid
+        pattern reduced the L-shaped solve time by **~8.5x** compared to a pure-cuOpt run,
+        with identical results.
 
     Parameters
     ---------------
@@ -321,6 +349,96 @@ class Cuopt(SolverBase):
     def get_obj(self) -> float:
         return float(self.model.ObjValue)
 
+    def to_structured(self) -> dict:
+        """Serialize the cuOpt model into a solver-agnostic structured representation.
+
+        See :meth:`~benderslib.solvers.SolverBase.to_structured` for the format.
+        This makes ``Cuopt`` usable as the **source** of a cross-backend model exchange,
+        e.g., to rebuild a cuOpt-built master problem as a SCIP model for the
+        recommended hybrid solving pattern (see the class docstring).
+        """
+        vars_ = []
+        for v in self.model.vars:
+            name = _get_var_name(v)
+            ub = float(v.getUpperBound())
+            vars_.append({
+                'name': name,
+                'lb': float(v.getLowerBound()),
+                'ub': ub if ub < 1e20 else float('inf'),
+                'vtype': 'I' if v.getVariableType() == INTEGER else 'C',
+                'obj': float(v.getObjectiveCoefficient()),
+            })
+
+        idx_to_name = {v.index: _get_var_name(v) for v in self.model.vars}
+        cons_ = []
+        for c in self.model.constrs:
+            cons_.append({
+                'name': _get_cons_name(c),
+                'sense': _get_sense_char(c),
+                'rhs': float(c.getRHS()),
+                'coefs': {idx_to_name[i]: float(coef) for i, coef in c.vindex_coeff_dict.items()},
+            })
+
+        return {'sense': 'min', 'vars': vars_, 'constraints': cons_}
+
+    @classmethod
+    def from_structured(cls, structured: dict) -> Problem:
+        """Build a cuOpt ``Problem`` from a solver-agnostic structured representation.
+
+        See :meth:`~benderslib.solvers.SolverBase.from_structured`. This makes ``Cuopt``
+        usable as a batching **target**: subproblems built in any backend that implements
+        :meth:`~benderslib.solvers.SolverBase.to_structured` (e.g., Gurobi, COPT, Pyomo, SCIP)
+        can be converted to cuOpt models and solved together via
+        :meth:`batch_solve` / :attr:`~benderslib.BendersParams.batch_sub` on the GPU.
+        See :meth:`~benderslib.SubProblems.from_models` for a ready-made convenience.
+
+        Parameters
+        ---------------
+        structured : dict
+            The structured representation produced by
+            :meth:`~benderslib.solvers.SolverBase.to_structured`.
+
+        Returns
+        ---------------
+        cuopt.linear_programming.problem.Problem
+            A native cuOpt model equivalent to the source model.
+        """
+        model = Problem(structured.get('name', 'StructuredProblem'))
+
+        var_map = {}
+        obj_terms = []
+        for v in structured.get('vars', []):
+            vtype = INTEGER if v.get('vtype', 'C') == 'I' else CONTINUOUS
+            var = model.addVariable(
+                lb=v.get('lb', 0.0),
+                ub=v.get('ub', float('inf')),
+                vtype=vtype,
+                name=v['name'],
+            )
+            var_map[v['name']] = var
+            obj_coef = float(v.get('obj', 0.0))
+            if obj_coef:
+                obj_terms.append(obj_coef * var)
+
+        if obj_terms:
+            model.setObjective(sum(obj_terms), sense=MINIMIZE)
+
+        for c in structured.get('constraints', []):
+            expr_vars = [var_map[name] for name in c['coefs'].keys()]
+            expr_coefs = [float(coef) for coef in c['coefs'].values()]
+            expr = LinearExpression(expr_vars, expr_coefs, 0.0)
+            rhs = float(c['rhs'])
+            sense = c.get('sense', 'G')
+            name = c.get('name') or ''
+            if sense == 'L':
+                model.addConstraint(expr <= rhs, name=name)
+            elif sense == 'E':
+                model.addConstraint(expr == rhs, name=name)
+            else:
+                model.addConstraint(expr >= rhs, name=name)
+
+        return model
+
     def add_cut(self, cut, name=None) -> None:
         expr = sum(coef * self._vars_map[var] for var, coef in zip(cut.vars, cut.coefs))
 
@@ -355,16 +473,32 @@ class Cuopt(SolverBase):
 
     @classmethod
     def batch_solve(cls, instances: list['Cuopt'], solver_options: dict = None) -> None:
-        """Solve a list of Cuopt subproblem instances concurrently on the GPU using cuOpt BatchSolve.
+        """Solve a list of Cuopt LP subproblem instances concurrently via cuOpt's ``BatchSolve``.
+
+        .. warning::
+            This relies on NVIDIA cuOpt's ``BatchSolve`` API, which
+            `NVIDIA has deprecated and scheduled for removal <https://github.com/NVIDIA/cuopt>`_
+            in a future release. Per NVIDIA's own documentation, it dispatches concurrent LP
+            solves across multiple **C++ threads** (not a single fused GPU kernel), and is
+            documented for **LP problems only**. If any instance's model is a MIP, this method
+            automatically falls back to sequential :meth:`solve` calls, matching NVIDIA's own
+            recommended migration path for when ``BatchSolve`` is removed.
 
         Parameters
-        ----------
+        ---------------
         instances : list[Cuopt]
-            List of Cuopt solver instances to solve simultaneously.
+            List of Cuopt solver instances to solve. All must have LP (non-MIP) models to use
+            the batched code path; if any is a MIP, this falls back to sequential solving.
         solver_options : dict, optional
-            Solver options to override default settings.
+            Solver options to override default settings for the batch.
         """
         if not instances:
+            return
+
+        # cuOpt's BatchSolve is documented for LP only; fall back safely for MIP models.
+        if any(getattr(inst.model, 'IsMIP', False) for inst in instances):
+            for inst in instances:
+                inst.solve()
             return
 
         from cuopt.linear_programming.solver import BatchSolve
@@ -388,7 +522,11 @@ class Cuopt(SolverBase):
                 inst.model._to_data_model()
             data_models.append(inst.model.model)
 
-        solutions, _ = BatchSolve(data_models, settings)
+        # Suppress NVIDIA's known BatchSolve DeprecationWarning; the risk is documented above
+        # and in BendersParams.batch_sub, rather than re-emitted on every Benders iteration.
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", message=".*BatchSolve.*", category=DeprecationWarning)
+            solutions, _ = BatchSolve(data_models, settings)
 
         for inst, sol in zip(instances, solutions):
             inst.model.populate_solution(sol)

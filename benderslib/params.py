@@ -131,12 +131,23 @@ class BendersParams:
     parallel subproblem solving. If set to ``-1``, BendersLib will determine 
     the number of threads to use based on the available CPU cores.
     """
-    batch_sub: bool = True
-    """**[L-shaped method / GPU Solving]** Whether to solve subproblems in a single GPU batch when supported.
-    
-    If ``True`` and all subproblems use a batch-capable solver backend (such as :class:`~benderslib.solvers.Cuopt`),
-    all subproblems in :class:`~benderslib.SubProblems` are solved simultaneously using GPU batch LP execution.
-    If ``False``, subproblems are solved sequentially or via CPU threads.
+    batch_sub: bool = False
+    """**[L-shaped method / cuOpt GPU Solving]** Whether to solve LP subproblems via cuOpt's batch solve API.
+
+    If ``True`` and all subproblems use a batch-capable solver backend (such as :class:`~benderslib.solvers.Cuopt`
+    with **all-LP** subproblems), all subproblems in :class:`~benderslib.SubProblems` are dispatched together
+    via the solver backend's ``batch_solve`` classmethod.
+    If ``False`` (default), subproblems are solved sequentially or via CPU threads (:attr:`~BendersParams.parallel_sub`).
+
+    .. warning::
+        For :class:`~benderslib.solvers.Cuopt`, this relies on NVIDIA cuOpt's ``BatchSolve`` API, which
+        `is deprecated and scheduled for removal by NVIDIA <https://github.com/NVIDIA/cuopt>`_
+        in a future cuOpt release. It runs concurrent LPs on multiple C++ threads rather than a fused
+        GPU kernel, and is **not supported for MIP subproblems**
+        (e.g. in :class:`~benderslib.IntegerLShaped`) — BendersLib automatically falls back to
+        sequential solving if any subproblem is a MIP. This parameter defaults to ``False`` and is
+        opt-in because of this upstream deprecation; monitor cuOpt release notes before relying on it
+        in production.
     """
 
     # Combinatorial Benders

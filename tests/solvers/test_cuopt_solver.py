@@ -90,6 +90,32 @@ class TestCuopt(BaseTestSolver):
         assert approx(c2.get_obj(), 10.0, atol=1e-5)
         assert approx(c3.get_obj(), 26.0, atol=1e-5)
 
+    def test_batch_solve_mip_fallback(self):
+        """MIP instances must fall back to sequential solving (cuOpt BatchSolve is LP-only)."""
+        from numpy.ma.testutils import approx
+        from benderslib import BendersConsts as CST
+        from cuopt.linear_programming.problem import INTEGER
+
+        # LP: min 3*x1 + 3*x2 s.t. x1 + 2*x2 >= 6, 2*x1 + x2 >= 6 -> obj = 12
+        p1 = _build_test_problem()
+
+        # MIP: min x s.t. x >= 2.5, x integer -> obj = 3 (an LP relaxation would give 2.5)
+        p2 = Problem("BatchMIP")
+        x = p2.addVariable(lb=0.0, vtype=INTEGER, name="x")
+        p2.addConstraint(x >= 2.5, name="c1")
+        p2.setObjective(1.0 * x, sense=MINIMIZE)
+
+        c1 = Cuopt(p1)
+        c2 = Cuopt(p2)
+
+        # Mixed LP/MIP batch must fall back to sequential solve, not produce LP-relaxation answers
+        Cuopt.batch_solve([c1, c2])
+
+        assert c1.status == CST.OPTIMAL
+        assert c2.status == CST.OPTIMAL
+        assert approx(c1.get_obj(), 12.0, atol=1e-5)
+        assert approx(c2.get_obj(), 3.0, atol=1e-5)
+
     def test_lshaped_stochastic_batch_gpu(self):
         """Test Two-Stage Stochastic L-shaped method with GPU batch subproblems."""
         from benderslib import MasterProblem, SubProblem, SubProblems, LShaped, BendersConsts as CST
@@ -104,6 +130,89 @@ class TestCuopt(BaseTestSolver):
 
         # Second stage (Subproblems for 3 scenarios with demands [10, 20, 30]):
         # Scenario s: min 5 * shortage s.t. shortage >= demand_s - x, shortage >= 0
+        demands = [10.0, 20.0, 30.0]
+        sub_list = []
+        for s, d in enumerate(demands):
+            sp = Problem(f"SubStage_{s}")
+            x_sub = sp.addVariable(lb=0.0, ub=50.0, vtype=CONTINUOUS, name="x")
+            shortage = sp.addVariable(lb=0.0, vtype=CONTINUOUS, name="shortage")
+            sp.addConstraint(shortage + x_sub >= d, name=f"demand_c_{s}")
+            sp.setObjective(5.0 * shortage, sense=MINIMIZE)
+            sub_list.append(SubProblem(Cuopt(sp)))
+
+        sub_problems = SubProblems(sub_list, prob=[1/3, 1/3, 1/3])
+
+        L = LShaped(
+            master_problem=master,
+            sub_problem=sub_problems,
+            complicating_vars=["x"],
+        )
+        L.params.batch_sub = True
+        L.params.multi_optim_cut = True
+        L.solve()
+
+        assert L.result.status == CST.OPTIMAL
+        assert 0 in L.result.solution
+        assert "x" in L.result.solution[0]
+        assert round(L.result.solution[0]["x"]) == 20
+        assert round(L.result.obj, 2) == 56.67
+
+    def test_annotated_benders_hybrid_master_solver(self):
+        """Test AnnotatedBenders master_solver API: cuOpt subproblems + SCIP master MILP."""
+        from benderslib import AnnotatedBenders, ClassicalBenders, BendersConsts as CST
+        from cuopt.linear_programming.problem import INTEGER
+
+        try:
+            from benderslib.solvers import Scip
+        except ImportError:
+            pytest.skip("pyscipopt is not installed")
+
+        # min 3*x + 4*y s.t. x + y >= 15, 2x + 5y >= 30, x binary -> obj = 59 (at x=1, y=14)
+        # (x=0 forces y >= 15 -> obj = 60)
+        p = Problem("HybridExample")
+        x = p.addVariable(lb=0.0, ub=1.0, vtype=INTEGER, name="x")
+        y = p.addVariable(lb=0.0, vtype=CONTINUOUS, name="y")
+        p.addConstraint(x + y >= 15.0, name="c1")
+        p.addConstraint(2.0 * x + 5.0 * y >= 30.0, name="c2")
+        p.setObjective(3.0 * x + 4.0 * y, sense=MINIMIZE)
+
+        # Hybrid: subproblems on cuOpt, master MILP rebuilt on SCIP via model exchange
+        BD = AnnotatedBenders(
+            p,
+            solver=Cuopt,
+            master_solver=Scip,
+            complicating_vars=["x"],
+            benders=ClassicalBenders,
+        )
+
+        # The master problem must be backed by SCIP after the exchange
+        assert BD.master_problem.solver.__class__.__name__ == "Scip"
+
+        BD.solve()
+
+        assert BD.result.status == CST.OPTIMAL
+        assert round(BD.result.obj, 2) == 59.0
+        assert "x" in BD.result.solution
+        assert round(BD.result.solution["x"], 5) == 1.0
+
+    def test_lshaped_stochastic_hybrid_scip_master(self):
+        """Test hybrid L-shaped: SCIP master MILP + cuOpt batched LP subproblems."""
+        from benderslib import MasterProblem, SubProblem, SubProblems, LShaped, BendersConsts as CST
+
+        try:
+            from pyscipopt import Model as ScipModel
+            from benderslib.solvers import Scip
+        except ImportError:
+            pytest.skip("pyscipopt is not installed")
+
+        # First stage (Master Problem, SCIP MILP): decide capacity x in [0, 50]
+        # min 2 * x
+        m_prob = ScipModel("MasterFirstStage")
+        x = m_prob.addVar(lb=0.0, ub=50.0, vtype="INTEGER", name="x")
+        m_prob.setObjective(2.0 * x, "minimize")
+        master = MasterProblem(Scip(m_prob))
+
+        # Second stage (cuOpt LP subproblems for 3 scenarios with demands [10, 20, 30])
         demands = [10.0, 20.0, 30.0]
         sub_list = []
         for s, d in enumerate(demands):

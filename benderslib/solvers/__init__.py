@@ -43,6 +43,21 @@ def _create_placeholder_solver(name: str, install_message: str):
 
 
 try:
+    from ._cuopt import Cuopt
+except ImportError:  # pragma: no cover
+    Cuopt = _create_placeholder_solver(
+        "Cuopt",
+        "cuOpt requires Linux (or WSL2) with an NVIDIA GPU, CUDA 12/13, and Python 3.11+. "
+        "Install it via 'pip install cuopt-cu13'."
+    )
+
+# NOTE: cuOpt must be imported before COPT (and ideally before any other native solver
+# backend). If coptpy is imported into the process before cuopt, cuOpt's MIP solver
+# segfaults on the very first solve (a native library incompatibility between the
+# coptpy and cuopt wheels). This is a real, environment-level conflict — not a Python-level
+# bug — so the safest general defense is to always import cuOpt first.
+
+try:
     from ._gurobi import Gurobi
 except ImportError:  # pragma: no cover
     Gurobi = _create_placeholder_solver("Gurobi", "Install it via 'pip install gurobipy'.")
@@ -56,6 +71,16 @@ try:
     from ._pyomo import Pyomo
 except ImportError:  # pragma: no cover
     Pyomo = _create_placeholder_solver("Pyomo", "Install it via 'pip install pyomo'.")
+except Exception as _pyomo_err:  # pragma: no cover
+    # Some Pyomo releases (e.g. 6.10.x) ship a solver plugin that eagerly probes for cuOpt
+    # and crashes with a NameError if cuopt is already imported at that point (a bug in
+    # Pyomo's own pyomo.solvers.plugins.solvers.cuopt_direct module, not a BendersLib issue).
+    Pyomo = _create_placeholder_solver(
+        "Pyomo",
+        f"Pyomo failed to import ({_pyomo_err.__class__.__name__}: {_pyomo_err}). "
+        "This may be caused by a known Pyomo/cuOpt co-installation bug; try importing "
+        "'pyomo.environ' before 'benderslib', or use a different Pyomo version."
+    )
 
 try:
     from ._scip import Scip
@@ -76,15 +101,6 @@ try:
     from ._cplexcp import CplexCP
 except ImportError:  # pragma: no cover
     CplexCP = _create_placeholder_solver("CplexCP", "Install it via 'pip install docplex'.")
-
-try:
-    from ._cuopt import Cuopt
-except ImportError:  # pragma: no cover
-    Cuopt = _create_placeholder_solver(
-        "Cuopt",
-        "cuOpt requires Linux (or WSL2) with an NVIDIA GPU, CUDA 12/13, and Python 3.11+. "
-        "Install it via 'pip install cuopt-cu13'."
-    )
 
 __all__ = [
     "SolverBase",

@@ -768,6 +768,88 @@ class SubProblems:
         self.status = CST.UNSOLVED
         """The status of the problem (see :class:`BendersConsts` for possible values)."""
 
+    @classmethod
+    def from_models(
+            cls,
+            models: Iterable,
+            solver: Type[SolverBase],
+            batch_solver: Type[SolverBase] | None = None,
+            prob: list[float] | None = None,
+            params: BendersParams | None = None,
+            solver_kwargs: dict | None = None,
+    ) -> 'SubProblems':
+        """Build a :class:`SubProblems` collection from a list of native subproblem models,
+        optionally converting them to a different (batch-capable) solver backend.
+
+        This is the recommended way to combine "model everything in your framework of choice"
+        with GPU batch LP solving: build each scenario subproblem in any backend that
+        implements :meth:`~benderslib.solvers.SolverBase.to_structured` (e.g., Gurobi, COPT,
+        Pyomo, SCIP), and pass ``batch_solver=Cuopt`` to have them converted and solved
+        together on the GPU via cuOpt's batch LP API.
+
+        Parameters
+        ---------------
+        models : Iterable
+            A list of subproblem models (one per scenario), in ``solver``'s native format.
+        solver : Type[SolverBase]
+            The solver class the models in ``models`` are built with.
+        batch_solver : Type[SolverBase], optional
+            A *different*, batch-capable solver class (e.g., :class:`~benderslib.solvers.Cuopt`)
+            to convert and solve the subproblems with. Each model is converted via the
+            cross-backend model exchange (:meth:`~benderslib.solvers.SolverBase.to_structured` /
+            :meth:`~benderslib.solvers.SolverBase.from_structured`). If not provided (default),
+            the subproblems are kept in ``solver``'s native format.
+
+            .. note::
+                ``batch_solver`` must implement :meth:`~benderslib.solvers.SolverBase.from_structured`,
+                and ``solver`` must implement :meth:`~benderslib.solvers.SolverBase.to_structured`.
+        prob : list[float], optional
+            A list of probabilities (weights) associated with each subproblem (see :class:`SubProblems`).
+        params : BendersParams, optional
+            Parameters for the collection. If not provided, default parameters are used.
+            When ``batch_solver`` is used, :attr:`~benderslib.BendersParams.batch_sub` is
+            automatically set to ``True``.
+        solver_kwargs : dict, optional
+            Extra keyword arguments forwarded when wrapping each model with ``solver``
+            (e.g., ``{'solver': 'gurobi'}`` for :class:`~benderslib.solvers.Pyomo`, whose
+            constructor requires a backend solver name).
+
+        Returns
+        ---------------
+        SubProblems
+
+        Example
+        ---------------
+        .. code-block:: python
+
+            from benderslib import SubProblems
+            from benderslib.solvers import Gurobi, Cuopt
+
+            scenario_models = [...]  # one gurobipy.Model per scenario
+
+            sub_problems = SubProblems.from_models(
+                scenario_models,
+                solver=Gurobi,
+                batch_solver=Cuopt,  # convert & solve all scenario LPs on the GPU in one batch
+                prob=scenario_probabilities,
+            )
+        """
+        solver_kwargs = solver_kwargs or {}
+        convert = batch_solver is not None and batch_solver is not solver
+
+        sub_list = []
+        for m in models:
+            wrapped = solver(m, **solver_kwargs)
+            if convert:
+                wrapped = batch_solver(batch_solver.from_structured(wrapped.to_structured()))
+            sub_list.append(SubProblem(wrapped))
+
+        params = params if params is not None else BendersParams()
+        if convert:
+            params.batch_sub = True
+
+        return cls(sub_list, prob=prob, params=params)
+
     def __repr__(self):
         return (
             f"Sub Problems: \n"
@@ -864,6 +946,34 @@ class SubProblems:
             self.status = CST.UNKNOWN
             raise UnexpectedSubStatusError(status=[sub.status for sub in self.sub_problems])
 
+    def __can_batch_solve(self) -> bool:
+        """Check whether all subproblems can be dispatched via a single ``batch_solve`` call.
+
+        Requires: :attr:`BendersParams.batch_sub` is ``True``, more than one subproblem,
+        all subproblems share the same batch-capable solver class, and none of the
+        underlying models are MIP (cuOpt's ``BatchSolve`` is documented for LP only;
+        see :attr:`BendersParams.batch_sub`).
+        """
+        if not getattr(self.params, 'batch_sub', False):
+            return False
+        if len(self.sub_problems) <= 1:
+            return False
+
+        solvers = [getattr(sub, 'solver', None) for sub in self.sub_problems]
+        first_cls = type(solvers[0])
+        if not all(type(s) is first_cls for s in solvers):
+            return False
+        if not hasattr(first_cls, 'batch_solve'):
+            return False
+
+        # Guard: cuOpt BatchSolve is documented/tested for LP subproblems only.
+        for s in solvers:
+            model = getattr(s, 'model', None)
+            if getattr(model, 'IsMIP', False):
+                return False
+
+        return True
+
     def solve(self) -> None:
         """Solve all subproblems and update the :attr:`status` attribute.
 
@@ -872,10 +982,9 @@ class SubProblems:
 
         It is used by the :meth:`~BendersSolver.solve` method.
         """
-        # Batch solve on GPU when supported (e.g. cuOpt GPU Batch LP) and enabled
-        if getattr(self.params, 'batch_sub', True) and len(self.sub_problems) > 1 and all(
-            hasattr(getattr(sub, 'solver', None), 'batch_solve') for sub in self.sub_problems
-        ):
+        # Batch solve via solver backend's batch_solve classmethod when supported and enabled
+        # (see BendersParams.batch_sub for supported backends and limitations).
+        if self.__can_batch_solve():
             first_solver = self.sub_problems[0].solver
             first_solver.batch_solve([sub.solver for sub in self.sub_problems])
             for sub in self.sub_problems:
