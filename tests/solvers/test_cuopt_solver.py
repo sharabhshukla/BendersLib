@@ -126,5 +126,8 @@ class TestCuopt(BaseTestSolver):
         L.solve()
 
         assert L.result.status == CST.OPTIMAL
-        assert "x" in L.result.solution
+        assert 0 in L.result.solution
+        assert "x" in L.result.solution[0]
+        assert round(L.result.solution[0]["x"]) == 20
+        assert round(L.result.obj, 2) == 56.67
 
