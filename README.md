@@ -128,6 +128,61 @@ Objective: 45.0
 Solution: {'x': 15.0, 'y': 0.0}
 ```
 
+### GPU-Accelerated Solving with NVIDIA cuOpt
+
+BendersLib supports GPU-accelerated solving using [NVIDIA cuOpt](https://github.com/NVIDIA/cuopt) for LP and MILP problems.
+
+#### Requirements
+- **OS**: Linux or Windows Subsystem for Linux (WSL2)
+- **GPU**: NVIDIA GPU with Volta architecture or newer (Compute Capability ≥ 7.0)
+- **CUDA**: CUDA 12.x or 13.x
+- **Python**: Python ≥ 3.11
+
+#### Installation
+
+To install in an external project directly from this branch:
+
+```bash
+# Using pip directly
+pip install "benderslib[cuopt] @ git+https://github.com/sharabhshukla/BendersLib.git@cuda-cuopt-cu13"
+```
+
+Or add to your `requirements.txt`:
+```text
+benderslib[cuopt] @ git+https://github.com/sharabhshukla/BendersLib.git@cuda-cuopt-cu13
+```
+
+*(Once merged and released to PyPI, standard `pip install "benderslib[cuopt]"` will be supported).*
+
+#### Quick Example with cuOpt
+
+```python
+from benderslib import AnnotatedBenders, ClassicalBenders
+from benderslib.solvers import Cuopt
+from cuopt.linear_programming.problem import Problem, CONTINUOUS, INTEGER, MINIMIZE
+
+# Build problem with native cuOpt Python API
+problem = Problem("cuopt_example")
+x = problem.addVariable(lb=0.0, ub=1.0, vtype=INTEGER, name="x")
+y = problem.addVariable(lb=0.0, vtype=CONTINUOUS, name="y")
+
+problem.addConstraint(x + y >= 15.0, name="c1")
+problem.addConstraint(2.0 * x + 5.0 * y >= 30.0, name="c2")
+problem.setObjective(3.0 * x + 4.0 * y, sense=MINIMIZE)
+
+# Solve with BendersLib on GPU
+benders = AnnotatedBenders(
+    problem,
+    solver=Cuopt,
+    complicating_vars=["x"],
+    benders=ClassicalBenders
+)
+benders.solve()
+
+print(f"Objective: {benders.result.obj}")
+print(f"Solution: {benders.result.solution}")
+```
+
 More examples are available at https://benders.dev/examples.
 
 ## License
