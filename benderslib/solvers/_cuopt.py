@@ -353,6 +353,48 @@ class Cuopt(SolverBase):
         status_name = self.model.Status.name if hasattr(self.model.Status, 'name') else str(self.model.Status)
         self._update_status('CUOPT', status_name)
 
+    @classmethod
+    def batch_solve(cls, instances: list['Cuopt'], solver_options: dict = None) -> None:
+        """Solve a list of Cuopt subproblem instances concurrently on the GPU using cuOpt BatchSolve.
+
+        Parameters
+        ----------
+        instances : list[Cuopt]
+            List of Cuopt solver instances to solve simultaneously.
+        solver_options : dict, optional
+            Solver options to override default settings.
+        """
+        if not instances:
+            return
+
+        from cuopt.linear_programming.solver import BatchSolve
+
+        first_inst = instances[0]
+        settings = SolverSettings()
+        _options = first_inst._options.get('CUOPT_OPTIONS', {}).copy()
+        if solver_options:
+            _options.update(solver_options)
+
+        for option, value in _options.items():
+            try:
+                settings.set_parameter(option, value)
+            except Exception:
+                pass
+
+        data_models = []
+        for inst in instances:
+            _invalidate(inst.model)
+            if inst.model.model is None:
+                inst.model._to_data_model()
+            data_models.append(inst.model.model)
+
+        solutions, _ = BatchSolve(data_models, settings)
+
+        for inst, sol in zip(instances, solutions):
+            inst.model.populate_solution(sol)
+            status_name = inst.model.Status.name if hasattr(inst.model.Status, 'name') else str(inst.model.Status)
+            inst._update_status('CUOPT', status_name)
+
     def _bnc_solve(self, callback_handler) -> None:
         raise BendersNotImplementedError(
             "Branch-and-check lazy constraint callbacks are not currently supported by the cuOpt solver backend. "

@@ -131,6 +131,13 @@ class BendersParams:
     parallel subproblem solving. If set to ``-1``, BendersLib will determine 
     the number of threads to use based on the available CPU cores.
     """
+    batch_sub: bool = True
+    """**[L-shaped method / GPU Solving]** Whether to solve subproblems in a single GPU batch when supported.
+    
+    If ``True`` and all subproblems use a batch-capable solver backend (such as :class:`~benderslib.solvers.Cuopt`),
+    all subproblems in :class:`~benderslib.SubProblems` are solved simultaneously using GPU batch LP execution.
+    If ``False``, subproblems are solved sequentially or via CPU threads.
+    """
 
     # Combinatorial Benders
 

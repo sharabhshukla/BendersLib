@@ -872,6 +872,17 @@ class SubProblems:
 
         It is used by the :meth:`~BendersSolver.solve` method.
         """
+        # Batch solve on GPU when supported (e.g. cuOpt GPU Batch LP) and enabled
+        if getattr(self.params, 'batch_sub', True) and len(self.sub_problems) > 1 and all(
+            hasattr(getattr(sub, 'solver', None), 'batch_solve') for sub in self.sub_problems
+        ):
+            first_solver = self.sub_problems[0].solver
+            first_solver.batch_solve([sub.solver for sub in self.sub_problems])
+            for sub in self.sub_problems:
+                sub.status = sub.solver.status
+            self.__update_status()
+            return
+
         if self.params.parallel_sub:
             return self.prl_solve()
 
