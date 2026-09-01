@@ -51,11 +51,29 @@ config = {
         'preprocessing.presolve': 0,  # Parameters for obtaining Farkas certificate
         'lpmethod': 2,  # Parameters for obtaining Farkas certificate
     },
+    'CUOPT_OPTIONS': {
+        'log_to_console': 0,  # Hide solver output
+        'method': 2,  # Use Dual Simplex (SolverMethod.DualSimplex) for exact duals and Farkas rays
+    },
     'STATUS_CODES': {
         'COPT': {
             1: 'OPTIMAL',
             2: 'INFEASIBLE',
             3: 'UNBOUNDED',
+        },
+        'CUOPT': {
+            'Optimal': 'OPTIMAL',
+            'PrimalFeasible': 'OPTIMAL',
+            'FeasibleFound': 'OPTIMAL',
+            'PrimalInfeasible': 'INFEASIBLE',
+            'Infeasible': 'INFEASIBLE',
+            'DualInfeasible': 'UNBOUNDED',
+            'Unbounded': 'UNBOUNDED',
+            'UnboundedOrInfeasible': 'UNBOUNDED',
+            'TimeLimit': 'TIMEOUT',
+            'IterationLimit': 'TIMEOUT',
+            'NumericalError': 'ERROR',
+            'NoTermination': 'UNKNOWN',
         },
         'CPLEX': {
             1: 'OPTIMAL',

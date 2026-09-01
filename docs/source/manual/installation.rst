@@ -128,6 +128,10 @@ Please refer to :ref:`solver-table` for solver features and license requirements
       - ``pip install docplex``
       - ``conda install ibmdecisionoptimization::docplex``
       - `Install <https://www.ibm.com/docs/en/icos/22.1.2?topic=cplex-installing>`__ [1]_
+    * - **cuOpt**
+      - ``pip install cuopt-cu13``
+      - ``conda install -c rapidsai -c conda-forge -c nvidia cuopt``
+      - `Install <https://docs.nvidia.com/cuopt/user-guide/latest/installation.html>`__
     * - **Gurobi**
       - ``pip install gurobipy``
       - ``conda install gurobi::gurobi``

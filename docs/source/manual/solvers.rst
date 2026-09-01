@@ -82,6 +82,14 @@ A Benders decomposition variant usually require one or two features to work prop
       - ✅
       - ❌
       - Commercial
+    * - **cuOpt** [5]_
+      - :class:`~.solvers.Cuopt`
+      - `Doc <https://docs.nvidia.com/cuopt/user-guide/latest/introduction.html>`__
+      - ✅
+      - 🟨 [6]_
+      - ❌
+      - ❌
+      - Open-source
     * - **Gurobi**
       - :class:`~.solvers.Gurobi`
       - `Doc <https://docs.gurobi.com>`__
@@ -214,6 +222,11 @@ A Benders decomposition variant usually require one or two features to work prop
        `installation instruction <https://pyomo.readthedocs.io/en/stable/getting_started/solvers.html>`_ *(by Pyomo),*
        *and* `supported solvers <https://github.com/Pyomo/pyomo/tree/main/pyomo/solvers/plugins/solvers>`_.
 .. [4] *Using* `Minimal Intractable System (MIS) Finder <https://pyomo.readthedocs.io/en/stable/api/pyomo.contrib.iis.mis.html>`_.
+.. [5] *NVIDIA cuOpt is a GPU-accelerated LP/MILP solver. It requires a Linux system (or WSL2) with an
+       NVIDIA GPU (Volta or newer), CUDA 12/13, and Python 3.11+.*
+.. [6] *cuOpt does not expose Farkas certificates directly.*
+       :class:`~.solvers.Cuopt` *derives extreme rays by solving an auxiliary elastic (phase-1) LP on the GPU,
+       which yields valid classical feasibility cuts at the cost of one extra LP solve per infeasible subproblem.*
 
 .. Nonlinear Solvers: IPOPT, Minotaur, Baron, KNITRO
 .. CP Solvers: Xpress Kalis, python-constraint, Z3, via MiniZinc (https://docs.minizinc.dev/en/stable/solvers.html)
@@ -332,6 +345,7 @@ which internally utilize the solver interfaces to interact with the optimization
             Pyomo
             Scip
             Cplex
+            Cuopt
         end
 
         subgraph "Constraint Programming"
@@ -344,6 +358,7 @@ which internally utilize the solver interfaces to interact with the optimization
         Pyomo -- inherits --> SolverBase
         Scip -- inherits --> SolverBase
         Cplex -- inherits --> SolverBase
+        Cuopt -- inherits --> SolverBase
         Ortools -- inherits --> SolverCPBase
         CplexCP -- inherits --> SolverCPBase
 

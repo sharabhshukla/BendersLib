@@ -77,6 +77,15 @@ try:
 except ImportError:  # pragma: no cover
     CplexCP = _create_placeholder_solver("CplexCP", "Install it via 'pip install docplex'.")
 
+try:
+    from ._cuopt import Cuopt
+except ImportError:  # pragma: no cover
+    Cuopt = _create_placeholder_solver(
+        "Cuopt",
+        "cuOpt requires Linux (or WSL2) with an NVIDIA GPU, CUDA 12/13, and Python 3.11+. "
+        "Install it via 'pip install cuopt-cu13'."
+    )
+
 __all__ = [
     "SolverBase",
     "SolverCPBase",
@@ -87,4 +96,5 @@ __all__ = [
     "Cplex",
     "Ortools",
     "CplexCP",
+    "Cuopt",
 ]
