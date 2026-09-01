@@ -181,6 +181,55 @@ def test_subproblems_from_models_batch():
     assert round(L.result.obj, 2) == 56.67
 
 
+@pytest.mark.skipif(
+    not (cuopt_available and scip_available),
+    reason="cuOpt or SCIP is not installed",
+)
+def test_subproblems_from_models_batch_scip_models():
+    """SubProblems.from_models(): pyscipopt-built scenario LPs batch-solved via cuOpt."""
+    from benderslib import MasterProblem, SubProblems, LShaped
+
+    # Master problem (SCIP MILP): decide capacity x in [0, 50], min 2*x
+    m_prob = ScipModel("MasterFirstStage")
+    x = m_prob.addVar(lb=0.0, ub=50.0, vtype="INTEGER", name="x")
+    m_prob.setObjective(2.0 * x, "minimize")
+    master = MasterProblem(Scip(m_prob))
+
+    # Scenario subproblems built with PYSCIPOPT: min 5*shortage s.t. shortage + x >= d
+    demands = [10.0, 20.0, 30.0]
+    sub_models = []
+    for s, d in enumerate(demands):
+        sp = ScipModel(f"SubStage_{s}")
+        x_sub = sp.addVar(lb=0.0, ub=50.0, vtype="CONTINUOUS", name="x")
+        shortage = sp.addVar(lb=0.0, vtype="CONTINUOUS", name="shortage")
+        sp.addCons(shortage + x_sub >= d, name=f"demand_c_{s}")
+        sp.setObjective(5.0 * shortage, "minimize")
+        sub_models.append(sp)
+
+    sub_problems = SubProblems.from_models(
+        sub_models, solver=Scip, batch_solver=Cuopt, prob=[1 / 3, 1 / 3, 1 / 3],
+    )
+
+    # batch_sub should be auto-enabled since a conversion happened
+    assert sub_problems.params.batch_sub is True
+    # each subproblem should now be backed by Cuopt after conversion
+    assert all(sp.solver.__class__.__name__ == "Cuopt" for sp in sub_problems.sub_problems)
+
+    L = LShaped(
+        master_problem=master,
+        sub_problem=sub_problems,
+        complicating_vars=["x"],
+    )
+    L.params.multi_optim_cut = True
+    L.solve()
+
+    assert L.result.status == CST.OPTIMAL
+    assert 0 in L.result.solution
+    assert "x" in L.result.solution[0]
+    assert round(L.result.solution[0]["x"]) == 20
+    assert round(L.result.obj, 2) == 56.67
+
+
 @pytest.mark.skipif(not (cuopt_available and gurobi_available), reason="cuOpt or Gurobi is not installed")
 def test_annotated_benders_sub_solver():
     """AnnotatedBenders sub_solver API: Gurobi master + cuOpt subproblem."""
